@@ -1,0 +1,36 @@
+---
+title: 'Rate-limiting a public inference endpoint'
+description: 'A public page that runs real LLM calls is an open wallet. The blast-radius cap: cheap models only, capped per IP, on KV.'
+date: 2026-03-18
+pillar: 'Backend & AI systems'
+tags: ['edge', 'security', 'cloudflare', 'kv']
+readingTime: '7 min'
+draft: false
+---
+
+> **Draft.** TODO: expand with the real limiter code and a load-test chart.
+
+Exposing real inference on a public, no-auth page is a standing invitation to run up
+someone else's bill. Before that endpoint gets a launch tweet, it gets a **rate
+limit and a kill switch** — cap the blast radius first.
+
+## The cap
+
+Three rules, in order of importance:
+
+1. **Cheap models only.** The live catalog never includes an expensive tier, so the
+   worst case is bounded by construction.
+2. **Per-IP limit.** Five routes per minute, tracked in a fixed window on
+   Cloudflare KV.
+3. **Demo by default.** Live mode is opt-in; the common path costs nothing.
+
+```ts
+const rl = await checkRateLimit(env.RL, ip); // 5/min fixed window in KV
+if (!rl.ok) return json({ error: 'rate-limited', retryAfter: rl.retryAfter }, 429);
+```
+
+## Why KV
+
+KV has no atomic increment, so the counter can race — but for a soft 5/min limit on
+cheap models, the small over-count is irrelevant next to the operational simplicity.
+TODO: note the trade vs. Durable Objects for stricter limits.

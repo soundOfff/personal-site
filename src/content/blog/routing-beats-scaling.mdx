@@ -1,0 +1,40 @@
+---
+title: 'Routing beats scaling: a cost study'
+description: 'Most LLM calls do not need the biggest model. Six weeks of production traffic, charted — and what classify-then-dispatch actually saved.'
+date: 2026-05-12
+pillar: 'Backend & AI systems'
+tags: ['routing', 'llm', 'cost', 'evals']
+readingTime: '9 min'
+draft: false
+---
+
+> **Draft.** TODO: replace the placeholder numbers below with the real production
+> figures from the Dex router before publishing.
+
+The default instinct when an LLM feature is too slow or too expensive is to reach
+for a bigger budget — more tokens, a larger model, a higher tier. The cheaper move
+is almost always to **route**: classify the request, then dispatch it to the
+smallest model that still clears the eval bar.
+
+## The setup
+
+We sat a classify-then-dispatch router in front of three providers — OpenAI, Groq
+and OpenRouter — and let it pick per request.
+
+```ts
+const cls = classify(prompt); // extractive | structured | reasoning | creative
+const model = cheapestThatClears(cls); // walk the catalog, cheapest first
+const result = await dispatch(model, prompt);
+```
+
+## What it saved
+
+TODO: the real chart. The headline: a large share of traffic was extractive or
+short-form, which the smallest model handles for a fraction of the cost — with no
+measurable quality regression on the evals that gate each class.
+
+## The catch
+
+Routing only works if your evals are honest. If a class's bar is too low, you ship
+quality regressions invisibly. That is why [evals are contracts](/blog/rate-limiting-inference) —
+the routing decision is only as trustworthy as the test that gates it.

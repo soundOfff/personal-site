@@ -1,0 +1,29 @@
+---
+title: 'Why a static site shows a dynamic demo'
+description: 'This site ships near-zero JavaScript and still runs real inference on demand. How the island + serverless split works.'
+date: 2026-04-03
+pillar: 'Build logs'
+tags: ['astro', 'architecture', 'islands', 'cloudflare']
+readingTime: '6 min'
+draft: false
+---
+
+> **Draft.** TODO: flesh out with the real build notes from this repo.
+
+A portfolio for a backend engineer should be fast — a technical audience notices.
+So the whole site is **static Astro**, shipping almost no JavaScript. But the hook
+is a _live_ multi-LLM router, which is anything but static.
+
+## The split
+
+Everything is prerendered HTML except one **React island** (the Playground) and one
+**on-demand route** (the live endpoint). The island hydrates only when scrolled
+into view; the endpoint runs as a Cloudflare Worker that holds the provider keys.
+
+## Demo by default
+
+The island defaults to **demo mode**: pre-recorded fixtures, bundled, free, and
+abuse-proof. Live mode is opt-in and rate-limited. The page is fully interactive
+before any network call — the demo is the product; the live call is the flourish.
+
+TODO: diagram the request path (island → Worker → provider → island).
