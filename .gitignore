@@ -1,0 +1,40 @@
+# build output
+dist/
+.output/
+
+# astro
+.astro/
+
+# cloudflare / wrangler
+.wrangler/
+worker-configuration.d.ts
+
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# secrets & local env (NEVER commit provider keys)
+.dev.vars
+.env
+.env.*
+!.env.example
+!.dev.vars.example
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor / os
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+Thumbs.db
