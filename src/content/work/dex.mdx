@@ -1,0 +1,43 @@
+---
+n: '01'
+title: 'Dex — multi-LLM routing'
+description: 'Classify-then-dispatch in front of OpenAI, Groq and OpenRouter, balancing latency, cost and quality. The system this playground demonstrates.'
+stack: 'Routing · evals'
+year: '2025'
+code: false
+draft: false
+---
+
+> **Draft — narrative only.** Dex is employer work, so this is a written account with
+> no proprietary code. TODO: confirm the figures and tighten the story before publishing.
+
+## Problem
+
+A product feature was making one model do everything — the biggest, most expensive
+tier, on every request, regardless of how trivial the request was. Latency was uneven
+and the bill scaled linearly with usage, which made the feature hard to justify.
+
+## Architecture
+
+I put a **classify-then-dispatch router** in front of three providers. Each incoming
+prompt is classified, then dispatched to the cheapest model that clears that class's
+eval bar; harder classes escalate to larger models, with per-provider fallback.
+
+- **Classify** — bucket the request (extractive, structured, reasoning, creative).
+- **Dispatch** — walk a cost-ordered catalog, pick the first model that clears the bar.
+- **Gate** — every class has an eval contract; nothing ships that the eval doesn't pass.
+
+## The key tradeoff
+
+Routing is only as trustworthy as its evals. A bar set too low ships silent quality
+regressions; set too high, you never realise the savings. The work was less about the
+router and more about **writing honest evals** for each class — and keeping them green.
+
+## Outcome
+
+TODO: the real numbers. Directionally: most traffic was cheap-class and moved to the
+small models with no measurable quality loss, cutting inference spend substantially
+while tightening tail latency.
+
+You can [try the routing logic yourself](/#playground) — the playground runs the same
+classify-then-dispatch contract in demo and live modes.

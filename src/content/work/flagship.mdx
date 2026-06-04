@@ -1,0 +1,57 @@
+---
+n: '03'
+title: 'Flagship — router playground'
+description: 'The multi-LLM router on this page, built end to end with real code and a live demo. Case study #3, doubling as the hero.'
+stack: 'Astro · TS · serverless'
+year: '2026'
+code: true
+draft: false
+---
+
+Unlike Dex and Mint, the Flagship is **mine**, so it ships with the real code. It is the
+same multi-LLM router idea, rebuilt from scratch as a public, abuse-proof demo: a static
+Astro site with one React island and one serverless route.
+
+## Problem
+
+How do you let a recruiter _experience_ a routing system — real inference, real latency,
+real cost — on a public page, without handing the internet an uncapped LLM bill?
+
+## Architecture
+
+Two decisions carry it (see the [ADRs](https://github.com/soundOfff/personal-site/tree/main/docs/adr)):
+
+1. **Demo by default.** The Playground ships pre-recorded fixtures, served from the edge,
+   free and abuse-proof. The page is fully interactive before any network call.
+2. **Live mode behind a cap.** Opt-in live inference runs in a Cloudflare Worker that
+   holds the keys, classifies the prompt, and dispatches to the cheapest model that clears
+   the bar — capped at 5 routes/min/IP on cheap models only.
+
+The classifier and catalog are the whole trick — cheap models, cost-ordered:
+
+```ts
+export function classify(prompt: string): PromptClass {
+  const p = prompt.toLowerCase();
+  if (/\bjson\b|\bextract\b|as json|\bschema\b/.test(p)) return 'structured';
+  if (/stack trace|debug|root cause|explain|\bwhy\b/.test(p)) return 'reasoning';
+  if (/haiku|poem|story|write a/.test(p)) return 'creative';
+  return prompt.length > 280 ? 'reasoning' : 'extractive';
+}
+
+// pick the cheapest catalog entry that clears the class AND has a key configured
+for (const entry of CATALOG) {
+  if (entry.clears.includes(cls) && env[entry.keyName]) return entry;
+}
+```
+
+## The key tradeoff
+
+The blast-radius cap. KV has no atomic increment, so the per-IP limiter can race — but for
+a soft 5/min limit on cheap models, the small over-count is irrelevant next to the
+operational simplicity. **Cap the blast radius first; optimise the limiter never.**
+
+## Outcome
+
+A portfolio page that ships near-zero JavaScript, scores high on Lighthouse, and still runs
+real inference on demand — proving the [thesis](/) in the one place it counts: by letting
+you run the router yourself. [Try it.](/#playground)

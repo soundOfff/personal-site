@@ -1,0 +1,33 @@
+---
+n: '02'
+title: 'Mint — 2–3M-user scale'
+description: 'High-traffic e-commerce APIs serving 2–3M users — the backend that stayed correct and fast under real load.'
+stack: 'Backend · Postgres'
+year: '2023'
+code: false
+draft: false
+---
+
+> **Draft — narrative only.** Employer work; no proprietary code. TODO: confirm scale
+> figures, dates and the specific systems before publishing.
+
+## Problem
+
+E-commerce APIs serving a few million users have no quiet hours — traffic spikes are
+the normal case, and correctness under contention (inventory, carts, checkout) matters
+as much as raw throughput.
+
+## Architecture
+
+TODO: describe the real shape — the hot paths, where caching sat, how reads and writes
+were separated, and what kept checkout consistent under load.
+
+## The key tradeoff
+
+TODO: the honest tension — e.g. consistency vs. latency on the inventory path, or the
+cost of a cache layer vs. the database load it shed.
+
+## Outcome
+
+TODO: the result — uptime and latency under peak, and what the system let the business
+do that it couldn't before.
