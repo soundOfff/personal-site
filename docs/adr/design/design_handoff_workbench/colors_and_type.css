@@ -1,0 +1,109 @@
+/* ============================================================
+   FocusQuote — Colors & Type foundations
+   The authoritative low-level tokens. Import this (or focusquote.css,
+   which includes these) into any project to inherit the system.
+   ============================================================ */
+
+:root {
+  /* ---- Paper surfaces (background, lightest → recessed) ---- */
+  --paper:        #FBFAF6;  /* primary background */
+  --paper-2:      #F4F2EC;  /* recessed / banded sections, inputs in popup */
+  --paper-3:      #ECE9DF;  /* deepest paper — stage backdrops, wells */
+
+  /* ---- Ink (text, darkest → lightest) ---- */
+  --ink:          #1A1814;  /* body + headings */
+  --ink-2:        #3A362F;  /* secondary text, dense paragraphs */
+  --muted:        #807A6F;  /* mono labels, meta */
+  --muted-2:      #B5AEA0;  /* placeholders, disabled, companion to dividers */
+
+  /* ---- Hairlines ---- */
+  --rule:         #E5E0D5;  /* primary 1px divider */
+  --rule-2:       #D9D3C5;  /* heavier hairline — inputs, segmented borders */
+
+  /* ---- Brand amber (the ONE action color per surface) ---- */
+  --amber:        #F2A03C;
+  --amber-deep:   #C77A1F;
+  --amber-soft:   #FBE6C8;
+
+  /* ---- Status tints (soft callouts only, never primary actions) ---- */
+  --blue-soft:    #E0EBF1;  --blue-ink:  #2E5C73;  --blue-edge:  #BCD3DD;
+  --sage-soft:    #E1EBDF;  --sage-ink:  #4A6A47;  --sage-edge:  #C6D7C2;
+  --clay-soft:    #F2DDD3;  --clay-ink:  #A04B26;  --clay-edge:  #E8C7B7;
+
+  /* ---- Page / chrome (outside the popup) ---- */
+  --page:         #E9E7E1;
+  --popup-border: #DAD3C2;
+
+  /* ============================================================
+     TYPE — three families, one job each
+     ============================================================ */
+  --font-serif:  'Newsreader', 'Iowan Old Style', Georgia, serif;     /* display, titles, quotes */
+  --font-sans:   'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif; /* body, UI */
+  --font-mono:   'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;   /* labels, codes, numerals */
+
+  /* ---- Semantic type roles (size / weight / tracking) ---- */
+  /* Display — Newsreader 600, tight tracking */
+  --t-display-size:   38px;  --t-display-weight: 600;  --t-display-track: -0.02em;
+  --t-h1-size:        30px;  --t-h1-weight:     600;   --t-h1-track:    -0.02em;
+  --t-h2-size:        22px;  --t-h2-weight:     600;   --t-h2-track:    -0.01em;
+  --t-title-size:     16px;  --t-title-weight:  600;   --t-title-track: -0.005em;
+
+  /* Body — Geist */
+  --t-body-size:      13px;  --t-body-weight:   400;   --t-body-track:  -0.005em;
+  --t-body-sm-size:   12px;  --t-meta-size:     11px;
+
+  /* Label — JetBrains Mono small-caps */
+  --t-label-size:     10.5px; --t-label-weight: 500;   --t-label-track: 0.12em;
+  --t-label-sm-size:  9.5px;  --t-label-sm-track: 0.06em;
+
+  /* ============================================================
+     RADII
+     ============================================================ */
+  --radius-popup:   14px;  /* popup / modal / large surface outer corner */
+  --radius-card:    10px;  /* cards, callouts, panels (11px in the web app) */
+  --radius-control: 8px;   /* buttons, inputs, segmented controls */
+  --radius-chip:    7px;   /* language chips, small affixes */
+  --radius-pill:    999px; /* status chips, avatars, badges */
+
+  /* ============================================================
+     SHADOWS — soft, warm, never blue/grey
+     ============================================================ */
+  --shadow-popup:
+    0 1px 0 rgba(255,255,255,0.7) inset,
+    0 12px 28px -12px rgba(40,30,15,0.18),
+    0 2px 6px -2px rgba(40,30,15,0.10);
+  --shadow-toolbar:
+    0 1px 0 rgba(255,255,255,0.7) inset,
+    0 14px 32px -10px rgba(40,30,15,0.22),
+    0 3px 8px -2px rgba(40,30,15,0.10);
+  --shadow-segmented-active: 0 1px 2px rgba(40,30,15,0.08);
+
+  /* ============================================================
+     FOCUS RING — always amber
+     ============================================================ */
+  --focus-ring: 0 0 0 3px rgba(242,160,60,0.18);
+}
+
+/* ------------------------------------------------------------
+   DARK THEME — the same system "by lamplight".
+   Set data-theme="dark" on <html>.
+   ------------------------------------------------------------ */
+:root[data-theme="dark"] {
+  --paper:   #1B1814;  --paper-2: #221E18;  --paper-3: #2A251F;
+  --ink:     #F0EBDB;  --ink-2:   #C9C2AE;  --muted:   #8C8576;  --muted-2: #5E5950;
+  --rule:    #2C2822;  --rule-2:  #383229;
+  --amber-soft: #3D2D14;
+  --blue-soft: #1E3340;  --blue-ink: #8FBCD0;  --blue-edge: #2D4859;
+  --sage-soft: #233326;  --sage-ink: #A4C49C;  --sage-edge: #354A38;
+  --clay-soft: #3A241A;  --clay-ink: #E0967A;  --clay-edge: #4E332A;
+  --page: #110F0C;  --popup-border: #3B342B;
+  --shadow-popup:
+    0 1px 0 rgba(255,240,210,0.04) inset,
+    0 12px 30px -12px rgba(0,0,0,0.55),
+    0 2px 6px -2px rgba(0,0,0,0.35);
+  --shadow-toolbar:
+    0 1px 0 rgba(255,240,210,0.05) inset,
+    0 14px 36px -10px rgba(0,0,0,0.65),
+    0 3px 8px -2px rgba(0,0,0,0.4);
+  --shadow-segmented-active: 0 1px 2px rgba(0,0,0,0.4);
+}

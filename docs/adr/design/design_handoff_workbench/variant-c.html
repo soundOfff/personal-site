@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Tomas Vance — Applied LLM systems</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="focusquote.css" />
+<style>
+  [hidden] { display: none !important; }
+  body { background: var(--paper); color: var(--ink); }
+  .inner { max-width: 1000px; margin: 0 auto; padding: 0 32px; }
+
+  /* ── nav ── */
+  .topnav { border-bottom: 1px solid var(--rule); position: sticky; top: 0; z-index: 20; background: color-mix(in oklab, var(--paper), transparent 8%); backdrop-filter: blur(8px); }
+  .topnav .inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+  .tile { width: 27px; height: 27px; border-radius: 7px; background: linear-gradient(180deg, #F4AC4F 0%, #EE9B30 100%); border: 1px solid var(--amber-deep); box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-weight: 600; font-size: 12px; letter-spacing: 0.02em; color: #2A1A05; line-height: 1; }
+  .brand b { font-family: var(--font-serif); font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
+  .navlinks { display: inline-flex; align-items: center; gap: 4px; }
+  .navlinks a { font-size: 12.5px; font-weight: 500; color: var(--ink-2); padding: 6px 10px; border-radius: 7px; }
+  .navlinks a:hover { background: var(--paper-2); color: var(--ink); }
+
+  /* ── hero ── */
+  .hero { text-align: center; padding: 92px 0 78px; }
+  .hero .mark { width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 26px; background: linear-gradient(180deg, #F4AC4F 0%, #EE9B30 100%); border: 1px solid var(--amber-deep); box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 10px 22px -10px rgba(199,122,31,0.5); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-weight: 600; font-size: 22px; letter-spacing: 0.02em; color: #2A1A05; line-height: 1; }
+  .hero .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber-deep); margin: 0 0 18px; }
+  .hero h1 { font-family: var(--font-serif); font-weight: 600; font-size: 53px; line-height: 1.05; letter-spacing: -0.025em; margin: 0 auto; max-width: 14ch; text-wrap: balance; }
+  .hero h1 em { font-style: italic; color: var(--amber-deep); }
+  .hero p { font-size: 16.5px; line-height: 1.6; color: var(--ink-2); margin: 24px auto 0; max-width: 56ch; text-wrap: pretty; }
+  .hero .cta { display: inline-flex; align-items: center; gap: 14px; margin-top: 32px; }
+  .facts { display: inline-flex; align-items: stretch; gap: 0; margin-top: 44px; border: 1px solid var(--rule); border-radius: var(--radius-card); background: var(--paper); overflow: hidden; }
+  .fact { padding: 14px 26px; display: flex; flex-direction: column; gap: 4px; border-left: 1px solid var(--rule); }
+  .fact:first-child { border-left: 0; }
+  .fact .num { font-family: var(--font-mono); font-size: 21px; font-weight: 500; letter-spacing: -0.01em; color: var(--ink); }
+  .fact .lbl { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+  /* ── section header ── */
+  .band { background: var(--paper-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .sec { padding: 64px 0; }
+  .sechead { text-align: center; margin-bottom: 36px; }
+  .sechead .eyebrow { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  .sechead h2 { font-family: var(--font-serif); font-weight: 600; font-size: 30px; letter-spacing: -0.02em; margin: 0; }
+  .sechead p { font-size: 14px; color: var(--muted); margin: 10px auto 0; max-width: 48ch; line-height: 1.55; }
+
+  /* ── featured playground (split) ── */
+  .pg { background: var(--paper); border: 1px solid var(--rule-2); border-radius: var(--radius-popup); overflow: hidden; box-shadow: var(--shadow-popup); }
+  .pg-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .pg-left { padding: 22px; border-right: 1px solid var(--rule); display: flex; flex-direction: column; gap: 14px; }
+  .pg-l-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .pg-l-top .ttl { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; }
+  .pg-l-top .ttl .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--sage-ink); box-shadow: 0 0 0 3px var(--sage-soft); }
+  .pg-prompts { display: grid; gap: 7px; }
+  .prompt { text-align: left; width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: var(--radius-control); border: 1px solid var(--rule); background: var(--paper); font-size: 13px; color: var(--ink-2); transition: background .12s, border-color .12s, color .12s; }
+  .prompt:hover { background: var(--paper-2); border-color: #C7C0AF; color: var(--ink); }
+  .prompt .ix { font-family: var(--font-mono); font-size: 10px; color: var(--muted-2); }
+  .prompt.is-active { border-color: var(--amber-deep); background: var(--amber-soft); color: var(--ink); box-shadow: var(--focus-ring); }
+  .prompt.is-active .ix { color: var(--amber-deep); }
+  .pg-l-run { margin-top: auto; display: flex; align-items: center; gap: 10px; }
+  .pg-route { flex: 1; }
+  .pg-route.is-routing { opacity: .7; pointer-events: none; }
+  .pg-route.is-routing svg { animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .live-note { font-size: 11.5px; color: var(--blue-ink); display: flex; gap: 7px; align-items: flex-start; line-height: 1.5; }
+  .live-note svg { flex-shrink: 0; margin-top: 1px; }
+
+  .pg-right { padding: 22px; background: var(--paper-2); display: flex; flex-direction: column; }
+  .pg-empty { margin: auto; text-align: center; max-width: 30ch; }
+  .pg-empty .glyph { width: 42px; height: 42px; border-radius: 11px; background: var(--paper); border: 1px solid var(--rule); display: inline-flex; align-items: center; justify-content: center; color: var(--muted-2); margin-bottom: 12px; }
+  .pg-empty p { font-family: var(--font-serif); font-style: italic; font-size: 14px; color: var(--muted); margin: 0; line-height: 1.5; }
+  .pg-out { display: grid; gap: 14px; align-content: start; }
+  .pg-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .metric { display: inline-flex; align-items: baseline; gap: 5px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .metric b { font-size: 12.5px; color: var(--ink); font-weight: 600; letter-spacing: -0.01em; }
+  .pg-why { font-size: 12px; color: var(--ink-2); display: flex; gap: 8px; align-items: flex-start; line-height: 1.5; }
+  .pg-why svg { color: var(--amber-deep); flex-shrink: 0; margin-top: 1px; }
+  .pg-resp { font-family: var(--font-mono); font-size: 12px; line-height: 1.65; white-space: pre-wrap; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-control); padding: 12px 13px; margin: 0; }
+
+  /* ── work card grid ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .wcard { display: flex; flex-direction: column; gap: 0; padding: 22px; border: 1px solid var(--rule); border-radius: var(--radius-card); background: var(--paper); transition: border-color .12s, background .12s; }
+  .wcard:hover { border-color: #C7C0AF; background: var(--paper-2); }
+  .wcard .top { display: flex; align-items: center; justify-content: space-between; }
+  .wcard .ic { width: 34px; height: 34px; border-radius: 9px; background: var(--paper-2); border: 1px solid var(--rule); display: inline-flex; align-items: center; justify-content: center; color: var(--amber-deep); }
+  .wcard:hover .ic { background: var(--amber-soft); border-color: #ECC78C; }
+  .wcard .yr { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--muted-2); }
+  .wcard h3 { font-family: var(--font-serif); font-weight: 600; font-size: 19px; letter-spacing: -0.01em; margin: 16px 0 0; color: var(--ink); }
+  .wcard:hover h3 { color: var(--amber-deep); }
+  .wcard p { font-size: 13px; color: var(--ink-2); line-height: 1.55; margin: 8px 0 18px; text-wrap: pretty; }
+  .wcard .foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 18px; border-top: 1px solid var(--rule); }
+  .wcard .stk { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+  .wcard .arrow { color: var(--muted-2); transition: transform .12s, color .12s; }
+  .wcard:hover .arrow { color: var(--amber-deep); transform: translateX(2px); }
+
+  /* ── writing ── */
+  .posts { max-width: 680px; margin: 0 auto; }
+  .post { display: flex; align-items: baseline; gap: 20px; padding: 16px 0; border-top: 1px solid var(--rule); }
+  .post:first-child { border-top: 0; }
+  .post .date { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em; color: var(--muted); width: 96px; flex-shrink: 0; }
+  .post .pbody { flex: 1; }
+  .post h3 { font-family: var(--font-serif); font-weight: 600; font-size: 18px; letter-spacing: -0.01em; margin: 0; transition: color .12s; }
+  .post:hover h3 { color: var(--amber-deep); }
+  .post p { font-size: 13px; color: var(--muted); margin: 4px 0 0; line-height: 1.5; }
+  .post .go { color: var(--muted-2); align-self: center; }
+  .post:hover .go { color: var(--amber-deep); }
+
+  /* ── footer ── */
+  footer { border-top: 1px solid var(--rule); background: var(--paper-2); }
+  .foot { text-align: center; padding: 52px 0 120px; }
+  .foot h3 { font-family: var(--font-serif); font-weight: 600; font-size: 24px; letter-spacing: -0.015em; margin: 0; }
+  .foot p { font-size: 13px; color: var(--muted); margin: 12px auto 0; max-width: 50ch; line-height: 1.6; }
+  .foot .links { display: inline-flex; gap: 8px; margin-top: 22px; }
+  .foot .colo { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-2); margin-top: 28px; }
+
+  /* ── variant switcher ── */
+  .vswitch { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 60; display: inline-flex; align-items: center; gap: 3px; background: var(--paper); border: 1px solid var(--popup-border); border-radius: 11px; padding: 4px; box-shadow: var(--shadow-toolbar); }
+  .vswitch .vlabel { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); padding: 0 8px 0 6px; }
+  .vswitch a { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 8px; font-size: 12px; font-weight: 500; color: var(--ink-2); }
+  .vswitch a .k { font-family: var(--font-mono); font-weight: 600; font-size: 11px; color: var(--muted); }
+  .vswitch a:hover { background: var(--paper-2); }
+  .vswitch a.is-active { background: var(--amber-soft); color: var(--ink); }
+  .vswitch a.is-active .k { color: var(--amber-deep); }
+
+  @media (max-width: 760px) {
+    .hero h1 { font-size: 38px; }
+    .navlinks .nlink { display: none; }
+    .pg-grid, .grid2 { grid-template-columns: 1fr; }
+    .pg-left { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .facts { flex-wrap: wrap; }
+    .vswitch .vlabel, .vswitch a .nm { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="inner">
+    <a class="brand" href="variant-c.html"><span class="tile">TV</span><b>Tomas Vance</b></a>
+    <nav class="navlinks">
+      <a class="nlink" href="#playground">Playground</a>
+      <a class="nlink" href="#work">Work</a>
+      <a class="nlink" href="#writing">Writing</a>
+      <button class="btn-icon quiet" data-theme-toggle aria-label="Toggle theme" style="margin-left:4px;"><svg width="15" height="15"><use href="icons.svg#i-moon"></use></svg></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="inner">
+      <div class="mark">TV</div>
+      <p class="kicker">Software engineer · Applied LLM systems</p>
+      <h1>Most LLM calls don&rsquo;t need the <em>biggest</em> model.</h1>
+      <p>I build systems that route, cache, and cap — so AI features stay cheap, fast, and shippable. Try the router below: it picks the smallest model that still clears the bar.</p>
+      <div class="cta">
+        <a class="btn btn-amber btn-lg" href="#playground"><svg width="15" height="15"><use href="icons.svg#i-play"></use></svg>Open the playground</a>
+        <a class="btn btn-ghost btn-lg" href="#work">See the work</a>
+      </div>
+      <div class="facts">
+        <div class="fact"><span class="num">71%</span><span class="lbl">cheaper inference</span></div>
+        <div class="fact"><span class="num">3</span><span class="lbl">providers routed</span></div>
+        <div class="fact"><span class="num">240ms</span><span class="lbl">median latency</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="playground">
+    <div class="inner sec">
+      <div class="sechead">
+        <p class="eyebrow">Playground</p>
+        <h2>Watch the router choose</h2>
+        <p>Each prompt is scored for difficulty, then sent to the cheapest model that passes an eval gate. Demo mode is cached at the edge and free.</p>
+      </div>
+
+      <div class="pg" data-pg>
+        <div class="pg-grid">
+          <div class="pg-left">
+            <div class="pg-l-top">
+              <span class="ttl"><span class="dot"></span>Model router</span>
+              <div class="segmented" style="padding:2px;">
+                <button class="is-active" data-pg-mode="demo">Demo</button>
+                <button data-pg-mode="live">Live</button>
+              </div>
+            </div>
+            <div class="pg-prompts">
+              <button class="prompt is-active" data-pg-prompt="summarize"><span class="ix">01</span>Summarize this release note in three bullets.</button>
+              <button class="prompt" data-pg-prompt="extract"><span class="ix">02</span>Pull the order id, total and currency as JSON.</button>
+              <button class="prompt" data-pg-prompt="debug"><span class="ix">03</span>Explain this stack trace and propose a fix.</button>
+              <button class="prompt" data-pg-prompt="haiku"><span class="ix">04</span>Write a haiku about hairlines.</button>
+            </div>
+            <p class="live-note" data-pg-note hidden><svg width="13" height="13"><use href="icons.svg#i-info"></use></svg>Live mode runs real inference behind a serverless function — keys stay server-side, capped at 5 routes/min per IP on cheap models.</p>
+            <div class="pg-l-run">
+              <button class="btn btn-amber pg-route" data-pg-route><span data-pg-route-label>Route prompt</span><svg width="14" height="14"><use href="icons.svg#i-refresh"></use></svg></button>
+            </div>
+          </div>
+
+          <div class="pg-right">
+            <div class="pg-empty" data-pg-empty>
+              <span class="glyph"><svg width="20" height="20"><use href="icons.svg#i-layers"></use></svg></span>
+              <p>Route a prompt to see which model the dispatcher picks, and what it costs.</p>
+            </div>
+            <div class="pg-out" data-pg-result hidden>
+              <div class="pg-meta">
+                <span class="chip is-sage" data-pg-modelchip><span class="dot is-sage"></span><span data-pg-field="model">—</span></span>
+                <span class="metric">via <b data-pg-field="provider">—</b></span>
+                <span class="metric"><svg width="11" height="11" style="color:var(--muted-2)"><use href="icons.svg#i-clock"></use></svg> <b data-pg-field="latency">—</b></span>
+                <span class="metric">cost <b data-pg-field="cost">—</b></span>
+              </div>
+              <p class="pg-why"><svg width="14" height="14"><use href="icons.svg#i-bulb"></use></svg><span data-pg-field="why">—</span></p>
+              <pre class="pg-resp" data-pg-field="response">—</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="work">
+    <div class="inner">
+      <div class="sechead">
+        <p class="eyebrow">Selected work</p>
+        <h2>Systems that had to be cheap to be real</h2>
+      </div>
+      <div class="grid2">
+        <a class="wcard" href="#">
+          <div class="top"><span class="ic"><svg width="18" height="18"><use href="icons.svg#i-layers"></use></svg></span><span class="yr">2025 — now</span></div>
+          <h3>The router, productionised</h3>
+          <p>Classify-then-dispatch in front of OpenAI, Groq and OpenRouter. Scores each prompt, sends it to the cheapest model that passes an eval gate, falls back on failure. Cut spend 71%.</p>
+          <div class="foot"><span class="stk">Go · evals · OpenRouter</span><span class="arrow"><svg width="16" height="16"><use href="icons.svg#i-arrow-r"></use></svg></span></div>
+        </a>
+        <a class="wcard" href="#">
+          <div class="top"><span class="ic"><svg width="18" height="18"><use href="icons.svg#i-refresh"></use></svg></span><span class="yr">2024</span></div>
+          <h3>Streaming ingest, 40M/day</h3>
+          <p>Rebuilt a batch pipeline as a back-pressured stream — exactly-once writes, replayable from any offset, p99 under 200ms. The boring kind of reliable.</p>
+          <div class="foot"><span class="stk">Rust · Kafka · ClickHouse</span><span class="arrow"><svg width="16" height="16"><use href="icons.svg#i-arrow-r"></use></svg></span></div>
+        </a>
+        <a class="wcard" href="#">
+          <div class="top"><span class="ic"><svg width="18" height="18"><use href="icons.svg#i-link"></use></svg></span><span class="yr">2023</span></div>
+          <h3>Collab backend for a docs editor</h3>
+          <p>CRDT sync service powering live cursors and offline merge for ~12k concurrent rooms. Convergence proofs, not vibes.</p>
+          <div class="foot"><span class="stk">TypeScript · CRDT · WS</span><span class="arrow"><svg width="16" height="16"><use href="icons.svg#i-arrow-r"></use></svg></span></div>
+        </a>
+        <a class="wcard" href="#">
+          <div class="top"><span class="ic"><svg width="18" height="18"><use href="icons.svg#i-target"></use></svg></span><span class="yr">2022</span></div>
+          <h3>Feature-flag evaluator</h3>
+          <p>Deterministic, edge-evaluated flags with sub-millisecond overhead and a full audit trail. Boring on purpose.</p>
+          <div class="foot"><span class="stk">Go · WASM · edge</span><span class="arrow"><svg width="16" height="16"><use href="icons.svg#i-arrow-r"></use></svg></span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="writing">
+    <div class="inner sec">
+      <div class="sechead">
+        <p class="eyebrow">Writing</p>
+        <h2>Notes from the middle of the stack</h2>
+      </div>
+      <div class="posts">
+        <a class="post" href="#"><span class="date">May 2026</span><span class="pbody"><h3>Routing beats scaling: a cost study</h3><p>Six weeks of production traffic and the spend curve that made me a believer.</p></span><span class="go"><svg width="16" height="16"><use href="icons.svg#i-arrow-r"></use></svg></span></a>
+        <a class="post" href="#"><span class="date">Apr 2026</span><span class="pbody"><h3>Why a static site shows a dynamic demo</h3><p>The site is Astro and ships almost no JavaScript. The one interactive thing is an island.</p></span><span class="go"><svg width="16" height="16"><use href="icons.svg#i-arrow-r"></use></svg></span></a>
+        <a class="post" href="#"><span class="date">Mar 2026</span><span class="pbody"><h3>Rate-limiting a public inference endpoint</h3><p>Cached demo by default, live behind a per-IP cap. Cheap to run, hard to abuse.</p></span><span class="go"><svg width="16" height="16"><use href="icons.svg#i-arrow-r"></use></svg></span></a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="inner foot">
+      <h3>Let&rsquo;s make AI features that are cheap to be real.</h3>
+      <p>Open to senior backend and infrastructure roles. The fastest way to reach me is email.</p>
+      <div class="links">
+        <a class="btn btn-amber" href="#"><svg width="14" height="14"><use href="icons.svg#i-send"></use></svg>tomas@vance.dev</a>
+        <a class="btn btn-ghost" href="#">GitHub</a>
+        <a class="btn btn-ghost" href="#">CV</a>
+      </div>
+      <p class="colo">Built with Astro · playground is a React island on a serverless function</p>
+    </div>
+  </footer>
+</main>
+
+<nav class="vswitch" aria-label="Design variants">
+  <span class="vlabel">Variant</span>
+  <a href="variant-a.html"><span class="k">A</span><span class="nm">Column</span></a>
+  <a href="variant-b.html"><span class="k">B</span><span class="nm">Workbench</span></a>
+  <a class="is-active" href="variant-c.html"><span class="k">C</span><span class="nm">Gallery</span></a>
+</nav>
+
+<script src="theme.js"></script>
+<script src="playground.js"></script>
+</body>
+</html>
