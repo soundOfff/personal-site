@@ -1,0 +1,15 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "types": ["@cloudflare/workers-types"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "verbatimModuleSyntax": true
+  },
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist", "node_modules", ".wrangler"]
+}
