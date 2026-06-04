@@ -1,0 +1,91 @@
+---
+// Self-hosted fonts (replaces editorial-ui's Google-Fonts @import for speed).
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/jetbrains-mono';
+
+// editorial-ui design system: tokens first, then the component CSS.
+import 'editorial-ui/tokens.css';
+import 'editorial-ui/styles.css';
+
+// Workbench layer (font-family overrides, base, ported layout). Must come last.
+import '../styles/global.css';
+
+import { site, profile } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${profile.name} — ${profile.role}`,
+  description = 'Backend engineer who builds the systems that make AI products work in production. Live multi-LLM router demo.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- TODO: add a real favicon at public/favicon.svg -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- No-FOUC theme bootstrap: set data-theme before first paint. -->
+    <script is:inline define:vars={{ key: site.themeKey }}>
+      try {
+        const t = localStorage.getItem(key);
+        if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+      } catch {
+        /* ignore */
+      }
+    </script>
+  </head>
+  <body>
+    <slot />
+
+    <!-- Theme toggle: flip data-theme, persist, swap the moon/sun glyph. -->
+    <script is:inline define:vars={{ key: site.themeKey }}>
+      (function () {
+        const root = document.documentElement;
+        const current = () =>
+          root.dataset.theme ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const apply = (theme) => {
+          root.dataset.theme = theme;
+          document.querySelectorAll('[data-theme-icon]').forEach((u) => {
+            u.setAttribute('href', theme === 'dark' ? '/icons.svg#i-sun' : '/icons.svg#i-moon');
+          });
+        };
+        apply(current());
+        document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const next = current() === 'dark' ? 'light' : 'dark';
+            try {
+              localStorage.setItem(key, next);
+            } catch {
+              /* ignore */
+            }
+            apply(next);
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
