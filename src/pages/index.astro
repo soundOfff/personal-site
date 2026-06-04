@@ -1,0 +1,218 @@
+---
+import { getCollection } from 'astro:content';
+import { Link } from 'editorial-ui';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Rail from '../components/Rail.astro';
+import Icon from '../components/Icon.astro';
+import Playground from '../islands/Playground';
+import { profile, proofs, tenets, toolbox, log, now } from '../data/site';
+import { repos } from '../data/repos';
+import { PILLAR_PRIORITY } from '../lib/pillars';
+
+// Work index — single source of truth is the `work` collection (also the case-study pages).
+const work = (await getCollection('work', ({ data }) => !data.draft)).sort((a, b) =>
+  a.data.n.localeCompare(b.data.n),
+);
+
+// Writing section — surface technical posts first (BRIEF: homepage curates technical-first).
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => {
+    const p = PILLAR_PRIORITY[a.data.pillar] - PILLAR_PRIORITY[b.data.pillar];
+    return p !== 0 ? p : b.data.date.valueOf() - a.data.date.valueOf();
+  })
+  .slice(0, 4);
+
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout>
+  <div class="shell">
+    <Rail />
+
+    <main class="content">
+      {/* 00 · readme */}
+      <section class="block" id="readme">
+        <p class="keybar">// <b>readme</b></p>
+        <p class="lede" set:html={profile.lede} />
+        <p class="sub">{profile.sub}</p>
+        <div class="startrow">
+          <a class="btn btn-amber btn-lg" href="#playground">
+            <Icon name="i-play" size={15} />Run the router
+          </a>
+          <Link variant="arrow" href="#work">
+            See the work index <Icon name="i-arrow-r" size={13} />
+          </Link>
+        </div>
+        <div class="metrics">
+          {
+            proofs.map((m) => (
+              <div class="m">
+                <div class="v">{m.accent ? <em>{m.value}</em> : m.value}</div>
+                <div class="k">{m.key}</div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      {/* 01 · playground (the one interactive island) */}
+      <section class="block" id="playground">
+        <p class="keybar">// <b>playground</b> · model router</p>
+        <Playground client:visible />
+      </section>
+
+      {/* 02 · work · index */}
+      <section class="block" id="work">
+        <p class="keybar">// <b>work</b> · index</p>
+        <table class="idx">
+          <tbody>
+            {
+              work.map((w) => (
+                <tr data-href={`/work/${w.id}`}>
+                  <td class="n">{w.data.n}</td>
+                  <td class="proj">
+                    <a href={`/work/${w.id}`}>
+                      <b>{w.data.title}</b>
+                    </a>
+                    <span>{w.data.description}</span>
+                  </td>
+                  <td class="stk">{w.data.stack}</td>
+                  <td class="yr">{w.data.year}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </section>
+
+      {/* 03 · open source */}
+      <section class="block" id="oss">
+        <p class="keybar">// <b>open source</b></p>
+        <div class="repos">
+          {
+            repos.map((r) => (
+              <a class="repo" href={r.href} target="_blank" rel="noopener noreferrer">
+                <span class="nm">
+                  <span class="org">{r.org}</span>
+                  {r.name}
+                </span>
+                <span class="meta">
+                  <span class="lang">
+                    <span class="sw" style={`background:${r.color}`} />
+                    {r.language}
+                  </span>
+                  <span class="stars">
+                    <span class="st">★</span>
+                    {r.stars ?? '—'}
+                  </span>
+                </span>
+                <span class="desc">{r.description}</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      {/* 04 · log · recent activity */}
+      <section class="block" id="log">
+        <p class="keybar">// <b>log</b> · recent activity</p>
+        <div class="log">
+          {
+            log.map((item) => (
+              <div class="logitem">
+                <div class="gutter">
+                  <span class="ln" />
+                  <span class="node" />
+                </div>
+                <div class="lbody">
+                  <div class="top">
+                    <span class="hash">{item.hash}</span>
+                    <span class="date">{item.date}</span>
+                    <span class="tag">{item.tag}</span>
+                  </div>
+                  <div class="msg">{item.msg}</div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      {/* 05 · writing */}
+      <section class="block" id="writing">
+        <p class="keybar">// <b>writing</b></p>
+        <div class="wlist">
+          {
+            posts.map((post) => (
+              <a class="wrow" href={`/blog/${post.id}`}>
+                <span class="d">{iso(post.data.date)}</span>
+                <span class="t">{post.data.title}</span>
+                <span class="rt">{post.data.readingTime}</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      {/* 06 · principles · how I build */}
+      <section class="block" id="principles">
+        <p class="keybar">// <b>principles</b> · how I build</p>
+        <div class="tenets">
+          {
+            tenets.map((t, i) => (
+              <div class="tenet">
+                <div class="nn">{String(i + 1).padStart(2, '0')}</div>
+                <h3>{t.title}</h3>
+                <p>{t.body}</p>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      {/* 07 · stack · toolbox */}
+      <section class="block" id="stack">
+        <p class="keybar">// <b>stack</b> · toolbox</p>
+        <div class="toolbox">
+          {
+            toolbox.map((col) => (
+              <div class="toolcol">
+                <div class="h">{col.h}</div>
+                <ul>
+                  {col.items.map((it) => (
+                    <li>{it}</li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      {/* 08 · now */}
+      <section class="block" id="now">
+        <p class="keybar">// <b>now</b></p>
+        <dl class="specs">
+          {
+            now.map((s) => (
+              <div class="spec">
+                <dt>{s.dt}</dt>
+                <dd>{s.dd}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+    </main>
+  </div>
+
+  {/* progressive enhancement: make work-index rows clickable */}
+  <script is:inline>
+    document.querySelectorAll('.idx tr[data-href]').forEach((row) => {
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
+        window.location.href = row.getAttribute('data-href');
+      });
+    });
+  </script>
+</BaseLayout>

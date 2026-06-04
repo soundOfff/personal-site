@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Badge } from 'editorial-ui';
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout title={`${post.data.title} — Tomas Brasca`} description={post.data.description}>
+  <div class="sheet">
+    <div class="topbar">
+      <a class="back" href="/blog"><Icon name="i-arrow-l" size={13} />all writing</a>
+      <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
+        <svg
+          width="15"
+          height="15"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <use href="/icons.svg#i-moon" data-theme-icon></use>
+        </svg>
+      </button>
+    </div>
+
+    <header class="page-head">
+      <p class="eyebrow">// <b>{post.data.pillar}</b></p>
+      <h1>{post.data.title}</h1>
+      <p class="dek">{post.data.description}</p>
+      <div class="meta">
+        <span>{iso(post.data.date)}</span>
+        <span>·</span>
+        <span>{post.data.readingTime}</span>
+        <div class="ptags">
+          {post.data.tags.map((t) => <Badge variant="info">#{t}</Badge>)}
+        </div>
+      </div>
+    </header>
+
+    <article class="prose">
+      <Content />
+    </article>
+  </div>
+</BaseLayout>

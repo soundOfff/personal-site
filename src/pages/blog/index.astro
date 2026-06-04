@@ -1,0 +1,81 @@
+---
+import { getCollection } from 'astro:content';
+import { Badge } from 'editorial-ui';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+// flat, tag-organized: collect tags for the (TODO) filter UI
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout
+  title="Writing — Tomas Brasca"
+  description="Build logs, backend & AI systems, algorithms, and startup-engineering notes."
+>
+  <div class="sheet">
+    <div class="topbar">
+      <a class="back" href="/"><Icon name="i-arrow-l" size={13} />back to index</a>
+      <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
+        <svg
+          width="15"
+          height="15"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <use href="/icons.svg#i-moon" data-theme-icon></use>
+        </svg>
+      </button>
+    </div>
+
+    <header class="page-head">
+      <p class="eyebrow">// <b>blog</b></p>
+      <h1>Writing</h1>
+      <p class="dek">
+        Four flat, equal pillars — backend &amp; AI systems, algorithms &amp; competitive
+        programming, build logs, and startup engineering. Newest first.
+      </p>
+      {
+        allTags.length > 0 && (
+          <div class="ptags">
+            {allTags.map((t) => (
+              <Badge>#{t}</Badge>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <div class="posts">
+      {
+        posts.map((post) => (
+          <article class="post">
+            <div class="pmeta">
+              <span>{iso(post.data.date)}</span>
+              <span>·</span>
+              <span>{post.data.pillar}</span>
+              <span>·</span>
+              <span>{post.data.readingTime}</span>
+            </div>
+            <h2>
+              <a href={`/blog/${post.id}`}>{post.data.title}</a>
+            </h2>
+            <p class="pdesc">{post.data.description}</p>
+            <div class="ptags">
+              {post.data.tags.map((t) => (
+                <Badge variant="info">#{t}</Badge>
+              ))}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>
