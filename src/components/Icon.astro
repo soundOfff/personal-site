@@ -1,0 +1,24 @@
+---
+// Thin wrapper over the public icon sprite (public/icons.svg).
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+}
+const { name, size = 16, class: className } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  class={className}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  <use href={`/icons.svg#${name}`}></use>
+</svg>

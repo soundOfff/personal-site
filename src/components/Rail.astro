@@ -1,0 +1,70 @@
+---
+import { profile, nav, contact, site } from '../data/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  /** which section id is the current page context (rarely used on homepage). */
+  active?: string;
+}
+const { active } = Astro.props;
+---
+
+<aside class="rail">
+  <div class="id">
+    <span class="tile">{profile.monogram}</span>
+    <div>
+      <div class="nm">{profile.name}</div>
+      <div class="rl">{profile.role}</div>
+    </div>
+  </div>
+
+  <span class="status"><span class="pulse"></span>{profile.status}</span>
+
+  <nav class="railnav" aria-label="Sections">
+    {
+      nav.map((item, i) => (
+        <a href={`#${item.id}`} aria-current={active === item.id ? 'true' : undefined}>
+          <span class="nx">{String(i).padStart(2, '0')}</span>
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="contact-wrap">
+    <div class="rail-sec">Contact</div>
+    <div class="contact">
+      {
+        contact.map((c) => {
+          const external = c.href.startsWith('http');
+          return (
+            <a
+              href={c.href}
+              target={external ? '_blank' : undefined}
+              rel={external ? 'me noopener noreferrer' : undefined}
+            >
+              <Icon name={c.icon} size={14} />
+              {c.label}
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+
+  <div class="rail-foot">
+    <span class="mono">{site.copyright}</span>
+    <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
+      <svg
+        width="15"
+        height="15"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        aria-hidden="true"
+      >
+        <use href="/icons.svg#i-moon" data-theme-icon></use>
+      </svg>
+    </button>
+  </div>
+</aside>
