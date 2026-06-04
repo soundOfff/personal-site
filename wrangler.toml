@@ -1,0 +1,18 @@
+# Cloudflare Workers configuration. The @astrojs/cloudflare adapter injects
+# `main` and the static-assets binding at build time; this file supplies the
+# worker name, compatibility settings, and our own bindings.
+name = "personal-site"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Per-IP rate-limit store for live mode (5 routes/min, cheap models only).
+# In `astro dev`, platformProxy simulates this binding locally — no real id needed.
+# TODO: create the namespace with `wrangler kv namespace create RL` and paste the id.
+[[kv_namespaces]]
+binding = "RL"
+id = "00000000000000000000000000000000"
+
+# Provider API keys are set as encrypted secrets, NOT here:
+#   wrangler secret put OPENAI_API_KEY
+#   wrangler secret put GROQ_API_KEY
+#   wrangler secret put OPENROUTER_API_KEY

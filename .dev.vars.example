@@ -1,0 +1,6 @@
+# Copy to `.dev.vars` for local live-mode development (git-ignored).
+# Leave any unset to keep that provider out of the live router.
+# If ALL are unset, live mode returns a graceful 503 and the island falls back to demo.
+OPENAI_API_KEY=
+GROQ_API_KEY=
+OPENROUTER_API_KEY=
