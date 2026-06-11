@@ -15,7 +15,7 @@ The look is the **"Workbench"** design — a sticky left meta-rail beside a hair
 | Components  | [`editorial-ui`](https://www.npmjs.com/package/editorial-ui) (tokens + components) |
 | Content     | Astro content collections (MDX blog)                                               |
 | Fonts       | Self-hosted via `@fontsource-variable` (Newsreader · Geist · JetBrains Mono)       |
-| Host        | Cloudflare Pages + Workers (`@astrojs/cloudflare`)                                 |
+| Host        | Cloudflare Workers — static assets + one on-demand route (`@astrojs/cloudflare`)   |
 | Live mode   | On-demand Worker route + KV per-IP rate limit                                      |
 
 See [`docs/adr/`](./docs/adr/) for the two hard-to-reverse decisions (Astro over Next.js; demo-default Playground) and [`BRIEF.md`](./BRIEF.md) / [`CONTEXT.md`](./CONTEXT.md) for positioning and domain language.
@@ -52,20 +52,31 @@ Local:
 cp .dev.vars.example .dev.vars   # fill in any provider keys you want active
 ```
 
-Production (Cloudflare):
+Production (Cloudflare) — keys live as **Worker secrets**, set once, surviving every deploy:
 
 ```bash
-wrangler kv namespace create RL          # paste the id into wrangler.toml
-wrangler pages secret put OPENAI_API_KEY
-wrangler pages secret put GROQ_API_KEY
-wrangler pages secret put OPENROUTER_API_KEY
+wrangler secret put OPENAI_API_KEY
+wrangler secret put GROQ_API_KEY
+wrangler secret put OPENROUTER_API_KEY
 ```
 
 ## Deploy
 
+This deploys as a **Cloudflare Worker** (static assets + the one on-demand `/api/route`),
+not Cloudflare Pages — the build emits `dist/client` (assets) and `dist/server` (worker).
+
+**CI (recommended):** every push to `main` deploys via
+[`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml). One-time setup: add the
+`CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit + Workers KV Storage: Edit) and
+`CLOUDFLARE_ACCOUNT_ID` repository secrets. The workflow finds-or-creates the `RL`
+rate-limit KV namespace and pins its id automatically — no manual KV setup.
+
+**Manual:**
+
 ```bash
-npm run build                  # outputs ./dist with a _worker.js
-wrangler pages deploy ./dist
+wrangler kv namespace create RL   # once; paste the id into wrangler.toml
+npm run deploy                    # astro build && wrangler deploy
+npm run preview                   # local prod-like run: astro build && wrangler dev
 ```
 
 ## Structure

@@ -1,0 +1,184 @@
+---
+title: 'Building editorial-ui: hairlines over shadows'
+description: 'A build log of my npm component library: four constraints, plain CSS, and why a design system for an audience of one beats a folder of copy-pasted buttons.'
+date: 2026-02-10
+pillar: 'Build logs'
+tags: ['design-systems', 'react', 'css', 'open-source']
+readingTime: '6 min'
+draft: false
+---
+
+The first three hours of every side project were always the same: button radius,
+grey scale, which font, how much shadow. Then the next project, the same three hours,
+slightly different answers. None of those answers ever made anything better. They were
+just decisions, and decisions are expensive even when they don't matter.
+
+The fix is not better taste. The fix is to make the decisions once, encode them, and
+never have the conversation again. So I built **editorial-ui**: a React component
+library on npm, designed for an audience of exactly one.
+
+## A design system for one person
+
+A company design system mediates disagreement between people. A personal one
+eliminates choice for your future self. That second job is easier and, for a solo
+builder, more valuable — the enemy is not inconsistency across a team, it is
+re-litigating the same bikeshed every weekend.
+
+The trick is that a system this small does not need a token taxonomy or a governance
+doc. It needs a handful of constraints strict enough that most questions answer
+themselves. I ended up with four.
+
+## Four constraints are the whole system
+
+1. **One amber action per view.** A single primary call-to-action is visually
+   distinct; everything else is ghost, quiet, or danger.
+2. **Hairlines over shadows.** Dividers are `1px solid var(--rule)`. Cards sit on the
+   surface plane instead of floating above it.
+3. **Warm paper surfaces.** Backgrounds are warm off-white, never pure white or cool
+   grey.
+4. **Serif for reading, sans for UI.** Newsreader appears at headings and quote
+   titles; Geist handles interface text; JetBrains Mono is reserved for small-caps
+   labels and never touches body copy.
+
+The constraints live in the token file, not in a style guide nobody reads. This is
+the top of `tokens.css`, verbatim:
+
+```css
+:root {
+  /* Paper surfaces */
+  --paper:        #FBFAF6;
+  --paper-2:      #F4F2EC;
+  --paper-3:      #ECE9DF;
+
+  /* Ink */
+  --ink:          #1A1814;
+  --ink-2:        #3A362F;
+  --muted:        #807A6F;
+  --muted-2:      #B5AEA0;
+
+  /* Hairlines */
+  --rule:         #E5E0D5;
+  --rule-2:       #D9D3C5;
+
+  /* Amber (one per surface) */
+  --amber:        #F2A03C;
+  --amber-deep:   #C77A1F;
+  --amber-soft:   #FBE6C8;
+}
+```
+
+Note the comment on the amber block. The rule is written where the colour is defined,
+so you cannot reach for `--amber` without reading it. There is no generic `--gray-50`
+through `--gray-900` ramp because a ramp is a menu, and menus invite choosing. Three
+papers, two inks, two rules. If a screen needs more than that, the screen is wrong.
+
+The fifth rule, implicit in the other four: **no new colours**. Every colour
+reference goes through a variable. Dark mode then becomes a token swap —
+`:root[data-theme="dark"]` redefines the same names — instead of a second stylesheet.
+
+## The technical shape
+
+React components plus plain CSS files. No Tailwind, no CSS-in-JS, no PostCSS.
+
+The build is tsup with the CSS passed through untouched:
+
+```ts
+// tsup.config.ts
+loader: {
+  '.css': 'copy',
+},
+```
+
+tsup's copy loader does not inline `@import` lines, so a small post-build script
+flattens `styles/index.css` into one self-contained bundle. That bundle matters
+because the package has a **CSS-only entry**: link
+`editorial-ui/styles.css` in a plain HTML page and write `class="btn-amber"`, no
+React required. The React components are a thin typed layer over those exact class
+names — `Button` with `variant="amber"` renders `class="btn btn-amber"` and nothing
+else. From the component source:
+
+```tsx
+const classNames = [
+  'btn',
+  variant && `btn-${variant}`,
+  size !== 'md' && `btn-${size}`,
+  block && 'btn-block',
+  disabled && 'is-disabled',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+```
+
+Why not Tailwind: Tailwind is a tool for making choices quickly, and the entire point
+of this library is that the choices are already made. Utility classes would hand back
+every decision I just removed. Why not CSS-in-JS: it adds a runtime, complicates
+server rendering, and makes the CSS-only entry impossible. Plain CSS files are
+inspectable in devtools exactly as written, diff cleanly against the design
+reference, and will still build in ten years.
+
+## What "one amber action" did to the API
+
+The constraint that defines the system is the one the
+library **cannot enforce**. A React component cannot see its siblings across the
+tree; `Button` has no way to know another amber button exists on the same screen.
+
+So the API encodes the constraint as friction instead. `variant` is optional, and the
+default is the neutral style:
+
+```tsx
+<Button variant="ghost" onClick={onCancel}>Cancel</Button>
+<Button variant="amber">Save</Button>
+```
+
+You opt *in* to prominence, never out of it. There is no `primary` prop that
+half the team sets out of habit — the word in the code is the colour on the screen,
+which makes a second amber button easy to spot in review. Every compound component
+ships the hierarchy pre-built: `Modal.Footer` examples pair a ghost cancel with one
+amber confirm, and the docs never show two ambers together, so copy-paste propagates
+the rule.
+
+The honest summary: the type system enforces *which* variants exist, the docs
+enforce *how many*, and review enforces the rest. A constraint that lives in
+convention is weaker than one that lives in the compiler, but it is much stronger
+than one that lives in nobody's head.
+
+## Publishing: the boring parts took longest
+
+The components were a focused sprint. Making the package consumable took longer than
+writing it, which I have come to accept as
+[the normal shape of shipping](/blog/the-unglamorous-middle).
+
+The two lines that absorbed the most debugging are in `package.json`:
+
+```json
+"sideEffects": ["**/*.css"],
+"exports": {
+  ".":            { "types": "./dist/react/index.d.ts", "import": "./dist/react/index.js" },
+  "./react":      { "types": "./dist/react/index.d.ts", "import": "./dist/react/index.js" },
+  "./fonts.css":  "./dist/styles/fonts.css",
+  "./tokens.css": "./dist/styles/tokens.css",
+  "./styles.css": "./dist/styles/index.css",
+  "./icons":      { "types": "./dist/react/icons/index.d.ts", "import": "./dist/react/icons/index.js" }
+}
+```
+
+The React entry auto-imports its stylesheet so consumers get styles for free.
+Without `sideEffects` declaring the CSS, bundlers tree-shake that import away and
+you ship unstyled buttons — silently, only in production builds. The exports map
+went through several rounds too: separate `fonts.css` and `tokens.css` entries exist
+so a Next.js app can self-host fonts and skip the Google Fonts import, and a
+post-build script prepends `"use client"` banners so the components survive the App
+Router. None of this is design. All of it decides whether anyone can actually use
+the thing.
+
+## Eating it
+
+The site you are reading runs on these tokens — the hairlines between sections are
+`var(--rule)`, the background is `var(--paper)`, and there is exactly one amber
+action per view, including the [Playground](/#playground), where the router demo's
+"route it" button is the amber of its screen. The
+[Flagship case study](/work/flagship) is the system's stress test: data-dense
+output, three providers side by side, still no shadows.
+
+Constraints beat choices. Four of them turned out to be a whole design system.

@@ -8,22 +8,103 @@ readingTime: '6 min'
 draft: false
 ---
 
-> **Draft.** TODO: flesh out with the real build notes from this repo.
+This site is prerendered HTML everywhere except the one feature it exists to show off — a demo that runs real inference.
 
-A portfolio for a backend engineer should be fast — a technical audience notices.
-So the whole site is **static Astro**, shipping almost no JavaScript. But the hook
-is a _live_ multi-LLM router, which is anything but static.
+The static half is easy to defend. The people this site is written for open dev tools out of habit. If a page that claims I build production systems takes three seconds to hydrate a hero animation, the claim is dead before the first paragraph. So: prerendered HTML, real CSS, no framework runtime. Astro does this by default and does it well.
+
+The problem is the centerpiece.
+
+## The contradiction
+
+The thing this site most needs to show is a [multi-LLM router](/work/flagship) — a visitor types a prompt, the system classifies it, dispatches to the cheapest model that clears the bar across OpenAI, Groq and OpenRouter, and shows latency, cost and output side by side. That is real inference. Real inference is about as far from static as a web page gets: it needs client state, a network call, server-side API keys, and [a rate limiter](/blog/rate-limiting-inference) so the public internet cannot run up my bill.
+
+A static site whose hook is dynamic. The whole build is the resolution of that contradiction.
 
 ## The split
 
-Everything is prerendered HTML except one **React island** (the Playground) and one
-**on-demand route** (the live endpoint). The island hydrates only when scrolled
-into view; the endpoint runs as a Cloudflare Worker that holds the provider keys.
+The resolution: everything is prerendered except exactly two things.
+
+One React island, mounted on the homepage:
+
+```astro
+<Playground client:visible />
+```
+
+And one on-demand route, which runs as a Cloudflare Worker:
+
+```ts
+// The ONE on-demand route. Everything else on the site is static.
+export const prerender = false;
+```
+
+That comment is in the actual source. Every page — homepage, case studies, every blog post including this one — is HTML generated at build time. The island is the only client-side state. The Worker route is the only server-side compute. The keys live in the Worker's environment and never touch the client.
+
+When a visitor opts into live mode, the request path is short:
+
+```
+┌  Playground island (browser)
+│     POST /api/route { prompt }
+▼
+┌  Cloudflare Worker
+│     1. liveAvailable?      → 503 if no keys
+│     2. rate limit (KV)     → 429, 5/min per IP
+│     3. classify(prompt)    → extractive | structured | reasoning | creative
+│     4. cheapest model that clears the class
+▼
+┌  Provider (Groq / OpenAI / OpenRouter)
+│     one chat completion, 512 tokens max
+▼
+└  RouteResult { model, latency, cost, why, response }
+      → back to the island, rendered like any demo run
+```
+
+Four hops, one of which is optional by design. **Most visitors never trigger it.**
 
 ## Demo by default
 
-The island defaults to **demo mode**: pre-recorded fixtures, bundled, free, and
-abuse-proof. Live mode is opt-in and rate-limited. The page is fully interactive
-before any network call — the demo is the product; the live call is the flourish.
+The island does not boot into live mode. It boots into demo mode: four pre-recorded routes, bundled into the island itself as plain TypeScript. Here is one, verbatim from `src/lib/router/fixtures.ts`:
 
-TODO: diagram the request path (island → Worker → provider → island).
+```ts
+{
+  key: 'summarize',
+  prompt: 'Summarize this release note in three bullets.',
+  model: 'llama-3.1-8b',
+  provider: 'Groq',
+  tone: 'sage',
+  latency: '240 ms',
+  cost: '$0.00004',
+  why: 'Extractive and short — the smallest model clears the bar.',
+  response:
+    '•  Auth tokens now rotate every 24 hours.\n•  Webhook retries are capped at 5 with backoff.\n•  Node 16 is dropped; minimum runtime is Node 18.',
+},
+```
+
+The fixtures are recordings of real runs, refreshed when the routing logic or providers change. Switching between them re-renders the full result — model, provider, latency, cost, routing rationale, response — with zero network. Free, instant, abuse-proof.
+
+The usual way to show off a system like this is a video or a GIF. Fixtures beat both, for three reasons. A GIF plays at its own pace; fixtures let the reader poke at the part they care about, in whatever order, for as long as they want. A video is dead weight: a 4 MB MP4 to show 2 KB of structured data. The four fixtures cost less than a single screenshot. And a recording proves nothing about the interface: with fixtures, the demo runs through the exact same React component, the same result rendering, the same state machine as a live route. The only thing demo mode fakes is the network call. Everything the reader sees is the real product surface.
+
+## What islands actually buy here
+
+`client:visible` is doing more work than it looks like. Astro renders the Playground's initial HTML at build time, so the section is visible and styled before any JavaScript arrives. The framework runtime and component code are only fetched when the island scrolls into the viewport — not on page load, not on idle, on *visible*.
+
+A reader who lands on a blog post and leaves gets effectively no JavaScript. A reader who opens the homepage but never scrolls to the Playground also gets none of the island's code. Only the reader who arrives at the demo pays for the demo, and by then the static HTML has long since finished rendering, so the cost is invisible.
+
+Interactivity is opt-in per component, not a tax on every page.
+
+## Numbers from the build
+
+From `dist/` after `astro build`, gzipped:
+
+- **Playground island** — about 5 KB. Component, state machine, and all four fixtures.
+- **React + ReactDOM** — about 44 KB. The runtime the island drags in.
+- **Everything else** — roughly 1 KB per page, which is Astro's prefetch script. Beyond that, blog posts and case studies are pure HTML and CSS.
+
+Honest accounting: the 44 KB of React for one widget is the least elegant number on this site, and swapping in Preact would cut it to around 4 KB. But the headline holds — that cost is isolated to one island and deferred until the island is actually seen. The site a reader experiences is ~1 KB of JS until the moment they reach the one feature that earns more, and the feature's own code is smaller than any one of the font files.
+
+## The demo is the product
+
+The framing I kept coming back to while building this: **the demo is the product; the live call is the flourish.** The fixtures carry the argument — they show the routing decision, the cost spread, the latency spread, the rationale. Live mode exists so a sceptical reader can verify none of it is staged, which is why it gets real keys, [a real rate limit](/blog/rate-limiting-inference), and a catalog of cheap models only.
+
+That ordering is what makes the contradiction dissolve. A static site cannot afford a dynamic centerpiece on every page load. It can absolutely afford one island that wakes up when you look at it, and one Worker that answers only when you explicitly opt in.
+
+The full write-up of the router itself — classifier, catalog, blast-radius cap — is in the [Flagship case study](/work/flagship). The demo is [live on the homepage](/#playground).

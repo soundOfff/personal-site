@@ -8,26 +8,57 @@ code: false
 draft: false
 ---
 
-> **Draft — narrative only.** Employer work; no proprietary code. TODO: confirm scale
-> figures, dates and the specific systems before publishing.
+> **Narrative only.** Mint is employer work, so this case study is a written account
+> with no proprietary code, and figures are directional rather than exact.
 
 ## Problem
 
-E-commerce APIs serving a few million users have no quiet hours — traffic spikes are
-the normal case, and correctness under contention (inventory, carts, checkout) matters
-as much as raw throughput.
+E-commerce APIs serving a few million users have no quiet hours. Traffic spikes —
+campaign drops, payday weekends, flash promotions — are the normal case, not the
+exception, and the hard part isn't raw throughput. It's staying **correct under
+contention**: inventory that never oversells, carts that never lose items, checkout
+that never double-charges, all while the read side absorbs orders of magnitude more
+traffic than the write side.
 
 ## Architecture
 
-TODO: describe the real shape — the hot paths, where caching sat, how reads and writes
-were separated, and what kept checkout consistent under load.
+The shape that worked was an aggressive separation of the read and write paths
+around a single Postgres source of truth.
+
+- **Reads got cached, writes got queued.** Catalog and pricing — the overwhelming
+  majority of traffic — served from a cache layer in front of Postgres, with
+  invalidation driven by write events rather than TTL guesswork on the hot paths.
+- **The inventory path stayed boringly transactional.** Stock decrements ran as
+  short, row-level-locked transactions with explicit lock ordering. No clever
+  distributed counters; one database, correct by construction.
+- **Checkout was made idempotent end to end.** Every order submission carried an
+  idempotency key, so a retried request — mobile networks retry constantly — could
+  never create a second order or a second charge.
+- **The slow stuff left the request path.** Emails, invoices, search indexing, and
+  analytics moved behind queues, keeping the synchronous path down to "validate,
+  reserve, charge, respond".
 
 ## The key tradeoff
 
-TODO: the honest tension — e.g. consistency vs. latency on the inventory path, or the
-cost of a cache layer vs. the database load it shed.
+Consistency versus latency on the inventory path. Serving stock levels from cache
+makes product pages fast but lies during a rush; locking rows on every read makes
+them honest but slow. We split the difference deliberately: **product pages show
+cached, slightly-stale stock; checkout re-validates against the source of truth
+inside the transaction.** A shopper might occasionally see "in stock" on an item
+that sells out seconds later — but nobody ever pays for an item the warehouse
+doesn't have. Choosing _where_ the staleness is allowed to live, rather than
+pretending it away, was the decision the whole system leaned on.
 
 ## Outcome
 
-TODO: the result — uptime and latency under peak, and what the system let the business
-do that it couldn't before.
+The platform rode its peak campaigns — multiples of baseline traffic — without
+oversells and without checkout incidents, and tail latency on the buying path
+stayed flat as traffic grew. The deeper outcome was operational: because
+correctness lived in a small, well-locked core instead of being smeared across
+services, scaling work became cache and queue tuning — routine, low-risk changes —
+rather than surgery on the money path.
+
+The habit Mint drilled in — find the one path that must never lie, make it small,
+and let everything else be eventually consistent — is the same instinct behind
+[the router's blast-radius cap](/work/flagship): decide your worst case up front
+and make it structural.

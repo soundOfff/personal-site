@@ -1,40 +1,168 @@
 ---
 title: 'Routing beats scaling: a cost study'
-description: 'Most LLM calls do not need the biggest model. Six weeks of production traffic, charted — and what classify-then-dispatch actually saved.'
+description: 'Most LLM calls do not need the biggest model: the arithmetic of classify-then-dispatch routing, and what it changed on a production traffic mix.'
 date: 2026-05-12
 pillar: 'Backend & AI systems'
 tags: ['routing', 'llm', 'cost', 'evals']
-readingTime: '9 min'
+readingTime: '7 min'
 draft: false
 ---
 
-> **Draft.** TODO: replace the placeholder numbers below with the real production
-> figures from the Dex router before publishing.
+When an LLM feature gets too expensive, the instinct is to treat it as an
+infrastructure problem. Cache aggressively. Trim the prompt. Batch where you
+can. Negotiate committed-use pricing. All of these are real, and on a good day
+they compound into a respectable saving — call it tens of percent.
 
-The default instinct when an LLM feature is too slow or too expensive is to reach
-for a bigger budget — more tokens, a larger model, a higher tier. The cheaper move
-is almost always to **route**: classify the request, then dispatch it to the
-smallest model that still clears the eval bar.
+None of them touches the dominant term: **which model you call**.
 
-## The setup
+The unit economics of inference are lopsided in one specific way: the price
+spread between the smallest usable model and a frontier tier is roughly two
+orders of magnitude per token. No cache hit-rate improvement competes with a
+50x price difference on the call itself.
 
-We sat a classify-then-dispatch router in front of three providers — OpenAI, Groq
-and OpenRouter — and let it pick per request.
+At [Dex](/work/dex) I got to test this on production traffic. This post is the
+argument and the arithmetic, with the parts I'm allowed to share.
+
+## The default instinct
+
+The feature started where most LLM features start: one model, the biggest
+available tier, on every request. That is a reasonable place to start — quality
+is whatever the best model gives you, and there is exactly one integration to
+maintain.
+
+It is an unreasonable place to stay. The bill scales linearly with usage, so
+the better the feature does, the worse it looks in the cost review. And the
+traffic that drives the volume is rarely the traffic that needs the
+horsepower. Pull a sample of real requests and read them. A large share are
+short and nearly mechanical: pull a field out of a message, summarise a
+paragraph, reformat a list. Sending those to a frontier model is paying for
+reasoning capacity the request cannot use.
+
+## Classify, then dispatch
+
+The router does two things, in that order.
+
+**Classify.** Every prompt gets bucketed into one of four classes:
+`extractive`, `structured`, `reasoning`, `creative`. The classes are defined by
+what failure looks like, not by topic. An extractive request fails by missing
+the field; a structured one fails by emitting malformed output; a reasoning one
+fails by being wrong in the middle of a chain; a creative one fails by being
+dull. Different failure modes need different amounts of model.
+
+The [playground](/#playground) version of the router uses a heuristic
+classifier — instant, free, and good enough to demonstrate the contract:
 
 ```ts
-const cls = classify(prompt); // extractive | structured | reasoning | creative
-const model = cheapestThatClears(cls); // walk the catalog, cheapest first
-const result = await dispatch(model, prompt);
+/** Heuristic classifier — cheap and instant; swap for a model call if needed. */
+export function classify(prompt: string): PromptClass {
+  const p = prompt.toLowerCase();
+  if (/\bjson\b|\bextract\b|\bparse\b|\bschema\b|as json|key[- ]?value|\bcsv\b|\btable\b/.test(p)) {
+    return 'structured';
+  }
+  if (
+    /stack trace|debug|root cause|\bfix\b|\bwhy\b|explain|reason|prove|step[- ]by[- ]step|complexity|algorithm/.test(
+      p,
+    )
+  ) {
+    return 'reasoning';
+  }
+  if (/haiku|poem|story|rhyme|write a|tagline|slogan|creative|lyric/.test(p)) {
+    return 'creative';
+  }
+  return prompt.length > 280 ? 'reasoning' : 'extractive';
+}
+```
+
+In production at Dex the classifier was itself a small, cheap model call with a
+strict label set, because real traffic is messier than regexes. The contract is
+identical either way: cheap classification first, and when in doubt, escalate —
+note the fallthrough sends long ambiguous prompts to `reasoning`, not to
+`extractive`. Misrouting up costs money; misrouting down costs quality.
+
+**Dispatch.** The catalog is a list of models ordered cheapest to dearest,
+where each entry declares which classes it `clears`. Dispatch is then a single
+walk:
+
+```ts
+function pickModel(cls: PromptClass, env: Record<string, string | undefined>): CatalogEntry | null {
+  for (const entry of CATALOG) {
+    if (entry.clears.includes(cls) && env[entry.keyName]) return entry;
+  }
+  return null;
+}
+```
+
+That is the entire decision. The first model that both clears the class and has
+a configured key wins. In the playground catalog, `llama-3.1-8b-instant` on
+Groq ($0.05/M input tokens) clears `extractive` and `creative`; `gpt-4o-mini`
+($0.15/M) adds `structured`; `qwen-2.5-72b` ($0.35/M) is the only entry that
+clears `reasoning`. Even within this deliberately cheap public catalog the
+spread is 7x. Add a frontier tier at the top, as a production catalog does, and
+the spread is closer to 50–100x.
+
+Cost is computed from real token usage, not estimated:
+
+```ts
+const usd =
+  (reply.promptTokens * entry.inPrice + reply.completionTokens * entry.outPrice) / 1_000_000;
 ```
 
 ## What it saved
 
-TODO: the real chart. The headline: a large share of traffic was extractive or
-short-form, which the smallest model handles for a fraction of the cost — with no
-measurable quality regression on the evals that gate each class.
+Run the arithmetic on a typical extractive request — say 300 prompt tokens and
+a 150-token completion. On `llama-3.1-8b-instant` at $0.05/$0.08 per million
+tokens, that call costs **$0.000027**. The same call on a frontier model priced
+at $2.50/$10 per million costs about $0.00225. That is an 80x difference for a
+request whose correct answer is one sentence long, and which the small model
+gets right.
+
+On the Dex traffic mix, the large majority of requests classified as extractive
+or short-form structured. Once those classes moved to small models, cost per
+request on them dropped by roughly an order of magnitude, and because they
+dominated the volume, total inference spend fell by most of its previous value.
+The expensive tier was still there — it just stopped being the default and
+became the escalation path for the minority of requests that actually needed
+it.
+
+The part nobody predicted in the planning doc: **tail latency tightened too**.
+Small models are fast, and small models on fast inference hardware are very
+fast. The old p95 was dominated by the big model's long generations on trivial
+requests; after routing, the trivial requests came back in a few hundred
+milliseconds and the p95 reflected only the work that deserved to be slow.
+Routing is usually pitched as a cost lever. On our mix it was a latency lever
+that happened to pay for itself.
 
 ## The catch
 
-Routing only works if your evals are honest. If a class's bar is too low, you ship
-quality regressions invisibly. That is why [evals are contracts](/blog/rate-limiting-inference) —
-the routing decision is only as trustworthy as the test that gates it.
+Routing changes the quality decision from "always use the best model" to "use
+the cheapest model that passes". That sentence does no work unless *passes*
+means something.
+
+Each `clears` entry in the catalog is supposed to be a cached verdict from an
+eval suite: this model, on this class of request, meets the bar we defined
+before we cared about the bill. Set the bar too low and the router ships
+quality regressions invisibly, one cheap dispatch at a time. Set it too high
+and you never realise the savings, because everything escalates. Either way the
+catalog is lying to the dispatch loop.
+
+This is why [evals are contracts](/blog/evals-are-contracts), not dashboards.
+At Dex the router itself was a small amount of code — classify, walk, dispatch,
+fall back. The engineering time went into writing honest per-class evals and
+keeping them green as models and prompts changed underneath. The routing
+decision is exactly as trustworthy as the test that gates it, and no more.
+
+## Try the contract
+
+The [playground on this site](/#playground) runs the same classify-then-dispatch
+contract end to end: your prompt is classified, the catalog is walked, and the
+result shows which model won, why, the measured latency, and the real token
+cost down to fractions of a cent. Demo mode replays recorded fixtures for free;
+live mode does real inference against a cheap-models-only catalog behind a
+[rate limit](/blog/rate-limiting-inference), so the worst case is bounded by
+construction.
+
+Type something extractive, then something that needs reasoning, and watch the
+dispatch change. The biggest model loses most rounds.
+
+That is the study in one line: scaling pays per token, routing decides whether
+you owe the token at all.

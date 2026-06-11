@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, sessionDrivers } from 'astro/config';
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 import cloudflare from '@astrojs/cloudflare';
@@ -18,6 +18,13 @@ export default defineConfig({
   adapter: cloudflare({
     imageService: 'passthrough',
   }),
+
+  // The site never uses Astro sessions. Without an explicit driver the adapter
+  // auto-binds a SESSION KV namespace that `wrangler deploy` then rejects for
+  // having no id — the memory driver keeps the deploy KV-free.
+  session: {
+    driver: sessionDrivers.memory(),
+  },
 
   integrations: [react(), mdx()],
 

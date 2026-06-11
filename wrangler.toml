@@ -7,7 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 
 # Per-IP rate-limit store for live mode (5 routes/min, cheap models only).
 # In `astro dev`, platformProxy simulates this binding locally — no real id needed.
-# TODO: create the namespace with `wrangler kv namespace create RL` and paste the id.
+# The placeholder id below is resolved automatically by the deploy workflow
+# (.github/workflows/deploy.yml), which finds or creates the "personal-site-RL"
+# namespace and substitutes its real id before building. For a manual deploy:
+# `wrangler kv namespace create RL`, then paste the id here.
 [[kv_namespaces]]
 binding = "RL"
 id = "00000000000000000000000000000000"

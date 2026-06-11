@@ -1,0 +1,78 @@
+# Deploys the site to Cloudflare Workers (static assets + the one on-demand route).
+#
+# One-time setup — add two repository secrets (Settings → Secrets → Actions):
+#   CLOUDFLARE_API_TOKEN   API token with "Workers Scripts: Edit" and
+#                          "Workers KV Storage: Edit" permissions.
+#   CLOUDFLARE_ACCOUNT_ID  Dashboard → Workers & Pages → right sidebar.
+#
+# Provider keys for the Playground's live mode are NOT GitHub secrets — set them
+# once as Worker secrets (they survive every deploy):
+#   wrangler secret put OPENAI_API_KEY
+#   wrangler secret put GROQ_API_KEY
+#   wrangler secret put OPENROUTER_API_KEY
+# With none set, live mode returns a graceful 503 and the island stays in demo mode.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One production deploy at a time; queued pushes wait instead of clobbering.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # wrangler.toml ships with a placeholder id for the RL (rate-limit) KV
+      # namespace so the repo stays account-agnostic. Find or create the real
+      # namespace and pin its id before the build bakes the config into
+      # dist/server/wrangler.json.
+      - name: Resolve RL KV namespace
+        run: |
+          set -euo pipefail
+          title="personal-site-RL"
+          id=$(npx wrangler kv namespace list | jq -r --arg t "$title" '.[] | select(.title == $t) | .id')
+          if [ -z "$id" ]; then
+            echo "KV namespace $title not found — creating it."
+            npx wrangler kv namespace create RL
+            id=$(npx wrangler kv namespace list | jq -r --arg t "$title" '.[] | select(.title == $t) | .id')
+          fi
+          [ -n "$id" ] || { echo "Failed to resolve the RL KV namespace id." >&2; exit 1; }
+          sed -i "s/00000000000000000000000000000000/$id/" wrangler.toml
+          echo "RL KV namespace id: $id"
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

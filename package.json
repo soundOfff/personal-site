@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro build && wrangler pages dev ./dist",
+    "preview": "astro build && wrangler dev",
+    "deploy": "astro build && wrangler deploy",
     "check": "astro check",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

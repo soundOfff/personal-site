@@ -1,0 +1,96 @@
+---
+title: 'What ICPC trains you to see'
+description: 'The lasting value of competitive programming is not the data structures — it is the reflex of stating the invariant and bounding the worst case before you type.'
+date: 2026-01-20
+pillar: 'Algorithms & competitive programming'
+tags: ['icpc', 'algorithms', 'invariants', 'debugging']
+readingTime: '6 min'
+draft: false
+---
+
+I have needed a segment tree in production exactly zero times.
+
+That is the standard objection to competitive programming as job training, and it is correct as far as it goes. Nobody at work has ever asked me for a suffix automaton. The data structures were never the transferable part. What transferred is a reflex the contest format beats into you: **state the invariant, bound the worst case, and only then write code.**
+
+I competed through university and made the ICPC South America finals. Years later, that reflex is the most-used thing I took from it.
+
+## What the format actually drills
+
+An ICPC contest is five hours, three people, one machine, around a dozen problems. Every wrong submission adds twenty penalty minutes to your score, so in practice you get **roughly one wrong answer of budget per problem** before it stops being worth solving.
+
+That penalty structure changes how you work. You cannot debug your way to correctness — the judge gives you one bit of feedback per submission. Strong teams converge on the same loop:
+
+1. **Read the constraints first.** n ≤ 10^5 and n ≤ 10^18 are different problems wearing the same statement.
+2. **State the invariant.** One sentence that must hold at every step, said out loud to a teammate before anyone touches the keyboard.
+3. **Bound the complexity.** About 10^8 simple operations per second. If the bound does not clear the limit, the idea is dead, however elegant.
+4. **Then type.** Typing is the cheapest step and the last one.
+
+The teams that beat us were rarely faster typists. They submitted less garbage.
+
+## A worked example
+
+Classic problem: longest subarray with sum at most S, elements non-negative, n up to 10^7. The instinct is to start typing two pointers. The trained move is to write the invariant first:
+
+> At the end of each iteration, `[l, r]` is a valid window (sum ≤ S) and `l` is the smallest left index that makes it valid.
+
+```cpp
+long long sum = 0;
+int l = 0, best = 0;
+for (int r = 0; r < n; r++) {
+  sum += a[r];                    // extend right
+  while (sum > S) sum -= a[l++];  // restore the invariant
+  best = max(best, r - l + 1);    // window valid, l minimal
+}
+```
+
+Three things fall out of that one sentence, all before the code exists.
+
+**Correctness.** `best` is a maximum over windows where `l` is minimal for each `r`, so no longer valid window was skipped.
+
+**Legality.** The `while` loop only restores the invariant because the elements are non-negative — shrinking the window can never increase the sum. Put a single negative number in the array and the invariant becomes unmaintainable, and sliding window is the wrong technique entirely. The invariant does not just prove the solution; it tells you when the tool is illegal.
+
+**Complexity.** `l` and `r` each move at most n times, so the loop is O(n). 10^7 clears the budget with room.
+
+None of this is exotic. The point is the ordering: invariant, bound, code. Once that is a reflex, it does not switch off when the contest ends.
+
+## The same reflex, in production
+
+**Window math.** The live endpoint on this site runs real LLM calls behind a per-IP rate limit on Cloudflare KV — [the full design](/blog/rate-limiting-inference) is its own post. The core of it:
+
+```ts
+const window = Math.floor(nowSec / windowSec);
+const key = `rl:${ip}:${window}`;
+```
+
+Invariant: a key counts requests in exactly one window, and the counter only grows within it. Worst cases, stated before the code was written: a client straddling a window boundary can burst roughly twice the limit, and KV has no atomic increment, so concurrent requests can over-admit slightly. Both bounded, both acceptable for a soft five-per-minute cap on cheap models. That is contest analysis verbatim — find the adversarial input, bound the damage, decide whether the bound is acceptable.
+
+**A greedy with a one-line proof.** The router behind the [playground](/#playground) keeps its model catalog ordered cheapest to dearest and picks like this:
+
+```ts
+function pickModel(cls: PromptClass, env: Record<string, string | undefined>): CatalogEntry | null {
+  for (const entry of CATALOG) {
+    if (entry.clears.includes(cls) && env[entry.keyName]) return entry;
+  }
+  return null;
+}
+```
+
+Cheapest-first is a greedy, and a greedy is only trustworthy when you can prove its property. Here the proof is one sentence: the catalog is sorted by price, so **the first model that clears the class is the cheapest model that clears it**. The production router I built at [Dex](/work/dex) runs the same shape across OpenAI, Groq and OpenRouter, and the cost case for it is the subject of [routing beats scaling](/blog/routing-beats-scaling). Being able to state the greedy's property in one line is what made the design easy to defend in review.
+
+**Capacity planning as complexity analysis.** The worst-case bill for a public inference endpoint is requests per window, times windows, times max tokens per request, times the dearest price in the catalog. Because the live catalog only contains cheap models, the constant is bounded by construction. Same muscle as checking a loop against 10^8 operations per second: name the worst case before you ship, not after the invoice.
+
+## What contests do not teach
+
+Honesty requires the other column. Contest code is **write-only**: it lives five hours, is read by nobody, and is full of variables named `a`, `cnt` and `dp`. Production code is read-mostly, and the contest teaches you nothing about that.
+
+It does not teach naming. It does not teach boring code — cleverness scores points in a contest and costs money in a codebase. It does not teach deletion; no judge has ever rewarded removing a feature. And it does not teach the timescale that matters at work: code that has to survive other people, changing requirements and your own forgetting, for years.
+
+I had to unlearn the compression instinct deliberately. Terse is fast under a clock. Terse is a liability in a repo. What transfers is everything that happens before the code — not the code.
+
+## Coda: the boring strategy
+
+I also won the GTS algo-trading competition, and the win followed the same drill. Most entries optimised the average: maximum expected return per round. Mine was the boring one. I spent most of my time bounding the worst case — sizing positions so that no single bad sequence could knock the strategy out — and accepted a visibly lower mean to get that guarantee.
+
+The flashier strategies had better averages, right up until the tail showed up. Mine was still standing at the end, which is the only metric the scoreboard counted.
+
+That is the whole lesson in one contest. State what must stay true. Bound the worst case. Let the average take care of itself.

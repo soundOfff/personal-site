@@ -1,0 +1,153 @@
+---
+title: 'The unglamorous middle'
+description: 'The distance between an AI demo and an AI product is all backend — routing, caps, evals, fallbacks — and startup incentives systematically starve it.'
+date: 2026-06-02
+pillar: 'Startup engineering & opinions'
+tags: ['ai-products', 'infrastructure', 'startups', 'opinion']
+readingTime: '5 min'
+draft: false
+---
+
+Every AI product demos well now.
+
+Type a prompt, watch the model answer, watch the room nod. The model does the
+demo for you: the floor on demo quality is set by the provider's last training
+run, not by anything your team built. Five years ago a slick ML demo was
+evidence of a strong team. Today it is evidence of an API key and an afternoon.
+
+If the demo is free, the demo is worthless as a signal, and everything that
+separates a demo from a product lives somewhere else. Specifically, it lives in the backend: routing,
+rate limits, evals, fallbacks, cost ceilings. **The unglamorous middle.**
+
+Startups systematically under-invest in it. Not because they are careless —
+because the incentives point the other way.
+
+## Week two
+
+The demo survives week one because nobody is using it yet. Week two of real
+traffic has four failure shapes, and I keep seeing the same four.
+
+**Cost, because there is no routing.** Every request goes to the flagship
+model, the "extract the date from this email" requests and the "reason through
+this contract" requests alike, so the bill scales linearly with usage and the
+unit economics never close.
+
+**Abuse, because there are no caps.** A public endpoint with a model behind it
+is an open wallet; someone scripts it over a weekend and Monday's inference
+spend looks like a growth chart.
+
+**Quality drift, because there are no evals.** A prompt tweak on Tuesday
+quietly breaks a workflow that worked on Monday, and the first failing test is
+a churned customer.
+
+**Outages, because there is no fallback.** Your uptime is now the provider's
+uptime; their status page is your status page; their incident review is your
+post-mortem.
+
+None of these are exotic, and none require scale to predict. Every one of them
+is visible in the architecture diagram on day one — if anyone is paid to look
+at the architecture diagram.
+
+## The middle is a list of boring contracts
+
+The good news: the middle is not a research problem. It is a short list of
+contracts, each individually dull.
+
+- **Routing.** Every request is served by the cheapest model that clears its
+  quality bar, not by the biggest model you can afford.
+  [Routing beats scaling](/blog/routing-beats-scaling) on roughly every traffic
+  mix I have seen; most production prompts are short and extractive.
+- **Caps.** No anonymous caller can spend more than a fixed, small amount of
+  your money, by construction.
+  [A public inference endpoint without one is an open wallet](/blog/rate-limiting-inference).
+- **Evals.** Behaviour the product depends on is written down as tests, and a
+  change ships only when they pass.
+  [Evals are contracts](/blog/evals-are-contracts), not dashboards.
+- **Fallbacks.** A provider outage degrades the product — a slower model, a
+  cached answer — instead of taking it down.
+- **Cost ceilings.** There exists a number above which the system stops
+  spending and starts paging, and someone chose that number on purpose.
+
+Notice what is missing: novelty. Each is weeks of work, not quarters — the
+rate limiter on this site took an evening; honest per-class evals took the
+longest. The hard part is deciding they matter before the incident that proves
+it.
+
+## Why nobody funds it
+
+Because the work is illegible to the people allocating the money.
+
+Demo work is legible to investors. It compresses into a thirty-second screen
+recording, it produces a visible delta every sprint, it photographs well in a
+deck. Middle work is legible only to users, only at scale, and mostly as an
+absence: the outage that didn't happen, the bill that didn't spike, the answer
+that didn't degrade. You cannot screen-record an absence.
+
+So the gradient is obvious. Demos raise rounds; middles don't. The middle gets
+staffed after the growth hire and the second frontend engineer, which means it
+gets built during the incident, under pressure, at the most expensive possible
+moment to write a contract.
+
+The market does correct this — week two arrives for everyone — but the
+correction is paid in churned users and emergency rewrites instead of salaries.
+
+## What taking it seriously looks like
+
+Mostly, a question of ordering.
+
+**A kill switch before a launch tweet.** Nothing public runs real inference
+until there is a way to turn it off and a cap on what it can spend. Even this
+site follows the rule: the [playground's](/#playground) live mode shipped
+behind a per-IP limit before it shipped at all. The gate is one small function
+on Cloudflare KV:
+
+```ts
+export async function checkRateLimit(
+  kv: KVNamespace | undefined,
+  ip: string,
+  limit = 5,
+  windowSec = 60,
+): Promise<RateLimitResult> {
+  if (!kv) return { ok: true, remaining: limit, retryAfter: 0 };
+
+  const nowSec = Date.now() / 1000;
+  const window = Math.floor(nowSec / windowSec);
+  const key = `rl:${ip}:${window}`;
+
+  const current = Number((await kv.get(key)) ?? '0');
+  const retryAfter = Math.ceil(windowSec - (nowSec % windowSec));
+
+  if (current >= limit) {
+    return { ok: false, remaining: 0, retryAfter };
+  }
+
+  await kv.put(key, String(current + 1), { expirationTtl: windowSec + 5 });
+  return { ok: true, remaining: limit - current - 1, retryAfter };
+}
+```
+
+Five routes per minute, cheap models only, so the worst case is bounded before
+the first visitor arrives. It took an evening.
+
+**A cost dashboard before a growth dashboard.** If you can tell me your weekly
+signups but not your cost per request by prompt class, you are measuring the
+demo, not the product. At Dex the routing work started exactly there: once cost
+per request was visible by class, the case for classify-then-dispatch made
+itself — most traffic was cheap-class, and on our mix the savings were
+substantial.
+
+**Hiring for the middle.** The engineer who asks "what happens when the
+provider is down?" in the design review is not slowing you down; they are doing
+week two's work at day one's prices. One backend hire who treats evals, caps
+and fallbacks as the actual job buys more runway than another round of prompt
+iteration.
+
+## The middle is the product
+
+The model is rented. The demo is everyone's. What a user actually buys is the
+middle: the answer that is still there at 2 a.m., the bill that surprises
+nobody, the quality that is the same on Thursday as it was on Monday.
+
+That is not the boring part around the product.
+
+It is the product.

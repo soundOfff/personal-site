@@ -1,0 +1,166 @@
+---
+title: 'Evals are contracts'
+description: 'Routing to the cheapest model that clears the bar only works if "clears" means something. An eval is that meaning, written down and runnable.'
+date: 2026-04-21
+pillar: 'Backend & AI systems'
+tags: ['evals', 'llm', 'testing', 'routing']
+readingTime: '6 min'
+draft: false
+---
+
+Three weeks ago the router started sending structured-output traffic to the
+smallest model in the catalog. Every dashboard improved — latency down, cost down,
+error rate flat. The eval stayed green the whole time, because the dataset never
+covered nested objects. Today, support tickets are your eval suite.
+
+That failure has nothing to do with routing. Routing is the easy half —
+[classify the request, dispatch to the cheapest model that clears the bar](/blog/routing-beats-scaling).
+The hard half is one word. _Clears_. Clears what? Measured how? Decided by whom?
+
+## The load-bearing word
+
+In the router that powers [this site's playground](/#playground), the contract is
+literal. Each catalog entry declares which prompt classes it is allowed to serve:
+
+```ts
+/** A cheap model we're willing to dispatch to, and the classes it clears. */
+interface CatalogEntry {
+  provider: string;
+  model: string;
+  /** USD per 1M tokens — used to compute real cost and to rank by price. */
+  inPrice: number;
+  outPrice: number;
+  /** prompt classes this model is allowed to serve. */
+  clears: PromptClass[];
+}
+```
+
+And dispatch is a walk down a cost-ordered list:
+
+```ts
+function pickModel(cls: PromptClass, env: Record<string, string | undefined>): CatalogEntry | null {
+  for (const entry of CATALOG) {
+    if (entry.clears.includes(cls) && env[entry.keyName]) return entry;
+  }
+  return null;
+}
+```
+
+That `clears` array is the entire routing decision. Eight lines of dispatch, one
+array of truth. So the real question is upstream: who edits that array, and on what
+evidence? If it gets edited by hand because somebody tried four prompts and the
+output looked fine, the router is laundering vibes through a type system.
+
+At [Dex](/work/dex) — same architecture, real traffic — the equivalent of that
+array was edited by exactly one thing: the eval suite. A model earned a class by
+passing the class's eval, and lost it the same way. No meeting could move a model
+up the catalog. A green run could.
+
+## What a contract looks like
+
+An eval-as-contract has four parts, per prompt class:
+
+1. **A fixed dataset.** Real cases, frozen at a version. Not "we'll try some prompts" —
+   a file in the repo, diffable, reviewed like code.
+2. **A pass criterion per case.** Mechanical wherever possible.
+3. **A threshold over the dataset.** The bar, as a number.
+4. **A consequence.** The threshold gates the catalog. Fail the eval, lose the class.
+
+Two sketches, one mechanical and one judged.
+
+**Extraction** is the easy case, because correctness is checkable. The dataset is a
+few hundred input documents with hand-verified expected fields; the criterion is
+exact match on the JSON keys that matter:
+
+```ts
+// evals/extraction.eval.ts
+export default {
+  class: 'extractive',
+  dataset: 'datasets/extraction-v7.jsonl', // 240 frozen cases
+  grade: (got, want) =>
+    ['order_id', 'total', 'currency'].every((k) => deepEqual(got[k], want[k])),
+  threshold: 0.98, // below this, the model loses the class
+};
+```
+
+No judge model, no partial credit. Either `total` is `128.40` or it isn't. When a
+candidate small model scores 0.99 on this, "good enough for extraction" stops being
+an opinion.
+
+**Reasoning** can't be exact-matched, so the criterion is a rubric graded by a
+stronger model: did the answer identify the actual root cause, did it propose a fix
+that compiles against the stated constraints, did it avoid inventing APIs. Three
+binary checks per case, a case passes at 3/3, and the threshold sits over the case
+pass rate. Rubric grading is noisier than exact match, so the dataset is bigger and
+the rubric itself is versioned — when the rubric changes, every model regrades, and
+the diff shows exactly which cases flipped.
+
+The output of a run is one number per model per class. The catalog is whatever
+those numbers say it is.
+
+## Two ways to lie to yourself
+
+A bar can fail in exactly two directions, and they are not symmetric in how they
+hurt.
+
+**Too low**, and silent quality regressions ship. The router happily sends
+structured-output traffic to the smallest model, the eval stays green because the
+dataset never covered nested objects, and three weeks later support tickets are
+your eval suite. This failure is invisible at the routing layer — every metric the
+router emits (latency, cost, error rate) improves while the product quietly gets
+worse. The only instrument that can catch it is the eval, which is precisely the
+instrument that's broken.
+
+**Too high**, and you never realise the savings. A 0.999 bar on extraction, scored
+against a dataset full of adversarial edge cases that are roughly nonexistent in
+production, keeps everything pinned to the expensive tier. Nobody files a ticket
+about money you didn't save. On our traffic mix at Dex, the bulk of requests were
+cheap-class; an over-tight bar on just those classes would have erased most of the
+win described in [the cost study](/blog/routing-beats-scaling).
+
+Too low is a correctness bug. Too high is a silent cost bug. You tune between them
+the same way you tune anything: by looking at what the eval missed and what it
+over-weighted, against production reality.
+
+## Evals rot
+
+Which brings up the uncomfortable part: production reality moves. An eval dataset
+is a snapshot of a traffic distribution, and traffic distributions shift. Users
+find new phrasings. The product grows a feature that produces a prompt shape the
+dataset has never seen. The classifier starts binning things into a class whose
+dataset predates the pattern. None of this turns the suite red — it turns it
+**stale**, which is worse, because stale looks identical to green.
+
+Treat eval datasets like dependency updates. On a cadence — for us, roughly
+monthly, plus whenever a new prompt pattern landed — sample recent production
+traffic per class, label it, fold it into the dataset, bump the version, re-run
+every model. Sometimes a model loses a class it had held for months. That's not
+the process failing; that's the process working. The demo fixtures on this site
+carry the same rule in a comment: refresh from real recordings whenever the
+routing logic changes materially, or the showcase goes stale.
+
+A frozen dataset is honest about the past. Only a refreshed one is honest about
+the present.
+
+## Contracts are cultural
+
+The deepest effect was never technical. An eval suite is the **API contract
+between the routing layer and the product** — the routing layer promises "anything
+I send to a model, that model has cleared", and the product team gets to define
+what clearing means, in cases, in a file, under review.
+
+That changes the shape of disagreements. "Is the small model good enough for
+extraction?" used to be a meeting: someone pastes two outputs into a channel,
+someone else counters with a cherry-picked failure, and whoever cares more wins.
+With the contract in place, the same disagreement is a pull request — here are
+thirty cases where the small model fails, add them to the dataset, run the suite,
+read the number. If the number drops below threshold, the model loses the class
+and the router stops sending it that traffic, automatically. If it doesn't, the
+thirty cases stay in the dataset as a permanent regression guard, and the savings
+stay on.
+
+Diffs against a dataset, instead of vibes against a screenshot.
+
+That is what makes the routing promise honest. The cheapest model that clears the
+bar is a great architecture and a meaningless sentence — until the bar is written
+down, runnable, versioned, and allowed to say no.

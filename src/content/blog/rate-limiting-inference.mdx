@@ -1,36 +1,164 @@
 ---
 title: 'Rate-limiting a public inference endpoint'
-description: 'A public page that runs real LLM calls is an open wallet. The blast-radius cap: cheap models only, capped per IP, on KV.'
+description: 'A public no-auth page that runs real LLM calls is an open wallet. The three-layer cap that bounds the worst case by construction.'
 date: 2026-03-18
 pillar: 'Backend & AI systems'
-tags: ['edge', 'security', 'cloudflare', 'kv']
-readingTime: '7 min'
+tags: ['rate-limiting', 'cloudflare', 'kv', 'security', 'edge']
+readingTime: '6 min'
 draft: false
 ---
 
-> **Draft.** TODO: expand with the real limiter code and a load-test chart.
+This site has a page that takes arbitrary text from anonymous strangers and turns it into
+LLM API calls billed to my card. Stated like that, it sounds like a mistake. The
+Playground exists anyway, because before the endpoint shipped, it got a cap — and the
+cap, not the endpoint, is the actual engineering.
 
-Exposing real inference on a public, no-auth page is a standing invitation to run up
-someone else's bill. Before that endpoint gets a launch tweet, it gets a **rate
-limit and a kill switch** — cap the blast radius first.
+## The threat model
 
-## The cap
+The threat is not the hug of death. A traffic spike from a link aggregator is
+human-paced, bursty and self-limiting; people click once, maybe twice, and leave. The
+edge absorbs that for free.
 
-Three rules, in order of importance:
+The threat is a script. `curl` in a `while true` loop, one IP, maximal-length prompts,
+running overnight because someone found a no-auth endpoint that does free inference. The
+failure mode is not downtime. The failure mode is a bill.
 
-1. **Cheap models only.** The live catalog never includes an expensive tier, so the
-   worst case is bounded by construction.
-2. **Per-IP limit.** Five routes per minute, tracked in a fixed window on
-   Cloudflare KV.
-3. **Demo by default.** Live mode is opt-in; the common path costs nothing.
+That reframes the design question. Not "how much load can this take" but **"what is the
+most this can ever cost me"** — a number derived from the design, one that holds even
+when individual defences misbehave.
+
+## Three layers, in order of importance
+
+**1. Cheap models only.** The live catalog has three entries; the dearest is
+qwen-2.5-72b at $0.35 in / $0.40 out per million tokens. Prompts over 2,000 characters
+are rejected with a 413, and every provider call sends `max_tokens: 512`. So the worst
+case per route is bounded by construction: roughly 500 input tokens plus 512 output
+tokens on the dearest model — about $0.0004. No request, however crafted, costs more.
+There is no expensive tier to trick the router into.
+
+**2. Per-IP cap.** Five routes per minute, fixed window, counted in Cloudflare KV. The
+arithmetic: 5/min over 1,440 minutes is 7,200 routes a day, times $0.0004 is **under $3
+a day per hostile IP**. Annoying. Not ruinous.
+
+**3. Demo by default.** The Playground ships with pre-recorded fixtures; the default
+path makes no network call and costs nothing. Live mode is an explicit opt-in, so the
+common case — someone clicking around — never touches the wallet. The island-plus-serverless
+split that makes this work is [its own post](/blog/static-site-dynamic-demo).
+
+The ordering matters. Layer 1 bounds the cost of a single request even if layer 2 fails
+completely. Layer 2 bounds the rate even if layer 3 is bypassed — and it will be; it's a
+toggle in the UI. Each layer assumes the one below it leaks.
+
+## The limiter
+
+The whole thing is twenty lines, verbatim from `src/lib/ratelimit.ts`:
 
 ```ts
-const rl = await checkRateLimit(env.RL, ip); // 5/min fixed window in KV
-if (!rl.ok) return json({ error: 'rate-limited', retryAfter: rl.retryAfter }, 429);
+export async function checkRateLimit(
+  kv: KVNamespace | undefined,
+  ip: string,
+  limit = 5,
+  windowSec = 60,
+): Promise<RateLimitResult> {
+  if (!kv) return { ok: true, remaining: limit, retryAfter: 0 };
+
+  const nowSec = Date.now() / 1000;
+  const window = Math.floor(nowSec / windowSec);
+  const key = `rl:${ip}:${window}`;
+
+  const current = Number((await kv.get(key)) ?? '0');
+  const retryAfter = Math.ceil(windowSec - (nowSec % windowSec));
+
+  if (current >= limit) {
+    return { ok: false, remaining: 0, retryAfter };
+  }
+
+  await kv.put(key, String(current + 1), { expirationTtl: windowSec + 5 });
+  return { ok: true, remaining: limit - current - 1, retryAfter };
+}
 ```
 
-## Why KV
+Three details worth walking through.
 
-KV has no atomic increment, so the counter can race — but for a soft 5/min limit on
-cheap models, the small over-count is irrelevant next to the operational simplicity.
-TODO: note the trade vs. Durable Objects for stricter limits.
+**The window key.** `Math.floor(nowSec / windowSec)` gives every request in the same
+calendar minute the same bucket index, so the key is `rl:<ip>:<window>` — something like
+`rl:203.0.113.7:29563218`. A new minute is a new key starting from zero; there is
+nothing to reset and no state machine to manage.
+
+**The TTL.** `expirationTtl: windowSec + 5` makes KV garbage-collect each counter
+shortly after its window can no longer match a lookup. No cron, no cleanup job; stale
+keys delete themselves. KV's minimum TTL is 60 seconds, so the `+5` also keeps the value
+legal when `windowSec` is exactly one minute.
+
+**`retryAfter`.** `Math.ceil(windowSec - (nowSec % windowSec))` is the time to the top
+of the next window. The endpoint surfaces it in both the body and the header, so the UI
+can show an honest countdown instead of a vague error:
+
+```ts
+const rl = await checkRateLimit(env.RL, ip);
+if (!rl.ok) {
+  return json<RouteError>({ error: 'rate-limited', retryAfter: rl.retryAfter }, 429, {
+    'retry-after': String(rl.retryAfter),
+  });
+}
+```
+
+Fixed windows have a known wart: a client can spend five requests at 12:00:59 and five
+more at 12:01:01 — ten in two seconds. I do not care. The cap defends an integral,
+dollars per day, not smoothness, and the daily integral is unchanged.
+
+## The race I'm choosing to lose
+
+KV has no atomic increment. The limiter is a read, a comparison and a write — so two
+concurrent requests can both read `4`, both pass, and both write `5`. Worse, KV is
+eventually consistent across edge locations: writes can take up to a minute to
+propagate, so an attacker hitting several colos at once can genuinely exceed 5/min.
+
+This is fine, and the layer ordering is why. The race inflates the rate by a small
+factor; it does not unbound it. If concurrency lets someone triple the limit, the worst
+day goes from under $3 to under $9. The point of putting the cheap-models catalog at
+layer 1 is that every failure mode of the limiter gets multiplied against a tiny number.
+
+When would I reach for Durable Objects instead? When the limit is a contract rather than
+a courtesy. A Durable Object gives you a single-threaded actor per key — true atomic
+increments, sliding windows, token buckets if you want them — at the price of another
+moving part and per-request billing. That trade is right when over-admission has real
+consequences: strict quotas, paid tiers, per-user metered billing, anything an invoice
+or an SLA depends on. The rule I use: **KV when over-admission is an annoyance, Durable
+Objects when it's a liability.**
+
+## Fail open or fail closed
+
+Look at the first line of the limiter again:
+
+```ts
+if (!kv) return { ok: true, remaining: limit, retryAfter: 0 };
+```
+
+No KV binding, no limiting. That is a deliberate fail-open, and fail-open is usually the
+wrong default for a security control, so it deserves a justification.
+
+The binding is absent in exactly one expected case: local dev without Cloudflare's
+platform proxy. In production the binding is declared in the same config that deploys
+the code; they ship atomically. So the realistic question is: if configuration ever
+drifts, do I want an unlimited endpoint or a dead one? Here, unlimited is still bounded —
+layer 1 caps every call at about $0.0004, the keys live server-side, and the catalog has
+no expensive tier. A dead Playground, by contrast, silently defeats the point of the
+site.
+
+That reasoning only holds because the limiter is not the last line of defence. If it
+were — if removing it meant unbounded spend per request — this line would fail closed,
+and loudly.
+
+## The cap is the feature
+
+It is tempting to file rate limiting under pre-launch chores. Here the dependency runs
+the other way: live mode exists *because* the worst case is bounded. Without the cap,
+the only responsible version of this demo is a video. With it, a public no-auth page can
+run real inference — the same classify-then-dispatch idea as
+[the cost study](/blog/routing-beats-scaling), with my own keys behind it — and the most
+damage any visitor can do is lunch money.
+
+The full architecture is in [the Flagship case study](/work/flagship). Or skip the
+write-up and [run the router yourself](/#playground) — the limiter is part of the demo.
+If you hit the 429, that's working as intended.

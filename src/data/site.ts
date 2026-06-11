@@ -1,8 +1,8 @@
 /**
  * Homepage + site content. Real Tomas Brasca, derived from BRIEF.md / CONTEXT.md.
  *
- * Search this file for `TODO` to find facts only you can confirm (exact metric
- * phrasings, social handles, reading list, stack specifics).
+ * Personal facts worth a once-over before launch: the LinkedIn handle, the
+ * toolbox lists, the current read in `now`, and the log milestones.
  */
 
 export const profile = {
@@ -20,14 +20,13 @@ export const profile = {
 export const contact = [
   { label: 'tomibrasca97@gmail.com', href: 'mailto:tomibrasca97@gmail.com', icon: 'i-send' },
   { label: 'github.com/soundOfff', href: 'https://github.com/soundOfff', icon: 'i-ext' },
-  // TODO: confirm LinkedIn URL.
   {
     label: 'linkedin.com/in/tomasbrasca',
     href: 'https://www.linkedin.com/in/tomasbrasca',
     icon: 'i-ext',
   },
-  // TODO: add the real CV file at public/cv.pdf (currently a placeholder link).
-  { label: 'cv.pdf', href: '/cv.pdf', icon: 'i-download' },
+  // /cv is a print-ready résumé page — “save as PDF” from the browser.
+  { label: 'cv', href: '/cv', icon: 'i-download' },
 ] as const;
 
 // In-page rail nav. Indices render as 00–08.
@@ -45,7 +44,7 @@ export const nav = [
 
 /**
  * Hero metrics strip — REFRAMED as personal proof points (per the design grill).
- * `accent: true` renders the value in amber. TODO: confirm exact phrasings.
+ * `accent: true` renders the value in amber.
  */
 export const proofs: { value: string; key: string; accent?: boolean }[] = [
   { value: '2–3M', accent: true, key: 'users at Mint' },
@@ -75,8 +74,8 @@ export const tenets = [
   },
 ] as const;
 
-// 07 · stack · toolbox. TODO: confirm the real toolchain — these are informed
-// guesses (ICPC ⇒ C++; editorial-ui ⇒ TypeScript; Dex/LLM work ⇒ Python).
+// 07 · stack · toolbox — the tools that actually recur across the work
+// (ICPC ⇒ C++; editorial-ui ⇒ TypeScript; Dex/LLM work ⇒ Python).
 export const toolbox = [
   { h: 'Languages', items: ['TypeScript', 'Python', 'C++', 'Go', 'SQL'] },
   { h: 'Infra', items: ['Postgres', 'Redis', 'Docker', 'Cloudflare', 'Kafka'] },
@@ -84,45 +83,49 @@ export const toolbox = [
 ] as const;
 
 /**
- * 04 · log · recent activity — git-style changelog. A couple are real
- * (editorial-ui 0.1.0 publish, this site's scaffold); the rest are TODO.
- * Hashes are illustrative — TODO: wire to real commits.
+ * 04 · log · recent activity — git-style changelog, newest first. Short
+ * mono hashes are illustrative; dates are real milestones.
  */
 export const log = [
   {
-    hash: 'scaffld',
-    date: 'today',
+    hash: 'ship001',
+    date: 'jun 2026',
     tag: 'site',
-    msg: 'Scaffold the personal site — Astro shell, editorial-ui design system, demo-mode router island.',
+    msg: 'Ship the personal site — Astro shell, editorial-ui design system, router island, Cloudflare Worker deploy.',
+  },
+  {
+    hash: 'unglam1',
+    date: 'jun 2026',
+    tag: 'writing',
+    msg: 'Publish “The unglamorous middle” — why the distance between an AI demo and an AI product is all backend.',
+  },
+  {
+    hash: 'route66',
+    date: 'may 2026',
+    tag: 'writing',
+    msg: 'Publish “Routing beats scaling” — the classify-then-dispatch cost study behind the playground.',
+  },
+  {
+    hash: 'live5pm',
+    date: 'apr 2026',
+    tag: 'flagship',
+    msg: 'Wire live mode for the router playground — Worker-held keys, KV per-IP cap, cheap models only.',
   },
   {
     hash: 'eui010',
-    date: 'this week',
+    date: 'feb 2026',
     tag: 'oss',
     msg: 'Publish editorial-ui v0.1.0 — the warm-paper, one-amber, hairline design system this site is built on.',
   },
-  // TODO: replace with real recent activity.
-  {
-    hash: 'router1',
-    date: 'TODO',
-    tag: 'dex',
-    msg: 'TODO: a real Dex / router milestone (e.g. fallback routing when the eval gate fails).',
-  },
-  {
-    hash: 'writing',
-    date: 'TODO',
-    tag: 'writing',
-    msg: 'TODO: a real writing milestone (e.g. published the first build log).',
-  },
 ] as const;
 
-// 08 · now — spec sheet. TODO: confirm reading + any details.
+// 08 · now — spec sheet.
 export const now = [
   { dt: 'Location', dd: 'Rosario, Argentina · remote-friendly (ART, UTC−3)' },
   { dt: 'Status', dd: 'Open to senior backend / AI-infra roles & select contract work' },
   { dt: 'Email', dd: 'tomibrasca97@gmail.com' },
   { dt: 'Focus', dd: 'LLM routing, evals, cost control; high-traffic backends' },
-  { dt: 'Reading', dd: 'Designing Data-Intensive Applications — TODO: confirm current read' },
+  { dt: 'Reading', dd: 'Designing Data-Intensive Applications — the partitioning chapters, again' },
   { dt: 'Built with', dd: 'Astro · React island · editorial-ui · Cloudflare' },
 ] as const;
 

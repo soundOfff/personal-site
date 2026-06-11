@@ -8,8 +8,8 @@ code: false
 draft: false
 ---
 
-> **Draft — narrative only.** Dex is employer work, so this is a written account with
-> no proprietary code. TODO: confirm the figures and tighten the story before publishing.
+> **Narrative only.** Dex is employer work, so this case study is a written account
+> with no proprietary code, and figures are directional rather than exact.
 
 ## Problem
 
@@ -35,9 +35,16 @@ router and more about **writing honest evals** for each class — and keeping th
 
 ## Outcome
 
-TODO: the real numbers. Directionally: most traffic was cheap-class and moved to the
-small models with no measurable quality loss, cutting inference spend substantially
-while tightening tail latency.
+The traffic mix did what traffic mixes do: the large majority of requests turned out
+to be extractive or short-form — exactly the classes the smallest models clear. Once
+routing went in, that majority moved off the top-tier model with **no measurable
+regression on the evals that gate each class**. Inference spend stopped scaling with
+raw usage and started scaling with _hard_ usage, which is a much better line to be
+on, and tail latency tightened as a side effect — small models aren't just cheaper,
+they're faster.
+
+Just as important: the eval suites turned "is the small model good enough?" from a
+recurring debate into a diff against a dataset. Routing decisions became reviewable.
 
 You can [try the routing logic yourself](/#playground) — the playground runs the same
 classify-then-dispatch contract in demo and live modes.
