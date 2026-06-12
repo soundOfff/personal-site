@@ -2,7 +2,7 @@
 n: '02'
 title: 'Mint — 2–3M-user scale'
 description: 'High-traffic e-commerce APIs serving 2–3M users — the backend that stayed correct and fast under real load.'
-stack: 'Backend · Postgres'
+stack: 'Microservices · WordPress · React · Postgres'
 year: '2023'
 code: false
 draft: false
@@ -20,10 +20,19 @@ contention**: inventory that never oversells, carts that never lose items, check
 that never double-charges, all while the read side absorbs orders of magnitude more
 traffic than the write side.
 
+There was a second constraint that shaped everything: **the core order system ran
+on WordPress**. It predated the team, the business depended on it daily, and a
+big-bang rewrite was never on the table.
+
 ## Architecture
 
-The shape that worked was an aggressive separation of the read and write paths
-around a single Postgres source of truth.
+Rather than fight the WordPress core, we built a **microservices architecture on
+top of it**. WordPress stayed the system of record for orders; everything
+performance-critical — catalog, inventory, pricing, checkout orchestration — moved
+into dedicated services that fronted it, so the legacy core only ever saw clean,
+validated, already-throttled traffic. The shape that worked inside that services
+layer was an aggressive separation of the read and write paths around a single
+Postgres source of truth.
 
 - **Reads got cached, writes got queued.** Catalog and pricing — the overwhelming
   majority of traffic — served from a cache layer in front of Postgres, with
@@ -37,6 +46,10 @@ around a single Postgres source of truth.
 - **The slow stuff left the request path.** Emails, invoices, search indexing, and
   analytics moved behind queues, keeping the synchronous path down to "validate,
   reserve, charge, respond".
+- **The frontend consumed it all through a React component library we maintain.**
+  One versioned library of storefront components — product cards, cart, checkout
+  flows — shared across every surface, so UI stayed consistent and backend services
+  could evolve behind stable component contracts instead of per-page integrations.
 
 ## The key tradeoff
 
@@ -54,11 +67,12 @@ pretending it away, was the decision the whole system leaned on.
 The platform rode its peak campaigns — multiples of baseline traffic — without
 oversells and without checkout incidents, and tail latency on the buying path
 stayed flat as traffic grew. The deeper outcome was operational: because
-correctness lived in a small, well-locked core instead of being smeared across
-services, scaling work became cache and queue tuning — routine, low-risk changes —
-rather than surgery on the money path.
+correctness lived in a small, well-locked core, scaling work became cache and queue tuning — routine, low-risk changes —
+rather than surgery on the money path. And the WordPress core never became the
+bottleneck everyone feared: shielded by the services layer, it kept doing the one
+job it was good at — being the order ledger — while everything around it scaled.
 
 The habit Mint drilled in — find the one path that must never lie, make it small,
 and let everything else be eventually consistent — is the same instinct behind
-[the router's blast-radius cap](/work/flagship): decide your worst case up front
+[the playground's blast-radius cap](/work/flagship): decide your worst case up front
 and make it structural.

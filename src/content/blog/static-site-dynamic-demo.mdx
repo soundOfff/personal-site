@@ -16,7 +16,7 @@ The problem is the centerpiece.
 
 ## The contradiction
 
-The thing this site most needs to show is a [multi-LLM router](/work/flagship) — a visitor types a prompt, the system classifies it, dispatches to the cheapest model that clears the bar across OpenAI, Groq and OpenRouter, and shows latency, cost and output side by side. That is real inference. Real inference is about as far from static as a web page gets: it needs client state, a network call, server-side API keys, and [a rate limiter](/blog/rate-limiting-inference) so the public internet cannot run up my bill.
+The thing this site most needs to show is a [live AI demo](/work/flagship) — a visitor types a prompt, the system classifies it, dispatches to the cheapest model that clears the bar across OpenAI, Groq and OpenRouter, and shows latency, cost and output side by side. That is real inference. Real inference is about as far from static as a web page gets: it needs client state, a network call, server-side API keys, and [a rate limiter](/blog/rate-limiting-inference) so the public internet cannot run up my bill.
 
 A static site whose hook is dynamic. The whole build is the resolution of that contradiction.
 
@@ -107,4 +107,4 @@ The framing I kept coming back to while building this: **the demo is the product
 
 That ordering is what makes the contradiction dissolve. A static site cannot afford a dynamic centerpiece on every page load. It can absolutely afford one island that wakes up when you look at it, and one Worker that answers only when you explicitly opt in.
 
-The full write-up of the router itself — classifier, catalog, blast-radius cap — is in the [Flagship case study](/work/flagship). The demo is [live on the homepage](/#playground).
+The full write-up of the system itself — classifier, catalog, blast-radius cap — is in the [Flagship case study](/work/flagship). The demo is [live on the homepage](/#playground).

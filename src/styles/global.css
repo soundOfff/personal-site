@@ -43,6 +43,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+
 a {
   color: inherit;
   text-decoration: none;
@@ -283,6 +284,15 @@ a {
 .keybar b {
   color: var(--amber-deep);
   font-weight: 600;
+}
+.keybar a {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  transition: color 0.12s;
+}
+.keybar a:hover {
+  color: var(--ink);
 }
 
 .lede {
@@ -760,6 +770,26 @@ a {
   margin-top: 4px;
   z-index: 1;
 }
+.logitem.upcoming .node {
+  position: relative;
+  border-color: var(--muted-2);
+}
+.logitem.upcoming .node::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--muted-2);
+  opacity: 0.4;
+  animation: ping 2.4s ease-out infinite;
+}
+.logitem.upcoming .hash {
+  color: var(--muted-2);
+}
+.logitem.upcoming .msg {
+  color: var(--muted);
+  font-style: italic;
+}
 .logitem .ln {
   position: absolute;
   top: 4px;
@@ -807,6 +837,13 @@ a {
   color: var(--ink);
   margin-top: 4px;
   line-height: 1.45;
+}
+.logitem .msg a {
+  color: var(--amber-deep);
+  text-decoration: none;
+}
+.logitem .msg a:hover {
+  text-decoration: underline;
 }
 
 /* ============================================================
@@ -1008,7 +1045,7 @@ a {
 .page-head h1 {
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: var(--t-h1-size);
+  font-size: calc(var(--t-h1-size, 32px) * 1.15);
   letter-spacing: var(--t-h1-track);
   line-height: 1.15;
   margin: 0;
@@ -1047,18 +1084,23 @@ a {
 .prose h2 {
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: var(--t-h2-size);
+  font-size: calc(var(--t-h2-size, 24px) * 1.1);
   letter-spacing: var(--t-h2-track);
+  line-height: 1.3;
   color: var(--ink);
-  margin-top: 1.9em;
-  padding-top: 0.3em;
+  margin-top: 1em;
 }
 .prose h3 {
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: var(--t-title-size);
+  font-size: calc(var(--t-title-size, 20px) * 1.1);
+  line-height: 1.3;
   color: var(--ink);
-  margin-top: 1.6em;
+  margin-top: 1em;
+}
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: 0.5em;
 }
 .prose a {
   color: var(--amber-deep);
@@ -1111,6 +1153,42 @@ a {
   border: 0;
   border-top: 1px solid var(--rule);
   margin: 2em 0;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.prose th {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  padding: 0 18px 9px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.prose td {
+  padding: 9px 18px 9px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: baseline;
+}
+.prose th:last-child,
+.prose td:last-child {
+  padding-right: 0;
+}
+.prose td:first-child {
+  color: var(--ink);
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+  }
 }
 
 /* blog index list */
@@ -1205,33 +1283,82 @@ a {
 }
 
 /* ============================================================
+   BACK TO TOP
+   ============================================================ */
+.back-to-top {
+  position: fixed;
+  bottom: 24px;
+  left: calc(50% + 392px);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.12s, color 0.12s;
+  z-index: 50;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+.back-to-top.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.back-to-top:hover {
+  color: var(--amber-deep);
+  border-color: var(--amber-deep);
+}
+@media (max-width: 900px) {
+  .back-to-top {
+    display: none !important;
+  }
+}
+
+/* ============================================================
    RESPONSIVE — collapse to one column
    ============================================================ */
 @media (max-width: 820px) {
   .shell {
     grid-template-columns: 1fr;
   }
+  /* rail becomes a compact top header band: id on the left, theme toggle on
+     the right, status pill wraps to its own line below. */
   .rail {
     position: static;
     height: auto;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 16px;
+    gap: 12px 16px;
+    padding: 18px 22px;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
   }
   .railnav,
   .rail .contact-wrap {
     display: none;
   }
   .rail-foot {
-    margin: 0;
+    order: 1;
+    margin: 0 0 0 auto;
+    gap: 12px;
   }
-  .specs {
-    grid-template-columns: 1fr;
+  /* copyright lives in the footer — drop it from the cramped mobile header */
+  .rail-foot .mono {
+    display: none;
   }
-  .tenets {
-    grid-template-columns: 1fr;
+  .status {
+    order: 2;
   }
+  /* tenets + specs keep two columns through the tablet range — collapsing them
+     here leaves the wide content column half-empty. They go single-col at 600. */
   .toolbox {
     grid-template-columns: 1fr 1fr;
     gap: 20px 24px;
@@ -1241,5 +1368,151 @@ a {
   }
   .sheet {
     padding: 24px 22px 32px;
+  }
+  .page-head h1 {
+    font-size: calc(var(--t-h1-size, 32px) * 1.02);
+  }
+}
+
+/* ── phones ── */
+@media (max-width: 600px) {
+  .block {
+    padding: 28px 0;
+  }
+  /* ease the display type down + let long words wrap rather than overflow */
+  .lede {
+    font-size: 22px;
+  }
+  .page-head h1 {
+    font-size: 28px;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  .page-head .dek {
+    font-size: 14.5px;
+  }
+  .prose {
+    font-size: 14.5px;
+  }
+  .prose h2 {
+    font-size: 21px;
+  }
+  .prose h3 {
+    font-size: 18px;
+  }
+
+  /* work index: drop the stack column — it crowds the title on a phone */
+  .idx .stk {
+    display: none;
+  }
+  .idx td {
+    padding: 12px 10px;
+  }
+  .idx .proj b {
+    font-size: 15px;
+  }
+
+  /* writing rows: title on its own line, date + read-time as a meta row below */
+  .wrow {
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 14px 0;
+  }
+  .wrow .t {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    font-size: 15px;
+  }
+  .wrow .d {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .wrow .rt {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: right;
+  }
+
+  /* grids collapse to a single column at phone width */
+  .tenets,
+  .specs {
+    grid-template-columns: 1fr;
+  }
+
+  /* footer: stack the copyright over the links instead of stranding them on
+     opposite ends of a wrapped space-between row */
+  .foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .toolbox {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .toolcol {
+    text-align: center;
+  }
+  .toolcol li {
+    justify-content: center;
+  }
+
+  /* metrics: a tidy 2-up grid; an odd last card spans the full width so the
+     strip never leaves a lone stretched cell */
+  .metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .metrics .m {
+    min-width: 0;
+    padding: 10px 13px;
+    border-left: 1px solid var(--rule);
+    border-top: 1px solid var(--rule);
+  }
+  .metrics .m:nth-child(odd) {
+    border-left: 0;
+  }
+  .metrics .m:nth-child(-n + 2) {
+    border-top: 0;
+  }
+  .metrics .m:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .metrics .m .v {
+    font-size: 16px;
+  }
+
+  /* playground: stack the run row so the Route button gets full width */
+  .console-run {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .console-run .pg-route {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ── narrow phones ── */
+@media (max-width: 400px) {
+  .content,
+  .sheet {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .rail {
+    padding: 16px;
+  }
+  .lede {
+    font-size: 20px;
+  }
+  .page-head h1 {
+    font-size: 25px;
+  }
+  /* spec label over value on the tightest screens */
+  .spec {
+    grid-template-columns: 1fr;
+    gap: 3px;
   }
 }

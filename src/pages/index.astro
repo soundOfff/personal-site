@@ -8,20 +8,23 @@ import Icon from '../components/Icon.astro';
 import Playground from '../islands/Playground';
 import { profile, proofs, tenets, toolbox, log, now } from '../data/site';
 import { repos } from '../data/repos';
-import { PILLAR_PRIORITY } from '../lib/pillars';
 
 // Work index — single source of truth is the `work` collection (also the case-study pages).
 const work = (await getCollection('work', ({ data }) => !data.draft)).sort((a, b) =>
   a.data.n.localeCompare(b.data.n),
 );
 
-// Writing section — surface technical posts first (BRIEF: homepage curates technical-first).
-const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => {
-    const p = PILLAR_PRIORITY[a.data.pillar] - PILLAR_PRIORITY[b.data.pillar];
-    return p !== 0 ? p : b.data.date.valueOf() - a.data.date.valueOf();
-  })
-  .slice(0, 4);
+// Writing section — homepage curates a hand-picked set, in this order.
+const FEATURED = [
+  'evals-are-contracts',
+  'binary-search-on-the-answer',
+  'data-structures-typescript-python',
+  'the-unglamorous-middle',
+];
+const byId = new Map(
+  (await getCollection('blog', ({ data }) => !data.draft)).map((p) => [p.id, p]),
+);
+const posts = FEATURED.map((id) => byId.get(id)).filter((p) => p !== undefined);
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 ---
@@ -114,7 +117,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
         <div class="log">
           {
             log.map((item) => (
-              <div class="logitem">
+              <div class:list={['logitem', item.upcoming && 'upcoming']}>
                 <div class="gutter">
                   <span class="ln" />
                   <span class="node" />
@@ -125,7 +128,14 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
                     <span class="date">{item.date}</span>
                     <span class="tag">{item.tag}</span>
                   </div>
-                  <div class="msg">{item.msg}</div>
+                  <div class="msg">
+                    {item.msg}
+                    {item.link && (
+                      <a href={item.link.href} target="_blank" rel="noopener noreferrer">
+                        {item.link.label}
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
@@ -135,7 +145,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 
       {/* 05 · writing */}
       <section class="block" id="writing">
-        <p class="keybar">// <b>writing</b></p>
+        <p class="keybar">// <b>writing</b> · <a href="/blog">all posts</a></p>
         <div class="wlist">
           {
             posts.map((post) => (

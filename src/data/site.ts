@@ -9,7 +9,7 @@ export const profile = {
   name: 'Tomas Brasca',
   monogram: 'TB',
   // mono uppercase role under the name in the rail
-  role: 'Backend · AI systems',
+  role: 'Fullstack · AI systems',
   // sage status pill (short)
   status: 'Open to work · Rosario, AR',
   // hero lede — the phrase wrapped in <em></em> renders italic + amber
@@ -27,7 +27,7 @@ export const contact = [
   },
   // Direct PDF download (public/cv.pdf); `download` sets the saved filename.
   // The print-ready /cv page still exists for an always-current version.
-  { label: 'CV', href: '/cv.pdf', icon: 'i-download', download: 'Resume_Brasca_Tomas.pdf' },
+  { label: 'Resume', href: '/cv.pdf', icon: 'i-download', download: 'Resume_Brasca_Tomas.pdf' },
 ] as const;
 
 // In-page rail nav. Indices render as 00–08.
@@ -50,9 +50,9 @@ export const nav = [
 export const proofs: { value: string; key: string; accent?: boolean }[] = [
   { value: '2-3M', accent: true, key: 'users at Mint' },
   { value: 'ICPC', key: 'SA finalist' },
-  { value: '1st', key: 'GTS algorithmic trading' },
-  { value: 'SE II', key: 'engineer · Dex' },
-  { value: '4+', key: 'yrs in backend' },
+  { value: '1st', key: 'GTS alg trading' },
+  { value: 'SE II', key: 'engineer at Dex' },
+  { value: '4+', key: 'yrs fullstack' },
 ];
 
 // 06 · principles — kept from the design; they map exactly to the router work.
@@ -87,7 +87,35 @@ export const toolbox = [
  * 04 · log · recent activity — git-style changelog, newest first. Short
  * mono hashes are illustrative; dates are real milestones.
  */
-export const log = [
+export const log: {
+  hash: string;
+  date: string;
+  tag: string;
+  msg: string;
+  /** Optional external link rendered after the message. */
+  link?: { label: string; href: string };
+  /** Renders as a "coming soon" node — dashed dot, muted text. */
+  upcoming?: boolean;
+}[] = [
+  {
+    hash: 'focusq0',
+    date: 'soon',
+    tag: 'coming soon',
+    msg: 'focus-quote — a Chrome extension for focus sessions: capture quotes from the web, set a goal, and get AI insights on which tabs were on-goal vs. distractions.',
+    upcoming: true,
+  },
+  {
+    hash: 'unglam1',
+    date: 'jun 2026',
+    tag: 'writing',
+    msg: 'Publish “The unglamorous middle” — joining my first startup three and a half years in, and learning the real job is the part nobody demos.',
+  },
+  {
+    hash: 'eui010',
+    date: 'jun 2026',
+    tag: 'oss',
+    msg: 'Publish editorial-ui v0.1.0 — the warm-paper, one-amber, hairline design system this site is built on.',
+  },
   {
     hash: 'ship001',
     date: 'jun 2026',
@@ -95,30 +123,13 @@ export const log = [
     msg: 'Ship the personal site — Astro shell, editorial-ui design system, router island, Cloudflare Worker deploy.',
   },
   {
-    hash: 'unglam1',
-    date: 'jun 2026',
-    tag: 'writing',
-    msg: 'Publish “The unglamorous middle” — why the distance between an AI demo and an AI product is all backend.',
-  },
-  {
-    hash: 'route66',
+    hash: 'dana100',
     date: 'may 2026',
-    tag: 'writing',
-    msg: 'Publish “Routing beats scaling” — the classify-then-dispatch cost study behind the playground.',
+    tag: 'launch',
+    msg: 'Launch Dana — AI meeting prep that pulls context from calendar, email, and Slack so you walk in already briefed.',
+    link: { label: 'danahq.com', href: 'https://danahq.com/' },
   },
-  {
-    hash: 'live5pm',
-    date: 'apr 2026',
-    tag: 'flagship',
-    msg: 'Wire live mode for the router playground — Worker-held keys, KV per-IP cap, cheap models only.',
-  },
-  {
-    hash: 'eui010',
-    date: 'feb 2026',
-    tag: 'oss',
-    msg: 'Publish editorial-ui v0.1.0 — the warm-paper, one-amber, hairline design system this site is built on.',
-  },
-] as const;
+];
 
 // 08 · now — spec sheet.
 export const now = [

@@ -52,6 +52,29 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       <Content />
     </article>
 
+    <button class="back-to-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="Back to top" type="button">
+      <Icon name="i-arrow-u" size={14} />
+    </button>
+
+    <script is:inline>
+      (function() {
+        const btn = document.querySelector('.back-to-top');
+        if (btn) {
+          // Check on load in case the user reloads halfway down
+          if (window.scrollY > window.innerHeight) {
+            btn.classList.add('is-visible');
+          }
+          window.addEventListener('scroll', () => {
+            if (window.scrollY > window.innerHeight) {
+              btn.classList.add('is-visible');
+            } else {
+              btn.classList.remove('is-visible');
+            }
+          }, { passive: true });
+        }
+      })();
+    </script>
+
     <Footer />
   </div>
 </BaseLayout>

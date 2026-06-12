@@ -1,7 +1,7 @@
 ---
 n: '01'
 title: 'Dex — multi-LLM routing'
-description: 'Classify-then-dispatch in front of OpenAI, Groq and OpenRouter, balancing latency, cost and quality. The system this playground demonstrates.'
+description: 'Classify-then-dispatch in front of OpenAI, Groq and OpenRouter, balancing latency, cost and quality.'
 stack: 'Routing · evals'
 year: '2025'
 code: false
@@ -19,7 +19,7 @@ and the bill scaled linearly with usage, which made the feature hard to justify.
 
 ## Architecture
 
-I put a **classify-then-dispatch router** in front of three providers. Each incoming
+I helped build a **classify-then-dispatch system** in front of three providers. Each incoming
 prompt is classified, then dispatched to the cheapest model that clears that class's
 eval bar; harder classes escalate to larger models, with per-provider fallback.
 
@@ -31,7 +31,7 @@ eval bar; harder classes escalate to larger models, with per-provider fallback.
 
 Routing is only as trustworthy as its evals. A bar set too low ships silent quality
 regressions; set too high, you never realise the savings. The work was less about the
-router and more about **writing honest evals** for each class — and keeping them green.
+routing logic and more about **writing honest evals** for each class — and keeping them green.
 
 ## Outcome
 

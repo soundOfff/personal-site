@@ -8,18 +8,18 @@ readingTime: '6 min'
 draft: false
 ---
 
-Three weeks ago the router started sending structured-output traffic to the
+Three weeks ago our system started sending structured-output traffic to the
 smallest model in the catalog. Every dashboard improved — latency down, cost down,
 error rate flat. The eval stayed green the whole time, because the dataset never
 covered nested objects. Today, support tickets are your eval suite.
 
-That failure has nothing to do with routing. Routing is the easy half —
+That failure might not be about routing. Routing is often the easy half —
 [classify the request, dispatch to the cheapest model that clears the bar](/blog/routing-beats-scaling).
 The hard half is one word. _Clears_. Clears what? Measured how? Decided by whom?
 
 ## The load-bearing word
 
-In the router that powers [this site's playground](/#playground), the contract is
+In the system that powers [this site's playground](/#playground), the contract is
 literal. Each catalog entry declares which prompt classes it is allowed to serve:
 
 ```ts
@@ -49,7 +49,7 @@ function pickModel(cls: PromptClass, env: Record<string, string | undefined>): C
 That `clears` array is the entire routing decision. Eight lines of dispatch, one
 array of truth. So the real question is upstream: who edits that array, and on what
 evidence? If it gets edited by hand because somebody tried four prompts and the
-output looked fine, the router is laundering vibes through a type system.
+output looked fine, the system is laundering vibes through a type system.
 
 At [Dex](/work/dex) — same architecture, real traffic — the equivalent of that
 array was edited by exactly one thing: the eval suite. A model earned a class by
@@ -97,16 +97,16 @@ the diff shows exactly which cases flipped.
 The output of a run is one number per model per class. The catalog is whatever
 those numbers say it is.
 
-## Two ways to lie to yourself
+## Two common pitfalls
 
 A bar can fail in exactly two directions, and they are not symmetric in how they
 hurt.
 
-**Too low**, and silent quality regressions ship. The router happily sends
+**Too low**, and silent quality regressions ship. The routing layer happily sends
 structured-output traffic to the smallest model, the eval stays green because the
 dataset never covered nested objects, and three weeks later support tickets are
 your eval suite. This failure is invisible at the routing layer — every metric the
-router emits (latency, cost, error rate) improves while the product quietly gets
+system emits (latency, cost, error rate) improves while the product quietly gets
 worse. The only instrument that can catch it is the eval, which is precisely the
 instrument that's broken.
 
@@ -154,7 +154,7 @@ someone else counters with a cherry-picked failure, and whoever cares more wins.
 With the contract in place, the same disagreement is a pull request — here are
 thirty cases where the small model fails, add them to the dataset, run the suite,
 read the number. If the number drops below threshold, the model loses the class
-and the router stops sending it that traffic, automatically. If it doesn't, the
+and the system stops sending it that traffic, automatically. If it doesn't, the
 thirty cases stay in the dataset as a permanent regression guard, and the savings
 stay on.
 

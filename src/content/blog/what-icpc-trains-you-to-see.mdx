@@ -8,7 +8,7 @@ readingTime: '6 min'
 draft: false
 ---
 
-I have needed a segment tree in production exactly zero times.
+I haven't often needed a segment tree in production.
 
 That is the standard objection to competitive programming as job training, and it is correct as far as it goes. Nobody at work has ever asked me for a suffix automaton. The data structures were never the transferable part. What transferred is a reflex the contest format beats into you: **state the invariant, bound the worst case, and only then write code.**
 
@@ -25,7 +25,7 @@ That penalty structure changes how you work. You cannot debug your way to correc
 3. **Bound the complexity.** About 10^8 simple operations per second. If the bound does not clear the limit, the idea is dead, however elegant.
 4. **Then type.** Typing is the cheapest step and the last one.
 
-The teams that beat us were rarely faster typists. They submitted less garbage.
+The teams that beat us were rarely faster typists. They simply made fewer mistakes.
 
 ## A worked example
 
@@ -64,7 +64,7 @@ const key = `rl:${ip}:${window}`;
 
 Invariant: a key counts requests in exactly one window, and the counter only grows within it. Worst cases, stated before the code was written: a client straddling a window boundary can burst roughly twice the limit, and KV has no atomic increment, so concurrent requests can over-admit slightly. Both bounded, both acceptable for a soft five-per-minute cap on cheap models. That is contest analysis verbatim — find the adversarial input, bound the damage, decide whether the bound is acceptable.
 
-**A greedy with a one-line proof.** The router behind the [playground](/#playground) keeps its model catalog ordered cheapest to dearest and picks like this:
+**A greedy with a one-line proof.** The system behind the [playground](/#playground) keeps its model catalog ordered cheapest to dearest and picks like this:
 
 ```ts
 function pickModel(cls: PromptClass, env: Record<string, string | undefined>): CatalogEntry | null {
@@ -75,7 +75,7 @@ function pickModel(cls: PromptClass, env: Record<string, string | undefined>): C
 }
 ```
 
-Cheapest-first is a greedy, and a greedy is only trustworthy when you can prove its property. Here the proof is one sentence: the catalog is sorted by price, so **the first model that clears the class is the cheapest model that clears it**. The production router I built at [Dex](/work/dex) runs the same shape across OpenAI, Groq and OpenRouter, and the cost case for it is the subject of [routing beats scaling](/blog/routing-beats-scaling). Being able to state the greedy's property in one line is what made the design easy to defend in review.
+Cheapest-first is a greedy, and a greedy is only trustworthy when you can prove its property. Here the proof is one sentence: the catalog is sorted by price, so **the first model that clears the class is the cheapest model that clears it**. The production system I worked on at [Dex](/work/dex) runs the same shape across OpenAI, Groq and OpenRouter, and the cost case for it is the subject of [routing beats scaling](/blog/routing-beats-scaling). Being able to state the greedy's property in one line is what made the design easy to defend in review.
 
 **Capacity planning as complexity analysis.** The worst-case bill for a public inference endpoint is requests per window, times windows, times max tokens per request, times the dearest price in the catalog. Because the live catalog only contains cheap models, the constant is bounded by construction. Same muscle as checking a loop against 10^8 operations per second: name the worst case before you ship, not after the invoice.
 

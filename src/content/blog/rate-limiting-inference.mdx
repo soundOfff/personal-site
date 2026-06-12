@@ -34,7 +34,7 @@ qwen-2.5-72b at $0.35 in / $0.40 out per million tokens. Prompts over 2,000 char
 are rejected with a 413, and every provider call sends `max_tokens: 512`. So the worst
 case per route is bounded by construction: roughly 500 input tokens plus 512 output
 tokens on the dearest model — about $0.0004. No request, however crafted, costs more.
-There is no expensive tier to trick the router into.
+There is no expensive tier to be tricked into.
 
 **2. Per-IP cap.** Five routes per minute, fixed window, counted in Cloudflare KV. The
 arithmetic: 5/min over 1,440 minutes is 7,200 routes a day, times $0.0004 is **under $3
@@ -152,7 +152,7 @@ and loudly.
 
 ## The cap is the feature
 
-It is tempting to file rate limiting under pre-launch chores. Here the dependency runs
+It can be tempting to file rate limiting under pre-launch chores. Here the dependency runs
 the other way: live mode exists _because_ the worst case is bounded. Without the cap,
 the only responsible version of this demo is a video. With it, a public no-auth page can
 run real inference — the same classify-then-dispatch idea as
@@ -160,5 +160,5 @@ run real inference — the same classify-then-dispatch idea as
 damage any visitor can do is lunch money.
 
 The full architecture is in [the Flagship case study](/work/flagship). Or skip the
-write-up and [run the router yourself](/#playground) — the limiter is part of the demo.
+write-up and [run the demo yourself](/#playground) — the limiter is part of it.
 If you hit the 429, that's working as intended.
