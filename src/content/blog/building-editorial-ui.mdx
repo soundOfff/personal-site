@@ -10,7 +10,7 @@ draft: false
 
 The first three hours of every side project were always the same: button radius,
 grey scale, which font, how much shadow. Then the next project, the same three hours,
-slightly different answers. None of those answers ever made anything better. They were
+slightly different answers. Those answers rarely made a significant difference. They were
 just decisions, and decisions are expensive even when they don't matter.
 
 The fix is not better taste. The fix is to make the decisions once, encode them, and
@@ -70,7 +70,7 @@ the top of `tokens.css`, verbatim:
 Note the comment on the amber block. The rule is written where the colour is defined,
 so you cannot reach for `--amber` without reading it. There is no generic `--gray-50`
 through `--gray-900` ramp because a ramp is a menu, and menus invite choosing. Three
-papers, two inks, two rules. If a screen needs more than that, the screen is wrong.
+papers, two inks, two rules. If a screen needs more than that, it might be getting too complex.
 
 The fifth rule, implicit in the other four: **no new colours**. Every colour
 reference goes through a variable. Dark mode then becomes a token swap —
@@ -176,7 +176,7 @@ the thing.
 
 The site you are reading runs on these tokens — the hairlines between sections are
 `var(--rule)`, the background is `var(--paper)`, and there is exactly one amber
-action per view, including the [Playground](/#playground), where the router demo's
+action per view, including the [Playground](/#playground), where the demo's
 "route it" button is the amber of its screen. The
 [Flagship case study](/work/flagship) is the system's stress test: data-dense
 output, three providers side by side, still no shadows.

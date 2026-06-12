@@ -49,7 +49,7 @@ the field; a structured one fails by emitting malformed output; a reasoning one
 fails by being wrong in the middle of a chain; a creative one fails by being
 dull. Different failure modes need different amounts of model.
 
-The [playground](/#playground) version of the router uses a heuristic
+The [playground](/#playground) version uses a heuristic
 classifier — instant, free, and good enough to demonstrate the contract:
 
 ```ts
@@ -140,13 +140,13 @@ means something.
 
 Each `clears` entry in the catalog is supposed to be a cached verdict from an
 eval suite: this model, on this class of request, meets the bar we defined
-before we cared about the bill. Set the bar too low and the router ships
+before we cared about the bill. Set the bar too low and the system ships
 quality regressions invisibly, one cheap dispatch at a time. Set it too high
 and you never realise the savings, because everything escalates. Either way the
 catalog is lying to the dispatch loop.
 
 This is why [evals are contracts](/blog/evals-are-contracts), not dashboards.
-At Dex the router itself was a small amount of code — classify, walk, dispatch,
+At Dex the implementation itself was a small amount of code — classify, walk, dispatch,
 fall back. The engineering time went into writing honest per-class evals and
 keeping them green as models and prompts changed underneath. The routing
 decision is exactly as trustworthy as the test that gates it, and no more.
