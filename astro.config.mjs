@@ -21,9 +21,11 @@ export default defineConfig({
 
   // The site never uses Astro sessions. Without an explicit driver the adapter
   // auto-binds a SESSION KV namespace that `wrangler deploy` then rejects for
-  // having no id — the memory driver keeps the deploy KV-free.
+  // having no id — an in-memory driver keeps the deploy KV-free. (`lruCache`
+  // rather than `memory`: both are in-memory, but only `lruCache` is in
+  // Astro's sessionDrivers type definitions.)
   session: {
-    driver: sessionDrivers.memory(),
+    driver: sessionDrivers.lruCache(),
   },
 
   integrations: [react(), mdx()],

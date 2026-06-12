@@ -8,7 +8,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 
-// flat, tag-organized: collect tags for the (TODO) filter UI
+// flat, tag-organized: collect tags for the filter chips below the dek
 const allTags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
@@ -44,9 +44,11 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       </p>
       {
         allTags.length > 0 && (
-          <div class="ptags">
+          <div class="ptags" role="group" aria-label="Filter posts by tag">
             {allTags.map((t) => (
-              <Badge>#{t}</Badge>
+              <button class="tagbtn" type="button" data-tag={t} aria-pressed="false">
+                <Badge>#{t}</Badge>
+              </button>
             ))}
           </div>
         )
@@ -56,7 +58,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
     <div class="posts">
       {
         posts.map((post) => (
-          <article class="post">
+          <article class="post" data-tags={post.data.tags.join(',')}>
             <div class="pmeta">
               <span>{iso(post.data.date)}</span>
               <span>·</span>
@@ -78,4 +80,41 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       }
     </div>
   </div>
+
+  {/* progressive enhancement: tag chips filter the list (click again to clear) */}
+  <script is:inline>
+    (() => {
+      const chips = document.querySelectorAll('.page-head .tagbtn');
+      const posts = document.querySelectorAll('.posts .post');
+      let active = null;
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          active = active === chip.dataset.tag ? null : chip.dataset.tag;
+          chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.tag === active)));
+          posts.forEach((p) => {
+            const tags = (p.dataset.tags || '').split(',');
+            p.hidden = active !== null && !tags.includes(active);
+          });
+        });
+      });
+    })();
+  </script>
 </BaseLayout>
+
+<style>
+  .tagbtn {
+    border: 0;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    font: inherit;
+  }
+  .tagbtn[aria-pressed='false'] :global(*) {
+    opacity: 0.9;
+  }
+  .tagbtn[aria-pressed='true'] {
+    outline: 1px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+</style>

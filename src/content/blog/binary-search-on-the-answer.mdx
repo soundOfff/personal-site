@@ -1,0 +1,75 @@
+---
+title: 'Binary search on the answer'
+description: 'The contest technique of searching the answer space instead of the input maps directly onto capacity planning: if "can the system handle X?" is monotone, you can find the exact ceiling in a dozen probes.'
+date: 2026-06-12
+pillar: 'Algorithms & competitive programming'
+tags: ['algorithms', 'binary-search', 'capacity-planning', 'load-testing']
+readingTime: '7 min'
+draft: false
+---
+
+There is a family of contest problems where the trick is to stop searching the input and start searching the answer.
+
+The canonical example: ship `n` packages within `D` days, minimizing truck capacity. Computing the optimal capacity directly is awkward. But checking a _given_ capacity is trivial — greedily fill days, count them. And the check is **monotone**: if capacity `c` works, every capacity above `c` works too. Monotone predicate plus cheap check means binary search, not on the array, but on the answer itself:
+
+```cpp
+bool feasible(long long cap) {
+  long long days = 1, load = 0;
+  for (int w : weights) {
+    if (w > cap) return false;
+    if (load + w > cap) { days++; load = w; }
+    else load += w;
+  }
+  return days <= D;
+}
+
+long long lo = 1, hi = totalWeight;
+while (lo < hi) {
+  long long mid = lo + (hi - lo) / 2;
+  if (feasible(mid)) hi = mid; else lo = mid + 1;
+}
+// lo is the minimum feasible capacity
+```
+
+The invariant carried through the loop: `hi` is always feasible-or-untested-upper-bound, `lo - 1` is always infeasible. The answer is pinched between them, and each probe halves the gap.
+
+In contests this technique is so common it has a name — "binary search on the answer" — and the reflex it trains is the useful part: **when the direct question is hard, ask whether the yes/no version is monotone.**
+
+## The production version is capacity planning
+
+"What is the maximum sustained RPS this service can handle?" is the same shape of question as the truck problem, and teams routinely answer it the awkward way: run one big load test at a guessed number, watch it fall over or not, guess again, argue about the guess.
+
+Reframe it as a predicate:
+
+> `feasible(rps)` = at a sustained `rps` for two minutes, p99 latency stays under 400 ms and the error rate stays under 0.1%.
+
+That predicate is monotone for the same reason the truck check is: if the service holds at 800 RPS, it holds at 700. (Where monotonicity genuinely breaks — caches that only warm up under load, autoscalers with hysteresis — you have learned something more important than the number. More on that below.)
+
+Monotone predicate, expensive-but-automatable check, bounded answer space. Binary search:
+
+```ts
+async function findCeiling(lo: number, hi: number): Promise<number> {
+  // invariant: lo is known-feasible, hi is known-infeasible
+  while (hi - lo > 25) {
+    const mid = Math.floor((lo + hi) / 2);
+    (await holdsAt(mid)) ? (lo = mid) : (hi = mid);
+  }
+  return lo; // feasible, within 25 RPS of the true ceiling
+}
+```
+
+Each probe is a two-minute load test. Searching 0–3,200 RPS to a 25-RPS resolution costs seven probes — about fifteen minutes of wall clock, unattended. The one-big-test approach burns the same fifteen minutes producing a single yes/no at a number someone guessed.
+
+Two details carry over from the contest version, and both are the kind of thing the judge punishes you for forgetting:
+
+**Bracket before you search.** The contest loop needs `lo` infeasible-adjacent and `hi` feasible (or vice versa) _before_ the first iteration. The production equivalent: confirm the service survives the floor and fails at the ceiling before bisecting. If it holds at your chosen `hi`, you have no bracket — and a search inside a broken bracket converges confidently to nonsense.
+
+**The check must be hermetic.** In contests, `feasible()` must not mutate state between probes, or the search lies to you. In load testing the equivalent sins are connection pools still draining from the previous probe, autoscaling triggered by probe four contaminating probe five, and caches warmed by earlier rounds. Cool-down between probes is not politeness; it is the precondition for the invariant.
+
+## When the predicate is not monotone
+
+The truck problem is monotone by construction. Production sometimes is not: I have watched a service pass at 900 RPS and fail at 600, because at 900 the autoscaler had already kicked in and at 600 it idled below the scale-up threshold while a single instance saturated.
+
+A binary search will not tell you this — it assumes monotonicity rather than checking it. The cheap defense: after the search converges, re-probe the claimed ceiling and one point well below it. If the "easier" point fails, the predicate is not monotone, the number is fiction, and the real finding is the non-monotonicity itself — that autoscaler threshold was the actual bug, and no amount of searching would have surfaced it as crisply as one failed re-probe.
+
+That, too, is a contest reflex. The technique is never the trick. Stating the conditions under which the technique is legal — _that_ is the trick.
