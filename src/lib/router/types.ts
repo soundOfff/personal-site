@@ -31,11 +31,20 @@ export interface PromptFixture extends RouteResult {
   key: string;
   /** The prompt text shown in the command list. */
   prompt: string;
+  /** Source material the prompt operates on ("this release note", "this stack
+   * trace"…) — sent along in live mode so the model has something real to work
+   * from instead of inventing data. */
+  input?: string;
 }
 
 /** Request body POSTed to the live endpoint. */
 export interface RouteRequest {
-  prompt: string;
+  /**
+   * Key of the curated fixture to run. Live mode only ever runs FIXTURES — the
+   * prompt and input are looked up server-side from this key, never sent by the
+   * client, so the endpoint can't be replayed as an open LLM proxy.
+   */
+  key: string;
 }
 
 /** Error payload from the live endpoint (429 rate-limited, 503 unconfigured…). */

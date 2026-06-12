@@ -1,7 +1,6 @@
 /**
  * 03 · open source. The two real public repos behind this site. Add more as
- * they go public; set `stars` to a number once known — while null the star
- * count is simply omitted rather than showing a fake or placeholder value.
+ * they go public.
  *
  * Language dot colors follow the design's palette; Astro uses its brand orange.
  */
@@ -13,8 +12,6 @@ export interface Repo {
   language: string;
   /** hex for the 8px language swatch. */
   color: string;
-  /** star count, or null while unknown. */
-  stars: number | null;
 }
 
 export const repos: Repo[] = [
@@ -26,7 +23,6 @@ export const repos: Repo[] = [
       'The warm-paper, one-amber, hairline-over-shadows React design system this whole site is built on.',
     language: 'TypeScript',
     color: '#3178C6',
-    stars: null,
   },
   {
     org: 'soundOfff/',
@@ -35,6 +31,5 @@ export const repos: Repo[] = [
     description: 'This site. Astro, near-zero JS, with a live multi-LLM router island on the edge.',
     language: 'Astro',
     color: '#FF5D01',
-    stars: null,
   },
 ];

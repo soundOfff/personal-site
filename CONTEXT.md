@@ -1,14 +1,15 @@
 # Personal Site
 
-Tomas Brasca's portfolio. A site that positions him as a backend engineer who builds the systems behind production AI products, aimed at people deciding whether to hire him.
+Tomas Brasca's portfolio. A site that positions him as a full-stack engineer who ships AI products end-to-end, aimed at people deciding whether to hire him.
 
 ## Language
 
 **Thesis**:
-The one sentence the whole site defends: _"Backend engineer who builds the systems that make AI products work in production."_ Backend is the foundation, AI/LLM systems are the edge, competitive-programming results are the proof. Every section must serve this sentence or be cut.
+The one sentence the whole site defends: _"Full-stack engineer who ships AI products end-to-end — web, mobile, and the backend that keeps them alive in production."_ End-to-end building is the foundation, AI/LLM systems are the edge, competitive-programming results are the proof. Every section must serve this sentence or be cut.
+_Superseded_: the original Thesis was backend-first ("Backend engineer who builds the systems that make AI products work in production"); it underclaimed real full-stack and mobile breadth.
 
 **Audience**:
-The people the site is written for: engineering hiring managers / recruiters (full-time) and founders / CTOs (contract). Treated as one buyer asking one question — _"Can this person own and ship backend systems that survive production?"_
+The people the site is written for: engineering hiring managers / recruiters (full-time) and founders / CTOs (contract). Treated as one buyer asking one question — _"Can this person own and ship an AI product end-to-end and keep it alive in production?"_ Mobile work is evidence of end-to-end breadth, not a separate funnel — the roles pitched stay AI-product / full-stack.
 _Avoid_: "users", "visitors" when you specifically mean the people deciding to hire him.
 
 **Case Study**:

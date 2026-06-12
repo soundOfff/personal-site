@@ -113,6 +113,10 @@ interface ProviderReply {
   completionTokens: number;
 }
 
+/** Keeps replies console-shaped: no "Certainly!", no closing offers to help. */
+const SYSTEM_PROMPT =
+  'Reply with only the requested output — no preamble, no code fences unless asked, no follow-up questions. Be terse.';
+
 async function callProvider(
   entry: CatalogEntry,
   prompt: string,
@@ -130,7 +134,10 @@ async function callProvider(
     },
     body: JSON.stringify({
       model: entry.model,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: prompt },
+      ],
       max_tokens: 512,
       temperature: cls === 'creative' ? 0.8 : 0.2,
     }),
@@ -161,10 +168,15 @@ export function liveAvailable(env: Record<string, string | undefined>): boolean 
 /**
  * Run the full route. Throws if no model can serve the class (no key for the
  * needed tier) — the caller maps that to a 503.
+ *
+ * `input` is the source material the prompt operates on (the release note to
+ * summarize, the stack trace to explain). The class is decided by the prompt
+ * alone; the input is appended for the provider call.
  */
 export async function route(
   prompt: string,
   env: Record<string, string | undefined>,
+  input?: string,
 ): Promise<RouteResult> {
   const cls = classify(prompt);
   const entry = pickModel(cls, env);
@@ -172,7 +184,8 @@ export async function route(
 
   const apiKey = env[entry.keyName] as string;
   const t0 = Date.now();
-  const reply = await callProvider(entry, prompt, apiKey, cls);
+  const fullPrompt = input ? `${prompt}\n\n${input}` : prompt;
+  const reply = await callProvider(entry, fullPrompt, apiKey, cls);
   const ms = Date.now() - t0;
 
   const usd =

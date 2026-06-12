@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { Link } from 'editorial-ui';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Rail from '../components/Rail.astro';
+import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
 import Playground from '../islands/Playground';
 import { profile, proofs, tenets, toolbox, log, now } from '../data/site';
@@ -36,7 +37,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
         <p class="lede" set:html={profile.lede} />
         <p class="sub">{profile.sub}</p>
         <div class="startrow">
-          <a class="btn btn-amber btn-lg" href="#playground">
+          <a class="btn btn-amber btn-md" href="#playground">
             <Icon name="i-play" size={15} />Run the router
           </a>
           <Link variant="arrow" href="#work">See the work index</Link>
@@ -98,10 +99,6 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
                   <span class="lang">
                     <span class="sw" style={`background:${r.color}`} />
                     {r.language}
-                  </span>
-                  <span class="stars">
-                    <span class="st">★</span>
-                    {r.stars ?? '—'}
                   </span>
                 </span>
                 <span class="desc">{r.description}</span>
@@ -201,6 +198,8 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
           }
         </dl>
       </section>
+
+      <Footer />
     </main>
   </div>
 

@@ -37,11 +37,13 @@ const { active } = Astro.props;
       {
         contact.map((c) => {
           const external = c.href.startsWith('http');
+          // The CV PDF also opens in a new tab so the reader keeps their place.
+          const newTab = external || c.href.endsWith('.pdf');
           return (
             <a
               href={c.href}
-              target={external ? '_blank' : undefined}
-              rel={external ? 'me noopener noreferrer' : undefined}
+              target={newTab ? '_blank' : undefined}
+              rel={newTab ? (external ? 'me noopener noreferrer' : 'noopener') : undefined}
             >
               <Icon name={c.icon} size={14} />
               {c.label}
@@ -68,3 +70,50 @@ const { active } = Astro.props;
     </button>
   </div>
 </aside>
+
+<!-- Scrollspy: highlight the rail item for the section nearest the top of the
+     viewport. Recomputed on scroll rather than IntersectionObserver so short
+     final sections still win when scrolled to the bottom. -->
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.railnav a[href^="#"]')];
+  const sections = links
+    .map((a) => document.getElementById(a.hash.slice(1)))
+    .filter((s): s is HTMLElement => s !== null);
+
+  if (links.length && sections.length) {
+    const setActive = (id: string) => {
+      links.forEach((a) => {
+        if (a.hash.slice(1) === id) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+    };
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      // At the very bottom, the last section is active even if it's short.
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 2) {
+        setActive(sections[sections.length - 1].id);
+        return;
+      }
+      const probe = window.scrollY + window.innerHeight * 0.3;
+      let current = sections[0];
+      for (const s of sections) {
+        if (s.offsetTop <= probe) current = s;
+      }
+      setActive(current.id);
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+  }
+</script>
