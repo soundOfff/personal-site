@@ -51,16 +51,21 @@ jobs:
       # wrangler.toml ships with a placeholder id for the RL (rate-limit) KV
       # namespace so the repo stays account-agnostic. Find or create the real
       # namespace and pin its id before the build bakes the config into
-      # dist/server/wrangler.json.
+      # dist/server/wrangler.json. Wrangler versions differ on the title they
+      # give a namespace created as "RL" (bare "RL" on wrangler 4.x,
+      # "personal-site-RL" on older versions), so match either.
       - name: Resolve RL KV namespace
         run: |
           set -euo pipefail
-          title="personal-site-RL"
-          id=$(npx wrangler kv namespace list | jq -r --arg t "$title" '.[] | select(.title == $t) | .id')
+          lookup() {
+            npx wrangler kv namespace list \
+              | jq -r '[.[] | select(.title == "RL" or .title == "personal-site-RL")][0].id // empty'
+          }
+          id=$(lookup)
           if [ -z "$id" ]; then
-            echo "KV namespace $title not found — creating it."
+            echo "RL KV namespace not found — creating it."
             npx wrangler kv namespace create RL
-            id=$(npx wrangler kv namespace list | jq -r --arg t "$title" '.[] | select(.title == $t) | .id')
+            id=$(lookup)
           fi
           [ -n "$id" ] || { echo "Failed to resolve the RL KV namespace id." >&2; exit 1; }
           sed -i "s/00000000000000000000000000000000/$id/" wrangler.toml

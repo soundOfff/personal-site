@@ -6,3 +6,4 @@ pnpm-lock.yaml
 package-lock.json
 # design references — kept verbatim as the source-of-truth prototype
 docs/adr/design
+.claude

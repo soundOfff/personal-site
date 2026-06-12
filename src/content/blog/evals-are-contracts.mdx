@@ -77,8 +77,7 @@ exact match on the JSON keys that matter:
 export default {
   class: 'extractive',
   dataset: 'datasets/extraction-v7.jsonl', // 240 frozen cases
-  grade: (got, want) =>
-    ['order_id', 'total', 'currency'].every((k) => deepEqual(got[k], want[k])),
+  grade: (got, want) => ['order_id', 'total', 'currency'].every((k) => deepEqual(got[k], want[k])),
   threshold: 0.98, // below this, the model loses the class
 };
 ```

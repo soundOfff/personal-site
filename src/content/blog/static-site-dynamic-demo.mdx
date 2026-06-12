@@ -85,7 +85,7 @@ The usual way to show off a system like this is a video or a GIF. Fixtures beat 
 
 ## What islands actually buy here
 
-`client:visible` is doing more work than it looks like. Astro renders the Playground's initial HTML at build time, so the section is visible and styled before any JavaScript arrives. The framework runtime and component code are only fetched when the island scrolls into the viewport — not on page load, not on idle, on *visible*.
+`client:visible` is doing more work than it looks like. Astro renders the Playground's initial HTML at build time, so the section is visible and styled before any JavaScript arrives. The framework runtime and component code are only fetched when the island scrolls into the viewport — not on page load, not on idle, on _visible_.
 
 A reader who lands on a blog post and leaves gets effectively no JavaScript. A reader who opens the homepage but never scrolls to the Playground also gets none of the island's code. Only the reader who arrives at the demo pays for the demo, and by then the static HTML has long since finished rendering, so the cost is invisible.
 

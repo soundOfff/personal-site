@@ -46,24 +46,24 @@ the top of `tokens.css`, verbatim:
 ```css
 :root {
   /* Paper surfaces */
-  --paper:        #FBFAF6;
-  --paper-2:      #F4F2EC;
-  --paper-3:      #ECE9DF;
+  --paper: #fbfaf6;
+  --paper-2: #f4f2ec;
+  --paper-3: #ece9df;
 
   /* Ink */
-  --ink:          #1A1814;
-  --ink-2:        #3A362F;
-  --muted:        #807A6F;
-  --muted-2:      #B5AEA0;
+  --ink: #1a1814;
+  --ink-2: #3a362f;
+  --muted: #807a6f;
+  --muted-2: #b5aea0;
 
   /* Hairlines */
-  --rule:         #E5E0D5;
-  --rule-2:       #D9D3C5;
+  --rule: #e5e0d5;
+  --rule-2: #d9d3c5;
 
   /* Amber (one per surface) */
-  --amber:        #F2A03C;
-  --amber-deep:   #C77A1F;
-  --amber-soft:   #FBE6C8;
+  --amber: #f2a03c;
+  --amber-deep: #c77a1f;
+  --amber-soft: #fbe6c8;
 }
 ```
 
@@ -131,15 +131,15 @@ default is the neutral style:
 <Button variant="amber">Save</Button>
 ```
 
-You opt *in* to prominence, never out of it. There is no `primary` prop that
+You opt _in_ to prominence, never out of it. There is no `primary` prop that
 half the team sets out of habit — the word in the code is the colour on the screen,
 which makes a second amber button easy to spot in review. Every compound component
 ships the hierarchy pre-built: `Modal.Footer` examples pair a ghost cancel with one
 amber confirm, and the docs never show two ambers together, so copy-paste propagates
 the rule.
 
-The honest summary: the type system enforces *which* variants exist, the docs
-enforce *how many*, and review enforces the rest. A constraint that lives in
+The honest summary: the type system enforces _which_ variants exist, the docs
+enforce _how many_, and review enforces the rest. A constraint that lives in
 convention is weaker than one that lives in the compiler, but it is much stronger
 than one that lives in nobody's head.
 
