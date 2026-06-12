@@ -30,7 +30,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
           stroke-width="1.6"
           aria-hidden="true"
         >
-          <use href="/icons.svg#i-moon" data-theme-icon></use>
+          <use href="#i-moon" data-theme-icon></use>
         </svg>
       </button>
     </div>
@@ -81,22 +81,37 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
     </div>
   </div>
 
-  {/* progressive enhancement: tag chips filter the list (click again to clear) */}
+  {
+    /* progressive enhancement: tag chips filter the list (click again to clear);
+      the active tag mirrors into ?tag= so filtered views survive reload/share */
+  }
   <script is:inline>
     (() => {
       const chips = document.querySelectorAll('.page-head .tagbtn');
       const posts = document.querySelectorAll('.posts .post');
       let active = null;
+      const apply = () => {
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.tag === active)));
+        posts.forEach((p) => {
+          const tags = (p.dataset.tags || '').split(',');
+          p.hidden = active !== null && !tags.includes(active);
+        });
+        const url = new URL(location.href);
+        if (active === null) url.searchParams.delete('tag');
+        else url.searchParams.set('tag', active);
+        history.replaceState(null, '', url);
+      };
       chips.forEach((chip) => {
         chip.addEventListener('click', () => {
           active = active === chip.dataset.tag ? null : chip.dataset.tag;
-          chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.tag === active)));
-          posts.forEach((p) => {
-            const tags = (p.dataset.tags || '').split(',');
-            p.hidden = active !== null && !tags.includes(active);
-          });
+          apply();
         });
       });
+      const initial = new URLSearchParams(location.search).get('tag');
+      if (initial && [...chips].some((c) => c.dataset.tag === initial)) {
+        active = initial;
+        apply();
+      }
     })();
   </script>
 </BaseLayout>

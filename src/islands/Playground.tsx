@@ -19,7 +19,7 @@ function RefreshIcon() {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <use href="/icons.svg#i-refresh"></use>
+      <use href="#i-refresh"></use>
     </svg>
   );
 }
@@ -34,7 +34,7 @@ function GlyphIcon({ id }: { id: string }) {
       strokeWidth="1.6"
       aria-hidden="true"
     >
-      <use href={`/icons.svg#${id}`}></use>
+      <use href={`#${id}`}></use>
     </svg>
   );
 }

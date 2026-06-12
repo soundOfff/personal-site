@@ -3,6 +3,7 @@ import { defineConfig, sessionDrivers } from 'astro/config';
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,6 +13,10 @@ export default defineConfig({
   // The site is static-first (near-zero JS). Only the live-mode Playground endpoint
   // opts into on-demand rendering via `export const prerender = false`.
   output: 'static',
+
+  // /work has no index page — case studies live at /work/<id> and the index is
+  // the #work section on the homepage. Catch the guessable bare URL.
+  redirects: { '/work': '/#work' },
 
   // The adapter reads wrangler.toml automatically, so `Astro.locals.runtime.env`
   // (KV, secrets) is simulated locally during `astro dev`.
@@ -28,7 +33,8 @@ export default defineConfig({
     driver: sessionDrivers.lruCache(),
   },
 
-  integrations: [react(), mdx()],
+  // sitemap emits /sitemap-index.xml at build time — robots.txt points at it.
+  integrations: [react(), mdx(), sitemap()],
 
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
 

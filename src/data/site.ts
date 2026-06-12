@@ -25,8 +25,9 @@ export const contact = [
     href: 'https://www.linkedin.com/in/tomasbrasca',
     icon: 'i-ext',
   },
-  // /cv is a print-ready résumé page — “save as PDF” from the browser.
-  { label: 'cv', href: '/cv', icon: 'i-download' },
+  // Direct PDF download (public/cv.pdf); `download` sets the saved filename.
+  // The print-ready /cv page still exists for an always-current version.
+  { label: 'CV', href: '/cv.pdf', icon: 'i-download', download: 'Resume_Brasca_Tomas.pdf' },
 ] as const;
 
 // In-page rail nav. Indices render as 00–08.
@@ -47,9 +48,9 @@ export const nav = [
  * `accent: true` renders the value in amber.
  */
 export const proofs: { value: string; key: string; accent?: boolean }[] = [
-  { value: '2–3M', accent: true, key: 'users at Mint' },
+  { value: '2-3M', accent: true, key: 'users at Mint' },
   { value: 'ICPC', key: 'SA finalist' },
-  { value: '1st', key: 'GTS algo-trading' },
+  { value: '1st', key: 'GTS algorithmic trading' },
   { value: 'SE II', key: 'engineer · Dex' },
   { value: '4+', key: 'yrs in backend' },
 ];
