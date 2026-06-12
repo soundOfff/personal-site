@@ -1,11 +1,18 @@
 import { useCallback, useRef, useState } from 'react';
 import { SegmentedControl, Button, Alert } from 'editorial-ui';
 import { FIXTURES } from '../lib/router/fixtures';
-import type { RouteError, RouteResult } from '../lib/router/types';
+import type { RouteError, RouteRequest, RouteResult } from '../lib/router/types';
 
 type Mode = 'demo' | 'live';
 
 const DEMO_DELAY_MS = 420;
+
+/** Seconds → a human retry hint; daily caps reset hours out, not seconds. */
+function formatRetry(seconds: number): string {
+  if (seconds < 90) return `${seconds}s`;
+  if (seconds < 5400) return `${Math.round(seconds / 60)} min`;
+  return `${Math.round(seconds / 3600)} h`;
+}
 
 function RefreshIcon() {
   return (
@@ -65,7 +72,7 @@ export default function Playground() {
       const res = await fetch('/api/route', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ prompt: fixture.prompt }),
+        body: JSON.stringify({ key: fixture.key } satisfies RouteRequest),
       });
 
       if (res.ok) {
@@ -77,12 +84,14 @@ export default function Playground() {
       if (res.status === 429) {
         finish(
           null,
-          `Rate limit reached — try again in ${body.retryAfter ?? 60}s. Demo mode is always free.`,
+          `Rate limit reached — try again in ${formatRetry(body.retryAfter ?? 60)}. Demo mode is always free.`,
         );
       } else if (res.status === 503) {
         finish(
           { ...fixture, mode: 'demo' },
-          "Live mode isn't enabled on this deploy yet — showing the cached demo route instead.",
+          body.error === 'daily-budget-exhausted'
+            ? "Live mode's shared daily budget is spent — showing the cached demo route. Resets at 00:00 UTC."
+            : "Live mode isn't enabled on this deploy yet — showing the cached demo route instead.",
         );
       } else {
         finish(null, 'The router hit an upstream error. Try demo mode, or try again.');
@@ -147,9 +156,12 @@ export default function Playground() {
         </div>
 
         <div className="console-run">
-          <span className="cap">
-            {mode === 'live' ? 'real inference · capped' : 'cached at edge · free'}
-          </span>
+          <div className="run-info">
+            <span className="cap">
+              {mode === 'live' ? 'real inference · capped' : 'cached at edge · free'}
+            </span>
+            {!hasResult && <span className="console-empty">select a prompt and route it</span>}
+          </div>
           <Button
             variant="amber"
             type="button"
@@ -165,11 +177,9 @@ export default function Playground() {
         {mode === 'live' && (
           <Alert variant="info" compact className="live-note">
             Live mode runs real inference behind a serverless function — keys stay server-side,
-            capped at 5 routes/min per IP on cheap models only.
+            capped at 5 routes/min and 20/day.
           </Alert>
         )}
-
-        {!hasResult && <div className="console-empty">select a prompt and route it</div>}
 
         {hasResult && (
           <div className="console-out" data-pg-result>
@@ -196,7 +206,9 @@ export default function Playground() {
                   <GlyphIcon id="i-bulb" />
                   <span>{result.why}</span>
                 </p>
-                <pre className="reply">{result.response}</pre>
+                <pre className={`reply${result.response.includes('\n') ? ' is-block' : ''}`}>
+                  {result.response}
+                </pre>
               </>
             )}
             {error && (

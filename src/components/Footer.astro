@@ -1,0 +1,30 @@
+---
+import { site, profile } from '../data/site';
+
+// Simple page footer, rendered at the bottom of both the homepage content
+// column and the subpage sheet. Short labels here on purpose — the rail's
+// contact block carries the full handles.
+const links = [
+  { label: 'github', href: 'https://github.com/soundOfff' },
+  { label: 'linkedin', href: 'https://www.linkedin.com/in/tomasbrasca' },
+  { label: 'email', href: 'mailto:tomibrasca97@gmail.com' },
+  { label: 'rss', href: '/rss.xml' },
+];
+---
+
+<footer class="foot">
+  <span class="foot-c">{site.copyright} {profile.name}</span>
+  <nav class="foot-links" aria-label="Footer">
+    {
+      links.map((l) => (
+        <a
+          href={l.href}
+          target={l.href.startsWith('http') ? '_blank' : undefined}
+          rel={l.href.startsWith('http') ? 'me noopener noreferrer' : undefined}
+        >
+          {l.label}
+        </a>
+      ))
+    }
+  </nav>
+</footer>

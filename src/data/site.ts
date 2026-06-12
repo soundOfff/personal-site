@@ -126,7 +126,7 @@ export const now = [
   { dt: 'Status', dd: 'Open to senior backend / AI-infra roles & select contract work' },
   { dt: 'Email', dd: 'tomibrasca97@gmail.com' },
   { dt: 'Focus', dd: 'LLM routing, evals, cost control; high-traffic backends' },
-  { dt: 'Reading', dd: 'Designing Data-Intensive Applications — the partitioning chapters, again' },
+  { dt: 'Reading', dd: 'AI Engineer' },
   { dt: 'Built with', dd: 'Astro · React island · editorial-ui · Cloudflare' },
 ] as const;
 

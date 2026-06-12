@@ -11,6 +11,8 @@ export const FIXTURES: PromptFixture[] = [
   {
     key: 'summarize',
     prompt: 'Summarize this release note in three bullets.',
+    input:
+      'v4.0.0 — Security & runtime updates. Authentication tokens are now rotated automatically every 24 hours; long-lived tokens issued before this release remain valid until their original expiry. Webhook delivery now retries failed requests up to 5 times with exponential backoff, after which the event is dead-lettered. Finally, we are dropping support for Node 16, which reached end of life; the minimum supported runtime is now Node 18.',
     model: 'llama-3.1-8b',
     provider: 'Groq',
     tone: 'sage',
@@ -23,6 +25,8 @@ export const FIXTURES: PromptFixture[] = [
   {
     key: 'extract',
     prompt: 'Pull the order id, total and currency as JSON.',
+    input:
+      'Order confirmation — Thanks for your purchase! Your order A-4471 has been received and is being prepared for dispatch. Items: 1× mechanical keyboard (€109.90), 1× keycap set (€18.50). Order total: €128.40 incl. VAT. You will receive tracking details within 2 business days.',
     model: 'gpt-4o-mini',
     provider: 'OpenAI',
     tone: 'blue',
@@ -34,6 +38,8 @@ export const FIXTURES: PromptFixture[] = [
   {
     key: 'debug',
     prompt: 'Explain this stack trace and propose a fix.',
+    input:
+      "TypeError: Cannot read properties of null (reading 'user')\n    at SessionStore.get session [as session] (src/auth/session-store.ts:48:31)\n    at AuthProvider.componentDidMount (src/components/AuthProvider.tsx:23:40)\n\nNotes: SessionStore.init() fetches remote config and resolves asynchronously; the constructor kicks it off but nothing awaits it before `session` is first read.",
     model: 'qwen-2.5-72b',
     provider: 'OpenRouter',
     tone: 'clay',

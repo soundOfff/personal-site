@@ -4,6 +4,7 @@ import { Badge } from 'editorial-ui';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
+import Footer from '../../components/Footer.astro';
 
 export const getStaticPaths = (async () => {
   const posts = await getCollection('blog');
@@ -50,5 +51,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
     <article class="prose">
       <Content />
     </article>
+
+    <Footer />
   </div>
 </BaseLayout>
