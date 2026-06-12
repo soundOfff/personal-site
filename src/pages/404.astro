@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout title="404 — Tomas Brasca" description="Page not found.">
+  <div class="sheet">
+    <div class="topbar">
+      <a class="back" href="/"><Icon name="i-arrow-l" size={13} />back to index</a>
+      <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
+        <svg
+          width="15"
+          height="15"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <use href="#i-moon" data-theme-icon></use>
+        </svg>
+      </button>
+    </div>
+
+    <header class="page-head">
+      <p class="eyebrow">// <b>404</b></p>
+      <h1>Route not found</h1>
+      <p class="dek">
+        No page matches this path — the router fell through every rule. Try the
+        <a href="/">index</a>, the <a href="/blog">writing</a>, or a
+        <a href="/work/dex">case study</a>.
+      </p>
+    </header>
+  </div>
+</BaseLayout>

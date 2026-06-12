@@ -1,4 +1,6 @@
 import type { APIRoute } from 'astro';
+// Astro v6 removed `Astro.locals.runtime.env`; bindings come from the module instead.
+import { env as workerEnv } from 'cloudflare:workers';
 import { route, liveAvailable } from '../../lib/router/live';
 import { checkRateLimit } from '../../lib/ratelimit';
 import type { RouteError, RouteRequest } from '../../lib/router/types';
@@ -13,8 +15,8 @@ function json<T>(body: T, status: number, extraHeaders: Record<string, string> =
   });
 }
 
-export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
-  const env = locals.runtime?.env ?? ({} as Env);
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  const env = workerEnv as unknown as Env;
 
   // Live mode is off until at least one provider key is configured.
   if (!liveAvailable(env as unknown as Record<string, string | undefined>)) {

@@ -1,7 +1,7 @@
 /**
  * 03 · open source. The two real public repos behind this site. Add more as
- * they go public; set `stars` to a number once known — until then it renders
- * as "—" rather than a fake count.
+ * they go public; set `stars` to a number once known — while null the star
+ * count is simply omitted rather than showing a fake or placeholder value.
  *
  * Language dot colors follow the design's palette; Astro uses its brand orange.
  */

@@ -1,5 +1,5 @@
 ---
-// Thin wrapper over the public icon sprite (public/icons.svg).
+// Thin wrapper over the icon sprite (src/assets/icons.svg, inlined by BaseLayout).
 interface Props {
   name: string;
   size?: number;
@@ -20,5 +20,5 @@ const { name, size = 16, class: className } = Astro.props;
   aria-hidden="true"
   focusable="false"
 >
-  <use href={`/icons.svg#${name}`}></use>
+  <use href={`#${name}`}></use>
 </svg>
