@@ -15,7 +15,11 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
 
-<BaseLayout title={`${entry.data.title} — Tomas Brasca`} description={entry.data.description}>
+<BaseLayout
+  title={`${entry.data.title} — Tomas Brasca`}
+  description={entry.data.description}
+  type="article"
+>
   <div class="sheet">
     <div class="topbar">
       <a class="back" href="/#work"><Icon name="i-arrow-l" size={13} />work index</a>

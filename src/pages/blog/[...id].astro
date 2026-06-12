@@ -16,7 +16,12 @@ const { Content } = await render(post);
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title={`${post.data.title} — Tomas Brasca`} description={post.data.description}>
+<BaseLayout
+  title={`${post.data.title} — Tomas Brasca`}
+  description={post.data.description}
+  type="article"
+  publishedTime={post.data.date.toISOString()}
+>
   <div class="sheet">
     <div class="topbar">
       <a class="back" href="/blog"><Icon name="i-arrow-l" size={13} />all writing</a>
