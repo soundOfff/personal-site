@@ -9,12 +9,12 @@ import Playground from '../islands/Playground';
 import { profile, proofs, tenets, toolbox, log, now } from '../data/site';
 import { repos } from '../data/repos';
 
-// Work index — single source of truth is the `work` collection (also the case-study pages).
+// Work index: single source of truth is the `work` collection (also the case-study pages).
 const work = (await getCollection('work', ({ data }) => !data.draft)).sort((a, b) =>
   a.data.n.localeCompare(b.data.n),
 );
 
-// Writing section — homepage curates a hand-picked set, in this order.
+// Writing section: homepage curates a hand-picked set, in this order.
 const FEATURED = [
   'evals-are-contracts',
   'binary-search-on-the-answer',

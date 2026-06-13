@@ -33,7 +33,7 @@ interface Props {
 }
 
 const {
-  title = `${profile.name} — ${profile.role}`,
+  title = `${profile.name} · ${profile.role}`,
   description = 'Backend engineer who builds the systems that make AI products work in production. Live multi-LLM router demo.',
   image = '/og.png',
   type = 'website',
@@ -81,7 +81,7 @@ const graph: Record<string, unknown>[] = [
     '@type': 'WebSite',
     '@id': `${siteOrigin.href}#website`,
     url: siteOrigin.href,
-    name: `${profile.name} — ${profile.role}`,
+    name: `${profile.name} · ${profile.role}`,
     description,
     inLanguage: 'en',
     author: { '@id': `${siteOrigin.href}#person` },
@@ -137,7 +137,7 @@ const robots = noindex
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${profile.name} — ${profile.role}`} />
+    <meta property="og:image:alt" content={`${profile.name} · ${profile.role}`} />
     {publishedTime && <meta property="article:published_time" content={publishedTime} />}
     {type === 'article' && <meta property="article:author" content={profile.name} />}
 
@@ -152,7 +152,7 @@ const robots = noindex
     <link
       rel="alternate"
       type="application/rss+xml"
-      title={`${profile.name} — Writing`}
+      title={`${profile.name} · Writing`}
       href={rssUrl}
     />
 
