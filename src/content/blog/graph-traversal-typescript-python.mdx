@@ -29,7 +29,6 @@ for (const [u, v] of edges) {
 }
 ```
 
-<<<<<<< Updated upstream
 That is the adjacency list, and it is the right representation for nearly everything: O(V + E) space, O(1) edge insertion, neighbors iterable in degree time. The adjacency _matrix_ earns its O(V²) memory only when the graph is dense or you need O(1) "is there an edge between u and v?" queries.
 
 From there, two booleans select the algorithm:
@@ -41,30 +40,12 @@ From there, two booleans select the algorithm:
 | Cycle detection, topological order | DFS        | DFS                 |
 | Negative edge weights              | n/a        | Bellman-Ford (rare) |
 
-=======
-That is the adjacency list, and it is the right representation for nearly everything — O(V + E) space, O(1) edge insertion, neighbors iterable in degree time. The adjacency _matrix_ earns its O(V²) memory only when the graph is dense or you need O(1) "is there an edge between u and v?" queries.
-
-From there, two booleans select the algorithm:
-
-| Question                           | Unweighted | Weighted            |
-| ---------------------------------- | ---------- | ------------------- |
-| Shortest path                      | BFS        | Dijkstra            |
-| Reachability / components          | BFS or DFS | BFS or DFS          |
-| Cycle detection, topological order | DFS        | DFS                 |
-| Negative edge weights              | —          | Bellman-Ford (rare) |
-
-> > > > > > > Stashed changes
 
 Three algorithms cover the table. Each is the previous one with the queue swapped out.
 
 ## BFS: the queue visits in distance order
 
-<<<<<<< Updated upstream
 BFS's bet: process nodes in the order they were discovered, and you process them in order of distance from the start. The invariant is worth saying out loud (_the queue only ever holds nodes at distance d and d+1, in that order_) because it is the entire proof that the first time you reach a node is the shortest way to reach it. That only holds when every edge costs the same, which is why BFS is the unweighted column of the table.
-=======
-BFS's bet: process nodes in the order they were discovered, and you process them in order of distance from the start. The invariant is worth saying out loud — _the queue only ever holds nodes at distance d and d+1, in that order_ — because it is the entire proof that the first time you reach a node is the shortest way to reach it. That only holds when every edge costs the same, which is why BFS is the unweighted column of the table.
-
-> > > > > > > Stashed changes
 
 ```python
 from collections import deque
@@ -140,12 +121,7 @@ Run that from every unvisited node and count the runs: that is connected compone
 
 ## Dijkstra: BFS where the queue becomes a heap
 
-<<<<<<< Updated upstream
 Make the edges weighted and BFS's invariant breaks: the first time you reach a node is no longer the cheapest. The repair is to always expand the _cheapest known frontier node_ instead of the oldest, which means the queue becomes a min-heap, which means this is the [heap gap](/blog/data-structures-typescript-python) from the field guide all over again: Python has `heapq`, TypeScript has nothing.
-=======
-Make the edges weighted and BFS's invariant breaks — the first time you reach a node is no longer the cheapest. The repair is to always expand the _cheapest known frontier node_ instead of the oldest, which means the queue becomes a min-heap, which means this is the [heap gap](/blog/data-structures-typescript-python) from the field guide all over again: Python has `heapq`, TypeScript has nothing.
-
-> > > > > > > Stashed changes
 
 ```python
 import heapq
@@ -181,9 +157,4 @@ In TypeScript, you face the same choice as in the field guide: for interview-siz
 | "How many groups/islands?"        | DFS components (or Union-Find) |
 | "Is there a circular dependency?" | DFS with on-path tracking      |
 
-<<<<<<< Updated upstream
 The deeper habit is noticing that a graph problem rarely announces itself as one. Package dependencies, currency conversion chains, social follows, state machines, spreadsheet cell references: none of these say "graph" in the ticket. The skill the contest table drills is hearing _nodes and edges_ in a problem that was stated in nouns and verbs, and then asking the only two questions that matter: are the edges weighted, and what do I actually need: a distance, an order, or a yes/no. Two booleans and a question. The algorithm picks itself.
-=======
-The deeper habit is noticing that a graph problem rarely announces itself as one. Package dependencies, currency conversion chains, social follows, state machines, spreadsheet cell references — none of these say "graph" in the ticket. The skill the contest table drills is hearing _nodes and edges_ in a problem that was stated in nouns and verbs, and then asking the only two questions that matter: are the edges weighted, and what do I actually need — a distance, an order, or a yes/no. Two booleans and a question. The algorithm picks itself.
-
-> > > > > > > Stashed changes
