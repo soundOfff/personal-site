@@ -84,14 +84,14 @@ export default function Playground() {
       if (res.status === 429) {
         finish(
           null,
-          `Rate limit reached — try again in ${formatRetry(body.retryAfter ?? 60)}. Demo mode is always free.`,
+          `Rate limit reached. Try again in ${formatRetry(body.retryAfter ?? 60)}. Demo mode is always free.`,
         );
       } else if (res.status === 503) {
         finish(
           { ...fixture, mode: 'demo' },
           body.error === 'daily-budget-exhausted'
-            ? "Live mode's shared daily budget is spent — showing the cached demo route. Resets at 00:00 UTC."
-            : "Live mode isn't enabled on this deploy yet — showing the cached demo route instead.",
+            ? "Live mode's shared daily budget is spent; showing the cached demo route. Resets at 00:00 UTC."
+            : "Live mode isn't enabled on this deploy yet; showing the cached demo route instead.",
         );
       } else {
         finish(null, 'The router hit an upstream error. Try demo mode, or try again.');
@@ -119,7 +119,7 @@ export default function Playground() {
             <i></i>
             <i></i>
           </span>
-          router — {mode}
+          router: {mode}
         </span>
         <SegmentedControl
           className="seg-mono"
@@ -176,7 +176,7 @@ export default function Playground() {
 
         {mode === 'live' && (
           <Alert variant="info" compact className="live-note">
-            Live mode runs real inference behind a serverless function — keys stay server-side,
+            Live mode runs real inference behind a serverless function; keys stay server-side,
             capped at 5 routes/min and 20/day.
           </Alert>
         )}
