@@ -13,7 +13,7 @@ export const PILLARS = [
 
 export type Pillar = (typeof PILLARS)[number];
 
-/** Homepage surfaces technical posts first — lower number = higher priority. */
+/** Homepage surfaces technical posts first; lower number = higher priority. */
 export const PILLAR_PRIORITY: Record<Pillar, number> = {
   'Backend & AI systems': 0,
   'Algorithms & competitive programming': 1,

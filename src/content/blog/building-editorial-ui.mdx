@@ -21,7 +21,7 @@ library on npm, designed for an audience of exactly one.
 
 A company design system mediates disagreement between people. A personal one
 eliminates choice for your future self. That second job is easier and, for a solo
-builder, more valuable — the enemy is not inconsistency across a team, it is
+builder, more valuable; the enemy is not inconsistency across a team, it is
 re-litigating the same bikeshed every weekend.
 
 The trick is that a system this small does not need a token taxonomy or a governance
@@ -73,8 +73,8 @@ through `--gray-900` ramp because a ramp is a menu, and menus invite choosing. T
 papers, two inks, two rules. If a screen needs more than that, it might be getting too complex.
 
 The fifth rule, implicit in the other four: **no new colours**. Every colour
-reference goes through a variable. Dark mode then becomes a token swap —
-`:root[data-theme="dark"]` redefines the same names — instead of a second stylesheet.
+reference goes through a variable. Dark mode then becomes a token swap
+(`:root[data-theme="dark"]` redefines the same names) instead of a second stylesheet.
 
 ## The technical shape
 
@@ -94,7 +94,7 @@ flattens `styles/index.css` into one self-contained bundle. That bundle matters
 because the package has a **CSS-only entry**: link
 `editorial-ui/styles.css` in a plain HTML page and write `class="btn-amber"`, no
 React required. The React components are a thin typed layer over those exact class
-names — `Button` with `variant="amber"` renders `class="btn btn-amber"` and nothing
+names: `Button` with `variant="amber"` renders `class="btn btn-amber"` and nothing
 else. From the component source:
 
 ```tsx
@@ -132,7 +132,7 @@ default is the neutral style:
 ```
 
 You opt _in_ to prominence, never out of it. There is no `primary` prop that
-half the team sets out of habit — the word in the code is the colour on the screen,
+half the team sets out of habit; the word in the code is the colour on the screen,
 which makes a second amber button easy to spot in review. Every compound component
 ships the hierarchy pre-built: `Modal.Footer` examples pair a ghost cancel with one
 amber confirm, and the docs never show two ambers together, so copy-paste propagates
@@ -165,7 +165,7 @@ The two lines that absorbed the most debugging are in `package.json`:
 
 The React entry auto-imports its stylesheet so consumers get styles for free.
 Without `sideEffects` declaring the CSS, bundlers tree-shake that import away and
-you ship unstyled buttons — silently, only in production builds. The exports map
+you ship unstyled buttons, silently, only in production builds. The exports map
 went through several rounds too: separate `fonts.css` and `tokens.css` entries exist
 so a Next.js app can self-host fonts and skip the Google Fonts import, and a
 post-build script prepends `"use client"` banners so the components survive the App
@@ -174,7 +174,7 @@ the thing.
 
 ## Eating it
 
-The site you are reading runs on these tokens — the hairlines between sections are
+The site you are reading runs on these tokens: the hairlines between sections are
 `var(--rule)`, the background is `var(--paper)`, and there is exactly one amber
 action per view, including the [Playground](/#playground), where the demo's
 "route it" button is the amber of its screen. The

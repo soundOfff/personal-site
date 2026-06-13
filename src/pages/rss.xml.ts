@@ -9,7 +9,7 @@ export const GET: APIRoute = async (context) => {
   );
 
   return rss({
-    title: `${profile.name} — Writing`,
+    title: `${profile.name} · Writing`,
     description:
       'Build logs, backend & AI systems, algorithms & competitive programming, and startup-engineering notes.',
     site: context.site!,

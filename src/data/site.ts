@@ -12,9 +12,9 @@ export const profile = {
   role: 'Fullstack · AI systems',
   // sage status pill (short)
   status: 'Open to work · Rosario, AR',
-  // hero lede — the phrase wrapped in <em></em> renders italic + amber
-  lede: "Most LLM calls don't need the biggest model — they need a dispatcher that knows which one will <em>clear the bar</em>.",
-  sub: "I'm a backend engineer who builds the systems that make AI products work in production — routing, scale, evals, the unglamorous middle. Backend is the foundation, LLM infrastructure is the edge, and competitive-programming results are the proof. Below is the router itself, running in demo mode.",
+  // hero lede: the phrase wrapped in <em></em> renders italic + amber
+  lede: "Most LLM calls don't need the biggest model. They need a dispatcher that knows which one will <em>clear the bar</em>.",
+  sub: "I'm a backend engineer who builds the systems that make AI products work in production: routing, scale, evals, the unglamorous middle. Backend is the foundation, LLM infrastructure is the edge, and competitive-programming results are the proof. Below is the router itself, running in demo mode.",
 } as const;
 
 export const contact = [
@@ -44,7 +44,7 @@ export const nav = [
 ] as const;
 
 /**
- * Hero metrics strip — REFRAMED as personal proof points (per the design grill).
+ * Hero metrics strip: REFRAMED as personal proof points (per the design grill).
  * `accent: true` renders the value in amber.
  */
 export const proofs: { value: string; key: string; accent?: boolean }[] = [
@@ -55,7 +55,7 @@ export const proofs: { value: string; key: string; accent?: boolean }[] = [
   { value: '4+', key: 'yrs fullstack' },
 ];
 
-// 06 · principles — kept from the design; they map exactly to the router work.
+// 06 · principles: kept from the design; they map exactly to the router work.
 export const tenets = [
   {
     title: 'Smallest model that passes',
@@ -75,7 +75,7 @@ export const tenets = [
   },
 ] as const;
 
-// 07 · stack · toolbox — the tools that actually recur across the work
+// 07 · stack · toolbox: the tools that actually recur across the work
 // (ICPC ⇒ C++; editorial-ui ⇒ TypeScript; Dex/LLM work ⇒ Python).
 export const toolbox = [
   { h: 'Languages', items: ['TypeScript', 'Python', 'C++', 'Go', 'SQL'] },
@@ -84,7 +84,7 @@ export const toolbox = [
 ] as const;
 
 /**
- * 04 · log · recent activity — git-style changelog, newest first. Short
+ * 04 · log · recent activity: git-style changelog, newest first. Short
  * mono hashes are illustrative; dates are real milestones.
  */
 export const log: {
@@ -94,44 +94,44 @@ export const log: {
   msg: string;
   /** Optional external link rendered after the message. */
   link?: { label: string; href: string };
-  /** Renders as a "coming soon" node — dashed dot, muted text. */
+  /** Renders as a "coming soon" node: dashed dot, muted text. */
   upcoming?: boolean;
 }[] = [
   {
     hash: 'focusq0',
     date: 'soon',
     tag: 'coming soon',
-    msg: 'focus-quote — a Chrome extension for focus sessions: capture quotes from the web, set a goal, and get AI insights on which tabs were on-goal vs. distractions.',
+    msg: 'focus-quote, a Chrome extension for focus sessions: capture quotes from the web, set a goal, and get AI insights on which tabs were on-goal vs. distractions.',
     upcoming: true,
   },
   {
     hash: 'unglam1',
     date: 'jun 2026',
     tag: 'writing',
-    msg: 'Publish “The unglamorous middle” — joining my first startup three and a half years in, and learning the real job is the part nobody demos.',
+    msg: 'Publish “The unglamorous middle”: joining my first startup three and a half years in, and learning the real job is the part nobody demos.',
   },
   {
     hash: 'eui010',
     date: 'jun 2026',
     tag: 'oss',
-    msg: 'Publish editorial-ui v0.1.0 — the warm-paper, one-amber, hairline design system this site is built on.',
+    msg: 'Publish editorial-ui v0.1.0: the warm-paper, one-amber, hairline design system this site is built on.',
   },
   {
     hash: 'ship001',
     date: 'jun 2026',
     tag: 'site',
-    msg: 'Ship the personal site — Astro shell, editorial-ui design system, router island, Cloudflare Worker deploy.',
+    msg: 'Ship the personal site: Astro shell, editorial-ui design system, router island, Cloudflare Worker deploy.',
   },
   {
     hash: 'dana100',
     date: 'may 2026',
     tag: 'launch',
-    msg: 'Launch Dana — AI meeting prep that pulls context from calendar, email, and Slack so you walk in already briefed.',
+    msg: 'Launch Dana: AI meeting prep that pulls context from calendar, email, and Slack so you walk in already briefed.',
     link: { label: 'danahq.com', href: 'https://danahq.com/' },
   },
 ];
 
-// 08 · now — spec sheet.
+// 08 · now: spec sheet.
 export const now = [
   { dt: 'Location', dd: 'Rosario, Argentina · remote-friendly (ART, UTC−3)' },
   { dt: 'Status', dd: 'Open to senior backend / AI-infra roles & select contract work' },

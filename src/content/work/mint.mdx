@@ -1,7 +1,7 @@
 ---
 n: '02'
-title: 'Mint — 2–3M-user scale'
-description: 'High-traffic e-commerce APIs serving 2–3M users — the backend that stayed correct and fast under real load.'
+title: 'Mint: 2–3M-user scale'
+description: 'High-traffic e-commerce APIs serving 2–3M users: the backend that stayed correct and fast under real load.'
 stack: 'Microservices · WordPress · React · Postgres'
 year: '2023'
 code: false
@@ -13,8 +13,8 @@ draft: false
 
 ## Problem
 
-E-commerce APIs serving a few million users have no quiet hours. Traffic spikes —
-campaign drops, payday weekends, flash promotions — are the normal case, not the
+E-commerce APIs serving a few million users have no quiet hours. Traffic spikes
+(campaign drops, payday weekends, flash promotions) are the normal case, not the
 exception, and the hard part isn't raw throughput. It's staying **correct under
 contention**: inventory that never oversells, carts that never lose items, checkout
 that never double-charges, all while the read side absorbs orders of magnitude more
@@ -28,27 +28,27 @@ big-bang rewrite was never on the table.
 
 Rather than fight the WordPress core, we built a **microservices architecture on
 top of it**. WordPress stayed the system of record for orders; everything
-performance-critical — catalog, inventory, pricing, checkout orchestration — moved
+performance-critical (catalog, inventory, pricing, checkout orchestration) moved
 into dedicated services that fronted it, so the legacy core only ever saw clean,
 validated, already-throttled traffic. The shape that worked inside that services
 layer was an aggressive separation of the read and write paths around a single
 Postgres source of truth.
 
-- **Reads got cached, writes got queued.** Catalog and pricing — the overwhelming
-  majority of traffic — served from a cache layer in front of Postgres, with
+- **Reads got cached, writes got queued.** Catalog and pricing, the overwhelming
+  majority of traffic, served from a cache layer in front of Postgres, with
   invalidation driven by write events rather than TTL guesswork on the hot paths.
 - **The inventory path stayed boringly transactional.** Stock decrements ran as
   short, row-level-locked transactions with explicit lock ordering. No clever
   distributed counters; one database, correct by construction.
 - **Checkout was made idempotent end to end.** Every order submission carried an
-  idempotency key, so a retried request — mobile networks retry constantly — could
+  idempotency key, so a retried request (mobile networks retry constantly) could
   never create a second order or a second charge.
 - **The slow stuff left the request path.** Emails, invoices, search indexing, and
   analytics moved behind queues, keeping the synchronous path down to "validate,
   reserve, charge, respond".
 - **The frontend consumed it all through a React component library we maintain.**
-  One versioned library of storefront components — product cards, cart, checkout
-  flows — shared across every surface, so UI stayed consistent and backend services
+  One versioned library of storefront components (product cards, cart, checkout
+  flows) shared across every surface, so UI stayed consistent and backend services
   could evolve behind stable component contracts instead of per-page integrations.
 
 ## The key tradeoff
@@ -58,21 +58,21 @@ makes product pages fast but lies during a rush; locking rows on every read make
 them honest but slow. We split the difference deliberately: **product pages show
 cached, slightly-stale stock; checkout re-validates against the source of truth
 inside the transaction.** A shopper might occasionally see "in stock" on an item
-that sells out seconds later — but nobody ever pays for an item the warehouse
+that sells out seconds later, but nobody ever pays for an item the warehouse
 doesn't have. Choosing _where_ the staleness is allowed to live, rather than
 pretending it away, was the decision the whole system leaned on.
 
 ## Outcome
 
-The platform rode its peak campaigns — multiples of baseline traffic — without
+The platform rode its peak campaigns (multiples of baseline traffic) without
 oversells and without checkout incidents, and tail latency on the buying path
 stayed flat as traffic grew. The deeper outcome was operational: because
-correctness lived in a small, well-locked core, scaling work became cache and queue tuning — routine, low-risk changes —
+correctness lived in a small, well-locked core, scaling work became cache and queue tuning, routine, low-risk changes,
 rather than surgery on the money path. And the WordPress core never became the
 bottleneck everyone feared: shielded by the services layer, it kept doing the one
-job it was good at — being the order ledger — while everything around it scaled.
+job it was good at, being the order ledger, while everything around it scaled.
 
-The habit Mint drilled in — find the one path that must never lie, make it small,
-and let everything else be eventually consistent — is the same instinct behind
+The habit Mint drilled in (find the one path that must never lie, make it small,
+and let everything else be eventually consistent) is the same instinct behind
 [the playground's blast-radius cap](/work/flagship): decide your worst case up front
 and make it structural.

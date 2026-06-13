@@ -5,7 +5,7 @@ import type { RouteResult, Tone } from './types';
  *
  * The contract this proves (the Dex thesis): most prompts don't need the
  * biggest model. We classify the prompt, then dispatch to the CHEAPEST model
- * that clears that class's bar — and only ever from a cheap-models catalog, so
+ * that clears that class's bar, and only ever from a cheap-models catalog, so
  * a public endpoint can never run up a large bill.
  */
 
@@ -23,7 +23,7 @@ interface CatalogEntry {
   /** display name in the result line. */
   label: string;
   tone: Tone;
-  /** USD per 1M tokens — used to compute real cost and to rank by price. */
+  /** USD per 1M tokens, used to compute real cost and to rank by price. */
   inPrice: number;
   outPrice: number;
   /** prompt classes this model is allowed to serve. */
@@ -31,7 +31,7 @@ interface CatalogEntry {
 }
 
 /**
- * Ordered cheapest → dearest. `pickModel` walks this list and takes the first
+ * Ordered cheapest to dearest. `pickModel` walks this list and takes the first
  * entry that both clears the class and has its provider key configured.
  */
 const CATALOG: CatalogEntry[] = [
@@ -70,7 +70,7 @@ const CATALOG: CatalogEntry[] = [
   },
 ];
 
-/** Heuristic classifier — cheap and instant; swap for a model call if needed. */
+/** Heuristic classifier: cheap and instant; swap for a model call if needed. */
 export function classify(prompt: string): PromptClass {
   const p = prompt.toLowerCase();
   if (/\bjson\b|\bextract\b|\bparse\b|\bschema\b|as json|key[- ]?value|\bcsv\b|\btable\b/.test(p)) {
@@ -97,10 +97,10 @@ function pickModel(cls: PromptClass, env: Record<string, string | undefined>): C
 }
 
 const WHY: Record<PromptClass, (label: string) => string> = {
-  extractive: (m) => `Extractive and short — ${m}, the smallest model that clears the bar.`,
-  creative: (m) => `A small creative task — ${m} handles it, no need to climb the ladder.`,
-  structured: (m) => `Structured output — ${m} for dependable, well-formed results.`,
-  reasoning: (m) => `Multi-step reasoning — only the larger ${m} passes the eval.`,
+  extractive: (m) => `Extractive and short; ${m}, the smallest model that clears the bar.`,
+  creative: (m) => `A small creative task; ${m} handles it, no need to climb the ladder.`,
+  structured: (m) => `Structured output; ${m} for dependable, well-formed results.`,
+  reasoning: (m) => `Multi-step reasoning; only the larger ${m} passes the eval.`,
 };
 
 function formatCost(usd: number): string {
@@ -115,7 +115,7 @@ interface ProviderReply {
 
 /** Keeps replies console-shaped: no "Certainly!", no closing offers to help. */
 const SYSTEM_PROMPT =
-  'Reply with only the requested output — no preamble, no code fences unless asked, no follow-up questions. Be terse.';
+  'Reply with only the requested output: no preamble, no code fences unless asked, no follow-up questions. Be terse.';
 
 async function callProvider(
   entry: CatalogEntry,
@@ -130,7 +130,7 @@ async function callProvider(
       authorization: `Bearer ${apiKey}`,
       // OpenRouter attribution headers (ignored by others).
       'HTTP-Referer': 'https://tomasbrasca.dev',
-      'X-Title': 'Tomas Brasca — router playground',
+      'X-Title': 'Tomas Brasca: router playground',
     },
     body: JSON.stringify({
       model: entry.model,
@@ -167,7 +167,7 @@ export function liveAvailable(env: Record<string, string | undefined>): boolean 
 
 /**
  * Run the full route. Throws if no model can serve the class (no key for the
- * needed tier) — the caller maps that to a 503.
+ * needed tier); the caller maps that to a 503.
  *
  * `input` is the source material the prompt operates on (the release note to
  * summarize, the stack trace to explain). The class is decided by the prompt

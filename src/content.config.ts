@@ -11,13 +11,13 @@ const blog = defineCollection({
     date: z.coerce.date(),
     pillar: z.enum(PILLARS),
     tags: z.array(z.string()).default([]),
-    /** e.g. "9 min" — shown in the writing rows. */
+    /** e.g. "9 min", shown in the writing rows. */
     readingTime: z.string(),
     draft: z.boolean().default(false),
   }),
 });
 
-// 02 · work · index + the case-study pages — single source of truth.
+// 02 · work · index + the case-study pages: single source of truth.
 const work = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/work' }),
   schema: z.object({
