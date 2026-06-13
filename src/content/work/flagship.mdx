@@ -1,6 +1,6 @@
 ---
 n: '03'
-title: 'Flagship — AI playground'
+title: 'Flagship: AI playground'
 description: 'The multi-LLM demo on this page, built end to end with real code and a live demo. Case study #3, doubling as the hero.'
 stack: 'Astro · TS · serverless'
 year: '2026'
@@ -14,8 +14,8 @@ Astro site with one React island and one serverless route.
 
 ## Problem
 
-How do you let a recruiter _experience_ a routing system — real inference, real latency,
-real cost — on a public page, without handing the internet an uncapped LLM bill?
+How do you let a recruiter _experience_ a routing system (real inference, real latency,
+real cost) on a public page, without handing the internet an uncapped LLM bill?
 
 ## Architecture
 
@@ -25,9 +25,9 @@ Two decisions carry it (see the [ADRs](https://github.com/soundOfff/personal-sit
    free and abuse-proof. The page is fully interactive before any network call.
 2. **Live mode behind a cap.** Opt-in live inference runs in a Cloudflare Worker that
    holds the keys, classifies the prompt, and dispatches to the cheapest model that clears
-   the bar — capped at 5 routes/min/IP on cheap models only.
+   the bar, capped at 5 routes/min/IP on cheap models only.
 
-The classifier and catalog are the whole trick — cheap models, cost-ordered:
+The classifier and catalog are the whole trick: cheap models, cost-ordered:
 
 ```ts
 export function classify(prompt: string): PromptClass {
@@ -46,12 +46,12 @@ for (const entry of CATALOG) {
 
 ## The key tradeoff
 
-The blast-radius cap. KV has no atomic increment, so the per-IP limiter can race — but for
+The blast-radius cap. KV has no atomic increment, so the per-IP limiter can race, but for
 a soft 5/min limit on cheap models, the small over-count is irrelevant next to the
 operational simplicity. **Cap the blast radius first; optimise the limiter never.**
 
 ## Outcome
 
 A portfolio page that ships near-zero JavaScript, scores high on Lighthouse, and still runs
-real inference on demand — proving the [thesis](/) in the one place it counts: by letting
+real inference on demand, proving the [thesis](/) in the one place it counts: by letting
 you run the demo yourself. [Try it.](/#playground)

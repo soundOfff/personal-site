@@ -11,7 +11,7 @@ draft: false
 When an LLM feature gets too expensive, the instinct is to treat it as an
 infrastructure problem. Cache aggressively. Trim the prompt. Batch where you
 can. Negotiate committed-use pricing. All of these are real, and on a good day
-they compound into a respectable saving — call it tens of percent.
+they compound into a respectable saving, call it tens of percent.
 
 None of them touches the dominant term: **which model you call**.
 
@@ -26,7 +26,7 @@ argument and the arithmetic, with the parts I'm allowed to share.
 ## The default instinct
 
 The feature started where most LLM features start: one model, the biggest
-available tier, on every request. That is a reasonable place to start — quality
+available tier, on every request. That is a reasonable place to start: quality
 is whatever the best model gives you, and there is exactly one integration to
 maintain.
 
@@ -50,10 +50,10 @@ fails by being wrong in the middle of a chain; a creative one fails by being
 dull. Different failure modes need different amounts of model.
 
 The [playground](/#playground) version uses a heuristic
-classifier — instant, free, and good enough to demonstrate the contract:
+classifier, instant, free, and good enough to demonstrate the contract:
 
 ```ts
-/** Heuristic classifier — cheap and instant; swap for a model call if needed. */
+/** Heuristic classifier: cheap and instant; swap for a model call if needed. */
 export function classify(prompt: string): PromptClass {
   const p = prompt.toLowerCase();
   if (/\bjson\b|\bextract\b|\bparse\b|\bschema\b|as json|key[- ]?value|\bcsv\b|\btable\b/.test(p)) {
@@ -75,7 +75,7 @@ export function classify(prompt: string): PromptClass {
 
 In production at Dex the classifier was itself a small, cheap model call with a
 strict label set, because real traffic is messier than regexes. The contract is
-identical either way: cheap classification first, and when in doubt, escalate —
+identical either way: cheap classification first, and when in doubt, escalate;
 note the fallthrough sends long ambiguous prompts to `reasoning`, not to
 `extractive`. Misrouting up costs money; misrouting down costs quality.
 
@@ -109,7 +109,7 @@ const usd =
 
 ## What it saved
 
-Run the arithmetic on a typical extractive request — say 300 prompt tokens and
+Run the arithmetic on a typical extractive request, say 300 prompt tokens and
 a 150-token completion. On `llama-3.1-8b-instant` at $0.05/$0.08 per million
 tokens, that call costs **$0.000027**. The same call on a frontier model priced
 at $2.50/$10 per million costs about $0.00225. That is an 80x difference for a
@@ -120,7 +120,7 @@ On the Dex traffic mix, the large majority of requests classified as extractive
 or short-form structured. Once those classes moved to small models, cost per
 request on them dropped by roughly an order of magnitude, and because they
 dominated the volume, total inference spend fell by most of its previous value.
-The expensive tier was still there — it just stopped being the default and
+The expensive tier was still there; it just stopped being the default and
 became the escalation path for the minority of requests that actually needed
 it.
 
@@ -146,7 +146,7 @@ and you never realise the savings, because everything escalates. Either way the
 catalog is lying to the dispatch loop.
 
 This is why [evals are contracts](/blog/evals-are-contracts), not dashboards.
-At Dex the implementation itself was a small amount of code — classify, walk, dispatch,
+At Dex the implementation itself was a small amount of code: classify, walk, dispatch,
 fall back. The engineering time went into writing honest per-class evals and
 keeping them green as models and prompts changed underneath. The routing
 decision is exactly as trustworthy as the test that gates it, and no more.

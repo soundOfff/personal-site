@@ -9,11 +9,11 @@ draft: false
 ---
 
 Three weeks ago our system started sending structured-output traffic to the
-smallest model in the catalog. Every dashboard improved — latency down, cost down,
+smallest model in the catalog. Every dashboard improved: latency down, cost down,
 error rate flat. The eval stayed green the whole time, because the dataset never
 covered nested objects. Today, support tickets are your eval suite.
 
-That failure might not be about routing. Routing is often the easy half —
+That failure might not be about routing. Routing is often the easy half:
 [classify the request, dispatch to the cheapest model that clears the bar](/blog/routing-beats-scaling).
 The hard half is one word. _Clears_. Clears what? Measured how? Decided by whom?
 
@@ -27,7 +27,7 @@ literal. Each catalog entry declares which prompt classes it is allowed to serve
 interface CatalogEntry {
   provider: string;
   model: string;
-  /** USD per 1M tokens — used to compute real cost and to rank by price. */
+  /** USD per 1M tokens, used to compute real cost and to rank by price. */
   inPrice: number;
   outPrice: number;
   /** prompt classes this model is allowed to serve. */
@@ -51,7 +51,7 @@ array of truth. So the real question is upstream: who edits that array, and on w
 evidence? If it gets edited by hand because somebody tried four prompts and the
 output looked fine, the system is laundering vibes through a type system.
 
-At [Dex](/work/dex) — same architecture, real traffic — the equivalent of that
+At [Dex](/work/dex), same architecture, real traffic, the equivalent of that
 array was edited by exactly one thing: the eval suite. A model earned a class by
 passing the class's eval, and lost it the same way. No meeting could move a model
 up the catalog. A green run could.
@@ -60,7 +60,7 @@ up the catalog. A green run could.
 
 An eval-as-contract has four parts, per prompt class:
 
-1. **A fixed dataset.** Real cases, frozen at a version. Not "we'll try some prompts" —
+1. **A fixed dataset.** Real cases, frozen at a version. Not "we'll try some prompts":
    a file in the repo, diffable, reviewed like code.
 2. **A pass criterion per case.** Mechanical wherever possible.
 3. **A threshold over the dataset.** The bar, as a number.
@@ -91,7 +91,7 @@ stronger model: did the answer identify the actual root cause, did it propose a 
 that compiles against the stated constraints, did it avoid inventing APIs. Three
 binary checks per case, a case passes at 3/3, and the threshold sits over the case
 pass rate. Rubric grading is noisier than exact match, so the dataset is bigger and
-the rubric itself is versioned — when the rubric changes, every model regrades, and
+the rubric itself is versioned; when the rubric changes, every model regrades, and
 the diff shows exactly which cases flipped.
 
 The output of a run is one number per model per class. The catalog is whatever
@@ -105,7 +105,7 @@ hurt.
 **Too low**, and silent quality regressions ship. The routing layer happily sends
 structured-output traffic to the smallest model, the eval stays green because the
 dataset never covered nested objects, and three weeks later support tickets are
-your eval suite. This failure is invisible at the routing layer — every metric the
+your eval suite. This failure is invisible at the routing layer: every metric the
 system emits (latency, cost, error rate) improves while the product quietly gets
 worse. The only instrument that can catch it is the eval, which is precisely the
 instrument that's broken.
@@ -127,11 +127,11 @@ Which brings up the uncomfortable part: production reality moves. An eval datase
 is a snapshot of a traffic distribution, and traffic distributions shift. Users
 find new phrasings. The product grows a feature that produces a prompt shape the
 dataset has never seen. The classifier starts binning things into a class whose
-dataset predates the pattern. None of this turns the suite red — it turns it
+dataset predates the pattern. None of this turns the suite red; it turns it
 **stale**, which is worse, because stale looks identical to green.
 
-Treat eval datasets like dependency updates. On a cadence — for us, roughly
-monthly, plus whenever a new prompt pattern landed — sample recent production
+Treat eval datasets like dependency updates. On a cadence (for us, roughly
+monthly, plus whenever a new prompt pattern landed) sample recent production
 traffic per class, label it, fold it into the dataset, bump the version, re-run
 every model. Sometimes a model loses a class it had held for months. That's not
 the process failing; that's the process working. The demo fixtures on this site
@@ -144,14 +144,14 @@ the present.
 ## Contracts are cultural
 
 The deepest effect was never technical. An eval suite is the **API contract
-between the routing layer and the product** — the routing layer promises "anything
+between the routing layer and the product**: the routing layer promises "anything
 I send to a model, that model has cleared", and the product team gets to define
 what clearing means, in cases, in a file, under review.
 
 That changes the shape of disagreements. "Is the small model good enough for
 extraction?" used to be a meeting: someone pastes two outputs into a channel,
 someone else counters with a cherry-picked failure, and whoever cares more wins.
-With the contract in place, the same disagreement is a pull request — here are
+With the contract in place, the same disagreement is a pull request: here are
 thirty cases where the small model fails, add them to the dataset, run the suite,
 read the number. If the number drops below threshold, the model loses the class
 and the system stops sending it that traffic, automatically. If it doesn't, the
@@ -161,5 +161,5 @@ stay on.
 Diffs against a dataset, instead of vibes against a screenshot.
 
 That is what makes the routing promise honest. The cheapest model that clears the
-bar is a great architecture and a meaningless sentence — until the bar is written
+bar is a great architecture and a meaningless sentence, until the bar is written
 down, runnable, versioned, and allowed to say no.

@@ -1,6 +1,6 @@
 ---
 title: 'Data structures in TypeScript and Python: what you get, what you build'
-description: 'A data structure is a bet about which operation must be fast. Your standard library has already placed some of those bets for you — a field guide to the ones it placed, the ones it didn’t, and the pattern to know for each.'
+description: 'A data structure is a bet about which operation must be fast. Your standard library has already placed some of those bets for you: a field guide to the ones it placed, the ones it didn’t, and the pattern to know for each.'
 date: 2026-06-12
 pillar: 'Algorithms & competitive programming'
 tags: ['data-structures', 'typescript', 'python', 'algorithms', 'interviews']
@@ -10,7 +10,7 @@ draft: false
 
 A data structure is a bet about which operation has to be fast. An array bets on random access. A hash map bets on key lookup. A heap bets that the only element you ever care about is the extreme one. Pick the structure whose bet matches the question your code keeps asking, and the complexity analysis mostly does itself.
 
-What changes between languages is not the bets — it is which ones the standard library has already placed for you. TypeScript and Python make different choices here, and the differences are exactly where interview code and production code go quietly quadratic. This post is the map I wish I'd had as one page: each structure, the question it answers in O(something good), and the one pattern per structure that does most of the work in practice.
+What changes between languages is not the bets; it is which ones the standard library has already placed for you. TypeScript and Python make different choices here, and the differences are exactly where interview code and production code go quietly quadratic. This post is the map I wish I'd had as one page: each structure, the question it answers in O(something good), and the one pattern per structure that does most of the work in practice.
 
 ## The map
 
@@ -33,15 +33,15 @@ What changes between languages is not the bets — it is which ones the standard
 
 The last four rows you will rarely implement outside a contest. The value of having them in the table is recognition: when someone asks "what was the average CPU between 2pm and 4pm?", you should hear *range query over an array* and know the answer space before opening an editor.
 
-One row gets no section below: graphs. Not because they matter less — because traversal is a toolkit of its own, and BFS, DFS, and Dijkstra deserve more than a paragraph. That's [the follow-up post](/blog/graph-traversal-typescript-python).
+One row gets no section below: graphs. Not because they matter less, but because traversal is a toolkit of its own, and BFS, DFS, and Dijkstra deserve more than a paragraph. That's [the follow-up post](/blog/graph-traversal-typescript-python).
 
 ## What the languages actually hand you
 
-Here is the asymmetry that shapes everything below. **Python gives you `list`, `dict`, `set`, `heapq`, and `collections.deque`. TypeScript gives you `Array`, `Map`, and `Set` — and that's it.** TypeScript has no heap, no deque, no sorted map; neither language has a linked list, trie, union-find, or segment tree. Both languages also hide static arrays from you entirely: every `list` and every `Array` is dynamic, resizing when capacity is hit, which costs you nothing you'll notice and buys you never thinking about capacity again.
+Here is the asymmetry that shapes everything below. **Python gives you `list`, `dict`, `set`, `heapq`, and `collections.deque`. TypeScript gives you `Array`, `Map`, and `Set`, and that's it.** TypeScript has no heap, no deque, no sorted map; neither language has a linked list, trie, union-find, or segment tree. Both languages also hide static arrays from you entirely: every `list` and every `Array` is dynamic, resizing when capacity is hit, which costs you nothing you'll notice and buys you never thinking about capacity again.
 
 Two practical consequences:
 
-**The queue trap.** A queue needs O(1) at both ends. Python's `list.pop(0)` and TypeScript's `Array.shift()` are both O(n) — every remaining element shifts left. Python has the fix built in:
+**The queue trap.** A queue needs O(1) at both ends. Python's `list.pop(0)` and TypeScript's `Array.shift()` are both O(n): every remaining element shifts left. Python has the fix built in:
 
 ```python
 from collections import deque
@@ -52,25 +52,25 @@ node = queue.popleft()   # O(1)
 
 TypeScript does not. For interview-sized inputs, `shift()` is fine and everyone knows it; for production, you either keep a read-index into a plain array or bring a dependency. The point is to know you are making that trade, not to discover it in a profiler.
 
-**The heap gap.** Python's `heapq` is right there — min-heap only, so a max-heap is "negate on the way in, negate on the way out", which is ugly and universal. TypeScript has nothing, and this is the single most common "wait, really?" for people arriving from Python or Java. In an interview you say so out loud and write the simplest thing that preserves the interface:
+**The heap gap.** Python's `heapq` is right there: min-heap only, so a max-heap is "negate on the way in, negate on the way out", which is ugly and universal. TypeScript has nothing, and this is the single most common "wait, really?" for people arriving from Python or Java. In an interview you say so out loud and write the simplest thing that preserves the interface:
 
 ```ts
 class MinHeap {
   private heap: number[] = [];
   push(val: number): void {
     this.heap.push(val);
-    this.heap.sort((a, b) => a - b); // O(n log n) per push — say it, then move on
+    this.heap.sort((a, b) => a - b); // O(n log n) per push, say it then move on
   }
   pop(): number | undefined { return this.heap.shift(); }
   peek(): number | undefined { return this.heap[0]; }
 }
 ```
 
-That is not a heap; it is a sorted array wearing a heap's interface. Naming the gap and bounding the cost is worth more than reproducing sift-up from memory under a clock.
+That is not a heap. It is a sorted array wearing a heap's interface. Naming the gap and bounding the cost is worth more than reproducing sift-up from memory under a clock.
 
 ## Arrays, and the one pattern that pays rent
 
-For everything beyond the basics, the leverage is not in the structure — it is in one pattern per structure that converts an O(n²) instinct into an O(n) solution. For arrays, that pattern is the **prefix sum**: spend O(n) once to build an accumulator, then answer any range-sum question in O(1).
+For everything beyond the basics, the leverage is not in the structure; it is in one pattern per structure that converts an O(n²) instinct into an O(n) solution. For arrays, that pattern is the **prefix sum**: spend O(n) once to build an accumulator, then answer any range-sum question in O(1).
 
 ```python
 def build_prefix(nums: list[int]) -> list[int]:
@@ -95,11 +95,11 @@ function rangeSum(prefix: number[], l: number, r: number): number {
 }
 ```
 
-The off-by-one is load-bearing: the extra leading zero is what lets `range_sum(prefix, 0, r)` work without a special case. Prefix sums are the *static* answer to range queries; the moment the underlying array needs updates between queries, you have walked into segment-tree territory — same question, harder bet.
+The off-by-one is load-bearing: the extra leading zero is what lets `range_sum(prefix, 0, r)` work without a special case. Prefix sums are the *static* answer to range queries; the moment the underlying array needs updates between queries, you have walked into segment-tree territory: same question, harder bet.
 
 ## Stacks: the monotonic trick
 
-A stack is a dynamic array you only touch at one end — both languages do it natively with `push`/`pop` (or `append`/`pop`), no ceremony. The pattern worth drilling is the **monotonic stack**: for each element, find the next greater (or smaller) element to its right, in O(n) instead of the naive O(n²).
+A stack is a dynamic array you only touch at one end, and both languages do it natively with `push`/`pop` (or `append`/`pop`), no ceremony. The pattern worth drilling is the **monotonic stack**: for each element, find the next greater (or smaller) element to its right, in O(n) instead of the naive O(n²).
 
 ```ts
 function nextGreater(nums: number[]): number[] {
@@ -117,11 +117,11 @@ function nextGreater(nums: number[]): number[] {
 // [2,1,2,4,3] → [4,2,4,-1,-1]
 ```
 
-The invariant — the stack always holds indices of a non-increasing run — is what makes the amortized analysis one sentence: every index is pushed once and popped at most once, so the nested-looking loop is O(n). Stock-span, daily-temperatures, largest-rectangle-in-histogram are all this one trick in costume.
+The invariant (the stack always holds indices of a non-increasing run) is what makes the amortized analysis one sentence: every index is pushed once and popped at most once, so the nested-looking loop is O(n). Stock-span, daily-temperatures, largest-rectangle-in-histogram are all this one trick in costume.
 
 ## Hash maps: store the complement, not the search
 
-Both languages make the hash map their best structure — Python's `dict` and TypeScript's `Map` are O(1) average for get/set/delete, and most "make it faster" interview answers are some form of "put a hash map in front of it." The canonical pattern is two-sum: instead of scanning for a partner for each element (O(n²)), record what you've *seen* and ask whether the current element completes a pair:
+Both languages make the hash map their best structure: Python's `dict` and TypeScript's `Map` are O(1) average for get/set/delete, and most "make it faster" interview answers are some form of "put a hash map in front of it." The canonical pattern is two-sum: instead of scanning for a partner for each element (O(n²)), record what you've *seen* and ask whether the current element completes a pair:
 
 ```python
 def two_sum(nums: list[int], target: int) -> list[int]:
@@ -137,7 +137,7 @@ The generalizable move is the reframe: *don't search forward for what you need; 
 
 ## The ones you always build from scratch
 
-Linked lists, tries, and union-find exist in neither standard library, and that turns out to be fine — each is under twenty lines, and the lines are the same every time. Union-find is the one I'd actually memorize, because it answers a question nothing else answers cheaply: *are these two things in the same group?* — in O(α(n)) per query. α is the inverse Ackermann function, and α(n) ≤ 4 for any n that fits in hardware, so treat it as constant.
+Linked lists, tries, and union-find exist in neither standard library, and that turns out to be fine: each is under twenty lines, and the lines are the same every time. Union-find is the one I'd actually memorize, because it answers a question nothing else answers cheaply: *are these two things in the same group?*, in O(α(n)) per query. α is the inverse Ackermann function, and α(n) ≤ 4 for any n that fits in hardware, so treat it as constant.
 
 ```python
 class UnionFind:
@@ -162,11 +162,11 @@ class UnionFind:
         return True
 ```
 
-Both optimizations matter and neither is optional: path compression flattens the tree as you query it, union by rank keeps it from growing tall in the first place. Connected components, cycle detection in undirected graphs, Kruskal's MST, "do these accounts belong to the same person" — all union-find, all the same twenty lines.
+Both optimizations matter and neither is optional: path compression flattens the tree as you query it, union by rank keeps it from growing tall in the first place. Connected components, cycle detection in undirected graphs, Kruskal's MST, "do these accounts belong to the same person": all union-find, all the same twenty lines.
 
-Linked lists earn their twenty lines differently: not as a container you'd reach for (O(n) to *find* anything), but as the only structure with O(1) delete at a known node — which is why the textbook LRU cache is a hash map pointing into a doubly linked list, and why the fast-and-slow-pointer trick (cycle detection, find-the-middle in one pass) keeps showing up.
+Linked lists earn their twenty lines differently: not as a container you'd reach for (O(n) to *find* anything), but as the only structure with O(1) delete at a known node, which is why the textbook LRU cache is a hash map pointing into a doubly linked list, and why the fast-and-slow-pointer trick (cycle detection, find-the-middle in one pass) keeps showing up.
 
-The LRU cache is worth thirty extra seconds, because it is the one interview classic that *composes* two structures: the hash map answers "do we have this key?" in O(1), the linked list answers "which entry is oldest?" in O(1), and every node is reachable from both. And here is where knowing your standard library's bets pays off twice — JavaScript's `Map` iterates in insertion order, which is a linked list already threaded through the buckets for you. A full LRU in TypeScript is a dozen lines and no node class:
+The LRU cache is worth thirty extra seconds, because it is the one interview classic that *composes* two structures: the hash map answers "do we have this key?" in O(1), the linked list answers "which entry is oldest?" in O(1), and every node is reachable from both. And here is where knowing your standard library's bets pays off twice: JavaScript's `Map` iterates in insertion order, which is a linked list already threaded through the buckets for you. A full LRU in TypeScript is a dozen lines and no node class:
 
 ```ts
 class LRUCache<K, V> {
@@ -191,10 +191,10 @@ class LRUCache<K, V> {
 }
 ```
 
-Python plays the same trick with `collections.OrderedDict` — `move_to_end` on access, `popitem(last=False)` to evict — and if the cache fronts a pure function, `functools.lru_cache` is one decorator. The hand-rolled doubly-linked-list version is still worth understanding, because it is exactly what these implementations do underneath. But reaching for it first is solving a problem your standard library already solved.
+Python plays the same trick with `collections.OrderedDict` (`move_to_end` on access, `popitem(last=False)` to evict), and if the cache fronts a pure function, `functools.lru_cache` is one decorator. The hand-rolled doubly-linked-list version is still worth understanding, because it is exactly what these implementations do underneath. But reaching for it first is solving a problem your standard library already solved.
 
 ## The ones you only reason about
 
-B-Trees and Bloom filters close the table, and the honest advice is: understand them, never implement them. A B+ Tree node is sized to one disk page, so hundreds of keys per node means a million-row index is three or four levels deep — three or four disk reads for any lookup. That sentence is the entire reason `CREATE INDEX` makes your query fast, and it is worth more in a system-design conversation than any implementation would be. A Bloom filter is the inverse trade: a few kilobits buy you "this key *definitely* doesn't exist", which is how RocksDB and Cassandra skip disk reads for absent keys — false positives possible, false negatives never.
+B-Trees and Bloom filters close the table, and the honest advice is: understand them, never implement them. A B+ Tree node is sized to one disk page, so hundreds of keys per node means a million-row index is three or four levels deep: three or four disk reads for any lookup. That sentence is the entire reason `CREATE INDEX` makes your query fast, and it is worth more in a system-design conversation than any implementation would be. A Bloom filter is the inverse trade: a few kilobits buy you "this key *definitely* doesn't exist", which is how RocksDB and Cassandra skip disk reads for absent keys: false positives possible, false negatives never.
 
-The pattern across this whole post is the same one: the structure is rarely the hard part. The hard part is hearing the question your code keeps asking — *next greater? same group? range with updates? definitely absent?* — and recognizing which bet, already placed and paid for, answers it. That recognition reflex is the part of contest training that actually transfers, which is [its own post](/blog/what-icpc-trains-you-to-see). The table is the artifact. The rest is recognition.
+The pattern across this whole post is the same one: the structure is rarely the hard part. The hard part is hearing the question your code keeps asking (*next greater? same group? range with updates? definitely absent?*) and recognizing which bet, already placed and paid for, answers it. That recognition reflex is the part of contest training that actually transfers, which is [its own post](/blog/what-icpc-trains-you-to-see). The table is the artifact. The rest is recognition.

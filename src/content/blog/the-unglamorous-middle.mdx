@@ -16,7 +16,7 @@ traffic that spiked on payday weekends and never apologised. The problems there
 were large but they were never _vague_: you knew the shape of the load, you knew
 which path could never lie, and there was enough structure around you that a
 careful engineer could be careful. I spent those years getting good at one
-thing — making a system stay correct under pressure — and I quietly assumed
+thing, making a system stay correct under pressure, and I quietly assumed
 that was most of the job.
 
 Dex was my first real startup, and the first thing it taught me is that the
@@ -28,7 +28,7 @@ A startup at speed is a different climate, not just a faster version of the same
 one. The roadmap was a guess that got re-rolled every couple of weeks. The thing
 that was urgent on Monday was sometimes irrelevant by Thursday, because a
 customer call or a cost spike had rewritten the priorities underneath us. I wore
-more hats in my first month than in the previous three years combined —
+more hats in my first month than in the previous three years combined:
 backend, a bit of infra, a bit of product, a lot of "whoever notices it owns
 it."
 
@@ -44,26 +44,26 @@ Three and a half years of experience, and a lot of it didn't transfer cleanly.
 Row-level locks and idempotency keys tell you nothing about how to make a model
 call cheap, or how to know whether a smaller model is "good enough," or what
 happens to your product when someone else's API has a bad night. I had to learn
-a new domain quickly — in public, against real traffic, with the meter
-running — because the alternative was the feature not shipping.
+a new domain quickly, in public, against real traffic, with the meter
+running, because the alternative was the feature not shipping.
 
 And the feature demoed beautifully. That was the trap.
 
 ## The middle is the product
 
 Every AI product demos well now. You type a prompt, the model answers, the room
-nods. The demo dazzled me too, at first — until the bill arrived and I
+nods. The demo dazzled me too, at first, until the bill arrived and I
 understood that the part everyone had been admiring was the part we hadn't
 built. The model was rented. The floor on demo quality was set by someone
 else's last training run, not by anything our team had done.
 
 Everything that turned that demo into a product lived somewhere much less
 photogenic: routing, rate limits, evals, fallbacks, cost ceilings. **The
-unglamorous middle.** Nobody puts it in the deck. It turned out to be the job —
+unglamorous middle.** Nobody puts it in the deck. It turned out to be the job,
 and, eventually, the place I was most useful.
 
 The feature had started where most LLM features start: one model, the biggest
-tier, on every request — the "pull the date out of this email" requests and the
+tier, on every request: the "pull the date out of this email" requests and the
 "reason through this contract" requests alike. So the bill scaled linearly with
 usage, and the better the feature did, the worse it looked in the cost review.
 
@@ -77,14 +77,14 @@ for (const entry of CATALOG) {
 }
 ```
 
-A few lines. The work was never those lines — it was earning the word
+A few lines. The work was never those lines; it was earning the word
 _clears_. A bar set too low ships quality regressions one cheap call at a time;
 a bar set too high means everything escalates and you never see the savings. So
 most of my real effort went into writing honest per-class evals and keeping them
 green while the models and prompts shifted underneath. The routing logic was an
 afternoon. The contracts that made it trustworthy were the quarter.
 
-The rest of the middle was the same texture. A cap before a launch — no
+The rest of the middle was the same texture. A cap before a launch: no
 anonymous caller should be able to spend an unbounded amount of someone else's
 money. A fallback, so a provider's bad night degraded the product instead of
 taking it down. None of it was novel. All of it was the difference between a
@@ -97,7 +97,7 @@ and let everything else be eventually consistent. That instinct still serves me.
 
 But the startup taught me two things scale never had to. The first is that you
 can pick up an entire unfamiliar domain faster than you'd believe when there's
-no one else to hand it to and the feature ships either way — competence under a
+no one else to hand it to and the feature ships either way. Competence under a
 deadline is mostly just refusing to wait until you feel qualified. The second is
 that the work users actually pay for is almost never the work that looks
 impressive in a demo. It's the answer that's still there at 2 a.m., the bill
