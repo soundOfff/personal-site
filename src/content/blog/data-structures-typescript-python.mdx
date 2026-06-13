@@ -14,24 +14,24 @@ What changes between languages is not the bets; it is which ones the standard li
 
 ## The map
 
-| Structure | Core bet | Where you've already met it |
-| --- | --- | --- |
-| Array | O(1) access by index | Everywhere |
-| Stack | O(1) at one end (LIFO) | Undo/redo, the call stack |
-| Queue | O(1) at both ends (FIFO) | BFS, task scheduling |
-| Linked list | O(1) insert/delete at a known node | LRU cache internals |
-| Hash table | O(1) average key lookup | Every cache, every index |
-| Heap | O(1) peek at min/max | OS schedulers, Dijkstra |
-| Graph | model relationships, traverse in O(V+E) | Shortest-path anything |
-| Union-Find | "are these connected?" in ~O(1) | Clustering, Kruskal's MST |
-| BST / AVL | sorted map, O(log n) everything | Java's TreeMap, C++ std::map |
-| B+ Tree | sorted map *on disk*, minimal page reads | Every `CREATE INDEX` in Postgres |
-| Trie | O(L) prefix lookup | Every autocomplete box |
-| Suffix array | O(m log n) substring search | Bioinformatics, plagiarism detection |
-| Segment tree | O(log n) range query *with updates* | Time-series rollups |
-| Bloom filter | "definitely not here" in O(1), tiny memory | RocksDB, Chrome safe-browsing |
+| Structure    | Core bet                                   | Where you've already met it          |
+| ------------ | ------------------------------------------ | ------------------------------------ |
+| Array        | O(1) access by index                       | Everywhere                           |
+| Stack        | O(1) at one end (LIFO)                     | Undo/redo, the call stack            |
+| Queue        | O(1) at both ends (FIFO)                   | BFS, task scheduling                 |
+| Linked list  | O(1) insert/delete at a known node         | LRU cache internals                  |
+| Hash table   | O(1) average key lookup                    | Every cache, every index             |
+| Heap         | O(1) peek at min/max                       | OS schedulers, Dijkstra              |
+| Graph        | model relationships, traverse in O(V+E)    | Shortest-path anything               |
+| Union-Find   | "are these connected?" in ~O(1)            | Clustering, Kruskal's MST            |
+| BST / AVL    | sorted map, O(log n) everything            | Java's TreeMap, C++ std::map         |
+| B+ Tree      | sorted map _on disk_, minimal page reads   | Every `CREATE INDEX` in Postgres     |
+| Trie         | O(L) prefix lookup                         | Every autocomplete box               |
+| Suffix array | O(m log n) substring search                | Bioinformatics, plagiarism detection |
+| Segment tree | O(log n) range query _with updates_        | Time-series rollups                  |
+| Bloom filter | "definitely not here" in O(1), tiny memory | RocksDB, Chrome safe-browsing        |
 
-The last four rows you will rarely implement outside a contest. The value of having them in the table is recognition: when someone asks "what was the average CPU between 2pm and 4pm?", you should hear *range query over an array* and know the answer space before opening an editor.
+The last four rows you will rarely implement outside a contest. The value of having them in the table is recognition: when someone asks "what was the average CPU between 2pm and 4pm?", you should hear _range query over an array_ and know the answer space before opening an editor.
 
 One row gets no section below: graphs. Not because they matter less, but because traversal is a toolkit of its own, and BFS, DFS, and Dijkstra deserve more than a paragraph. That's [the follow-up post](/blog/graph-traversal-typescript-python).
 
@@ -61,8 +61,12 @@ class MinHeap {
     this.heap.push(val);
     this.heap.sort((a, b) => a - b); // O(n log n) per push, say it then move on
   }
-  pop(): number | undefined { return this.heap.shift(); }
-  peek(): number | undefined { return this.heap[0]; }
+  pop(): number | undefined {
+    return this.heap.shift();
+  }
+  peek(): number | undefined {
+    return this.heap[0];
+  }
 }
 ```
 
@@ -95,7 +99,11 @@ function rangeSum(prefix: number[], l: number, r: number): number {
 }
 ```
 
+<<<<<<< Updated upstream
 The off-by-one is load-bearing: the extra leading zero is what lets `range_sum(prefix, 0, r)` work without a special case. Prefix sums are the *static* answer to range queries; the moment the underlying array needs updates between queries, you have walked into segment-tree territory: same question, harder bet.
+=======
+The off-by-one is load-bearing: the extra leading zero is what lets `range_sum(prefix, 0, r)` work without a special case. Prefix sums are the _static_ answer to range queries; the moment the underlying array needs updates between queries, you have walked into segment-tree territory — same question, harder bet.
+>>>>>>> Stashed changes
 
 ## Stacks: the monotonic trick
 
@@ -121,7 +129,11 @@ The invariant (the stack always holds indices of a non-increasing run) is what m
 
 ## Hash maps: store the complement, not the search
 
+<<<<<<< Updated upstream
 Both languages make the hash map their best structure: Python's `dict` and TypeScript's `Map` are O(1) average for get/set/delete, and most "make it faster" interview answers are some form of "put a hash map in front of it." The canonical pattern is two-sum: instead of scanning for a partner for each element (O(n²)), record what you've *seen* and ask whether the current element completes a pair:
+=======
+Both languages make the hash map their best structure — Python's `dict` and TypeScript's `Map` are O(1) average for get/set/delete, and most "make it faster" interview answers are some form of "put a hash map in front of it." The canonical pattern is two-sum: instead of scanning for a partner for each element (O(n²)), record what you've _seen_ and ask whether the current element completes a pair:
+>>>>>>> Stashed changes
 
 ```python
 def two_sum(nums: list[int], target: int) -> list[int]:
@@ -133,11 +145,15 @@ def two_sum(nums: list[int], target: int) -> list[int]:
     return []
 ```
 
-The generalizable move is the reframe: *don't search forward for what you need; remember backward what you've had.* Frequency counts, anagram grouping, and memoization are the same move with different keys.
+The generalizable move is the reframe: _don't search forward for what you need; remember backward what you've had._ Frequency counts, anagram grouping, and memoization are the same move with different keys.
 
 ## The ones you always build from scratch
 
+<<<<<<< Updated upstream
 Linked lists, tries, and union-find exist in neither standard library, and that turns out to be fine: each is under twenty lines, and the lines are the same every time. Union-find is the one I'd actually memorize, because it answers a question nothing else answers cheaply: *are these two things in the same group?*, in O(α(n)) per query. α is the inverse Ackermann function, and α(n) ≤ 4 for any n that fits in hardware, so treat it as constant.
+=======
+Linked lists, tries, and union-find exist in neither standard library, and that turns out to be fine — each is under twenty lines, and the lines are the same every time. Union-find is the one I'd actually memorize, because it answers a question nothing else answers cheaply: _are these two things in the same group?_ — in O(α(n)) per query. α is the inverse Ackermann function, and α(n) ≤ 4 for any n that fits in hardware, so treat it as constant.
+>>>>>>> Stashed changes
 
 ```python
 class UnionFind:
@@ -164,9 +180,15 @@ class UnionFind:
 
 Both optimizations matter and neither is optional: path compression flattens the tree as you query it, union by rank keeps it from growing tall in the first place. Connected components, cycle detection in undirected graphs, Kruskal's MST, "do these accounts belong to the same person": all union-find, all the same twenty lines.
 
+<<<<<<< Updated upstream
 Linked lists earn their twenty lines differently: not as a container you'd reach for (O(n) to *find* anything), but as the only structure with O(1) delete at a known node, which is why the textbook LRU cache is a hash map pointing into a doubly linked list, and why the fast-and-slow-pointer trick (cycle detection, find-the-middle in one pass) keeps showing up.
 
 The LRU cache is worth thirty extra seconds, because it is the one interview classic that *composes* two structures: the hash map answers "do we have this key?" in O(1), the linked list answers "which entry is oldest?" in O(1), and every node is reachable from both. And here is where knowing your standard library's bets pays off twice: JavaScript's `Map` iterates in insertion order, which is a linked list already threaded through the buckets for you. A full LRU in TypeScript is a dozen lines and no node class:
+=======
+Linked lists earn their twenty lines differently: not as a container you'd reach for (O(n) to _find_ anything), but as the only structure with O(1) delete at a known node — which is why the textbook LRU cache is a hash map pointing into a doubly linked list, and why the fast-and-slow-pointer trick (cycle detection, find-the-middle in one pass) keeps showing up.
+
+The LRU cache is worth thirty extra seconds, because it is the one interview classic that _composes_ two structures: the hash map answers "do we have this key?" in O(1), the linked list answers "which entry is oldest?" in O(1), and every node is reachable from both. And here is where knowing your standard library's bets pays off twice — JavaScript's `Map` iterates in insertion order, which is a linked list already threaded through the buckets for you. A full LRU in TypeScript is a dozen lines and no node class:
+>>>>>>> Stashed changes
 
 ```ts
 class LRUCache<K, V> {
@@ -177,7 +199,7 @@ class LRUCache<K, V> {
     if (!this.map.has(key)) return undefined;
     const val = this.map.get(key)!;
     this.map.delete(key);
-    this.map.set(key, val);   // re-insert → now the newest entry
+    this.map.set(key, val); // re-insert → now the newest entry
     return val;
   }
 
@@ -185,7 +207,7 @@ class LRUCache<K, V> {
     if (this.map.has(key)) this.map.delete(key);
     this.map.set(key, val);
     if (this.map.size > this.capacity) {
-      this.map.delete(this.map.keys().next().value!);   // first key = oldest
+      this.map.delete(this.map.keys().next().value!); // first key = oldest
     }
   }
 }
@@ -195,6 +217,12 @@ Python plays the same trick with `collections.OrderedDict` (`move_to_end` on acc
 
 ## The ones you only reason about
 
+<<<<<<< Updated upstream
 B-Trees and Bloom filters close the table, and the honest advice is: understand them, never implement them. A B+ Tree node is sized to one disk page, so hundreds of keys per node means a million-row index is three or four levels deep: three or four disk reads for any lookup. That sentence is the entire reason `CREATE INDEX` makes your query fast, and it is worth more in a system-design conversation than any implementation would be. A Bloom filter is the inverse trade: a few kilobits buy you "this key *definitely* doesn't exist", which is how RocksDB and Cassandra skip disk reads for absent keys: false positives possible, false negatives never.
 
 The pattern across this whole post is the same one: the structure is rarely the hard part. The hard part is hearing the question your code keeps asking (*next greater? same group? range with updates? definitely absent?*) and recognizing which bet, already placed and paid for, answers it. That recognition reflex is the part of contest training that actually transfers, which is [its own post](/blog/what-icpc-trains-you-to-see). The table is the artifact. The rest is recognition.
+=======
+B-Trees and Bloom filters close the table, and the honest advice is: understand them, never implement them. A B+ Tree node is sized to one disk page, so hundreds of keys per node means a million-row index is three or four levels deep — three or four disk reads for any lookup. That sentence is the entire reason `CREATE INDEX` makes your query fast, and it is worth more in a system-design conversation than any implementation would be. A Bloom filter is the inverse trade: a few kilobits buy you "this key _definitely_ doesn't exist", which is how RocksDB and Cassandra skip disk reads for absent keys — false positives possible, false negatives never.
+
+The pattern across this whole post is the same one: the structure is rarely the hard part. The hard part is hearing the question your code keeps asking — _next greater? same group? range with updates? definitely absent?_ — and recognizing which bet, already placed and paid for, answers it. That recognition reflex is the part of contest training that actually transfers, which is [its own post](/blog/what-icpc-trains-you-to-see). The table is the artifact. The rest is recognition.
+>>>>>>> Stashed changes

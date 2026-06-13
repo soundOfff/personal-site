@@ -29,6 +29,7 @@ for (const [u, v] of edges) {
 }
 ```
 
+<<<<<<< Updated upstream
 That is the adjacency list, and it is the right representation for nearly everything: O(V + E) space, O(1) edge insertion, neighbors iterable in degree time. The adjacency *matrix* earns its O(V²) memory only when the graph is dense or you need O(1) "is there an edge between u and v?" queries.
 
 From there, two booleans select the algorithm:
@@ -39,12 +40,28 @@ From there, two booleans select the algorithm:
 | Reachability / components | BFS or DFS | BFS or DFS |
 | Cycle detection, topological order | DFS | DFS |
 | Negative edge weights | n/a | Bellman-Ford (rare) |
+=======
+That is the adjacency list, and it is the right representation for nearly everything — O(V + E) space, O(1) edge insertion, neighbors iterable in degree time. The adjacency _matrix_ earns its O(V²) memory only when the graph is dense or you need O(1) "is there an edge between u and v?" queries.
+
+From there, two booleans select the algorithm:
+
+| Question                           | Unweighted | Weighted            |
+| ---------------------------------- | ---------- | ------------------- |
+| Shortest path                      | BFS        | Dijkstra            |
+| Reachability / components          | BFS or DFS | BFS or DFS          |
+| Cycle detection, topological order | DFS        | DFS                 |
+| Negative edge weights              | —          | Bellman-Ford (rare) |
+>>>>>>> Stashed changes
 
 Three algorithms cover the table. Each is the previous one with the queue swapped out.
 
 ## BFS: the queue visits in distance order
 
+<<<<<<< Updated upstream
 BFS's bet: process nodes in the order they were discovered, and you process them in order of distance from the start. The invariant is worth saying out loud (*the queue only ever holds nodes at distance d and d+1, in that order*) because it is the entire proof that the first time you reach a node is the shortest way to reach it. That only holds when every edge costs the same, which is why BFS is the unweighted column of the table.
+=======
+BFS's bet: process nodes in the order they were discovered, and you process them in order of distance from the start. The invariant is worth saying out loud — _the queue only ever holds nodes at distance d and d+1, in that order_ — because it is the entire proof that the first time you reach a node is the shortest way to reach it. That only holds when every edge costs the same, which is why BFS is the unweighted column of the table.
+>>>>>>> Stashed changes
 
 ```python
 from collections import deque
@@ -67,7 +84,7 @@ The [queue trap](/blog/data-structures-typescript-python) from the field guide s
 function bfs(graph: Map<number, number[]>, start: number): Map<number, number> {
   const dist = new Map([[start, 0]]);
   const queue = [start];
-  let head = 0;                       // read-index: O(1) "dequeue", no shift()
+  let head = 0; // read-index: O(1) "dequeue", no shift()
   while (head < queue.length) {
     const node = queue[head++];
     for (const neighbor of graph.get(node) ?? []) {
@@ -87,7 +104,7 @@ One detail that separates working BFS from subtly-broken BFS: mark nodes visited
 
 Swap the queue for a stack and you get DFS. The distance-order guarantee is gone; what you get instead is **completion order** (a node finishes only after everything reachable from it has finished), and that is the property behind every structural question: does this graph have a cycle? What order do these dependencies resolve in? How many islands are there?
 
-The recursive version is the one everyone writes, because the call stack *is* the stack:
+The recursive version is the one everyone writes, because the call stack _is_ the stack:
 
 ```python
 def dfs(graph: dict[int, list[int]], node: int, visited: set[int]) -> None:
@@ -116,11 +133,15 @@ function dfs(graph: Map<number, number[]>, start: number): Set<number> {
 }
 ```
 
-Run that from every unvisited node and count the runs: that is connected components. Track nodes currently *on* the recursion path (not just visited) and a revisit means a cycle. Record the order nodes finish and reverse it: topological sort. All the structure questions are DFS plus one extra piece of bookkeeping.
+Run that from every unvisited node and count the runs: that is connected components. Track nodes currently _on_ the recursion path (not just visited) and a revisit means a cycle. Record the order nodes finish and reverse it: topological sort. All the structure questions are DFS plus one extra piece of bookkeeping.
 
 ## Dijkstra: BFS where the queue becomes a heap
 
+<<<<<<< Updated upstream
 Make the edges weighted and BFS's invariant breaks: the first time you reach a node is no longer the cheapest. The repair is to always expand the *cheapest known frontier node* instead of the oldest, which means the queue becomes a min-heap, which means this is the [heap gap](/blog/data-structures-typescript-python) from the field guide all over again: Python has `heapq`, TypeScript has nothing.
+=======
+Make the edges weighted and BFS's invariant breaks — the first time you reach a node is no longer the cheapest. The repair is to always expand the _cheapest known frontier node_ instead of the oldest, which means the queue becomes a min-heap, which means this is the [heap gap](/blog/data-structures-typescript-python) from the field guide all over again: Python has `heapq`, TypeScript has nothing.
+>>>>>>> Stashed changes
 
 ```python
 import heapq
@@ -143,17 +164,21 @@ def dijkstra(graph: dict[int, list[tuple[int, int]]], start: int) -> dict[int, i
 
 The subtle line is the stale-entry skip. `heapq` has no decrease-key operation, so when a cheaper route to a node is found, the old, more expensive heap entry is not removed; it is left to rot and discarded when it surfaces. That "lazy deletion" is the standard trick, it keeps the complexity at O((V + E) log V), and forgetting the skip gives you an algorithm that is correct but re-expands nodes for no reason.
 
-In TypeScript, you face the same choice as in the field guide: for interview-sized inputs, a sorted array wearing a heap's interface is fine *if you say the cost out loud*; for production, a priority-queue dependency is one of the few data-structure imports that genuinely earns its place in `package.json`.
+In TypeScript, you face the same choice as in the field guide: for interview-sized inputs, a sorted array wearing a heap's interface is fine _if you say the cost out loud_; for production, a priority-queue dependency is one of the few data-structure imports that genuinely earns its place in `package.json`.
 
 ## The recognition table
 
-| You hear | You reach for |
-| --- | --- |
-| "Fewest hops / moves / steps" | BFS |
-| "Can A reach B?" | BFS or DFS, either |
-| "Cheapest route", weights ≥ 0 | Dijkstra |
-| "Valid build/course order" | DFS topological sort |
-| "How many groups/islands?" | DFS components (or Union-Find) |
-| "Is there a circular dependency?" | DFS with on-path tracking |
+| You hear                          | You reach for                  |
+| --------------------------------- | ------------------------------ |
+| "Fewest hops / moves / steps"     | BFS                            |
+| "Can A reach B?"                  | BFS or DFS, either             |
+| "Cheapest route", weights ≥ 0     | Dijkstra                       |
+| "Valid build/course order"        | DFS topological sort           |
+| "How many groups/islands?"        | DFS components (or Union-Find) |
+| "Is there a circular dependency?" | DFS with on-path tracking      |
 
+<<<<<<< Updated upstream
 The deeper habit is noticing that a graph problem rarely announces itself as one. Package dependencies, currency conversion chains, social follows, state machines, spreadsheet cell references: none of these say "graph" in the ticket. The skill the contest table drills is hearing *nodes and edges* in a problem that was stated in nouns and verbs, and then asking the only two questions that matter: are the edges weighted, and what do I actually need: a distance, an order, or a yes/no. Two booleans and a question. The algorithm picks itself.
+=======
+The deeper habit is noticing that a graph problem rarely announces itself as one. Package dependencies, currency conversion chains, social follows, state machines, spreadsheet cell references — none of these say "graph" in the ticket. The skill the contest table drills is hearing _nodes and edges_ in a problem that was stated in nouns and verbs, and then asking the only two questions that matter: are the edges weighted, and what do I actually need — a distance, an order, or a yes/no. Two booleans and a question. The algorithm picks itself.
+>>>>>>> Stashed changes
