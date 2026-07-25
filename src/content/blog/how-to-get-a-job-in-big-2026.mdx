@@ -8,6 +8,11 @@ readingTime: '7 min'
 draft: false
 ---
 
+import PipelineFig from '../../components/diagrams/PipelineFig.astro';
+import LinkedListFig from '../../components/diagrams/LinkedListFig.astro';
+import ScriptFig from '../../components/diagrams/ScriptFig.astro';
+import ReviewLoopFig from '../../components/diagrams/ReviewLoopFig.astro';
+
 So you got fired from your quality startup or your big tech company, and now
 the only questions in your head are the ones I had two months ago: what the
 hell do we study now, which area is worth betting on, and which tools are good
@@ -59,10 +64,7 @@ for me:
 
 Almost every process I went through looked like this:
 
-1. HR screen
-2. Technical interview (async or sync)
-3. System design interview
-4. A meeting with a manager, a founder, sometimes the CEO
+<PipelineFig />
 
 Two footnotes from the trenches. Outside big tech, step 3 is often not a
 formal system design round: at consultancies and small product companies it
@@ -88,6 +90,8 @@ done, your biggest mistake in production, the next thing you want to learn.
 I keep a tested file of answers that I know sound like me. Think of it as the
 script for a play where you're a famous enough actor to improvise: you can
 change the lines, but you'd better know the play.
+
+<ScriptFig />
 
 My rules for this stage:
 
@@ -124,20 +128,7 @@ The data structures you should be able to build and use:
 - Linked lists -> easy to understand, and reversing one is the canonical
   warm-up:
 
-```ts
-type ListNode = { val: number; next: ListNode | null };
-
-function reverse(head: ListNode | null): ListNode | null {
-  let prev: ListNode | null = null;
-  while (head) {
-    const next = head.next; // save it before we cut the link
-    head.next = prev;
-    prev = head;
-    head = next;
-  }
-  return prev;
-}
-```
+<LinkedListFig />
 
 - Hash tables -> must know. No negotiation on this one.
 - Binary trees -> good to know, and the exercises are genuinely fun.
@@ -199,6 +190,8 @@ agents produce. "I ask Claude and turn on plan mode" dies at the first
 follow-up question. A practiced setup, rules files, agents, a repeatable
 workflow you can rebuild in front of someone, helps you demo that judgment
 convincingly. But the setup is the prop; the review habits are the act.
+
+<ReviewLoopFig />
 
 One caveat before you show up with your rig: some companies still ban AI in
 interviews entirely, Amazon and Goldman among them. Check before you plug in.

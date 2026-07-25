@@ -1190,6 +1190,75 @@ a {
   }
 }
 
+/* prose diagrams: inline-SVG figures themed via tokens, so they follow
+   light/dark like the rest of the page. Same card treatment as pre blocks. */
+.prose figure.diagram {
+  margin: 1.1em 0 0;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  padding: 22px 20px 16px;
+}
+.prose figure.diagram svg {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  margin: 0 auto;
+}
+.prose figure.diagram figcaption {
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+}
+.diagram .d-box {
+  fill: var(--paper);
+  stroke: var(--ink-2);
+}
+.diagram .d-bar {
+  fill: var(--rule);
+}
+.diagram .d-label {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  fill: var(--ink);
+}
+.diagram .d-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--muted);
+}
+.diagram .d-note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--muted);
+}
+.diagram .d-line {
+  stroke: var(--muted);
+  fill: none;
+}
+.diagram .d-head {
+  fill: var(--muted);
+}
+.diagram .d-accent {
+  stroke: var(--amber-deep);
+  fill: none;
+}
+.diagram .d-accent-head {
+  fill: var(--amber-deep);
+}
+.diagram .d-accent-fill {
+  fill: var(--amber-soft);
+  stroke: var(--amber-deep);
+}
+.diagram .d-accent-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--amber-deep);
+}
+
 /* blog index list */
 .posts {
   display: flex;

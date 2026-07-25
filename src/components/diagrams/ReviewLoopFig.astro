@@ -1,0 +1,38 @@
+---
+/**
+ * Blog diagram: the AI-workflow loop interviewers actually grade. The amber
+ * review box and reject path are the emphasis. Token classes from global.css.
+ */
+---
+
+<figure class="diagram">
+  <svg
+    viewBox="0 0 600 210"
+    role="img"
+    aria-label="Flow diagram: your prompt goes to the agent, which produces output. The output drops into your review, which either sends it back to the prompt, labeled reject refine again, or ships it."
+  >
+    <rect class="d-box" x="40" y="40" width="110" height="40" rx="8"></rect>
+    <text class="d-label" x="95" y="65" text-anchor="middle">your prompt</text>
+    <line class="d-line" x1="150" y1="60" x2="222" y2="60"></line>
+    <polygon class="d-head" points="224,55 224,65 230,60"></polygon>
+    <rect class="d-box" x="230" y="40" width="120" height="40" rx="8"></rect>
+    <text class="d-label" x="290" y="65" text-anchor="middle">the agent</text>
+    <line class="d-line" x1="350" y1="60" x2="412" y2="60"></line>
+    <polygon class="d-head" points="414,55 414,65 420,60"></polygon>
+    <rect class="d-box" x="420" y="40" width="110" height="40" rx="8"></rect>
+    <text class="d-label" x="475" y="65" text-anchor="middle">its output</text>
+    <polyline class="d-line" points="475,80 475,120 320,120 320,142"></polyline>
+    <polygon class="d-head" points="315,144 325,144 320,150"></polygon>
+    <rect class="d-accent-fill" x="255" y="150" width="130" height="40" rx="8"></rect>
+    <text class="d-label" x="320" y="175" text-anchor="middle">your review</text>
+    <polyline class="d-accent" points="255,170 95,170 95,88"></polyline>
+    <polygon class="d-accent-head" points="90,86 100,86 95,80"></polygon>
+    <text class="d-accent-text" x="104" y="163">reject, refine, again</text>
+    <line class="d-line" x1="385" y1="170" x2="532" y2="170"></line>
+    <polygon class="d-head" points="534,165 534,175 540,170"></polygon>
+    <text class="d-label" x="500" y="162">ship</text>
+  </svg>
+  <figcaption>
+    The loop they actually grade. The rig is scenery; the amber box is the act.
+  </figcaption>
+</figure>

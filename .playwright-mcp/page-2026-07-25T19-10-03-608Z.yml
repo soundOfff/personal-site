@@ -1,0 +1,164 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "all writing" [ref=e4] [cursor=pointer]:
+      - /url: /blog
+    - button "Toggle theme" [ref=e7] [cursor=pointer]
+  - banner [ref=e10]:
+    - paragraph [ref=e11]: // Startup engineering & opinions
+    - heading "How to get a job as a software developer in big 2026" [level=1] [ref=e12]
+    - paragraph [ref=e13]: "Two months of job hunting, four offers, and the roadmap that came out of it: the 2026 pipeline, what to actually practice, and why your AI workflow is now part of the interview."
+    - generic [ref=e14]:
+      - generic [ref=e15]: 2026-07-25
+      - generic [ref=e16]: ·
+      - generic [ref=e17]: 7 min
+      - generic [ref=e18]:
+        - generic [ref=e19]: "#career"
+        - generic [ref=e20]: "#interviews"
+        - generic [ref=e21]: "#job-hunting"
+        - generic [ref=e22]: "#ai"
+  - article [ref=e23]:
+    - paragraph [ref=e24]: "So you got fired from your quality startup or your big tech company, and now the only questions in your head are the ones I had two months ago: what the hell do we study now, which area is worth betting on, and which tools are good to go."
+    - paragraph [ref=e25]: This started as a conversation with a friend about how we could both land a remote job, and it turned into the roadmap I wish someone had handed me. It organizes my own path, and maybe you leave with a tool you hadn’t heard of, or with confirmation for one you had.
+    - heading "Where I’m speaking from" [level=2] [ref=e26]
+    - paragraph [ref=e27]: I started searching two months ago. Right now I have four offers, most of them from consultancies. I also got deep into two product companies but didn’t pass their last technical round, mainly because system design is my weak spot, and that round usually sits right before the behavioural. I have five years of full-stack experience.
+    - paragraph [ref=e28]: "I did competitive programming, so algorithms are the comfortable part: I can analyze and present a solution for pretty much any LeetCode medium. Hards are another story. They combine several patterns under tight constraints, sometimes with an advanced structure on top, and while big tech runs mostly on mediums too, the hards show up in their onsites and senior loops. I decided that grind wasn’t for me this round."
+    - paragraph [ref=e29]: "Two things are non-negotiable wherever you apply. English, and understanding the business: in every interview you should know what they’re building and ask good questions about it."
+    - paragraph [ref=e30]: "The third thing changed since my last job hunt: being a builder matters now. They want to see design principles, that you can work with AI, and that you communicate well. You need to sell what you build, and sell yourself as the person who built it. The AI part is big enough that it gets its own section below."
+    - heading "Before any meeting" [level=2] [ref=e31]
+    - paragraph [ref=e32]: "Polish your LinkedIn first. There’s plenty of advice out there; what worked for me:"
+    - list [ref=e33]:
+      - listitem [ref=e34]: A generic but clean cover image.
+      - listitem [ref=e35]: A profile photo that looks professional.
+      - listitem [ref=e36]: A shorter headline with strong words.
+      - listitem [ref=e37]: A portfolio. Mine is simple on purpose, but a good one can also show your design taste.
+      - listitem [ref=e38]: Experience and personal projects actually up to date.
+    - heading "The stages" [level=2] [ref=e39]
+    - paragraph [ref=e40]: "Almost every process I went through looked like this:"
+    - figure "The pipeline. Dashed = the consultancy bonus level." [ref=e41]:
+      - 'img "The interview pipeline as a flowchart: HR screen, technical interview, system design, then manager or CEO, plus a dashed bonus stage, the client interview, at staff-augmentation consultancies. Behavioural questions live inside the HR screen and the final meeting." [ref=e42]'
+      - paragraph [ref=e44]: "01"
+      - paragraph [ref=e46]: HR screen
+      - paragraph [ref=e48]: behavioural, act I
+      - paragraph [ref=e50]: "02"
+      - paragraph [ref=e52]: Technical interview
+      - paragraph [ref=e54]: async or sync
+      - paragraph [ref=e56]: "03"
+      - paragraph [ref=e58]: System design
+      - paragraph [ref=e60]: often folded into 04
+      - paragraph [ref=e62]: outside big tech
+      - paragraph [ref=e64]: "04"
+      - paragraph [ref=e66]: Manager / founder / CEO
+      - paragraph [ref=e68]: behavioural, encore
+      - paragraph [ref=e70]: "05"
+      - paragraph [ref=e72]: Client interview
+      - paragraph [ref=e74]: staff-aug bonus level
+    - paragraph [ref=e76]: "Two footnotes from the trenches. Outside big tech, step 3 is often not a formal system design round: at consultancies and small product companies it becomes a technical-depth conversation, or gets merged into the final meeting. And if the consultancy does staff augmentation, expect a bonus round where the client interviews you again after you already passed everything. The behavioural questions rarely get their own stage; they’re sprinkled into the HR screen and the final meeting."
+    - heading "The HR screen" [level=2] [ref=e77]
+    - paragraph [ref=e78]: My notes call this stage RRHH, because Spanish. Your recruiter calls it HR.
+    - paragraph [ref=e79]: Here you need to convince a person that you’re a good match for the role. Explain things simply. Communication is everything.
+    - paragraph [ref=e80]: "What works for me is preparing answers before the questions arrive. They usually follow from the role, so ask an AI what’s likely to come up and do your own research on top. Then there are the evergreens: the last thing you built and how, your current AI workflow, the most challenging thing you’ve done, your biggest mistake in production, the next thing you want to learn."
+    - paragraph [ref=e81]: "I keep a tested file of answers that I know sound like me. Think of it as the script for a play where you’re a famous enough actor to improvise: you can change the lines, but you’d better know the play."
+    - figure [ref=e82]:
+      - img "A document titled answers.md with several ruled lines of text. One line is highlighted in amber and labeled improvise here." [ref=e83]
+      - paragraph [ref=e85]: answers.md
+      - paragraph [ref=e87]: tested answers
+      - paragraph [ref=e89]: improvise here
+      - paragraph [ref=e91]: "The script: answers you have tested out loud, and the line you are allowed to improvise."
+    - paragraph [ref=e92]: "My rules for this stage:"
+    - list [ref=e93]:
+      - listitem [ref=e94]: Don’t blame others in your answers. Own what you did.
+      - listitem [ref=e95]: When a story involves asking a more experienced teammate for help, say so. You can’t know everything, and solo players have a bad reputation.
+      - listitem [ref=e96]: Your AI workflow can’t be “I ask Claude and turn on plan mode.” Research real ways of working with AI. More on this below.
+    - heading "The technical interview" [level=2] [ref=e97]
+    - paragraph [ref=e98]: Usually the second step. Sometimes it’s the first. Whatever, you prepare the same way.
+    - paragraph [ref=e99]: "My advice: practice one language until it’s boring, and if they propose another, ask whether you can use yours. There’s too much to learn in 2026 to maintain two interview languages, and most companies let you pick any mainstream one anyway. The exceptions are domain rounds: a front-end interview will be JavaScript, a mobile one speaks whatever the platform speaks, and consultancy tests are sometimes tied to the client’s stack."
+    - paragraph [ref=e100]:
+      - text: For practice I recommend LeetCode or any platform like it, though I prefer
+      - link "NeetCode" [ref=e101] [cursor=pointer]:
+        - /url: https://neetcode.io/
+      - text: ": the curated lists (the NeetCode 150 is free) give you structure instead of a pile of thousands of unsorted problems. I run one of those study plans as fast as I can, and in the process I only use AI to ask how a solution could be more performant or which more advanced concept applies. Not to solve the problem for me."
+    - paragraph [ref=e102]: "The data structures you should be able to build and use:"
+    - list [ref=e103]:
+      - listitem [ref=e104]: Arrays -> static and dynamic, and how they differ under the hood.
+      - listitem [ref=e105]: Queue and stack -> the classic Valid Parentheses problem teaches a pattern you’ll reuse everywhere.
+      - listitem [ref=e106]: "Linked lists -> easy to understand, and reversing one is the canonical warm-up:"
+    - figure "Walk it once, flip every next pointer, the tail becomes the new head." [ref=e107]:
+      - 'img "Two versions of the same three-node list. Before: head points at node one and the arrows run left to right into null. After: every arrow is flipped, null sits on the left, and head points at node three." [ref=e108]'
+      - paragraph [ref=e109]: before
+      - paragraph [ref=e111]: head
+      - paragraph [ref=e113]: "1"
+      - paragraph [ref=e115]: "2"
+      - paragraph [ref=e117]: "3"
+      - paragraph [ref=e119]: "null"
+      - paragraph [ref=e121]: after
+      - paragraph [ref=e123]: head
+      - paragraph [ref=e125]: "null"
+      - paragraph [ref=e127]: "1"
+      - paragraph [ref=e129]: "2"
+      - paragraph [ref=e131]: "3"
+      - paragraph [ref=e133]: every next pointer,
+      - paragraph [ref=e135]: flipped
+    - list [ref=e137]:
+      - listitem [ref=e138]: Hash tables -> must know. No negotiation on this one.
+      - listitem [ref=e139]: Binary trees -> good to know, and the exercises are genuinely fun.
+      - listitem [ref=e140]: B-trees -> good to know conceptually. Nearly every mainstream database (Postgres, MySQL, SQLite, MongoDB) uses the B-tree family (usually B+ trees) for its indexes, and often for the table data itself. Nobody will ask you to implement one; they’ll ask why an index makes a query fast, and when it doesn’t help.
+      - listitem [ref=e141]: Tries -> autocomplete. Elasticsearch’s completion suggester runs on trie-shaped automata, so this one is not just interview folklore.
+      - listitem [ref=e142]: "Probabilistic structures -> Bloom filters (RocksDB and Cassandra use them to skip files that can’t contain your key), HyperLogLog, count-min sketch. Honesty: outside big tech these live in system design conversations, not coding rounds."
+    - paragraph [ref=e143]: "And at minimum these algorithms:"
+    - list [ref=e144]:
+      - listitem [ref=e145]: Recursion.
+      - listitem [ref=e146]: DFS and BFS.
+      - listitem [ref=e147]: "Binary search, and not just the code: understand why it works."
+    - paragraph [ref=e148]:
+      - text: I’ve written a longer
+      - link "field guide to these structures" [ref=e149] [cursor=pointer]:
+        - /url: /blog/data-structures-typescript-python
+      - text: and a whole post on
+      - link "binary search beyond arrays" [ref=e150] [cursor=pointer]:
+        - /url: /blog/binary-search-on-the-answer
+      - text: if you want to go deeper.
+    - heading "System design and CEO talks" [level=2] [ref=e151]
+    - paragraph [ref=e152]: "Honesty first: this is the round that knocked me out of two product companies, so read this section as notes from the guy who failed it, not the guy who passed it."
+    - paragraph [ref=e153]: "One clarification so you don’t repeat my typo: the round is called system design. Architecture, APIs, database choices, scaling, trade-offs. A design system is a different thing entirely, the frontend artifact with component libraries and design tokens, and some frontend loops test that separately."
+    - paragraph [ref=e154]: "What I can recommend: research the team you’d be joining and what they’re building, so the conversation can go toward the systems they actually run instead of a generic URL shortener."
+    - paragraph [ref=e155]:
+      - text: For learning the material itself, I recommend Matt Pocock’s /teach skill (
+      - code [ref=e156]: npx skills add mattpocock/skills --skill=teach
+      - text: ). It turns a directory into a study workspace your coding agent teaches from, pulling cited sources instead of answering from model memory.
+    - paragraph [ref=e157]: The final meeting with the manager or CEO doubles as the behavioural round, so your HR-screen script gets a second performance.
+    - heading "The AI workflow question" [level=2] [ref=e158]
+    - paragraph [ref=e159]: In 2026 your AI workflow is part of the interview. Canva replaced its computer-science-fundamentals round with an AI-assisted coding interview. Meta added an AI-enabled round, Google is piloting one, and AI-native startups like Sierra hand you agent tooling and watch what you do with it.
+    - paragraph [ref=e160]: "What they evaluate is not the size of your rig. It’s judgment: when you rejected AI output, how you knew it was wrong, how you validate what your agents produce. “I ask Claude and turn on plan mode” dies at the first follow-up question. A practiced setup, rules files, agents, a repeatable workflow you can rebuild in front of someone, helps you demo that judgment convincingly. But the setup is the prop; the review habits are the act."
+    - figure [ref=e161]:
+      - 'img "Flow diagram: your prompt goes to the agent, which produces output. The output drops into your review, which either sends it back to the prompt, labeled reject refine again, or ships it." [ref=e162]'
+      - paragraph [ref=e164]: your prompt
+      - paragraph [ref=e166]: the agent
+      - paragraph [ref=e168]: its output
+      - paragraph [ref=e170]: your review
+      - paragraph [ref=e172]: reject, refine, again
+      - paragraph [ref=e174]: ship
+      - paragraph [ref=e176]: The loop they actually grade. The rig is scenery; the amber box is the act.
+    - paragraph [ref=e177]: "One caveat before you show up with your rig: some companies still ban AI in interviews entirely, Amazon and Goldman among them. Check before you plug in."
+    - heading "The open questions" [level=2] [ref=e178]
+    - paragraph [ref=e179]: "Things I’m still researching, and I owe each of them its own post:"
+    - list [ref=e180]:
+      - listitem [ref=e181]: Where do you actually find the jobs, and is any tool useful for it?
+      - listitem [ref=e182]: What should you read for technical interviews?
+      - listitem [ref=e183]: How is AI changing the process from the company’s side?
+      - listitem [ref=e184]: Startups vs mid-size companies.
+      - listitem [ref=e185]: "Is LeetCode dead? (I just told you to grind it, so: not yet.)"
+      - listitem [ref=e186]: System design book recommendations.
+      - listitem [ref=e187]: What does the survivor profile look like?
+    - paragraph [ref=e188]: If you have answers to any of these, my inbox is open. Meanwhile I’ll be in some HR screen, improvising from my script.
+  - button "Back to top"
+  - contentinfo [ref=e189]:
+    - generic [ref=e190]: © 2026 Tomas Brasca
+    - navigation "Footer" [ref=e191]:
+      - link "github" [ref=e192] [cursor=pointer]:
+        - /url: https://github.com/soundOfff
+      - link "linkedin" [ref=e193] [cursor=pointer]:
+        - /url: https://www.linkedin.com/in/tomasbrasca
+      - link "email" [ref=e194] [cursor=pointer]:
+        - /url: mailto:tomibrasca97@gmail.com
+      - link "rss" [ref=e195] [cursor=pointer]:
+        - /url: /rss.xml

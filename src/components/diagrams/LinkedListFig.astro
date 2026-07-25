@@ -1,0 +1,52 @@
+---
+/**
+ * Blog diagram: reversing a linked list, before/after. Amber marks the
+ * flipped pointers and the moved head. Token classes from global.css.
+ */
+---
+
+<figure class="diagram">
+  <svg
+    viewBox="0 0 560 250"
+    role="img"
+    aria-label="Two versions of the same three-node list. Before: head points at node one and the arrows run left to right into null. After: every arrow is flipped, null sits on the left, and head points at node three."
+  >
+    <text class="d-note" x="40" y="34">before</text>
+    <text class="d-accent-text" x="122" y="20" text-anchor="middle">head</text>
+    <line class="d-accent" x1="122" y1="26" x2="122" y2="40"></line>
+    <polygon class="d-accent-head" points="117,40 127,40 122,46"></polygon>
+    <rect class="d-box" x="100" y="48" width="44" height="36" rx="6"></rect>
+    <text class="d-label" x="122" y="71" text-anchor="middle">1</text>
+    <line class="d-line" x1="144" y1="66" x2="182" y2="66"></line>
+    <polygon class="d-head" points="184,61 184,71 190,66"></polygon>
+    <rect class="d-box" x="190" y="48" width="44" height="36" rx="6"></rect>
+    <text class="d-label" x="212" y="71" text-anchor="middle">2</text>
+    <line class="d-line" x1="234" y1="66" x2="272" y2="66"></line>
+    <polygon class="d-head" points="272,61 272,71 278,66"></polygon>
+    <rect class="d-box" x="280" y="48" width="44" height="36" rx="6"></rect>
+    <text class="d-label" x="302" y="71" text-anchor="middle">3</text>
+    <line class="d-line" x1="324" y1="66" x2="342" y2="66"></line>
+    <polygon class="d-head" points="342,61 342,71 348,66"></polygon>
+    <text class="d-note" x="356" y="71">null</text>
+    <text class="d-note" x="40" y="150">after</text>
+    <text class="d-accent-text" x="302" y="136" text-anchor="middle">head</text>
+    <line class="d-accent" x1="302" y1="142" x2="302" y2="156"></line>
+    <polygon class="d-accent-head" points="297,156 307,156 302,162"></polygon>
+    <text class="d-note" x="40" y="187">null</text>
+    <line class="d-accent" x1="100" y1="182" x2="80" y2="182"></line>
+    <polygon class="d-accent-head" points="80,177 80,187 74,182"></polygon>
+    <rect class="d-box" x="100" y="164" width="44" height="36" rx="6"></rect>
+    <text class="d-label" x="122" y="187" text-anchor="middle">1</text>
+    <line class="d-accent" x1="190" y1="182" x2="152" y2="182"></line>
+    <polygon class="d-accent-head" points="152,177 152,187 146,182"></polygon>
+    <rect class="d-box" x="190" y="164" width="44" height="36" rx="6"></rect>
+    <text class="d-label" x="212" y="187" text-anchor="middle">2</text>
+    <line class="d-accent" x1="280" y1="182" x2="242" y2="182"></line>
+    <polygon class="d-accent-head" points="242,177 242,187 236,182"></polygon>
+    <rect class="d-box" x="280" y="164" width="44" height="36" rx="6"></rect>
+    <text class="d-label" x="302" y="187" text-anchor="middle">3</text>
+    <text class="d-note" x="350" y="178">every next pointer,</text>
+    <text class="d-note" x="350" y="192">flipped</text>
+  </svg>
+  <figcaption>Walk it once, flip every next pointer, the tail becomes the new head.</figcaption>
+</figure>
