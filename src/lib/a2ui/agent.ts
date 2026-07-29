@@ -1,21 +1,20 @@
 /**
- * The agent: one forced tool call to Claude, turned into A2UI messages.
+ * The agent: one forced tool call, turned into A2UI messages.
  *
- * Written against the Messages API over `fetch` rather than the SDK, because
- * this runs in a Worker and the only thing needed is one request shape. It also
- * keeps the cost model visible: the numbers reported under each answer are
- * computed here from the usage the API returns, not estimated.
+ * Written against OpenRouter's OpenAI-compatible `/chat/completions` over `fetch`
+ * rather than an SDK, because this runs in a Worker and the only thing needed is
+ * one request shape. OpenRouter is the transport, not the model: it routes to
+ * Claude (`anthropic/claude-haiku-4.5` by default), so what answers a visitor is
+ * still Claude — the gateway just holds the billing relationship.
  *
  * Two decisions carry it:
  *
  *   • **Forced tool use.** `tool_choice` pins the model to `render_surface`, so
  *     "reply in prose instead" is not a failure mode that exists. What comes
  *     back is a JSON object or an error, never a paragraph to parse.
- *   • **Prompt caching.** Instructions, catalog and tool schema are identical on
- *     every request and sit behind a cache breakpoint; only the retrieved
- *     context and the conversation change. That is most of the input served at a
- *     tenth of the price, and it is what makes a public, unauthenticated demo
- *     affordable enough to leave switched on.
+ *   • **Reported cost, not estimated cost.** `usage: { include: true }` asks the
+ *     gateway what the turn actually cost and the console prints that number.
+ *     The price table below is only the fallback for when it's absent.
  *
  * The model is the smallest one that clears the bar — the same argument the rest
  * of this site makes about routing. Override with `A2UI_MODEL`.
@@ -26,9 +25,12 @@ import { RENDERABLE_TYPES, countComponents, toMessages, type RenderInput } from 
 import type { A2uiMessage, HistoryTurn, TurnMeta } from './types';
 import type { AgentContext } from '../portfolio/retrieve';
 
-const DEFAULT_MODEL = 'claude-haiku-4-5-20251001';
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const API_VERSION = '2023-06-01';
+const DEFAULT_MODEL = 'anthropic/claude-haiku-4.5';
+const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+
+/** Sent for OpenRouter's attribution listings; harmless if the site moves. */
+const APP_URL = 'https://tomasbrasca.dev';
+const APP_TITLE = 'tomasbrasca.dev · a2ui portfolio agent';
 
 /** Generous enough for a twelve-component surface, tight enough to bound cost. */
 const MAX_TOKENS = 2048;
@@ -37,8 +39,8 @@ const MAX_TOKENS = 2048;
 const TIMEOUT_MS = 25_000;
 
 export interface AgentEnv {
-  ANTHROPIC_API_KEY?: string;
-  /** Optional model override, e.g. "claude-sonnet-5". */
+  OPENROUTER_API_KEY?: string;
+  /** Optional model override, e.g. "anthropic/claude-sonnet-5". */
   A2UI_MODEL?: string;
 }
 
@@ -51,46 +53,54 @@ export class AgentError extends Error {
   }
 }
 
-/** True when the agent is configured (live mode is usable). */
+/** True when the agent is configured. */
 export function agentAvailable(env: AgentEnv): boolean {
-  return typeof env.ANTHROPIC_API_KEY === 'string' && env.ANTHROPIC_API_KEY.length > 0;
+  return typeof env.OPENROUTER_API_KEY === 'string' && env.OPENROUTER_API_KEY.length > 0;
 }
 
 /* -------------------------------------------------------------- accounting */
 
-/** USD per million tokens, matched by model-id prefix. */
+/**
+ * USD per million tokens, matched by model-id prefix. Only a fallback: the
+ * gateway reports the real spend per turn, and that is what gets displayed when
+ * it arrives. Keep these in sync with openrouter.ai/models if you edit them.
+ */
 const PRICING: Record<string, { input: number; output: number }> = {
-  'claude-haiku-4-5': { input: 1, output: 5 },
-  'claude-sonnet-5': { input: 3, output: 15 },
-  'claude-sonnet-4-5': { input: 3, output: 15 },
-  'claude-opus-5': { input: 15, output: 75 },
+  'anthropic/claude-haiku-4.5': { input: 1, output: 5 },
+  'anthropic/claude-sonnet-5': { input: 2, output: 10 },
+  'anthropic/claude-sonnet-4.5': { input: 3, output: 15 },
+  'anthropic/claude-opus-5': { input: 5, output: 25 },
 };
 
 const FALLBACK_PRICE = { input: 1, output: 5 };
 
 interface Usage {
-  input_tokens?: number;
-  output_tokens?: number;
-  cache_creation_input_tokens?: number;
-  cache_read_input_tokens?: number;
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  prompt_tokens_details?: { cached_tokens?: number };
+  /** OpenRouter's own accounting, in USD. Present because we ask for it. */
+  cost?: number;
+}
+
+function cachedFrom(usage: Usage): number {
+  return usage.prompt_tokens_details?.cached_tokens ?? 0;
 }
 
 /**
- * Anthropic bills a cache write at 1.25× the input rate and a cache read at
- * 0.1×, and reports all three counts separately — so this is the real cost of
- * the turn, not an approximation of it.
+ * Fallback pricing. `prompt_tokens` is the whole prompt including anything the
+ * upstream served from cache, so cached tokens are billed at a tenth and
+ * subtracted out rather than counted twice.
  */
 function priceOf(model: string, usage: Usage): number {
   const price =
     Object.entries(PRICING).find(([prefix]) => model.startsWith(prefix))?.[1] ?? FALLBACK_PRICE;
 
-  const fresh = usage.input_tokens ?? 0;
-  const written = usage.cache_creation_input_tokens ?? 0;
-  const read = usage.cache_read_input_tokens ?? 0;
-  const output = usage.output_tokens ?? 0;
+  const cached = cachedFrom(usage);
+  const fresh = Math.max(0, (usage.prompt_tokens ?? 0) - cached);
+  const output = usage.completion_tokens ?? 0;
 
   return (
-    (fresh * price.input + written * price.input * 1.25 + read * price.input * 0.1) / 1_000_000 +
+    (fresh * price.input + cached * price.input * 0.1) / 1_000_000 +
     (output * price.output) / 1_000_000
   );
 }
@@ -105,20 +115,38 @@ function formatLatency(ms: number): string {
 
 /* ------------------------------------------------------------------ request */
 
-interface AnthropicResponse {
+interface ToolCall {
+  function?: { name?: string; arguments?: string };
+}
+
+interface ChatResponse {
   model?: string;
-  stop_reason?: string;
-  content?: { type: string; name?: string; input?: unknown }[];
+  choices?: {
+    finish_reason?: string;
+    message?: { content?: string | null; tool_calls?: ToolCall[] };
+  }[];
   usage?: Usage;
+  error?: { message?: string };
 }
 
 /**
  * Replay the conversation. Agent turns are replayed as their `summary` line
  * rather than the surface they described: the model needs to know it already
  * showed the routing posts, not to re-read forty components to find that out.
+ *
+ * The system prompt is split in two messages the same way it was split for the
+ * Messages API — instructions first, retrieved context second — because that is
+ * the boundary a cache would want even where this transport doesn't expose one.
  */
-function toApiMessages(message: string, history: HistoryTurn[]) {
+function toApiMessages(
+  message: string,
+  history: HistoryTurn[],
+  instructions: string,
+  context: string,
+) {
   return [
+    { role: 'system' as const, content: instructions },
+    { role: 'system' as const, content: context },
     ...history.map((turn) => ({
       role: turn.role === 'user' ? ('user' as const) : ('assistant' as const),
       content: turn.text,
@@ -127,7 +155,7 @@ function toApiMessages(message: string, history: HistoryTurn[]) {
   ];
 }
 
-async function callAnthropic(body: unknown, apiKey: string): Promise<AnthropicResponse> {
+async function callGateway(body: unknown, apiKey: string): Promise<ChatResponse> {
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), TIMEOUT_MS);
 
@@ -136,8 +164,9 @@ async function callAnthropic(body: unknown, apiKey: string): Promise<AnthropicRe
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': API_VERSION,
+        authorization: `Bearer ${apiKey}`,
+        'HTTP-Referer': APP_URL,
+        'X-Title': APP_TITLE,
       },
       body: JSON.stringify(body),
       signal: abort.signal,
@@ -145,10 +174,18 @@ async function callAnthropic(body: unknown, apiKey: string): Promise<AnthropicRe
 
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
-      throw new AgentError('upstream-failed', `anthropic ${res.status}: ${detail.slice(0, 300)}`);
+      throw new AgentError('upstream-failed', `openrouter ${res.status}: ${detail.slice(0, 300)}`);
     }
 
-    return (await res.json()) as AnthropicResponse;
+    const parsed = (await res.json()) as ChatResponse;
+
+    // The gateway can answer 200 with an error body when a provider rejects the
+    // request downstream, so a status check alone isn't enough.
+    if (parsed.error) {
+      throw new AgentError('upstream-failed', `openrouter: ${parsed.error.message ?? 'unknown'}`);
+    }
+
+    return parsed;
   } catch (err) {
     if (err instanceof AgentError) throw err;
     if (err instanceof Error && err.name === 'AbortError') {
@@ -182,53 +219,62 @@ export async function generateSurface({
   subjectName,
   env,
 }: GenerateArgs): Promise<GeneratedSurface> {
-  const apiKey = env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new AgentError('upstream-failed', 'ANTHROPIC_API_KEY is not set');
+  const apiKey = env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new AgentError('upstream-failed', 'OPENROUTER_API_KEY is not set');
 
   const model = env.A2UI_MODEL || DEFAULT_MODEL;
   const started = Date.now();
 
-  const response = await callAnthropic(
+  const response = await callGateway(
     {
       model,
       max_tokens: MAX_TOKENS,
       // Deterministic enough that the same question gives the same shape of
       // answer, loose enough that the prose isn't identical every time.
       temperature: 0.3,
-      system: [
-        // Everything before the breakpoint is byte-identical across requests:
-        // tool schema, instructions, catalog. This is the cached prefix.
-        {
-          type: 'text',
-          text: systemInstructions(subjectName),
-          cache_control: { type: 'ephemeral' },
-        },
-        { type: 'text', text: contextBlock(context) },
-      ],
-      messages: toApiMessages(message, history),
-      tools: [renderTool(RENDERABLE_TYPES)],
-      tool_choice: { type: 'tool', name: 'render_surface' },
+      messages: toApiMessages(
+        message,
+        history,
+        systemInstructions(subjectName),
+        contextBlock(context),
+      ),
+      tools: [{ type: 'function', function: renderTool(RENDERABLE_TYPES) }],
+      tool_choice: { type: 'function', function: { name: 'render_surface' } },
+      // Ask for the real spend so the console reports it instead of a guess.
+      usage: { include: true },
     },
     apiKey,
   );
 
   const latency = Date.now() - started;
 
-  const call = response.content?.find(
-    (block) => block.type === 'tool_use' && block.name === 'render_surface',
-  );
-  if (!call?.input) {
+  const choice = response.choices?.[0];
+  const call = choice?.message?.tool_calls?.find((c) => c.function?.name === 'render_surface');
+
+  if (!call?.function?.arguments) {
     // Forced tool use makes this near-impossible; the one real path to it is
     // hitting max_tokens mid-object, so surface it as its own failure.
     throw new AgentError(
       'no-surface',
-      `no render_surface call (stop_reason: ${response.stop_reason ?? 'unknown'})`,
+      `no render_surface call (finish_reason: ${choice?.finish_reason ?? 'unknown'})`,
     );
   }
 
-  const input = call.input as RenderInput;
+  // Unlike the Messages API, arguments arrive as a JSON string — a truncated
+  // object fails here rather than at validation, and means the same thing.
+  let input: RenderInput;
+  try {
+    input = JSON.parse(call.function.arguments) as RenderInput;
+  } catch {
+    throw new AgentError(
+      'no-surface',
+      `render_surface arguments were not valid JSON (finish_reason: ${choice?.finish_reason ?? 'unknown'})`,
+    );
+  }
+
   const messages = toMessages(input);
   const usage = response.usage ?? {};
+  const reported = typeof usage.cost === 'number' ? usage.cost : null;
 
   return {
     messages,
@@ -237,10 +283,10 @@ export async function generateSurface({
     meta: {
       model: response.model ?? model,
       latency: formatLatency(latency),
-      inputTokens: (usage.input_tokens ?? 0) + (usage.cache_creation_input_tokens ?? 0),
-      outputTokens: usage.output_tokens ?? 0,
-      cachedTokens: usage.cache_read_input_tokens ?? 0,
-      cost: formatCost(priceOf(response.model ?? model, usage)),
+      inputTokens: usage.prompt_tokens ?? 0,
+      outputTokens: usage.completion_tokens ?? 0,
+      cachedTokens: cachedFrom(usage),
+      cost: formatCost(reported ?? priceOf(response.model ?? model, usage)),
       components: countComponents(messages),
     },
   };

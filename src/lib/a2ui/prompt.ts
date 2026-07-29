@@ -5,11 +5,10 @@
  * out here, so the prompt cannot describe a component the validator will reject
  * or a prop the renderer will ignore. Adding a component updates the prompt.
  *
- * Prompt layout matters for cost as much as for quality. The prompt is built in
- * two blocks: the instructions and catalog (identical on every request, marked
- * `cache_control` in `agent.ts`) and the retrieved context (changes per turn, so
- * it sits after the cache breakpoint). The stable half is roughly three quarters
- * of the input, and it is served from cache at a tenth of the price.
+ * Prompt layout still matters for cost. The prompt is built in two blocks: the
+ * instructions and catalog (identical on every request) and the retrieved context
+ * (changes per turn). The stable half is roughly three quarters of the input, so
+ * it is the half worth caching wherever the transport can cache.
  */
 
 import { CATALOG, type CatalogEntry, type PropSpec } from './catalog';

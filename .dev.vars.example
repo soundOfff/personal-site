@@ -1,9 +1,10 @@
-# Copy to `.dev.vars` for local live-mode development (git-ignored).
-# Leave ANTHROPIC_API_KEY unset and /api/a2ui returns a graceful 503: the
-# Playground falls back to its bundled demo transcripts and still works.
-ANTHROPIC_API_KEY=
+# Copy to `.dev.vars` for local development (git-ignored).
+# OPENROUTER_API_KEY is required: the Playground has no offline path, so without
+# it /api/a2ui returns 503 and the section reports that it isn't configured.
+OPENROUTER_API_KEY=
 
-# Optional. The agent defaults to claude-haiku-4-5-20251001 — the smallest model
+# Optional. The agent defaults to anthropic/claude-haiku-4.5 — the smallest model
 # that clears the bar, which is the same argument the rest of the site makes.
-# Override for a quality/cost trade, e.g. A2UI_MODEL=claude-sonnet-5
+# OpenRouter slugs, not first-party ids. Override for a quality/cost trade,
+# e.g. A2UI_MODEL=anthropic/claude-sonnet-5
 A2UI_MODEL=
