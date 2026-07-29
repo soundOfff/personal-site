@@ -95,7 +95,10 @@ function safeHref(href: string): string | null {
 function inline(text: string): ReactNode[] {
   return text.split(INLINE).map((chunk, i) => {
     if (chunk.startsWith('**') && chunk.endsWith('**')) {
-      return <strong key={i}>{chunk.slice(2, -2)}</strong>;
+      // Re-parse the inside: the model reliably writes **[label](/path)**, and
+      // bold matches first, so without this the link renders as literal
+      // brackets. One level deep only — the inner text has no `**` left.
+      return <strong key={i}>{inline(chunk.slice(2, -2))}</strong>;
     }
     if (chunk.startsWith('`') && chunk.endsWith('`')) {
       return <code key={i}>{chunk.slice(1, -1)}</code>;
@@ -163,7 +166,10 @@ const Callout: A2uiComponent = ({ props }) => {
   const variant = tone === 'good' ? 'success' : tone === 'warn' ? 'warn' : 'info';
   return (
     <Alert variant={variant} compact className="a2-callout">
-      {inline(str(props.text))}
+      {/* One element, not a list of nodes: Alert lays its children out with
+          flex, so bold and links inside the sentence would each become their
+          own column instead of staying in the line. */}
+      <span>{inline(str(props.text))}</span>
     </Alert>
   );
 };
