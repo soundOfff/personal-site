@@ -28,6 +28,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# playwright mcp scratch output (page snapshots, console logs, screenshots)
+.playwright-mcp/
+
+# stray screenshots dropped at the repo root — real images belong in public/ or src/
+/*.png
+
 # editor / os
 .DS_Store
 .vscode/*
