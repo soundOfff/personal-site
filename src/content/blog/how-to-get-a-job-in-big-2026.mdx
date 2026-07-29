@@ -4,13 +4,14 @@ description: 'Two months of job hunting, four offers, and the roadmap that came 
 date: 2026-07-25
 pillar: 'Startup engineering & opinions'
 tags: ['career', 'interviews', 'job-hunting', 'ai']
-readingTime: '7 min'
+readingTime: '11 min'
 draft: false
 ---
 
 import PipelineFig from '../../components/diagrams/PipelineFig.astro';
 import LinkedListFig from '../../components/diagrams/LinkedListFig.astro';
 import ScriptFig from '../../components/diagrams/ScriptFig.astro';
+import TakeHomeFig from '../../components/diagrams/TakeHomeFig.astro';
 import ReviewLoopFig from '../../components/diagrams/ReviewLoopFig.astro';
 
 So you got fired from your quality startup or your big tech company, and now
@@ -59,6 +60,72 @@ for me:
 - A portfolio. Mine is simple on purpose, but a good one can also show your
   design taste.
 - Experience and personal projects actually up to date.
+
+## Your résumé
+
+Tools first. [resume.io](https://resume.io/) if you want a clean result fast
+and don't care about the format underneath. If you do care, build it in
+[Typst](https://typst.app/universe/package/silver-dev-cv) instead: the
+`silver-dev-cv` package gives you a résumé that typesets like LaTeX, plain
+text you can diff and version, without LaTeX's own learning curve. And
+[Silver.dev's behavioural checker](https://open.silver.dev/behavioral-checker)
+is worth a pass on your HR-screen answers too, not just the résumé.
+
+Mine is a plain-text Typst file: [resume.typ](https://github.com/soundOfff/personal-site/blob/main/resume/resume.typ),
+compiled with `typst compile resume.typ cv.pdf`. Take it as a starting point,
+not a template to copy verbatim, since the whole point above is editing it
+per company.
+
+The rules I actually follow once the document exists:
+
+- **Match your LinkedIn, don't mirror it.** They will open both tabs
+  side by side. Any discrepancy between the two plants a doubt, and doubt
+  tends to turn into rejection. Same story, not the same sentence twice.
+- **Edit the résumé per company.** Find people who already work there on
+  LinkedIn; their profiles are the answer key, since they're proof of what
+  got someone hired for that role. Borrow their title phrasing, reorder your
+  bullets toward what their listing asks for, and pick the two or three
+  experiences that tell the story that fits this specific role, not the
+  complete story of your career.
+- **Write a per-company "about."** It should answer, explicitly or between
+  the lines, "why should this company hire me" for this exact role. A generic
+  summary answers no one's question.
+- **No photo, no cover image.** Common in Argentina, close to taboo at US
+  companies. Cut it for anything outside the local market.
+- **Run every edit through Grammarly.** A typo you'd forgive in a Slack
+  message is not one they'll forgive in the one document you control
+  completely.
+- **No stars, bars, or 1-to-5 scores next to your skills.** They read as
+  invented precision. List the skill, prove the level in the experience
+  bullets instead.
+- **Don't link a GitHub with nothing on it.** An empty-looking profile invites
+  a question you don't want asked in the room. Link it once it has real
+  projects or contributions, not before.
+
+## Where I actually apply
+
+LinkedIn is the default and I still use it, but these are the boards that
+earned more per hour I spent on them:
+
+- [Wellfound](https://wellfound.com/) for startup roles. Listings publish
+  salary and equity ranges up front, which kills the processes that were never
+  going to match before they eat three of your evenings.
+- [Work at a Startup](https://www.ycombinator.com/jobs), the YC board. Fewer
+  rounds and a faster answer, but each round is more intense, and you're
+  usually talking to a founder instead of a recruiter.
+- Hacker News' monthly ["Who is hiring?"](https://news.ycombinator.com/submitted?id=whoishiring)
+  thread. No platform, no recruiter in the middle: you email or reply straight
+  into the listing. Slower per application, but the reply rate is the highest
+  of anything on this list.
+- [Himalayas](https://himalayas.app/) and
+  [We Work Remotely](https://weworkremotely.com/) when I want the search
+  pre-filtered to remote-first companies instead of filtering LinkedIn's noise
+  myself.
+- [Built In](https://builtin.com/) if you're open to hybrid and want a sense
+  of which city's scene is hiring, salary bands included there too.
+
+Applying is the cheap part of all this. Every one of these rewards a portfolio
+link that works far more than a cover letter that says nothing.
 
 ## The stages
 
@@ -150,9 +217,47 @@ And at minimum these algorithms:
 - DFS and BFS.
 - Binary search, and not just the code: understand why it works.
 
+The three resources I actually work through, in the order I reach for them:
+
+- [The NeetCode roadmap](https://neetcode.io/roadmap) when I want to study by
+  pattern and see which topic depends on which.
+- [LeetCode 75](https://leetcode.com/studyplan/leetcode-75/) when a process
+  starts next week and I want the shortest path back to sharp.
+- [Frontend Masters' algorithms course](https://frontendmasters.com/courses/algorithms/)
+  if you have time and would rather be taught than grind. It's behind a paid
+  subscription, and it's the one that rebuilds intuition rather than speed.
+
 I've written a longer [field guide to these structures](/blog/data-structures-typescript-python)
 and a whole post on [binary search beyond arrays](/blog/binary-search-on-the-answer)
 if you want to go deeper.
+
+## The take-home
+
+Sometimes stage 2 isn't a call, it's a repo. This one sucks if you already have
+a job, because it spends a weekend you didn't budget. I do mine on a Saturday
+and I cap it at four or five hours.
+
+Be honest about the time. They read commit timestamps, so "I gave it one
+afternoon, here's what I'd do with another day" is a fine answer and a
+suspiciously polished twenty-hour submission is not, even when it's better.
+
+<TakeHomeFig />
+
+What I optimize for, in order:
+
+- **Get to the point.** Find the actual need behind the prompt and why it
+  exists. There's a real problem underneath, and they're hiring the person who
+  can spot it, not the one who implements the spec literally.
+- **A clean UI/UX.** Now that AI writes the boilerplate, a rough interface no
+  longer reads as "I focused on the backend." It reads as not caring.
+- **README and a clean architecture.** Non-negotiable. The README is where you
+  write down the trade-offs you took and what you'd do with another week, and
+  it's the document the review call runs on.
+- **Deploy it if you can.** A URL beats a clone-and-run every time.
+
+The cap is doing as much work as the list. Scoping is the skill being tested,
+and a submission that clearly ate the whole weekend answers that question the
+wrong way.
 
 ## System design and CEO talks
 
@@ -169,7 +274,8 @@ What I can recommend: research the team you'd be joining and what they're
 building, so the conversation can go toward the systems they actually run
 instead of a generic URL shortener.
 
-For learning the material itself, I recommend Matt Pocock's /teach skill
+For learning the material itself, I recommend
+[Matt Pocock's /teach skill](https://www.aihero.dev/skills-teach)
 (`npx skills add mattpocock/skills --skill=teach`). It turns a directory into
 a study workspace your coding agent teaches from, pulling cited sources
 instead of answering from model memory.
@@ -193,6 +299,17 @@ convincingly. But the setup is the prop; the review habits are the act.
 
 <ReviewLoopFig />
 
+The workflow I describe when they ask is iterative and vertical. Generate,
+test, generate again, with each pass shipping a thin but complete slice of the
+product instead of a horizontal layer of it. And write the decisions down as
+you go: a short product doc per slice recording why A and not B. Those docs are
+the whole difference between "the agent wrote it" and "I directed it," and
+they're what you read from when someone asks you why.
+
+Which makes the cheapest preparation obvious. Whatever you build as a showcase,
+build it with the workflow you plan to describe. The project becomes the
+portfolio link, and the process becomes the answers.
+
 One caveat before you show up with your rig: some companies still ban AI in
 interviews entirely, Amazon and Goldman among them. Check before you plug in.
 
@@ -200,8 +317,6 @@ interviews entirely, Amazon and Goldman among them. Check before you plug in.
 
 Things I'm still researching, and I owe each of them its own post:
 
-- Where do you actually find the jobs, and is any tool useful for it?
-- What should you read for technical interviews?
 - How is AI changing the process from the company's side?
 - Startups vs mid-size companies.
 - Is LeetCode dead? (I just told you to grind it, so: not yet.)
