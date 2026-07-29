@@ -1,57 +1,84 @@
 ---
 n: '03'
-title: 'Flagship: AI playground'
-description: 'The multi-LLM demo on this page, built end to end with real code and a live demo. Case study #3, doubling as the hero.'
-stack: 'Astro · TS · serverless'
+title: 'Flagship: conversational portfolio'
+description: 'The agent on this page: ask a question about the work, get back a generated interface. A2UI protocol, custom renderer, edge backend — with the source.'
+stack: 'A2UI · Astro · TS · serverless'
 year: '2026'
 code: true
 draft: false
 ---
 
-Unlike Dex and Mint, the Flagship is a personal project, so it ships with the real code. It explores the
-same multi-LLM routing idea, rebuilt from scratch as a public, abuse-proof demo: a static
-Astro site with one React island and one serverless route.
+Unlike Dex and Mint, the Flagship is a personal project, so it ships with the real code.
+Ask the agent on the homepage a question about my work and it answers with an interface —
+project cards, a comparison table, a timeline — composed on the spot rather than picked
+from a set of screens somebody drew in advance.
 
 ## Problem
 
-How do you let a recruiter _experience_ a routing system (real inference, real latency,
-real cost) on a public page, without handing the internet an uncapped LLM bill?
+A portfolio is a fixed set of pages, and the person reading it has a specific question:
+_can this person own an AI product end to end?_ Every reader takes a different route to
+that answer, and the site can only guess at one of them.
+
+The obvious fix is a chatbot, which is worse. A wall of generated prose on a page that
+claims care about interface work argues against itself. What I wanted was the answer
+_rendered_: ask about the writing and get the list, ask how two systems differ and get the
+table.
 
 ## Architecture
 
-Two decisions carry it (see the [ADRs](https://github.com/soundOfff/personal-site/tree/main/docs/adr)):
+That is what Google's **A2UI** (agent-to-user-interface) protocol is for: the agent emits
+JSON describing components instead of prose, and the client renders them. There is no
+client library for it, so all of this is written from scratch — four decisions carry it
+(see the [ADRs](https://github.com/soundOfff/personal-site/tree/main/docs/adr)):
 
-1. **Demo by default.** The Playground ships pre-recorded fixtures, served from the edge,
-   free and abuse-proof. The page is fully interactive before any network call.
-2. **Live mode behind a cap.** Opt-in live inference runs in a Cloudflare Worker that
-   holds the keys, classifies the prompt, and dispatches to the cheapest model that clears
-   the bar, capped at 5 routes/min/IP on cheap models only.
+**1. One catalog, three consumers.** `src/lib/a2ui/catalog.ts` declares every component
+the agent may use, with its props documented for a model to read. That one declaration
+generates the catalog section of the system prompt, drives the server-side validator, and
+is type-checked against the React registry at build time. The agent cannot name a
+component that does not exist, and a component cannot exist that the agent was never told
+about.
 
-The classifier and catalog are the whole trick: cheap models, cost-ordered:
+**2. Forced tool use, then repair.** The model is pinned to a single tool call, so
+"answered in prose instead" is not a failure mode. What comes back is still checked
+against the catalog, pruned to the tree reachable from the root, and normalised — list
+props are lifted into the A2UI data model and replaced with `{ path }` bindings, which is
+what lets a later turn refresh a table without resending the surface:
 
 ```ts
-export function classify(prompt: string): PromptClass {
-  const p = prompt.toLowerCase();
-  if (/\bjson\b|\bextract\b|as json|\bschema\b/.test(p)) return 'structured';
-  if (/stack trace|debug|root cause|explain|\bwhy\b/.test(p)) return 'reasoning';
-  if (/haiku|poem|story|write a/.test(p)) return 'creative';
-  return prompt.length > 280 ? 'reasoning' : 'extractive';
-}
-
-// pick the cheapest catalog entry that clears the class AND has a key configured
-for (const entry of CATALOG) {
-  if (entry.clears.includes(cls) && env[entry.keyName]) return entry;
-}
+// unknown types and props are dropped, not rejected: a bad prop should cost
+// the visitor that detail, never the whole answer
+const kept = [...reachableFrom(root, byId).values()];
+const model = liftToDataModel(kept);
 ```
+
+**3. The content is the context.** A build-time pass over the Astro collections emits a
+[portfolio snapshot](/data/portfolio.json) — every case study, post, repo and log entry.
+The agent is given a TF-IDF-ranked slice of it per question, so it answers about this
+site's real content and cannot invent a project. Publish a post, and the agent knows about
+it on the next deploy. There is no second index to keep in sync.
+
+**4. Demo by default, live behind a cap.** The island boots into recorded transcripts:
+free, offline, abuse-proof, interactive before any network call. Live mode posts to a
+Cloudflare Worker that holds the key, capped per-IP and globally. The prompt's stable
+half — instructions, catalog, tool schema — sits behind a cache breakpoint, so most of
+each request's input is served from Anthropic's prompt cache at a tenth of the price.
 
 ## The key tradeoff
 
-The blast-radius cap. KV has no atomic increment, so the per-IP limiter can race, but for
-a soft 5/min limit on cheap models, the small over-count is irrelevant next to the
-operational simplicity. **Cap the blast radius first; optimise the limiter never.**
+**Generated UI, from a small model.** The agent runs on Haiku, not the largest model
+available, and the catalog is fourteen components rather than an open-ended DSL. Both are
+the same bet, and it is the bet the [Dex case study](/work/dex) argues for: constrain the
+problem until the cheapest thing that can solve it does. A narrow catalog is a worse
+drawing tool and a far better target for a small model, and a surface that is cheap enough
+to leave switched on for the public beats a better one behind a login.
+
+The cost of that bet is real. The agent cannot invent a layout it wasn't given, so a
+question that wants a shape outside the catalog gets an approximation of it.
 
 ## Outcome
 
-A portfolio page that ships near-zero JavaScript, scores high on Lighthouse, and still runs
-real inference on demand, proving the [thesis](/) in the one place it counts: by letting
-you run the demo yourself. [Try it.](/#playground)
+A portfolio page that still ships near-zero JavaScript, and answers a question I did not
+anticipate with an interface I did not build. Every turn shows what it cost — model,
+latency, tokens, cache hits, dollars — and will show you the raw A2UI messages behind it,
+because the audience for this page opens dev tools out of habit.
+[Ask it something.](/#playground)

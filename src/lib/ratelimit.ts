@@ -4,9 +4,9 @@
  *
  * Live mode is gated on three fixed windows, checked in order so a single IP
  * can never consume more than its own share of the global budget:
- *   1. per-IP burst  : 5 routes / 60s   (snappy retries, blocks hammering)
- *   2. per-IP daily  : 20 routes / 24h  (the sustained abuse gate)
- *   3. global daily  : 500 routes / 24h (hard ceiling across ALL IPs; the only
+ *   1. per-IP burst  : 6 turns / 60s   (snappy retries, blocks hammering)
+ *   2. per-IP daily  : 25 turns / 24h  (the sustained abuse gate)
+ *   3. global daily  : 300 turns / 24h (hard ceiling across ALL IPs; the only
  *      control IP rotation can't bypass; on hit, live falls back to demo)
  *
  * KV has no atomic increment, so its read-modify-write races under parallel
@@ -63,34 +63,38 @@ async function consume(
   return { ok: true, remaining: limit - count, retryAfter };
 }
 
-/** Per-IP burst limit: 5 routes / 60s. */
+/** Per-IP burst limit: 6 turns / 60s. */
 export function checkRateLimit(
   kv: KVNamespace | undefined,
   ip: string,
-  limit = 5,
+  limit = 6,
   windowSec = MINUTE,
 ): Promise<RateLimitResult> {
   return consume(kv, `rl:${ip}`, limit, windowSec);
 }
 
-/** Per-IP daily cap: 20 routes / 24h, the sustained abuse gate. */
+/** Per-IP daily cap: 25 turns / 24h, the sustained abuse gate. */
 export function checkDailyLimit(
   kv: KVNamespace | undefined,
   ip: string,
-  limit = 20,
+  limit = 25,
 ): Promise<RateLimitResult> {
   return consume(kv, `rld:${ip}`, limit, DAY);
 }
 
 /**
- * Global daily budget: 500 routes / 24h across ALL IPs, a hard ceiling IP
- * rotation can't bypass. Checked last so a single IP (already gated to 20/day)
+ * Global daily budget: 300 turns / 24h across ALL IPs, a hard ceiling IP
+ * rotation can't bypass. Checked last so a single IP (already gated to 25/day)
  * can only ever consume its own share of this budget. Windows align to the unix
  * epoch, i.e. they reset at 00:00 UTC.
+ *
+ * Sized against the real per-turn cost: with the prompt cache warm, a turn is a
+ * fraction of a cent, so this ceiling is a small fixed daily spend rather than
+ * an open-ended one.
  */
 export function checkGlobalLimit(
   kv: KVNamespace | undefined,
-  limit = 500,
+  limit = 300,
 ): Promise<RateLimitResult> {
   return consume(kv, 'rlg', limit, DAY);
 }

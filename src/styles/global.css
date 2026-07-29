@@ -433,105 +433,186 @@ a {
   padding: 14px;
   font-family: var(--font-mono);
 }
-.cmds {
-  display: grid;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-.cmd {
-  text-align: left;
-  display: flex;
-  gap: 9px;
+/* right side of the console bar: clear + the demo/live switch */
+.a2-bar-right {
+  display: inline-flex;
   align-items: center;
-  width: 100%;
-  padding: 7px 9px;
-  border-radius: 7px;
-  border: 1px solid transparent;
+  gap: 10px;
+}
+.a2-reset {
+  border: 0;
   background: transparent;
+  padding: 0;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 12.5px;
-  color: var(--ink-2);
-  transition:
-    background 0.12s,
-    border-color 0.12s;
-}
-.cmd .car {
-  color: var(--muted-2);
-}
-.cmd:hover {
-  background: var(--paper-2);
-}
-.cmd.is-active {
-  background: var(--amber-soft);
-  border-color: #ecc78c;
-  color: var(--ink);
-}
-.cmd.is-active .car {
-  color: var(--amber-deep);
-}
-
-.console-run {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 4px;
-}
-/* cap + empty-state hint stack on the left; the Route button centers on the stack */
-.console-run .run-info {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-.console-run .cap {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
   color: var(--muted);
+  transition: color 0.12s;
 }
-.pg-route.is-routing {
-  opacity: 0.7;
-  pointer-events: none;
-}
-.pg-route svg {
-  flex-shrink: 0;
-}
-.pg-route.is-routing svg {
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.a2-reset:hover {
+  color: var(--ink-2);
 }
 
 .live-note {
   margin-top: 12px;
 }
 
-.console-empty {
+/* ── the transcript ── */
+.a2-thread {
+  display: grid;
+  gap: 22px;
+}
+.a2-turn {
+  display: grid;
+  gap: 12px;
+}
+.a2-turn + .a2-turn {
+  border-top: 1px dashed var(--rule-2);
+  padding-top: 22px;
+}
+/* the visitor's question, echoed as a prompt line */
+.a2-ask {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink);
+}
+.a2-ask .car {
+  color: var(--amber-deep);
+  flex-shrink: 0;
+}
+.a2-notice {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.a2-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* per-turn observability strip; reuses the console status line */
+.a2-status {
+  border-top: 1px dashed var(--rule-2);
+  padding-top: 10px;
+}
+
+/* the raw protocol, collapsed until asked for */
+.a2-peek > summary {
+  cursor: pointer;
+  list-style: none;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  transition: color 0.12s;
+}
+.a2-peek > summary::-webkit-details-marker {
+  display: none;
+}
+.a2-peek > summary::before {
+  content: '+';
   color: var(--muted-2);
 }
-.console-empty::before {
-  content: '❯';
+.a2-peek[open] > summary::before {
+  content: '−';
+}
+.a2-peek > summary:hover {
+  color: var(--ink-2);
+}
+.a2-peek pre {
+  margin: 10px 0 0;
+  padding: 12px;
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--paper-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+/* ── pending turn ── */
+.a2-skeleton {
+  display: grid;
+  gap: 9px;
+}
+.a2-sk-line,
+.a2-sk-block {
+  display: block;
+  border-radius: 5px;
+  background: linear-gradient(90deg, var(--paper-2) 25%, var(--paper-3) 50%, var(--paper-2) 75%);
+  background-size: 200% 100%;
+  animation: a2-shimmer 1.4s linear infinite;
+}
+.a2-sk-line {
+  height: 11px;
+}
+.a2-sk-line.is-w70 {
+  width: 70%;
+}
+.a2-sk-line.is-w90 {
+  width: 90%;
+}
+.a2-sk-block {
+  height: 58px;
+}
+@keyframes a2-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.a2-composing {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
   color: var(--muted-2);
 }
 
-.console-out {
-  margin-top: 14px;
-  border-top: 1px dashed var(--rule-2);
-  padding-top: 14px;
-  display: grid;
-  gap: 11px;
+/* ── composer ── */
+.a2-composer {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
 }
+.a2-composer .a2-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.a2-send {
+  flex-shrink: 0;
+}
+.a2-send svg {
+  flex-shrink: 0;
+}
+.a2-starters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 11px;
+}
+
 .statusline {
   font-family: var(--font-mono);
   font-size: 11.5px;
@@ -570,37 +651,6 @@ a {
 .statusline .chip-tone.is-amber b {
   color: var(--amber-deep);
 }
-.whyline {
-  font-family: var(--font-sans);
-  font-size: 12px;
-  color: var(--ink-2);
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  line-height: 1.5;
-}
-.whyline svg {
-  color: var(--amber-deep);
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.reply {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--ink);
-  margin: 0;
-}
-.reply::before {
-  content: 'router ❯ ';
-  color: var(--amber-deep);
-}
-.reply.is-block::before {
-  content: 'router ❯';
-  display: block;
-}
 .console-error {
   font-family: var(--font-sans);
   font-size: 12px;
@@ -609,6 +659,386 @@ a {
   gap: 8px;
   align-items: flex-start;
   line-height: 1.5;
+}
+
+/* ============================================================
+   A2UI: the generated surface
+
+   One class per catalog component, so the agent composes from the same
+   vocabulary the rest of the page is built in and a generated answer is
+   indistinguishable from a hand-built section. Nothing here is per-turn:
+   the agent chooses components, never styles.
+   ============================================================ */
+.a2-surface {
+  font-family: var(--font-sans);
+}
+
+/* ── containers ── */
+.a2-stack {
+  display: grid;
+}
+.a2-stack.is-sm {
+  gap: 8px;
+}
+.a2-stack.is-md {
+  gap: 14px;
+}
+.a2-stack.is-lg {
+  gap: 22px;
+}
+.a2-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .a2-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── text ── */
+.a2-heading {
+  display: grid;
+  gap: 3px;
+}
+.a2-heading h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.a2-eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--muted);
+}
+.a2-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+.a2-text strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.a2-text code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--paper-2);
+  color: var(--ink);
+}
+.a2-text a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--amber);
+  text-underline-offset: 2px;
+}
+.a2-text a:hover {
+  color: var(--amber-deep);
+}
+.a2-callout {
+  font-size: 12.5px;
+}
+
+.a2-code {
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  background: var(--paper-2);
+}
+.a2-code-lang {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.a2-code pre {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.a2-code-cap {
+  padding: 0 12px 10px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* ── project card ── */
+.a2-card {
+  display: grid;
+  gap: 5px;
+  padding: 12px 13px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  transition:
+    border-color 0.12s,
+    background 0.12s;
+}
+.a2-card.is-link:hover {
+  border-color: var(--rule-2);
+  background: var(--paper-2);
+}
+.a2-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+.a2-card-top b {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.a2-card.is-link:hover .a2-card-top b {
+  color: var(--amber-deep);
+}
+.a2-card-badge {
+  flex-shrink: 0;
+}
+.a2-card-desc {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.a2-card-meta {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.a2-card-year {
+  margin-left: auto;
+}
+
+/* ── blog list ── */
+.a2-posts {
+  display: grid;
+  border-top: 1px solid var(--rule);
+}
+.a2-post {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--rule);
+}
+.a2-post-t {
+  font-size: 13px;
+  color: var(--ink);
+  transition: color 0.12s;
+}
+a.a2-post:hover .a2-post-t {
+  color: var(--amber-deep);
+}
+.a2-post-meta {
+  display: inline-flex;
+  gap: 10px;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.a2-post-p {
+  color: var(--muted-2);
+}
+
+/* ── table ── */
+.a2-table-wrap {
+  overflow-x: auto;
+}
+.a2-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.a2-table th {
+  text-align: left;
+  padding: 7px 10px 7px 0;
+  border-bottom: 1px solid var(--rule-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.a2-table td {
+  padding: 8px 10px 8px 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+  vertical-align: top;
+}
+.a2-table td:first-child {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.a2-table-cap {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* ── timeline ── */
+.a2-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.a2-tl-item {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 0 0 14px 18px;
+  border-left: 1px solid var(--rule);
+}
+.a2-tl-item:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+.a2-tl-node {
+  position: absolute;
+  left: -4px;
+  top: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--amber);
+}
+.a2-tl-top {
+  display: inline-flex;
+  gap: 9px;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.a2-tl-tag {
+  padding: 1px 6px;
+  border-radius: var(--radius-chip);
+  background: var(--paper-2);
+  color: var(--muted-2);
+}
+.a2-tl-title {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.a2-tl-title a {
+  text-decoration: underline;
+  text-decoration-color: var(--amber);
+  text-underline-offset: 2px;
+}
+
+/* ── metrics ── */
+.a2-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.a2-metric {
+  flex: 1 1 100px;
+  padding: 11px 13px;
+  border-left: 1px solid var(--rule);
+}
+.a2-metric:first-child {
+  border-left: 0;
+}
+.a2-metric-v {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.a2-metric-v em {
+  font-style: italic;
+  color: var(--amber-deep);
+}
+.a2-metric-k {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* ── chips, link ── */
+.a2-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.a2-link {
+  margin: 0;
+}
+
+/* ── actions: the follow-up questions that keep it a conversation ── */
+.a2-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+}
+.a2-actions-lbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+.a2-action {
+  padding: 5px 11px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+.a2-action:hover {
+  background: var(--amber-soft);
+  border-color: var(--amber);
+  color: var(--ink);
+}
+
+/* A type the catalog knows and the registry doesn't: visible, not silent. */
+.a2-unknown {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--clay-ink);
 }
 
 /* ============================================================

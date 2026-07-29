@@ -5,7 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Rail from '../components/Rail.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
-import Playground from '../islands/Playground';
+import A2UIPlayground from '../islands/A2UIPlayground';
 import { profile, proofs, tenets, toolbox, log, now } from '../data/site';
 import { repos } from '../data/repos';
 
@@ -41,7 +41,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
         <p class="sub">{profile.sub}</p>
         <div class="startrow">
           <a class="btn btn-amber btn-md" href="#playground">
-            <Icon name="i-play" size={15} />Run the router
+            <Icon name="i-play" size={15} />Ask the portfolio
           </a>
           <Link variant="arrow" href="#work">See the work index</Link>
         </div>
@@ -59,8 +59,8 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 
       {/* 01 · playground (the one interactive island) */}
       <section class="block" id="playground">
-        <p class="keybar">// <b>playground</b> · model router</p>
-        <Playground client:visible />
+        <p class="keybar">// <b>playground</b> · a2ui portfolio agent</p>
+        <A2UIPlayground client:visible />
       </section>
 
       {/* 02 · work · index */}

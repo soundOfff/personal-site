@@ -14,7 +14,7 @@ export const profile = {
   status: 'Open to work · Rosario, AR',
   // hero lede: the phrase wrapped in <em></em> renders italic + amber
   lede: "Most LLM calls don't need the biggest model. They need a dispatcher that knows which one will <em>clear the bar</em>.",
-  sub: "I'm a backend engineer who builds the systems that make AI products work in production: routing, scale, evals, the unglamorous middle. Backend is the foundation, LLM infrastructure is the edge, and competitive-programming results are the proof. Below is the router itself, running in demo mode.",
+  sub: "I'm a backend engineer who builds the systems that make AI products work in production: routing, scale, evals, the unglamorous middle. Backend is the foundation, LLM infrastructure is the edge, and competitive-programming results are the proof. Below, an agent answers questions about all of it by generating the interface it answers in.",
 } as const;
 
 export const contact = [
@@ -105,6 +105,12 @@ export const log: {
     upcoming: true,
   },
   {
+    hash: 'a2ui001',
+    date: 'jul 2026',
+    tag: 'site',
+    msg: 'Replace the router demo with an A2UI conversational portfolio: ask a question, a Claude agent composes the answer as generated UI over a custom renderer.',
+  },
+  {
     hash: 'unglam1',
     date: 'jun 2026',
     tag: 'writing',
@@ -138,7 +144,7 @@ export const now = [
   { dt: 'Email', dd: 'tomibrasca97@gmail.com' },
   { dt: 'Focus', dd: 'LLM routing, evals, cost control; high-traffic backends' },
   { dt: 'Reading', dd: 'AI Engineer' },
-  { dt: 'Built with', dd: 'Astro · React island · editorial-ui · Cloudflare' },
+  { dt: 'Built with', dd: 'Astro · React island · A2UI · editorial-ui · Cloudflare' },
 ] as const;
 
 export const site = {

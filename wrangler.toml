@@ -5,7 +5,7 @@ name = "personal-site"
 compatibility_date = "2026-06-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Per-IP rate-limit store for live mode (5 routes/min, cheap models only).
+# Per-IP rate-limit store for live mode (6 questions/min, one small model only).
 # In `astro dev`, platformProxy simulates this binding locally — no real id needed.
 # The placeholder id below is resolved automatically by the deploy workflow
 # (.github/workflows/deploy.yml), which finds or creates the "personal-site-RL"
@@ -15,7 +15,9 @@ compatibility_flags = ["nodejs_compat"]
 binding = "RL"
 id = "00000000000000000000000000000000"
 
-# Provider API keys are set as encrypted secrets, NOT here:
-#   wrangler secret put OPENAI_API_KEY
-#   wrangler secret put GROQ_API_KEY
-#   wrangler secret put OPENROUTER_API_KEY
+# The agent's API key is set as an encrypted secret, NOT here:
+#   wrangler secret put ANTHROPIC_API_KEY
+#
+# Optional model override (a plain var is fine; it isn't a secret):
+#   [vars]
+#   A2UI_MODEL = "claude-sonnet-5"
