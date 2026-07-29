@@ -1239,6 +1239,149 @@ a.a2-post:hover .a2-post-t {
   color: var(--muted);
 }
 
+/* ── shared caption for the drawn components ── */
+.a2-fig-cap {
+  margin: 9px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ── bar chart ── */
+.a2-bars {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+  /* Bars are read by length against each other, not against the panel. Past
+     this width the tracks just stretch and the values drift off to the right. */
+  max-width: 520px;
+}
+.a2-bar {
+  display: grid;
+  /* label · track · value. The track is the only elastic column, so a long
+     label truncates instead of squeezing the bars into different lengths. */
+  grid-template-columns: minmax(0, 84px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.a2-bar-l {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.a2-bar-track {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--rule);
+  overflow: hidden;
+}
+.a2-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--muted-2);
+  transform-origin: left center;
+}
+.a2-bar.is-accent .a2-bar-fill {
+  background: var(--amber);
+}
+.a2-bar-v {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── flow: the pipeline diagram ── */
+.a2-flow {
+  margin: 0;
+  min-width: 0;
+}
+.a2-flow-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 0;
+}
+.a2-flow-step {
+  display: flex;
+  align-items: center;
+}
+.a2-flow-box {
+  display: grid;
+  gap: 1px;
+  padding: 6px 11px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  background: var(--paper-2);
+}
+/* the last stage is where the request lands: give it the one amber */
+.a2-flow-step:last-child .a2-flow-box {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+}
+.a2-flow-l {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.a2-flow-n {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.a2-flow-arrow {
+  padding: 0 7px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--muted-2);
+}
+
+/* ── gauge ── */
+.a2-gauge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.a2-gauge-dial {
+  position: relative;
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  /* --pct arrives unitless from the component, so the sweep is a calc away. */
+  background: conic-gradient(var(--amber) calc(var(--pct, 0) * 1%), var(--rule) 0);
+}
+.a2-gauge-dial::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+}
+.a2-gauge-v {
+  position: relative;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--ink);
+}
+.a2-gauge-l {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
 /* ── chips, link ── */
 .a2-chips {
   display: flex;

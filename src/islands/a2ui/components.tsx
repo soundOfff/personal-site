@@ -14,7 +14,7 @@
  * crafted POST should cost one component, never the page.
  */
 
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, type CSSProperties, type ReactNode } from 'react';
 import { Alert, Badge, Chip, Link } from 'editorial-ui';
 import type { ComponentType } from '../../lib/a2ui/catalog';
 
@@ -32,6 +32,19 @@ const str = (value: unknown, fallback = ''): string =>
   typeof value === 'string' ? value : fallback;
 
 const bool = (value: unknown): boolean => value === true;
+
+/**
+ * A 0–100 share. Anything else — a fraction the model wrote as 0.82, a count it
+ * mistook for a percentage, a string — is clamped rather than dropped, because
+ * these values only ever set a bar width or a dial angle.
+ */
+function pct(value: unknown): number {
+  const n = typeof value === 'string' ? Number(value) : value;
+  if (typeof n !== 'number' || !Number.isFinite(n)) return 0;
+  // 0 < n < 1 is the model writing a fraction; 1 is left alone, since "1%" is a
+  // real figure here and reading it as 100% would be a lie rather than a nudge.
+  return Math.min(100, Math.max(0, n > 0 && n < 1 ? n * 100 : n));
+}
 
 function rows(value: unknown): Record<string, unknown>[] {
   return Array.isArray(value)
@@ -300,6 +313,77 @@ const Metrics: A2uiComponent = ({ props }) => (
   </div>
 );
 
+/* -------------------------------------------------- charts and diagrams */
+
+const BarChart: A2uiComponent = ({ props }) => {
+  const items = rows(props.items);
+  const caption = str(props.caption);
+  if (!items.length) return null;
+
+  return (
+    <figure className="a2-bars">
+      {items.map((item, i) => (
+        <div className={bool(item.accent) ? 'a2-bar is-accent' : 'a2-bar'} key={i}>
+          <span className="a2-bar-l">{str(item.label)}</span>
+          <span className="a2-bar-track">
+            {/* A bar the visitor can see even at 1%: the number next to it is
+                the truth, the track is only there to make it comparable. */}
+            <span
+              className="a2-bar-fill"
+              style={{ width: `${Math.max(1.5, pct(item.percent))}%` }}
+            />
+          </span>
+          <span className="a2-bar-v">{str(item.value)}</span>
+        </div>
+      ))}
+      {caption && <figcaption className="a2-fig-cap">{caption}</figcaption>}
+    </figure>
+  );
+};
+
+const Flow: A2uiComponent = ({ props }) => {
+  const steps = rows(props.steps);
+  const caption = str(props.caption);
+  if (!steps.length) return null;
+
+  return (
+    <figure className="a2-flow">
+      <ol className="a2-flow-steps">
+        {steps.map((step, i) => (
+          <li className="a2-flow-step" key={i}>
+            <span className="a2-flow-box">
+              <span className="a2-flow-l">{str(step.label)}</span>
+              {str(step.note) && <span className="a2-flow-n">{str(step.note)}</span>}
+            </span>
+            {i < steps.length - 1 && (
+              <span className="a2-flow-arrow" aria-hidden="true">
+                →
+              </span>
+            )}
+          </li>
+        ))}
+      </ol>
+      {caption && <figcaption className="a2-fig-cap">{caption}</figcaption>}
+    </figure>
+  );
+};
+
+const Gauge: A2uiComponent = ({ props }) => {
+  const percent = pct(props.percent);
+  const label = str(props.label);
+  const display = str(props.display) || `${Math.round(percent)}%`;
+
+  return (
+    // One image to a screen reader: the dial is decoration for the two strings.
+    <div className="a2-gauge" role="img" aria-label={`${display} — ${label}`}>
+      <span className="a2-gauge-dial" style={{ '--pct': percent } as CSSProperties}>
+        <span className="a2-gauge-v">{display}</span>
+      </span>
+      <span className="a2-gauge-l">{label}</span>
+    </div>
+  );
+};
+
 const Chips: A2uiComponent = ({ props }) => (
   <div className="a2-chips">
     {strings(props.items).map((item, i) => (
@@ -364,6 +448,9 @@ export const REGISTRY = {
   Table,
   Timeline,
   Metrics,
+  BarChart,
+  Flow,
+  Gauge,
   Chips,
   Link: LinkComponent,
   Actions,

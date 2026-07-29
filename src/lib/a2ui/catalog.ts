@@ -202,6 +202,84 @@ export const CATALOG = {
     },
   },
 
+  /* -- charts and diagrams ---------------------------------------------- */
+
+  BarChart: {
+    doc: 'Horizontal bars, largest first. The right choice whenever the answer compares quantities that appear in the context — traffic, latency, cost per turn, model share, years per role. Two to six bars.',
+    props: {
+      items: {
+        type: 'object[]',
+        required: true,
+        max: 6,
+        doc: 'The bars, largest first.',
+        item: {
+          label: { type: 'string', required: true, max: 40, doc: 'What the bar is, e.g. "Mint".' },
+          value: {
+            type: 'string',
+            required: true,
+            max: 16,
+            doc: 'The figure as it should read, e.g. "2-3M" or "180 ms". Copied from the context.',
+          },
+          percent: {
+            type: 'number',
+            required: true,
+            doc: 'Bar length, 0–100, scaled so the largest bar is 100. This is presentation only — the visitor reads `value`.',
+          },
+          accent: { type: 'boolean', doc: 'true tints this bar amber. At most one per chart.' },
+        },
+      },
+      caption: {
+        type: 'string',
+        max: 160,
+        doc: 'One line under the chart saying what it measures.',
+      },
+    },
+  },
+
+  Flow: {
+    doc: 'A pipeline diagram: labelled stages joined by arrows. Use whenever the answer is a sequence — a request path, a routing decision, a build or eval loop. Much clearer than the same steps written as a sentence.',
+    props: {
+      steps: {
+        type: 'object[]',
+        required: true,
+        max: 6,
+        doc: 'The stages, in order.',
+        item: {
+          label: {
+            type: 'string',
+            required: true,
+            max: 28,
+            doc: 'One to three words, e.g. "classify" or "small model".',
+          },
+          note: {
+            type: 'string',
+            max: 40,
+            doc: 'Optional half-line under the stage, e.g. "~40 ms".',
+          },
+        },
+      },
+      caption: { type: 'string', max: 160, doc: 'One line under the diagram.' },
+    },
+  },
+
+  Gauge: {
+    doc: 'A single share, drawn as a dial. Use only when the context gives you an actual percentage or ratio — "82% of turns never reach the big model". If you have a figure but no percentage, use Metrics or BarChart instead.',
+    props: {
+      percent: { type: 'number', required: true, doc: 'The share, 0–100.' },
+      label: {
+        type: 'string',
+        required: true,
+        max: 80,
+        doc: 'What the share is of, e.g. "turns served by the small model".',
+      },
+      display: {
+        type: 'string',
+        max: 12,
+        doc: 'Text in the middle of the dial. Defaults to the percentage; set it for things like "top 1%".',
+      },
+    },
+  },
+
   Chips: {
     doc: 'A row of small tags. Use for stacks, tools, and languages.',
     props: {
@@ -226,8 +304,8 @@ export const CATALOG = {
       prompts: {
         type: 'string[]',
         required: true,
-        max: 3,
-        doc: 'Two or three questions in the visitor’s voice, e.g. "How did the routing work?". Each must be answerable from the context.',
+        max: 4,
+        doc: 'Three or four questions in the visitor’s voice, e.g. "How did the routing work?". Each must be answerable from the context, and each should open a different thread — one deeper on what you just showed, the others sideways into work, writing, or background the visitor has not seen yet.',
       },
     },
   },

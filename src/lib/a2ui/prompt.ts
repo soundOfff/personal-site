@@ -48,18 +48,27 @@ export function catalogDocs(): string {
  * close with Actions" rhythm; more would just cost cached tokens.
  */
 const EXAMPLE = `{
-  "summary": "Showed the two routing-related posts and linked the Dex case study.",
+  "summary": "Diagrammed the routing path, showed the two routing posts, linked the Dex case study.",
   "root": "root",
   "components": [
-    { "id": "root", "type": "Stack", "props": { "children": ["intro", "posts", "next"] } },
+    { "id": "root", "type": "Stack", "props": { "children": ["intro", "path", "posts", "next"] } },
     { "id": "intro", "type": "Text", "props": {
-        "text": "Two posts cover routing directly. The longer argument is in **[the Dex case study](/work/dex)**." } },
+        "text": "Every request is classified before it is answered, and most never reach a frontier model. The longer argument is in **[the Dex case study](/work/dex)**." } },
+    { "id": "path", "type": "Flow", "props": {
+        "steps": [
+          { "label": "request" },
+          { "label": "classify", "note": "cheap model" },
+          { "label": "route" },
+          { "label": "answer" }
+        ],
+        "caption": "The dispatcher decides the ladder rung before any tokens are spent." } },
     { "id": "posts", "type": "BlogList", "props": { "items": [
         { "title": "Routing beats scaling", "href": "/blog/routing-beats-scaling", "date": "2026-05-12", "readingTime": "8 min", "pillar": "Backend & AI systems" }
       ] } },
     { "id": "next", "type": "Actions", "props": { "prompts": [
         "How does the classifier decide?",
-        "What did routing save at Dex?"
+        "What did routing save at Dex?",
+        "What else has he shipped?"
       ] } }
   ]
 }`;
@@ -76,9 +85,10 @@ You do not reply in prose. You call the \`render_surface\` tool exactly once. Ev
 ## How to answer
 
 - Answer the question first, in a \`Text\` component, in one to three sentences. Then show the evidence as components underneath.
-- Choose the component that matches the shape of the answer: several projects → \`ProjectCard\`s in a \`Stack\`; posts → \`BlogList\`; "how do X and Y compare" → \`Table\`; anything dated → \`Timeline\`; headline numbers → \`Metrics\`.
+- Choose the component that matches the shape of the answer: several projects → \`ProjectCard\`s in a \`Stack\`; posts → \`BlogList\`; "how do X and Y compare" → \`Table\`; anything dated → \`Timeline\`; headline numbers → \`Metrics\`; quantities worth seeing side by side → \`BarChart\`; a sequence of stages → \`Flow\`; one share or rate → \`Gauge\`.
+- **Every surface must carry at least one component that is not prose**, and the more visual the better. A stack of \`Text\` and an \`Actions\` is a chat reply; the point of this interface is that the answer is drawn. If you are about to describe a pipeline in a sentence, draw it with \`Flow\`. If you are about to write two numbers into a sentence, compare them with \`BarChart\`.
 - Prefer components over prose. If you catch yourself listing titles inside a \`Text\`, that list wanted to be a \`BlogList\` or a stack of \`ProjectCard\`s.
-- Close almost every surface with \`Actions\` offering two or three follow-up questions that the context can actually answer.
+- Close every surface with \`Actions\` offering three or four follow-up questions that the context can actually answer, and spread them: one that goes deeper on what you just showed, the rest opening threads the visitor has not seen.
 - Six to twelve components is a good surface. One \`Text\` is too thin; twenty is a page, not an answer.
 
 ## Rules you cannot break
@@ -124,13 +134,17 @@ ${JSON.stringify(context, null, 1)}
 ${focus}`;
 }
 
-/** JSON Schema for the one tool the agent may call. */
+/**
+ * JSON Schema for the one tool the agent may call. Returned provider-neutral —
+ * `agent.ts` wraps it in whatever envelope the transport wants, so this file
+ * stays about the contract rather than about whose API is on the other end.
+ */
 export function renderTool(componentTypes: string[]) {
   return {
     name: 'render_surface',
     description:
       'Render the answer as a user interface. Declare every component as a flat list, then name the root. Call this exactly once.',
-    input_schema: {
+    parameters: {
       type: 'object',
       properties: {
         summary: {
