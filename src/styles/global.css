@@ -142,35 +142,6 @@ a {
   margin-top: 3px;
 }
 
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--sage-ink);
-  background: var(--sage-soft);
-  border: 1px solid var(--sage-edge);
-  border-radius: var(--radius-pill);
-  padding: 4px 10px;
-  align-self: flex-start;
-}
-.status .pulse {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-pill);
-  background: var(--sage-ink);
-  position: relative;
-}
-.status .pulse::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--sage-ink);
-  opacity: 0.4;
-  animation: ping 2.4s ease-out infinite;
-}
 @keyframes ping {
   0% {
     transform: scale(0.7);
@@ -2271,7 +2242,7 @@ a.a2-post:hover .a2-post-t {
     grid-template-columns: 1fr;
   }
   /* rail becomes a compact top header band: id on the left, theme toggle on
-     the right, status pill wraps to its own line below. */
+     the right. */
   .rail {
     position: static;
     height: auto;
@@ -2295,9 +2266,6 @@ a.a2-post:hover .a2-post-t {
   /* copyright lives in the footer, so drop it from the cramped mobile header */
   .rail-foot .mono {
     display: none;
-  }
-  .status {
-    order: 2;
   }
   /* tenets + specs keep two columns through the tablet range; collapsing them
      here leaves the wide content column half-empty. They go single-col at 600. */

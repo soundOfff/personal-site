@@ -63,7 +63,7 @@ export interface LogItem {
 
 export interface PortfolioSnapshot {
   generatedAt: string;
-  profile: { name: string; role: string; status: string; lede: string; summary: string };
+  profile: { name: string; role: string; lede: string; summary: string };
   proofs: { value: string; label: string }[];
   work: WorkItem[];
   posts: PostItem[];
@@ -144,7 +144,6 @@ export async function buildSnapshot(): Promise<PortfolioSnapshot> {
     profile: {
       name: profile.name,
       role: profile.role,
-      status: profile.status,
       lede: stripTags(profile.lede),
       summary: profile.sub,
     },
