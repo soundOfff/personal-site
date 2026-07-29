@@ -4,10 +4,10 @@
  *
  * Live mode is gated on three fixed windows, checked in order so a single IP
  * can never consume more than its own share of the global budget:
- *   1. per-IP burst  : 6 turns / 60s   (snappy retries, blocks hammering)
- *   2. per-IP daily  : 25 turns / 24h  (the sustained abuse gate)
+ *   1. per-IP burst  : 3 turns / 60s   (double-submits and hammering)
+ *   2. per-IP daily  : 5 turns / 24h   (the real per-visitor allowance)
  *   3. global daily  : 300 turns / 24h (hard ceiling across ALL IPs; the only
- *      control IP rotation can't bypass; on hit, live falls back to demo)
+ *      control IP rotation can't bypass; on hit, the endpoint 503s until reset)
  *
  * KV has no atomic increment, so its read-modify-write races under parallel
  * requests; the in-memory counter is incremented before any await (isolates are
@@ -63,21 +63,28 @@ async function consume(
   return { ok: true, remaining: limit - count, retryAfter };
 }
 
-/** Per-IP burst limit: 6 turns / 60s. */
+/**
+ * Per-IP burst limit: 3 turns / 60s. Kept below the daily cap so it still bites
+ * — it catches a double-submit or a script before the visitor burns the day's
+ * allowance in one second, rather than being dead code behind DAILY_LIMIT.
+ */
 export function checkRateLimit(
   kv: KVNamespace | undefined,
   ip: string,
-  limit = 6,
+  limit = 3,
   windowSec = MINUTE,
 ): Promise<RateLimitResult> {
   return consume(kv, `rl:${ip}`, limit, windowSec);
 }
 
-/** Per-IP daily cap: 25 turns / 24h, the sustained abuse gate. */
+/** Questions one visitor gets per day. Surfaced in the UI, so it is exported. */
+export const DAILY_LIMIT = 5;
+
+/** Per-IP daily cap: 5 turns / 24h, resetting at 00:00 UTC. */
 export function checkDailyLimit(
   kv: KVNamespace | undefined,
   ip: string,
-  limit = 25,
+  limit = DAILY_LIMIT,
 ): Promise<RateLimitResult> {
   return consume(kv, `rld:${ip}`, limit, DAY);
 }

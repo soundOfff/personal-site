@@ -6,6 +6,7 @@ import { A2uiValidationError } from '../../lib/a2ui/validate';
 import { getSnapshot } from '../../lib/portfolio/snapshot';
 import { selectContext } from '../../lib/portfolio/retrieve';
 import {
+  DAILY_LIMIT,
   checkDailyLimit,
   checkGlobalLimit,
   checkRateLimit,
@@ -19,7 +20,7 @@ export const prerender = false;
 /**
  * Caps on what a single request may carry. Unlike the old router endpoint,
  * which only ever ran a fixture chosen server-side by key, this one has to
- * accept free text — so the limits are the boundary. A question longer than
+ * accept free text on every turn — so the limits are the boundary. A question longer than
  * this is not a question, and history is trimmed rather than trusted: it is
  * client-supplied, so it is treated as more visitor input, never as instruction.
  */
@@ -66,8 +67,8 @@ function sanitizeHistory(raw: unknown): HistoryTurn[] {
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   const env = workerEnv as unknown as Env;
 
-  // Live mode is off until the key is configured. The island maps this 503 to
-  // its bundled demo transcripts, so the section still works on a fresh clone.
+  // No key, no agent: this endpoint is the only way the Playground answers
+  // anything, so an unconfigured deploy has to say so rather than fake a turn.
   if (!agentAvailable(env)) {
     return json<A2uiError>({ error: 'live-unconfigured' }, 503);
   }
@@ -136,7 +137,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       env,
     });
 
-    return json<A2uiResponse>({ messages, summary, mode: 'live', meta }, 200);
+    return json<A2uiResponse>(
+      {
+        messages,
+        summary,
+        meta,
+        // Counted before the turn ran, so this is what is left *after* it.
+        quota: { remaining: Math.max(0, daily.remaining), limit: DAILY_LIMIT },
+      },
+      200,
+    );
   } catch (err) {
     if (err instanceof A2uiValidationError) {
       return json<A2uiError>({ error: 'unrenderable-surface' }, 502);

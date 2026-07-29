@@ -102,13 +102,13 @@ export interface A2uiResponse {
   messages: A2uiMessage[];
   /** One-line plain-text description of what was rendered; feeds `history`. */
   summary: string;
-  /** Which path produced this turn. */
-  mode: 'demo' | 'live';
-  /** Observability strip under the surface. Absent in demo mode. */
-  meta?: TurnMeta;
+  /** Observability strip under the surface. */
+  meta: TurnMeta;
+  /** The visitor's daily allowance, so the UI can show what is left. */
+  quota: { remaining: number; limit: number };
 }
 
-/** What the console's status line reports about a live turn. */
+/** What the console's status line reports about a turn. */
 export interface TurnMeta {
   model: string;
   /** Human-formatted, e.g. "1.2 s". */
