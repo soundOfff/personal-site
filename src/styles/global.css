@@ -918,6 +918,53 @@ a {
   font-family: var(--font-sans);
 }
 
+/* The surface assembles itself: each block of the root stack rises in turn, and
+   bars sweep out to their width. It is a small thing, but it is the difference
+   between a page that was fetched and one you watched an agent compose — which
+   is the claim this whole section is making. Mount-time only: surfaces are
+   memoised per turn, so nothing replays when the transcript grows. */
+@media (prefers-reduced-motion: no-preference) {
+  .a2-surface > .a2-stack > * {
+    animation: a2-rise 0.32s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+  .a2-surface > .a2-stack > *:nth-child(2) {
+    animation-delay: 0.06s;
+  }
+  .a2-surface > .a2-stack > *:nth-child(3) {
+    animation-delay: 0.12s;
+  }
+  .a2-surface > .a2-stack > *:nth-child(4) {
+    animation-delay: 0.18s;
+  }
+  .a2-surface > .a2-stack > *:nth-child(5) {
+    animation-delay: 0.24s;
+  }
+  .a2-surface > .a2-stack > *:nth-child(n + 6) {
+    animation-delay: 0.3s;
+  }
+  .a2-bar-fill {
+    animation: a2-sweep 0.55s 0.2s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+}
+@keyframes a2-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes a2-sweep {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 /* ── containers ──
    `minmax(0, …)` throughout, for the reason given above `.a2-thread`. */
 .a2-stack {
