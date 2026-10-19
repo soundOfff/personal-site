@@ -670,7 +670,7 @@ export function squish(s: SoundKit): void {
   s.burst({ dur: 0.12, kind: 'lowpass', f: 900, vol: 0.07 });
 }
 
-/** the postmark coming down on a telegram */
+/** the office's date stamp coming down on a telegram */
 export function stamp(s: SoundKit): void {
   s.tone({ f0: hz('E3'), f1: hz('B1'), dur: 0.09, vol: 0.2 });
   s.burst({ dur: 0.05, kind: 'lowpass', f: 700, vol: 0.24 });
@@ -715,7 +715,7 @@ const score: ReelScore = {
   idea: 'an Alpine–Slavic band in a cuckoo clock: balalaika tremolo, cimbalom, zither, the hotel organ and timpani, in E harmonic minor, brisk, with dead stops',
   cues: [
     { id: 'hover', label: 'cimbalom, cotton beater', play: hover },
-    { id: 'click', label: 'the concierge’s desk bell', play: (s) => deskBell(s) },
+    { id: 'click', label: "the concierge's desk bell", play: (s) => deskBell(s) },
     { id: 'section', label: 'clunk, balalaika tremolo, timpani', play: (s, n) => section(s, n) },
     { id: 'surface', label: 'zither run to the tonic', play: (s, n) => run(s, n) },
     { id: 'done', label: 'balalaika accelerando, dead stop', play: flourish },
@@ -729,7 +729,7 @@ const score: ReelScore = {
     { id: 'creak', label: 'portrait on its wire', play: creak },
     { id: 'clack', label: 'telegraph key', play: clack },
     { id: 'squish', label: 'pastry tier settling', play: squish },
-    { id: 'stamp', label: 'postmark', play: stamp },
+    { id: 'stamp', label: 'date stamp', play: stamp },
     { id: 'thud', label: 'pastry box set down', play: thud },
     { id: 'paper', label: 'tissue paper', play: (s) => paper(s) },
     {
