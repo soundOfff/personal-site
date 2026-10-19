@@ -247,6 +247,23 @@ export default function A2UIPlayground() {
     [ask],
   );
 
+  /* The hero's "Open the playground" asks for the panel with an event. A click
+     that landed before this island hydrated left a flag instead. */
+  useEffect(() => {
+    const root = document.documentElement;
+    const take = () => {
+      root.removeAttribute('data-playground-want');
+      setOpen(true);
+    };
+    if (root.hasAttribute('data-playground-want')) take();
+    root.setAttribute('data-playground-ready', '');
+    document.addEventListener('playground:open', take);
+    return () => {
+      document.removeEventListener('playground:open', take);
+      root.removeAttribute('data-playground-ready');
+    };
+  }, []);
+
   /* The dialog is native, so Esc, the backdrop and focus containment are the
      platform's job; React only keeps `open` in step with the element. */
   useEffect(() => {

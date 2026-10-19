@@ -53,8 +53,8 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
         <p class="lede" set:html={profile.lede} />
         <p class="sub">{profile.sub}</p>
         <div class="startrow">
-          <a class="btn btn-amber btn-md" href="#playground">
-            <Icon name="i-play" size={15} />Ask the portfolio
+          <a class="btn btn-amber btn-md" href="#playground" data-playground-open>
+            <Icon name="i-play" size={15} />Open the playground
           </a>
           <Link variant="arrow" href="#work">See the work index</Link>
         </div>
@@ -298,6 +298,22 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
     import { bootBoxOffice } from '../reels/boxoffice/boxoffice';
     boot();
     bootBoxOffice();
+  </script>
+
+  {
+    /* progressive enhancement: the hero button opens the playground panel in one
+      click. Before the island hydrates it scrolls there and leaves a flag the
+      island picks up; without JS it is a plain anchor. */
+  }
+  <script is:inline>
+    document.querySelectorAll('[data-playground-open]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        const root = document.documentElement;
+        if (root.hasAttribute('data-playground-ready')) e.preventDefault();
+        else root.setAttribute('data-playground-want', '');
+        document.dispatchEvent(new Event('playground:open'));
+      });
+    });
   </script>
 
   {/* progressive enhancement: make work-index rows clickable */}
