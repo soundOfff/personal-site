@@ -1,0 +1,8 @@
+/* ============================================================
+   Reel 04 · The Grand Budapest Hotel.
+   Every rule lives inside :root[data-reel='budapest'] (keyframes and
+   @property are the exception: top level, prefixed 'budapest-').
+   ============================================================ */
+:root[data-reel='budapest'] {
+  /* reel styles go here */
+}

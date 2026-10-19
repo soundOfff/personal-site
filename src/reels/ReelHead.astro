@@ -1,0 +1,30 @@
+---
+/**
+ * Homepage-only head: the reel bootstrap (before first paint, so a returning
+ * visitor's film is on screen from frame one) and the CSS generated from the
+ * reel configs.
+ */
+import { REELS, REEL_KEY, DEFAULT_REEL } from './registry';
+import { reelCss } from './css';
+
+const ids = REELS.map((r) => r.id);
+const css = reelCss(REELS);
+---
+
+<script is:inline define:vars={{ key: REEL_KEY, ids, fallback: DEFAULT_REEL }}>
+  (function () {
+    const root = document.documentElement;
+    let picked = null;
+    try {
+      picked = localStorage.getItem(key);
+    } catch {
+      picked = fallback;
+    }
+    root.dataset.reel = ids.indexOf(picked) >= 0 ? picked : fallback;
+    root.dataset.act = '0';
+    root.dataset.sec = '0';
+    // Nothing picked yet, and not a deep link: the box office opens.
+    if (ids.indexOf(picked) < 0 && !location.hash) root.dataset.firstVisit = '';
+  })();
+</script>
+<style is:inline set:html={css}></style>

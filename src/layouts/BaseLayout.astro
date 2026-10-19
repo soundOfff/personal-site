@@ -156,6 +156,9 @@ const robots = noindex
       href={rssUrl}
     />
 
+    <!-- Page-specific head (the homepage's reel bootstrap + generated CSS). -->
+    <slot name="head" />
+
     <!-- Structured data (Person + WebSite, plus Article on posts). -->
     <script type="application/ld+json" is:inline set:html={jsonLd} />
 

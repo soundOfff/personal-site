@@ -1,0 +1,10 @@
+/* Every reel's stylesheet, scoped under :root[data-reel='<id>'] so only the
+   screening reel applies. Fonts are declared here but a file is only fetched
+   once text in that family renders. */
+@import './engine.css';
+@import './parasite/reel.css';
+@import './mood/reel.css';
+@import './br2049/reel.css';
+@import './budapest/reel.css';
+@import './odyssey/reel.css';
+@import './boxoffice/boxoffice.css';

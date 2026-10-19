@@ -1,0 +1,7 @@
+/* ============================================================
+   The box office: the first-visit ticket picker.
+   Shown while html[data-first-visit] is set, or when opened from the rail.
+   ============================================================ */
+.boxoffice {
+  display: none;
+}

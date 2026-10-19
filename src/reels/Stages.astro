@@ -1,0 +1,31 @@
+---
+/**
+ * Renders every reel's Stage.astro for one insertion point. Only reels that
+ * list the point in `config.stages` render; the generated head CSS shows the
+ * active reel's wrapper (display: contents) and hides the rest.
+ */
+import type { StagePoint } from './types';
+import { REELS } from './registry';
+
+interface Props {
+  at: StagePoint;
+}
+const { at } = Astro.props;
+
+type StageComponent = (props: { at: StagePoint }) => unknown;
+const modules = import.meta.glob<{ default: StageComponent }>('./*/Stage.astro', { eager: true });
+const stageOf = (id: string) => modules[`./${id}/Stage.astro`]?.default;
+
+const here = REELS.filter((r) => r.stages.includes(at) && stageOf(r.id));
+---
+
+{
+  here.map((r) => {
+    const Stage = stageOf(r.id)!;
+    return (
+      <div class="reel-stage" data-stage={r.id} data-at={at}>
+        <Stage at={at} />
+      </div>
+    );
+  })
+}

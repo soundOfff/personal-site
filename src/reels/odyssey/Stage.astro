@@ -1,0 +1,14 @@
+---
+/**
+ * Reel 05 · 2001: A Space Odyssey: reel-only markup. Rendered once per point listed in
+ * config.stages; the engine hides it unless this reel is screening.
+ */
+import type { StagePoint } from '../types';
+
+interface Props {
+  at: StagePoint;
+}
+const { at } = Astro.props;
+---
+
+{at === 'backdrop' && null}

@@ -1,0 +1,32 @@
+---
+/**
+ * The projector: cue marks, letterbox bars and the title card shown between
+ * reels. Each reel can bring its own card (a `title` stage); the rest get the
+ * default one built from config. Also hosts the aria-live line the engine
+ * announces each reel change on.
+ */
+import { REELS } from './registry';
+import Stages from './Stages.astro';
+---
+
+<div class="projector" data-projector aria-hidden="true">
+  <div class="pj-dim"></div>
+  <div class="pj-bar pj-t"></div>
+  <div class="pj-bar pj-b"></div>
+  <span class="pj-cue"></span>
+  <div class="pj-card">
+    <Stages at="title" />
+    {
+      REELS.filter((r) => !r.stages.includes('title')).map((r) => (
+        <div class="pj-title" data-for={r.id}>
+          {r.native && <div class="pj-native">{r.native}</div>}
+          <div class="pj-name">{r.title}</div>
+          <div class="pj-sub">
+            {r.year ? `${r.year} · ${r.director} · the portfolio of Tomas Brasca` : r.meta}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+<p class="sr-only" aria-live="polite" data-reel-live></p>

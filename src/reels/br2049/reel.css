@@ -1,0 +1,8 @@
+/* ============================================================
+   Reel 03 · Blade Runner 2049.
+   Every rule lives inside :root[data-reel='br2049'] (keyframes and
+   @property are the exception: top level, prefixed 'br2049-').
+   ============================================================ */
+:root[data-reel='br2049'] {
+  /* reel styles go here */
+}

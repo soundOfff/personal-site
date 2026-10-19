@@ -1,0 +1,8 @@
+/* ============================================================
+   Reel 02 · In the Mood for Love.
+   Every rule lives inside :root[data-reel='mood'] (keyframes and
+   @property are the exception: top level, prefixed 'mood-').
+   ============================================================ */
+:root[data-reel='mood'] {
+  /* reel styles go here */
+}

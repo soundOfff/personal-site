@@ -1,6 +1,8 @@
 ---
 import { profile, nav, contact, site } from '../data/site';
 import Icon from './Icon.astro';
+import Switcher from '../reels/Switcher.astro';
+import Stages from '../reels/Stages.astro';
 
 interface Props {
   /** which section id is the current page context (rarely used on homepage). */
@@ -18,6 +20,8 @@ const { active } = Astro.props;
     </div>
   </div>
 
+  <Switcher />
+
   <nav class="railnav" aria-label="Sections">
     {
       nav.map((item, i) => (
@@ -28,6 +32,8 @@ const { active } = Astro.props;
       ))
     }
   </nav>
+
+  <Stages at="rail" />
 
   <div class="contact-wrap">
     <div class="rail-sec">Contact</div>
@@ -54,6 +60,10 @@ const { active } = Astro.props;
 
   <div class="rail-foot">
     <span class="mono">{site.copyright}</span>
+    <button class="snd" type="button" data-sound-toggle aria-pressed="true">
+      <span class="w" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span data-sound-label>sound on</span>
+    </button>
     <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
       <svg
         width="15"

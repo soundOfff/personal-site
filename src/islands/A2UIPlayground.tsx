@@ -119,6 +119,14 @@ const WELCOME_TURN: Turn = {
   state: stateFrom(WELCOME.messages),
 };
 
+/**
+ * Tell the page what the agent is doing, so a film reel can score it
+ * (src/reels: the engine relays these to whichever reel is screening).
+ */
+function cue(name: 'ask' | 'surface' | 'error' | 'open' | 'close', count?: number) {
+  document.dispatchEvent(new CustomEvent('reel:cue', { detail: { name, count } }));
+}
+
 export default function A2UIPlayground() {
   const [turns, setTurns] = useState<Turn[]>([WELCOME_TURN]);
   const [draft, setDraft] = useState('');
@@ -160,6 +168,7 @@ export default function A2UIPlayground() {
         if (res.ok) {
           const body = (await res.json()) as A2uiResponse;
           if (body.quota) setQuota(body.quota);
+          cue('surface', body.messages.length);
           append({
             question,
             summary: body.summary,
@@ -172,6 +181,7 @@ export default function A2UIPlayground() {
 
         const body = (await res.json().catch(() => ({}))) as A2uiError;
         setPending(null);
+        cue('error');
 
         if (res.status === 429) {
           const retryAfter = body.retryAfter ?? 60;
@@ -198,6 +208,7 @@ export default function A2UIPlayground() {
         setError('The agent failed to compose a surface. Try rephrasing the question.');
       } catch {
         setPending(null);
+        cue('error');
         setError('Network error reaching the agent. Check the connection and ask again.');
       }
     },
@@ -214,6 +225,7 @@ export default function A2UIPlayground() {
       setDraft('');
       setError(null);
       setPending(question);
+      cue('ask');
       void askAgent(question, turns);
     },
     [askAgent, pending, spent, turns],
@@ -243,6 +255,7 @@ export default function A2UIPlayground() {
 
     if (open && !dialog.open) {
       dialog.showModal();
+      cue('open');
       // The composer is the point of the panel — but not at the cost of
       // throwing up a keyboard over a phone screen the moment it opens.
       if (window.matchMedia('(min-width: 700px)').matches) {
@@ -250,6 +263,7 @@ export default function A2UIPlayground() {
       }
     } else if (!open && dialog.open) {
       dialog.close();
+      cue('close');
     }
   }, [open]);
 

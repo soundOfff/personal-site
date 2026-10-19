@@ -1,0 +1,8 @@
+/* ============================================================
+   Reel 05 · 2001: A Space Odyssey.
+   Every rule lives inside :root[data-reel='odyssey'] (keyframes and
+   @property are the exception: top level, prefixed 'odyssey-').
+   ============================================================ */
+:root[data-reel='odyssey'] {
+  /* reel styles go here */
+}

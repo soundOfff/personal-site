@@ -1,0 +1,8 @@
+/* ============================================================
+   Reel 01 · Parasite.
+   Every rule lives inside :root[data-reel='parasite'] (keyframes and
+   @property are the exception: top level, prefixed 'parasite-').
+   ============================================================ */
+:root[data-reel='parasite'] {
+  /* reel styles go here */
+}
