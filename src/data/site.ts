@@ -57,19 +57,19 @@ export const proofs: { value: string; key: string; accent?: boolean }[] = [
 export const tenets = [
   {
     title: 'Smallest model that passes',
-    body: 'Capability is a budget, not a flex. Start at the bottom of the ladder and only climb when an eval forces you to.',
+    body: 'Start with the cheapest model and move up only when an eval fails on it.',
   },
   {
     title: 'Cache before you call',
-    body: 'The cheapest token is the one you never send. Memoize aggressively; treat the model as the slow path.',
+    body: 'Check the cache before calling a model, and treat the call as the slow path.',
   },
   {
     title: 'Cap the blast radius',
-    body: 'Every public endpoint gets a rate limit and a kill switch before it gets a launch tweet.',
+    body: 'Every public endpoint gets a rate limit and a kill switch before launch. The agent on this page has both: five questions a day per visitor, and a shared daily ceiling that turns it off.',
   },
   {
     title: 'Evals are contracts',
-    body: "If a behaviour isn't measured, it isn't shipped. Write the contract down, then make it runnable.",
+    body: "Write down what a behaviour must do as an eval you can run. If there is no eval, it doesn't ship.",
   },
 ] as const;
 
@@ -135,10 +135,16 @@ export const log: {
 
 // 08 · now: spec sheet.
 export const now = [
-  { dt: 'Location', dd: 'Rosario, Argentina · remote-friendly (ART, UTC−3)' },
-  { dt: 'Status', dd: 'Open to senior backend / AI-infra roles & select contract work' },
+  { dt: 'Location', dd: 'Rosario, Argentina. Remote, UTC−3' },
+  {
+    dt: 'Status',
+    dd: 'Open to senior backend and AI infrastructure roles, and select contract work',
+  },
   { dt: 'Email', dd: 'tomibrasca97@gmail.com' },
-  { dt: 'Focus', dd: 'LLM routing, evals, cost control; high-traffic backends' },
+  {
+    dt: 'Focus',
+    dd: 'AI features end to end: LLM routing, evals, cost control and high-traffic backends',
+  },
   { dt: 'Reading', dd: 'AI Engineer' },
   { dt: 'Built with', dd: 'Astro · React island · A2UI · editorial-ui · Cloudflare' },
 ] as const;
