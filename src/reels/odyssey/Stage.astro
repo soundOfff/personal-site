@@ -130,6 +130,44 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
           <span class="od-flare" />
           <span class="od-earth" />
           <span class="od-moon" />
+          <svg
+            class="od-orbital-trace"
+            data-film-find="odyssey"
+            data-find-zone="#readme"
+            viewBox="0 0 900 340"
+            fill="none"
+          >
+            <g class="od-orbit-plane">
+              <ellipse
+                cx="450"
+                cy="170"
+                rx="410"
+                ry="119"
+                stroke="currentColor"
+                stroke-opacity="0.36"
+              />
+              <ellipse
+                cx="450"
+                cy="170"
+                rx="348"
+                ry="90"
+                stroke="currentColor"
+                stroke-opacity="0.14"
+                stroke-dasharray="2 12"
+              />
+              <path
+                d="M30 170h58m724 0h58M450 34v30m0 212v30"
+                stroke="currentColor"
+                stroke-opacity="0.5"
+              />
+              <g transform="translate(450 170) scale(1 .29)">
+                <g class="od-orbit-craft">
+                  <circle cx="410" r="8" fill="#f2e8ca" />
+                  <path d="M383 0h19" stroke="#f2e8ca" stroke-width="3" stroke-linecap="round" />
+                </g>
+              </g>
+            </g>
+          </svg>
         </div>
       </div>
       <p class="od-frame">

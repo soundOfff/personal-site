@@ -3505,3 +3505,88 @@
     transition: none;
   }
 }
+
+/* Designeer / Lagan Bansal: digital water, translated into corridor-window reflections. */
+:root[data-reel='mood'] {
+  .mood-liquid-memory {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    contain: paint;
+    color: #d7aa6b;
+  }
+  .mood-liquid-streak {
+    position: absolute;
+    inset: -20%;
+    background: linear-gradient(
+      115deg,
+      transparent 27%,
+      rgb(214 131 65 / 0.16) 35%,
+      rgb(235 190 109 / 0.3) 41%,
+      transparent 54%
+    );
+    transform: translateX(calc(var(--find-x, 0) * 12px));
+    transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .mood-liquid-title {
+    position: absolute;
+    right: 12%;
+    top: 16%;
+    writing-mode: vertical-rl;
+    font: 700 clamp(20px, 2.3vw, 36px)/1.2 var(--mood-cjk);
+    letter-spacing: 0.2em;
+    color: #c4563b;
+    opacity: 0.3;
+    transform: translate(calc(var(--find-x, 0) * -5px), calc(var(--find-y, 0) * -7px));
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .mood-water-ring {
+    position: absolute;
+    bottom: 8%;
+    left: 30%;
+    width: 52%;
+    aspect-ratio: 4 / 1;
+    border: 1px solid rgb(219 175 102 / 0.5);
+    border-radius: 50%;
+    opacity: 0.35;
+  }
+  .mood-water-ring.is-b {
+    left: 8%;
+    bottom: 16%;
+    width: 34%;
+  }
+  .mood-water-ring.is-c {
+    left: 48%;
+    bottom: 21%;
+    width: 30%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mood-water-ring {
+      animation: mood-memory-ring 5.8s ease-out infinite paused;
+    }
+    .mood-water-ring.is-b {
+      animation-delay: -2.1s;
+    }
+    .mood-water-ring.is-c {
+      animation-delay: -4.2s;
+    }
+    .mood-liquid-memory.is-live .mood-water-ring {
+      animation-play-state: running;
+    }
+  }
+}
+@keyframes mood-memory-ring {
+  0% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.55;
+  }
+  90%,
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}

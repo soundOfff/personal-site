@@ -2888,3 +2888,107 @@
     }
   }
 }
+
+/* Designeer / Bakers Studio: ASCII + pixel crush, as a replicant's retinal scan. */
+:root[data-reel='br2049'] {
+  #readme .br-retina {
+    position: absolute;
+    z-index: 1;
+    top: 23svh;
+    right: 4%;
+    width: min(440px, 34vw);
+    padding: 22px 10px;
+    border: 0;
+    background: none;
+    color: #7a3b27;
+    text-align: center;
+    cursor: crosshair;
+    transform: perspective(900px) rotateY(calc(var(--find-x, 0) * -9deg))
+      rotateX(calc(var(--find-y, 0) * 5deg));
+    transition:
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.7s;
+  }
+  .br-retina-frame {
+    position: relative;
+    display: block;
+    padding: 28px 0;
+    border-block: 1px solid rgb(94 45 31 / 0.25);
+  }
+  .br-retina-frame::before,
+  .br-retina-frame::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    width: 1px;
+    height: 10px;
+    background: currentColor;
+  }
+  .br-retina-frame::before {
+    left: 0;
+  }
+  .br-retina-frame::after {
+    right: 0;
+  }
+  .br-retina-eye {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    color: inherit;
+    font: 500 clamp(5px, 0.68vw, 10px)/1 var(--font-mono);
+    letter-spacing: 0;
+    white-space: pre;
+  }
+  .br-retina-id,
+  .br-retina-scale {
+    position: absolute;
+    left: 0;
+    right: 0;
+    font: 400 9px/1 var(--font-mono);
+    letter-spacing: 0.2em;
+    opacity: 0.7;
+  }
+  .br-retina-id {
+    top: 0;
+  }
+  .br-retina-scale {
+    bottom: 0;
+  }
+  .br-retina-beam {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    opacity: 0;
+    background: #b6d7cd;
+    box-shadow: 0 0 14px rgb(164 220 214 / 0.5);
+  }
+  #readme .br-retina:is(:hover, :focus-visible, .is-scanning) {
+    color: #1d5554;
+  }
+  .br-retina:focus-visible {
+    outline: 1px solid #366b66;
+    outline-offset: 8px;
+  }
+  @media (max-width: 1100px) {
+    #readme .br-retina {
+      top: calc(100svh + 60px);
+      right: 10%;
+      width: 260px;
+      color: #7cb6b9;
+    }
+    .br-retina-eye {
+      font-size: 6px;
+    }
+    .br-retina-frame {
+      border-color: rgb(124 182 185 / 0.25);
+    }
+    #readme .br-retina:is(:hover, :focus-visible, .is-scanning) {
+      color: #b6d7cd;
+    }
+  }
+}

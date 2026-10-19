@@ -401,6 +401,10 @@ export function boot(): void {
   root.dataset.sec = '0';
   root.dataset.act = String(actOf(reel, 0));
 
+  const syncMotion = () => root.toggleAttribute('data-motion-suspended', document.hidden);
+  document.addEventListener('visibilitychange', syncMotion);
+  syncMotion();
+
   watchSections();
   wireSwitcher();
   wireSoundToggles();

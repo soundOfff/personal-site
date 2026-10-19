@@ -83,14 +83,49 @@ const mail = contact.find((c) => c.href.startsWith('mailto:'));
 
 {
   at === 'in:readme' && (
-    <div class="gb-hero" aria-hidden="true">
+    <div class="gb-hero">
       <p class="gb-kicker">The portfolio of</p>
       <p class="gb-name">Tomas Brasca</p>
       <p class="gb-kicker2">Rosario, Argentina</p>
-      <figure class="gb-dio-wrap">
+      <figure class="gb-dio-wrap" aria-hidden="true">
         <Diorama era="1932" />
         <figcaption class="gb-slugline">EXT. GRAND BUDAPEST HOTEL - DAY</figcaption>
       </figure>
+      <button
+        class="gb-luggage"
+        type="button"
+        data-film-find="budapest"
+        data-find-zone=".gb-dio-wrap"
+        data-find-action="flip"
+        aria-label="Turn over the Grand Budapest luggage tag"
+        aria-pressed="false"
+      >
+        <span class="gb-luggage-string" aria-hidden="true" />
+        <span class="gb-luggage-turn" aria-hidden="true">
+          <span class="gb-luggage-face gb-luggage-front">
+            <span class="gb-luggage-crest">GB</span>
+            <span class="gb-luggage-hotel">
+              The Grand
+              <br />
+              Budapest Hotel
+            </span>
+            <span class="gb-luggage-rule" />
+            <span class="gb-luggage-room">1932</span>
+            <span class="gb-luggage-small">Zubrowka · First class</span>
+          </span>
+          <span class="gb-luggage-face gb-luggage-back">
+            <span class="gb-luggage-small">A most distinguished guest</span>
+            <span class="gb-luggage-guest">
+              Tomas
+              <br />
+              Brasca
+            </span>
+            <span class="gb-luggage-rule" />
+            <span class="gb-luggage-small">Rosario → Zubrowka</span>
+            <span class="gb-luggage-stamp">ADMITTED</span>
+          </span>
+        </span>
+      </button>
     </div>
   )
 }

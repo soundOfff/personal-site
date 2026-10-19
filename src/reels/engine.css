@@ -463,3 +463,14 @@ html:root:not([data-reel='house']) [data-theme-toggle] {
   text-transform: uppercase;
   color: rgba(236, 235, 228, 0.62);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-film-find],
+  [data-film-find] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+html[data-motion-suspended] .reel-stage * {
+  animation-play-state: paused !important;
+}

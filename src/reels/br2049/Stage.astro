@@ -21,6 +21,22 @@ interface Props {
   at: StagePoint;
 }
 const { at } = Astro.props;
+const glyphs = ' .:;=+*#%@';
+const retina = Array.from({ length: 25 }, (_, row) =>
+  Array.from({ length: 67 }, (_, col) => {
+    const x = (col - 33) / 30;
+    const y = (row - 12) / 11;
+    if (Math.abs(y) > Math.pow(Math.max(0, 1 - x * x), 0.65) * 0.64) return ' ';
+    const radius = Math.hypot(x * 1.7, y);
+    if (radius < 0.19) return '@';
+    if (radius < 0.49) {
+      const ray = Math.sin(Math.atan2(y, x * 1.7) * 37 + radius * 24);
+      return glyphs[5 + Math.round((ray + 1) * 1.5)];
+    }
+    const lid = Math.abs(y) / Math.max(0.01, Math.pow(1 - x * x, 0.65) * 0.64);
+    return lid > 0.83 ? '+='[(row + col) % 2] : (row * 19 + col * 7) % 13 < 2 ? ':' : '.';
+  }).join(''),
+).join('\n');
 const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60) % 60).padStart(2, '0')}:00`;
 ---
 
@@ -133,6 +149,21 @@ const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60)
         <div class="br-dust" data-br-dust="34" />
         <div class="br-fog" />
       </div>
+      <button
+        class="br-retina"
+        type="button"
+        data-film-find="br2049"
+        data-find-zone=".br-hero"
+        data-find-action="scan"
+        aria-label="Run the retinal scan"
+      >
+        <span class="br-retina-frame" aria-hidden="true">
+          <span class="br-retina-id">NEXUS · 2049</span>
+          <pre class="br-retina-eye">{retina}</pre>
+          <span class="br-retina-beam" />
+          <span class="br-retina-scale">01 ──── 02 ──── 03</span>
+        </span>
+      </button>
       <div class="br-flight" aria-hidden="true">
         <div class="br-pin">
           <div class="br-fl-sky" />

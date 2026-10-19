@@ -3014,3 +3014,47 @@
     }
   }
 }
+
+/* Designeer / Steve Lauda's Tracelight: the geometry of an orbital light trace. */
+:root[data-reel='odyssey'] {
+  .od-orbital-trace {
+    position: absolute;
+    left: 50%;
+    bottom: 52px;
+    width: 1040px;
+    height: 393px;
+    margin-left: -520px;
+    overflow: visible;
+    color: #8bb3cc;
+    pointer-events: none;
+    transform: rotate(calc(-9deg + var(--find-x, 0) * 4deg))
+      translateY(calc(var(--find-y, 0) * 6px));
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .od-orbit-plane {
+    transform-origin: 450px 170px;
+    transform: rotate(-5deg);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .od-orbit-craft {
+      transform-origin: 0 0;
+      animation: odyssey-flight-trace 24s linear infinite paused;
+    }
+    .od-orbital-trace.is-live .od-orbit-craft {
+      animation-play-state: running;
+    }
+  }
+  @media (max-width: 820px) {
+    .od-orbital-trace {
+      width: 800px;
+      height: 302px;
+      margin-left: -400px;
+      bottom: 92px;
+    }
+  }
+}
+@keyframes odyssey-flight-trace {
+  to {
+    transform: rotate(360deg);
+  }
+}

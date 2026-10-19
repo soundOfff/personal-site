@@ -16,6 +16,7 @@
  *     entr'acte's clusters at the intermission; a Ligeti choir at the monolith
  *     and in the room; the same clusters under the star gate's rush
  */
+import { mountFilmFind } from '../finds';
 import type { Bed } from '../sound';
 import type { ReelContext, ReelModule } from '../types';
 import {
@@ -64,6 +65,7 @@ const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
    mount
    ============================================================ */
 function mount(ctx: ReelContext): () => void {
+  const stopFind = mountFilmFind(ctx);
   const { root, signal, reducedMotion } = ctx;
   const S = ctx.sound;
   const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel);
@@ -100,7 +102,7 @@ function mount(ctx: ReelContext): () => void {
     if (clockEl && now && clockEl.textContent !== now) clockEl.textContent = now;
   };
   tickClock();
-  const clockId = window.setInterval(tickClock, 1000);
+  const clockId = window.setInterval(tickClock, 30_000);
 
   /* ---------- the agent: lens state and the playground's cues ---------- */
   const stateEl = $('[data-od-state]');
@@ -494,6 +496,7 @@ function mount(ctx: ReelContext): () => void {
   }
 
   return () => {
+    stopFind();
     window.clearInterval(clockId);
     window.clearTimeout(settle);
     timers.forEach((id) => window.clearTimeout(id));
