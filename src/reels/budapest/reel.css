@@ -817,10 +817,8 @@
     margin-bottom: 48px;
   }
   .gb-kicker {
-    margin: 0 -0.42em 0 0;
-    font: 500 12px/1.4 var(--font-sans);
-    letter-spacing: 0.42em;
-    text-transform: uppercase;
+    margin: 0;
+    font: italic 400 19px/1.3 var(--gb-serif);
     color: var(--muted);
   }
   .gb-name {
@@ -831,9 +829,9 @@
     color: var(--ink);
   }
   .gb-kicker2 {
-    margin: 0 -0.32em 0 0;
+    margin: 0 -0.12em 0 0;
     font: 500 11px/1.4 var(--font-sans);
-    letter-spacing: 0.32em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--amber-deep);
   }
@@ -1231,7 +1229,7 @@
     border-bottom: 1px solid var(--rule-2);
     color: var(--ink);
     font: 500 12px var(--font-sans);
-    letter-spacing: 0.2em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
     transition:
@@ -1253,7 +1251,7 @@
     background: var(--gb-red);
     color: var(--gb-cream);
     font: 500 12px/1 var(--font-sans);
-    letter-spacing: 0.24em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     filter: none;
     box-shadow:
@@ -1354,8 +1352,8 @@
   .metrics .m .k {
     display: block;
     margin-top: 6px;
-    font: 500 9.5px/1.4 var(--font-sans);
-    letter-spacing: 0.2em;
+    font: 500 10.5px/1.4 var(--font-sans);
+    letter-spacing: 0.08em;
     color: #2e1430;
   }
 
@@ -1386,14 +1384,14 @@
   .console-bar .who {
     gap: 14px;
     font: 500 10.5px/1.3 var(--font-sans);
-    letter-spacing: 0.24em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gb-rose);
   }
   .a2-launch-count,
   .a2-quota {
-    font: 500 10px/1.3 var(--font-sans);
-    letter-spacing: 0.2em;
+    font: 500 10.5px/1.3 var(--font-sans);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #e9c9d6;
   }
@@ -1401,8 +1399,8 @@
     color: #ffcf6e;
   }
   .a2-reset {
-    font: 500 10px var(--font-sans);
-    letter-spacing: 0.2em;
+    font: 500 10.5px var(--font-sans);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -1539,9 +1537,9 @@
   }
   .a2-starter-lbl {
     padding: 0;
-    font: 500 10px/1.3 var(--font-sans);
-    letter-spacing: 0.26em;
-    margin-right: -0.26em;
+    font: 500 10.5px/1.3 var(--font-sans);
+    letter-spacing: 0.12em;
+    margin-right: -0.12em;
     color: var(--muted);
   }
   .a2-starters {
@@ -1574,8 +1572,8 @@
     justify-content: center;
   }
   .a2-actions-lbl {
-    font: 500 10px var(--font-sans);
-    letter-spacing: 0.24em;
+    font: 500 10.5px var(--font-sans);
+    letter-spacing: 0.12em;
     color: var(--muted);
   }
   .live-note {
@@ -1650,8 +1648,8 @@
   }
   .a2-turn::before {
     content: 'Carton Nº ' counter(gb-carton, decimal-leading-zero) / '';
-    font: 500 10px/1 var(--font-sans);
-    letter-spacing: 0.26em;
+    font: 500 10.5px/1 var(--font-sans);
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     text-align: center;
     color: var(--amber-deep);
@@ -1696,7 +1694,7 @@
   .a2-peek > summary::before {
     color: var(--muted);
     font-family: var(--font-sans);
-    letter-spacing: 0.2em;
+    letter-spacing: 0.1em;
   }
   .a2-peek {
     text-align: center;
@@ -1804,8 +1802,8 @@
     font: 600 20px/1.25 var(--gb-serif);
   }
   .a2-eyebrow {
-    font: 500 10px var(--font-sans);
-    letter-spacing: 0.22em;
+    font: 500 10.5px var(--font-sans);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--amber-deep);
   }
@@ -1839,8 +1837,8 @@
   .a2-card-meta,
   .a2-post-meta,
   .a2-tl-top {
-    font: 500 9.5px/1.4 var(--font-sans);
-    letter-spacing: 0.16em;
+    font: 500 10.5px/1.4 var(--font-sans);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -1863,8 +1861,8 @@
   .a2-table th {
     padding-left: 10px;
     background: color-mix(in oklab, var(--gb-pinkbox) 35%, #fff);
-    font: 500 9.5px var(--font-sans);
-    letter-spacing: 0.18em;
+    font: 500 10.5px var(--font-sans);
+    letter-spacing: 0.08em;
     color: var(--muted);
   }
   .a2-table td {
@@ -1966,8 +1964,8 @@
     color: var(--ink-2);
   }
   .idx .stk {
-    font: 500 9.5px/1.6 var(--font-sans);
-    letter-spacing: 0.14em;
+    font: 500 10.5px/1.6 var(--font-sans);
+    letter-spacing: 0.06em;
     color: var(--muted);
   }
   .idx .yr {
@@ -2154,7 +2152,7 @@
     display: block;
     margin-bottom: 6px;
     font: 500 10.5px/1.3 var(--font-sans);
-    letter-spacing: 0.24em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -2169,8 +2167,8 @@
     order: 3;
     flex-direction: column;
     gap: 16px;
-    font: 500 10px/1.3 var(--font-sans);
-    letter-spacing: 0.2em;
+    font: 500 10.5px/1.3 var(--font-sans);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -2391,9 +2389,8 @@
   }
   .wrow .d {
     grid-area: d;
-    font: 500 9.5px/1.4 var(--font-sans);
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
+    font: 500 10.5px/1.4 var(--font-sans);
+    letter-spacing: 0.08em;
     color: var(--muted);
   }
   .wrow:hover .t {
@@ -2434,9 +2431,9 @@
   }
   .tenet h3 {
     margin: 12px 0 8px;
-    font: 500 14px/1.4 var(--font-sans);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    font: 600 19px/1.3 var(--gb-serif);
+    letter-spacing: 0;
+    text-transform: none;
   }
   .tenet p {
     max-width: 40ch;
@@ -2615,8 +2612,8 @@
     border-bottom: 0;
   }
   .spec dt {
-    font: 500 10px/1.5 var(--font-sans);
-    letter-spacing: 0.24em;
+    font: 500 10.5px/1.5 var(--font-sans);
+    letter-spacing: 0.12em;
     color: var(--muted);
   }
   .spec dd {
@@ -2755,8 +2752,8 @@
     padding: 22px var(--gb-gutter) 30px;
     border-top: 3px double var(--rule-2);
     background: var(--paper);
-    font: 500 10px/1.4 var(--font-sans);
-    letter-spacing: 0.24em;
+    font: 500 10.5px/1.4 var(--font-sans);
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
   }
