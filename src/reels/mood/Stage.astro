@@ -54,9 +54,9 @@ const titleRain = at === 'title' ? drops(40, 18, 40) : [];
 
 const credits: [string, string][] = [
   ['A portfolio by', 'Tomas Brasca'],
-  ['Screened through', 'In the Mood for Love (花樣年華) · 2000'],
-  ['Directed by', 'Wong Kar-wai, not this site'],
-  ['Palette & motifs', 'A fan homage, not affiliated with the film'],
+  ['Screened through', 'In the Mood for Love, Wong Kar-wai, 2000'],
+  ['Rooms and cheongsams after', 'William Chang Suk-ping'],
+  ['The waltz after', 'Shigeru Umebayashi'],
 ];
 ---
 
@@ -86,19 +86,17 @@ const credits: [string, string][] = [
       </span>
       <span class="mood-vtitle" aria-hidden="true">
         <span class="zh">花樣年華</span>
-        <span class="en">In the Mood for Love · 2000</span>
+        <span class="en">In the Mood for Love</span>
       </span>
       <span class="mood-doorway is-l" aria-hidden="true" data-mood-door="l">
         <i class="inner" />
         <i class="frame" />
         <i class="spill" />
-        <i class="hint">push the door</i>
       </span>
       <span class="mood-doorway is-r" aria-hidden="true" data-mood-door="r">
         <i class="inner" />
         <i class="frame" />
         <i class="spill" />
-        <i class="hint">push the door</i>
       </span>
     </>
   )
@@ -224,8 +222,7 @@ const credits: [string, string][] = [
             Tell the wall a secret
           </label>
           <p class="shint" id="mood-secret-hint">
-            Whisper it into the hole and it is sealed in plaster, the way secrets end in this film.
-            It stays on this page: nothing is sent, nothing is saved.
+            Whisper it into the hole, then cover it with mud. Nothing you type leaves this page.
           </p>
           <div class="srow">
             <input
@@ -258,9 +255,6 @@ const credits: [string, string][] = [
           <span class="wall is-r" />
         </span>
         <div class="mood-credits-in">
-          <p class="cr-cn" aria-hidden="true">
-            花樣年華
-          </p>
           <dl class="cr">
             {credits.map(([k, v]) => (
               <div>
@@ -269,14 +263,10 @@ const credits: [string, string][] = [
               </div>
             ))}
           </dl>
+          <p class="cr-note">A fan homage, not affiliated with the film.</p>
         </div>
       </div>
-      <button
-        class="mood-clock"
-        type="button"
-        aria-label="The wall clock: ring the chime"
-        data-mood-clock
-      >
+      <button class="mood-clock" type="button" aria-label="Ring the wall clock" data-mood-clock>
         <span class="face" aria-hidden="true">
           <i class="ticks" />
           <i class="hh" />
@@ -304,8 +294,8 @@ const credits: [string, string][] = [
         <span class="t-cn">花樣年華</span>
         <span class="t-col">
           <span class="t-en">In the Mood for Love</span>
-          <span class="t-sub">2000 · Wong Kar-wai</span>
-          <span class="t-sub">the portfolio of Tomas Brasca</span>
+          <span class="t-sub">Wong Kar-wai, 2000</span>
+          <span class="t-sub">A portfolio by Tomas Brasca</span>
         </span>
       </span>
     </div>

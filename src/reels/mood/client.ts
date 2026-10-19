@@ -409,7 +409,7 @@ const reel: ReelModule = {
       }
     });
 
-    /* ---- room 2046: tell the wall a secret ---- */
+    /* ---- Angkor Wat: tell the wall a secret ---- */
     const form = document.querySelector<HTMLFormElement>('[data-mood-secret]');
     const hole = document.querySelector<HTMLElement>('[data-mood-hole]');
     const whisper = document.querySelector<HTMLElement>('[data-mood-whisper]');
@@ -435,7 +435,7 @@ const reel: ReelModule = {
             input.focus();
             return;
           }
-          // The secret only ever lives in this element, and only until it is sealed.
+          // The secret only ever lives in this element, and only until the mud goes on.
           whisper.textContent = text;
           input.value = '';
           typed = 0;
@@ -451,7 +451,7 @@ const reel: ReelModule = {
             plaster(s);
           }, 780 * step);
           later(() => {
-            sealed.textContent = 'Sealed in room 2046. Nobody will read it, not even me.';
+            sealed.textContent = 'Left in the wall. Nobody will read it, not even me.';
             // the A7 bar: left on the dominant, never resolved
             waltzBar(3);
           }, 1500 * step);
