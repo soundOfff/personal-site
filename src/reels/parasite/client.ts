@@ -159,6 +159,12 @@ const reel: ReelModule = {
     const place = (i: number) => nav?.style.setProperty('--px-mark', String(i));
     place(mark);
 
+    // reel.css paints the rail's numbers from 1 like the S# slugs; give the
+    // markup's 00-08 the same numbers so screen readers hear what is shown.
+    const numbers = [...(nav?.querySelectorAll<HTMLElement>('.nx') ?? [])];
+    const houseNumbers = numbers.map((el) => el.textContent);
+    numbers.forEach((el, i) => (el.textContent = String(i + 1)));
+
     /* ---- the lights: each comes on as the walker first gets down to it, and stays on ---- */
     let deep = -1;
     const reach = (i: number, withSound: boolean) => {
@@ -331,6 +337,7 @@ const reel: ReelModule = {
       offSound();
       rainEl?.classList.remove('is-raining');
       strip?.classList.remove('is-fumigated');
+      numbers.forEach((el, i) => (el.textContent = houseNumbers[i]));
       nav?.style.removeProperty('--px-mark');
       nav?.style.removeProperty('--px-deep');
       delete root.dataset.pxLit;
