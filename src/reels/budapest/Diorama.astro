@@ -1,0 +1,111 @@
+---
+/**
+ * The hotel as a miniature, the way Anderson shot it. 1932 is the hero: pink,
+ * domed, snowing, a quarter of the windows lit, the funicular climbing. 1968
+ * is the same model a generation on: stripped of its dome and awning,
+ * repainted, most rooms dark. The interlude crops it to scope.
+ */
+interface Props {
+  era: '1932' | '1968';
+}
+const { era } = Astro.props;
+const aged = era === '1968';
+
+// A seeded scatter so the diorama renders the same on every build.
+let seed = aged ? 68 : 23;
+const rnd = () => {
+  seed = (seed * 9301 + 49297) % 233280;
+  return seed / 233280;
+};
+const windows = (n: number) =>
+  Array.from({ length: n }, () => ({ d: Math.round(rnd() * 650), on: rnd() < (aged ? 0.12 : 0.24) }));
+const winsL = windows(12);
+const winsC = windows(15);
+const winsR = windows(12);
+const flakes = aged
+  ? []
+  : Array.from({ length: 30 }, () => ({
+      l: (rnd() * 100).toFixed(1),
+      s: (2 + rnd() * 3.5).toFixed(1),
+      o: (0.5 + rnd() * 0.5).toFixed(2),
+      du: (6 + rnd() * 7).toFixed(1),
+      de: (rnd() * 12).toFixed(1),
+    }));
+---
+
+<div class="gb-dio" data-gb-dio={era}>
+  {
+    !aged && (
+      <>
+        <span class="cloud c1" />
+        <span class="cloud c2" />
+        <span class="cloud c3" />
+      </>
+    )
+  }
+  <span class="mtn ml2" />
+  <span class="mtn mr2" />
+  <span class="mtn mc" />
+  <span class="pines p1" />
+  <span class="pines p2" />
+  <span class="ledge" />
+  <span class="snowbank" />
+  {
+    !aged && (
+      <span class="track">
+        <span class="car" />
+      </span>
+    )
+  }
+  <span class="hotel">
+    <span class="wing wl">
+      <span class="roof" />
+      <span class="wins">
+        {winsL.map((w) => (
+          <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+        ))}
+      </span>
+    </span>
+    <span class="wing wr">
+      <span class="roof" />
+      <span class="wins">
+        {winsR.map((w) => (
+          <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+        ))}
+      </span>
+    </span>
+    <span class="core">
+      <span class="tower">
+        {
+          !aged && (
+            <>
+              <span class="dome" />
+              <span class="spire" />
+            </>
+          )
+        }
+      </span>
+      <span class="roof" />
+      <span class="sign">T · B</span>
+      <span class="wins">
+        {winsC.map((w) => (
+          <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+        ))}
+      </span>
+      {!aged && <span class="awn" />}
+      <span class="door" />
+    </span>
+  </span>
+  {
+    !aged && (
+      <span class="flakes">
+        {flakes.map((f) => (
+          <i
+            class="flake"
+            style={`left:${f.l}%;width:${f.s}px;height:${f.s}px;opacity:${f.o};animation-duration:${f.du}s;animation-delay:-${f.de}s`}
+          />
+        ))}
+      </span>
+    )
+  }
+</div>

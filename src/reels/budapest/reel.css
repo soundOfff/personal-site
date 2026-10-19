@@ -904,14 +904,11 @@
       0 0 0 7px var(--gb-gold),
       0 34px 60px -40px rgba(46, 20, 48, 0.6);
   }
-  .gb-ratio {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
+  /* the caption is a screenplay slugline, typed flush left */
+  .gb-slugline {
     margin-top: 10px;
-    font: 500 9.5px/1.4 var(--font-sans);
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
+    font: 400 12.5px/1.4 var(--font-mono);
+    text-align: left;
     color: var(--muted);
   }
 
@@ -1186,6 +1183,66 @@
   .gb-dio:hover .w {
     background: #ffe2a1;
     box-shadow: 0 0 5px rgba(255, 199, 90, 0.8);
+  }
+  /* 1968: the same model repainted in the act's ochre and brown, its dome and
+     awning gone, most rooms let go; what light there is, is sodium orange */
+  .gb-dio[data-gb-dio='1968'] {
+    background: linear-gradient(180deg, #e4d9c4 0%, #ece3d1 60%, #f2ebdf 100%);
+
+    .mc {
+      background: #b1a28a;
+    }
+    .ml2,
+    .mr2 {
+      background: #a3947b;
+    }
+    .mtn::after {
+      background: #f3eee4;
+    }
+    .pines {
+      background:
+        linear-gradient(135deg, transparent 50%, #6f7445 50%) 0 0 / 16px 100%,
+        linear-gradient(225deg, transparent 50%, #6f7445 50%) 0 0 / 16px 100%;
+    }
+    .ledge {
+      background: #e6dccb;
+    }
+    .snowbank {
+      background: linear-gradient(180deg, #e0d4bf, #eae1d0);
+    }
+    .roof,
+    .door {
+      background: #7a3b2e;
+    }
+    .wing {
+      background: #d6b68a;
+      box-shadow: inset 0 -6px 0 rgba(122, 59, 46, 0.16);
+    }
+    .core {
+      background: #cba573;
+      box-shadow: inset 0 -6px 0 rgba(122, 59, 46, 0.18);
+    }
+    .tower {
+      top: -20%;
+      height: 22%;
+      background: #c39866;
+    }
+    .sign {
+      background: #efe4cf;
+      color: #7a3b2e;
+      box-shadow: 0 0 0 1px var(--gb-gold-lo);
+    }
+    .w {
+      background: #7d5b45;
+    }
+    .w.on {
+      background: #d9822b;
+      box-shadow: none;
+    }
+  }
+  .gb-dio[data-gb-dio='1968']:hover .w {
+    background: #d9822b;
+    box-shadow: none;
   }
   @media (prefers-reduced-motion: reduce) {
     .gb-dio .flakes {
@@ -2001,14 +2058,15 @@
   }
 
   /* ============================================================
-     INTERLUDES: the years between
+     INTERLUDES: the years between. 1968 shows the hotel aged, cropped
+     to scope; the matte closes on it. On phones, with no matte, 1985
+     sits in a 1.85 frame of its own.
      ============================================================ */
   .gb-interlude {
     --il-bg: #eed9ae;
     --il-ink: #33200f;
     --il-mut: #6b4f2e;
-    --il-acc: #8a3b12;
-    padding: 96px 24px;
+    padding: 64px 24px 72px;
     background: var(--il-bg);
     color: var(--il-ink);
     text-align: center;
@@ -2017,27 +2075,37 @@
     --il-bg: #dce6ee;
     --il-ink: #241532;
     --il-mut: #5a4f69;
-    --il-acc: #8e1b26;
+    padding: 96px 24px;
   }
   .il-k {
-    margin: 0 -0.44em 0 0;
-    font: 500 11px/1.4 var(--font-sans);
-    letter-spacing: 0.44em;
-    text-transform: uppercase;
+    margin: 0;
+    font: italic 400 21px/1.3 var(--gb-serif);
     color: var(--il-mut);
   }
   .il-year {
-    margin: 12px 0;
+    margin: 8px 0 0;
     font: 400 clamp(84px, 11vw, 136px) / 1 var(--gb-serif);
     letter-spacing: 0.03em;
     color: var(--il-ink);
   }
-  .il-r {
-    margin: 0 -0.34em 0 0;
-    font: 500 12px/1.4 var(--font-sans);
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
-    color: var(--il-acc);
+  .il-shot {
+    position: relative;
+    width: min(100%, 760px);
+    aspect-ratio: 2.35 / 1;
+    margin: 28px auto 0;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px var(--gb-gold-lo),
+      0 0 0 6px #f7ead0,
+      0 0 0 7px rgba(138, 100, 32, 0.55),
+      0 30px 50px -36px rgba(51, 32, 15, 0.6);
+  }
+  /* the 1.37 set, cropped to its middle band: the hotel and the treeline */
+  .il-shot .gb-dio {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -43%;
   }
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
@@ -2835,7 +2903,17 @@
       font-size: 84px;
     }
     .gb-interlude {
-      padding: 72px 18px;
+      padding: 56px 18px 64px;
+    }
+    .gb-interlude[data-era='2'] {
+      padding: 24px 0;
+      background: var(--gb-plum);
+    }
+    .gb-interlude[data-era='2'] .il-frame {
+      aspect-ratio: 1.85 / 1;
+      display: grid;
+      place-content: center;
+      background: var(--il-bg);
     }
     .gb-cr div {
       gap: 12px;

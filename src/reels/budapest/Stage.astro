@@ -7,13 +7,14 @@
  *                 and the front desk's progress rule with its funicular car
  *   rail          the right-hand brass plate: room number + era, both rolling
  *   in:readme     the opening: name plate, the pastel diorama, chapter card
- *   in:<section>  a PART chapter card (the section's keybar finishes the card)
- *   after:work    1968 interlude · after:writing 1985 interlude
+ *   in:<section>  a Part chapter card (the section's keybar finishes the card)
+ *   after:work    1968 interlude, the hotel aged · after:writing 1985 interlude
  *   credits       the service bell and the end credits
  *   title         the projector's title card
  */
 import type { StagePoint, SectionId } from '../types';
 import { nav, contact } from '../../data/site';
+import Diorama from './Diorama.astro';
 
 interface Props {
   at: StagePoint;
@@ -34,26 +35,7 @@ const chapters: Record<SectionId, string> = {
 const sectionOf = at.startsWith('in:') ? (at.slice(3) as SectionId) : null;
 const part = sectionOf ? nav.findIndex((n) => n.id === sectionOf) + 1 : 0;
 
-// A seeded scatter so the diorama renders the same on every build.
-let seed = 23;
-const rnd = () => {
-  seed = (seed * 9301 + 49297) % 233280;
-  return seed / 233280;
-};
-const windows = (n: number) =>
-  Array.from({ length: n }, () => ({ d: Math.round(rnd() * 650), on: rnd() < 0.24 }));
-const winsL = windows(12);
-const winsC = windows(15);
-const winsR = windows(12);
-const flakes = Array.from({ length: 30 }, () => ({
-  l: (rnd() * 100).toFixed(1),
-  s: (2 + rnd() * 3.5).toFixed(1),
-  o: (0.5 + rnd() * 0.5).toFixed(2),
-  du: (6 + rnd() * 7).toFixed(1),
-  de: (rnd() * 12).toFixed(1),
-}));
-
-const eras = ['1932 · 1.37 : 1', '1968 · 2.35 : 1', '1985 · 1.85 : 1'];
+const eras = ['1932', '1968', '1985'];
 const mail = contact.find((c) => c.href.startsWith('mailto:'));
 ---
 
@@ -111,66 +93,8 @@ const mail = contact.find((c) => c.href.startsWith('mailto:'));
       <p class="gb-name">Tomas Brasca</p>
       <p class="gb-kicker2">Fullstack · AI systems · Rosario</p>
       <figure class="gb-dio-wrap">
-        <div class="gb-dio" data-gb-dio>
-          <span class="cloud c1" />
-          <span class="cloud c2" />
-          <span class="cloud c3" />
-          <span class="mtn ml2" />
-          <span class="mtn mr2" />
-          <span class="mtn mc" />
-          <span class="pines p1" />
-          <span class="pines p2" />
-          <span class="ledge" />
-          <span class="snowbank" />
-          <span class="track">
-            <span class="car" />
-          </span>
-          <span class="hotel">
-            <span class="wing wl">
-              <span class="roof" />
-              <span class="wins">
-                {winsL.map((w) => (
-                  <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
-                ))}
-              </span>
-            </span>
-            <span class="wing wr">
-              <span class="roof" />
-              <span class="wins">
-                {winsR.map((w) => (
-                  <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
-                ))}
-              </span>
-            </span>
-            <span class="core">
-              <span class="tower">
-                <span class="dome" />
-                <span class="spire" />
-              </span>
-              <span class="roof" />
-              <span class="sign">T · B</span>
-              <span class="wins">
-                {winsC.map((w) => (
-                  <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
-                ))}
-              </span>
-              <span class="awn" />
-              <span class="door" />
-            </span>
-          </span>
-          <span class="flakes">
-            {flakes.map((f) => (
-              <i
-                class="flake"
-                style={`left:${f.l}%;width:${f.s}px;height:${f.s}px;opacity:${f.o};animation-duration:${f.du}s;animation-delay:-${f.de}s`}
-              />
-            ))}
-          </span>
-        </div>
-        <figcaption class="gb-ratio">
-          <span>1.37 : 1</span>
-          <span>Exterior · the hotel · winter</span>
-        </figcaption>
+        <Diorama era="1932" />
+        <figcaption class="gb-slugline">EXT. GRAND BUDAPEST HOTEL - DAY</figcaption>
       </figure>
     </div>
   )
@@ -190,7 +114,9 @@ const mail = contact.find((c) => c.href.startsWith('mailto:'));
     <div class="gb-interlude" data-era="1" aria-hidden="true">
       <p class="il-k">Thirty-six years later</p>
       <p class="il-year">1968</p>
-      <p class="il-r">The frame widens · 2.35 : 1</p>
+      <div class="il-shot">
+        <Diorama era="1968" />
+      </div>
     </div>
   )
 }
@@ -198,9 +124,10 @@ const mail = contact.find((c) => c.href.startsWith('mailto:'));
 {
   at === 'after:writing' && (
     <div class="gb-interlude" data-era="2" aria-hidden="true">
-      <p class="il-k">Seventeen years after that</p>
-      <p class="il-year">1985</p>
-      <p class="il-r">The frame settles · 1.85 : 1</p>
+      <div class="il-frame">
+        <p class="il-k">Seventeen years after that</p>
+        <p class="il-year">1985</p>
+      </div>
     </div>
   )
 }

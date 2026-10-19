@@ -203,8 +203,8 @@ const reel: ReelModule = {
     window.addEventListener('resize', reframe, { passive: true, signal });
     frame();
 
-    /* ---------- the diorama: a window comes on, another goes off ---------- */
-    const dio = document.querySelector<HTMLElement>('[data-gb-dio]');
+    /* ---------- the hero diorama: a window comes on, another goes off ---------- */
+    const dio = document.querySelector<HTMLElement>('[data-gb-dio="1932"]');
     const wins = dio ? [...dio.querySelectorAll<HTMLElement>('.w')] : [];
     const lit = new Set(wins.filter((w) => w.classList.contains('on')));
     let twinkle = 0;
