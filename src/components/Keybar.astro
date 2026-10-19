@@ -3,8 +3,9 @@
  * A section's keybar. `.kb-sl` (the `//`) and `.kb-d` (the optional descriptor,
  * from the default slot) carry no styles of their own, so each reel can drop or
  * restyle them. The ` · ` before a descriptor is `.kb-d::before`, so a reel can
- * keep the descriptor and drop the dot. The markup stays on one line because a
- * leading whitespace node prints as a gap after a reel's `.keybar::before`.
+ * keep the descriptor and drop the dot. The markup stays on one line, and out of
+ * Prettier's reach in `.prettierignore`, because a leading whitespace node
+ * prints as a gap after a reel's `.keybar::before`.
  */
 import Slugs from '../reels/Slugs.astro';
 import type { SectionId } from '../reels/types';
@@ -17,5 +18,4 @@ const { sec, label } = Astro.props;
 const described = Astro.slots.has('default');
 ---
 
-<!-- prettier-ignore -->
 <p class="keybar"><span class="kb-sl" aria-hidden="true">//</span> <b>{label}</b>{described && <span class="kb-d"><slot /></span>}<Slugs sec={sec} /></p>
