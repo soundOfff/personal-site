@@ -102,7 +102,7 @@ const mood: ReelConfig = {
       code: 'paper',
       name: 'the newspaper',
       native: '報館',
-      slug: 'ochre grid',
+      slug: 'plain ochre',
       sections: ['oss'],
       tokens: tokens({
         bg: '#4F3810',
@@ -158,7 +158,7 @@ const mood: ReelConfig = {
     {
       code: 'taxi',
       name: "we won't be like them",
-      slug: 'black pinstripe',
+      slug: 'plain black',
       sections: ['principles'],
       tokens: tokens({
         bg: '#13100F',
@@ -268,7 +268,7 @@ const mood: ReelConfig = {
   motifs: [
     'two lacquered doors side by side as the CTAs',
     'a different cheongsam each time she takes the stairs',
-    'one wallpaper per room, seen in the margins',
+    'three wallpapers, seen in the doorway margins',
     'rain only inside the lamp cone',
     'thermos steam agent state',
     "Tomas's chop on every answer",

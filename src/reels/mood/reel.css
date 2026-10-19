@@ -9,8 +9,8 @@
 /* ============================================================
    Reel 02 · In the Mood for Love.
    Nine rooms off one corridor. The rail becomes a strip of brass doorplates;
-   every section is a scene seen through its doorway, with its own wallpaper
-   and a lamp if the scene is at night. Courier is kept for the screenplay
+   every section is a scene seen through its doorway, in its own colour,
+   with a lamp if the scene is at night. Courier is kept for the screenplay
    slugs; everything else is set in the serifs.
    Every rule lives inside :root[data-reel='mood'] (keyframes and @property
    are top level, prefixed 'mood-'), except the title card, which belongs to
@@ -689,10 +689,11 @@
     text-decoration-style: solid;
   }
 
-  /* ---------- the wallpapers: one per room, at full strength in the
-     doorway's margins and washed out behind the words, the way you see
-     the paper round someone standing in a door ---------- */
-  & :is(#playground, #work, #oss, #log, #writing, #principles, #now, .mood-secret) {
+  /* ---------- three wallpapers: the landing's lattice, one blossom on two
+     grounds, and 2046's 原稿紙. At full strength in the doorway's margins
+     and washed out behind the words, the way you see the paper round
+     someone standing in a door. The newspaper and the taxi are plain. ---------- */
+  & :is(#playground, #work, #log, #writing, #now, .mood-secret) {
     --wash: linear-gradient(
       90deg,
       transparent calc(var(--side) + var(--inset) - 30px),
@@ -701,6 +702,7 @@
       transparent calc(100% - var(--side) - var(--inset) + 30px)
     );
   }
+  /* the noodle stall: the same jade lattice as the landing */
   & #playground {
     background-image:
       var(--wash),
@@ -715,17 +717,6 @@
     background-size:
       auto,
       56px 56px;
-  }
-  & #oss {
-    background-image:
-      var(--wash), linear-gradient(rgba(240, 228, 201, 0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(240, 228, 201, 0.07) 1px, transparent 1px),
-      linear-gradient(rgba(0, 0, 0, 0.16) 2px, transparent 2px);
-    background-size:
-      auto,
-      18px 18px,
-      18px 18px,
-      54px 54px;
   }
   /* navy blossom: the same flower, smaller, in cream */
   & #log {
@@ -748,12 +739,6 @@
     background-position:
       0 0,
       calc(var(--side) + var(--inset)) 6px;
-  }
-  /* black pinstripe, a suit's */
-  & #principles {
-    background-image:
-      var(--wash),
-      repeating-linear-gradient(90deg, rgba(240, 228, 201, 0.07) 0 2px, transparent 2px 9px);
   }
   /* the felt, under the one lamp over the table */
   & #stack {
