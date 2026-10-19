@@ -490,13 +490,15 @@
     padding-left: 0.18em;
     color: var(--ink);
   }
+  /* sluglines belong to the screenplay, so they're set in the mono, not the ship's Michroma */
   & .keybar .reel-slug {
     order: -2;
     flex-basis: 100%;
     margin: 0;
-    font: 400 9.5px/1.5 var(--font-display);
-    letter-spacing: 0.38em;
-    padding-left: 0.38em;
+    font: 400 10.5px/1.5 var(--font-mono);
+    letter-spacing: 0.14em;
+    padding-left: 0.14em;
+    text-wrap: balance;
     color: var(--muted);
   }
   /* sections whose keybar is only "// <name>": the slashes alone read as a stray glyph */
@@ -547,10 +549,7 @@
   & [data-sec='0'] .keybar .reel-slug {
     order: 1;
     flex-basis: auto;
-    font: inherit;
-    letter-spacing: inherit;
     padding: 0 0 0 8px;
-    color: var(--muted);
   }
   & [data-sec='0'] .keybar::after {
     content: none;
@@ -2551,10 +2550,6 @@
     }
     & .keybar b {
       font-size: 19px;
-    }
-    & .keybar .reel-slug {
-      letter-spacing: 0.22em;
-      padding-left: 0.22em;
     }
     & .idx tbody tr {
       grid-template-columns: 30px minmax(0, 1fr);

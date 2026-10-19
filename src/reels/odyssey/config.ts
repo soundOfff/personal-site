@@ -2,6 +2,13 @@ import type { ReelConfig } from '../types';
 import { tokens } from '../tokens';
 
 /**
+ * A screenplay slugline: INT. or EXT., the place, then the time when it
+ * changes. The no-break space keeps each dash with the field after it, so a
+ * wrapped slug never ends a line on a dash.
+ */
+const slug = (...fields: string[]) => fields.join('\u00a0- ');
+
+/**
  * Reel 05 · 2001: A Space Odyssey. Seeded from the design canvas board
  * Odyssey.dc.html.
  *
@@ -43,7 +50,7 @@ const odyssey: ReelConfig = {
       code: 'I',
       name: 'The Dawn of Man',
       native: 'THE DAWN OF MAN',
-      slug: 'Alignment · dawn',
+      slug: slug('EXT. SPACE', 'BEHIND THE MOON', 'SUNRISE'),
       sections: ['readme'],
       tokens: tokens({
         bg: '#050608',
@@ -63,7 +70,7 @@ const odyssey: ReelConfig = {
       code: 'II',
       name: 'TMA-1',
       native: 'TMA-1',
-      slug: 'Space station · lunar surface',
+      slug: slug('INT. SPACE STATION V', 'LOUNGE'),
       sections: ['playground', 'work'],
       tokens: tokens({
         bg: '#F2F2F0',
@@ -83,7 +90,7 @@ const odyssey: ReelConfig = {
       code: 'III',
       name: 'Jupiter Mission',
       native: 'JUPITER MISSION · 18 MONTHS LATER',
-      slug: 'Pod bay · centrifuge',
+      slug: slug('INT. DISCOVERY', 'POD BAY'),
       sections: ['oss', 'log'],
       tokens: tokens({
         bg: '#E6E8E4',
@@ -103,7 +110,7 @@ const odyssey: ReelConfig = {
       code: 'III·M',
       name: 'Logic memory center',
       native: 'JUPITER MISSION · AFTER THE INTERMISSION',
-      slug: 'Logic memory center',
+      slug: slug('INT. DISCOVERY', 'LOGIC MEMORY CENTER'),
       sections: ['writing', 'principles'],
       tokens: tokens({
         bg: '#4A0B08',
@@ -123,7 +130,7 @@ const odyssey: ReelConfig = {
       code: 'IV',
       name: 'Jupiter and Beyond the Infinite',
       native: 'JUPITER AND BEYOND THE INFINITE',
-      slug: 'Star gate · the room',
+      slug: slug('INT. THE ROOM'),
       sections: ['stack', 'now'],
       tokens: tokens({
         bg: '#EEF4E8',
@@ -147,15 +154,15 @@ const odyssey: ReelConfig = {
     title: "'Michroma', system-ui, sans-serif",
   },
   sections: {
-    readme: { slug: 'Act I · The dawn of man' },
-    playground: { slug: 'Act II · Space station · 01' },
-    work: { slug: 'Act II · Lunar surface · 02' },
-    oss: { slug: 'Act III · Pod bay · 03' },
-    log: { slug: 'Act III · Centrifuge · 04' },
-    writing: { slug: 'Act III · Logic memory center · 05' },
-    principles: { slug: 'Act III · Logic memory center · 06' },
-    stack: { slug: 'Act IV · The room · 07' },
-    now: { slug: 'Act IV · The room · 08' },
+    readme: { slug: slug('EXT. SPACE', 'BEHIND THE MOON', 'SUNRISE') },
+    playground: { slug: slug('INT. SPACE STATION V', 'LOUNGE') },
+    work: { slug: slug('EXT. TYCHO CRATER', 'TMA-1 EXCAVATION') },
+    oss: { slug: slug('INT. DISCOVERY', 'POD BAY') },
+    log: { slug: slug('INT. DISCOVERY', 'CENTRIFUGE') },
+    writing: { slug: slug('INT. DISCOVERY', 'LOGIC MEMORY CENTER') },
+    principles: { slug: slug('INT. DISCOVERY', 'LOGIC MEMORY CENTER', 'CONTINUOUS') },
+    stack: { slug: slug('INT. THE ROOM') },
+    now: { slug: slug('INT. THE ROOM', 'LATER') },
   },
   stages: [
     'backdrop',
