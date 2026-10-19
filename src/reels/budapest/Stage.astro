@@ -3,8 +3,8 @@
  * Reel 04 · The Grand Budapest Hotel: reel-only markup. Rendered once per point listed in
  * config.stages; the engine hides it unless this reel is screening.
  *
- *   backdrop      the frame matte (aspect ratio by era), the whip pan, grain,
- *                 and the front desk's progress rule with its funicular car
+ *   backdrop      the frame matte (aspect ratio by era), the whip pan's blur,
+ *                 grain, and the front desk's progress rule
  *   rail          the right-hand brass plate: room number + era, both rolling
  *   in:readme     the opening: name plate, the pastel diorama, chapter card
  *   in:<section>  a Part chapter card (the section's keybar finishes the card)
@@ -49,19 +49,14 @@ const mail = contact.find((c) => c.href.startsWith('mailto:'));
         <i class="mr" />
         <span class="fl" />
       </div>
-      <div class="gb-whip" aria-hidden="true" data-gb-whip>
-        <i />
-        <i />
-        <i />
-        <i />
-        <i />
-      </div>
+      <svg class="gb-fx" width="0" height="0" aria-hidden="true">
+        <filter id="gb-hblur" x="-10%" width="120%">
+          <feGaussianBlur stdDeviation="36 0" />
+        </filter>
+      </svg>
       <div class="gb-grain" aria-hidden="true" />
       <div class="gb-prog" aria-hidden="true">
         <span class="gb-prog-fill" />
-        <span class="gb-ride">
-          <span class="gb-car" />
-        </span>
       </div>
     </>
   )

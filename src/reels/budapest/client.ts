@@ -6,7 +6,7 @@
  * E harmonic minor, after Desplat, plus the hotel's own noises.
  *
  *   - the key rack: a brass key tink per key, a key-ring jingle and a whip pan
- *     (pastel smear, stereo whoosh) on every in-page jump
+ *     (the page smears sideways, stereo whoosh) on every in-page jump
  *   - other hovers: the cimbalom's cotton beater, wandering the scale
  *   - the cut into each era: an interlude crossing the middle of the screen
  *     closes the matte to the era's ratio (html[data-gb-ar]), with a projector
@@ -100,7 +100,6 @@ const reel: ReelModule = {
     ) => document.addEventListener(type, fn, { ...opts, signal });
 
     /* ---------- the whip pan: every in-page jump from the rack or the hero ---------- */
-    const whip = document.querySelector<HTMLElement>('[data-gb-whip]');
     let whipping = false;
     const land = (id: string) => {
       const prior = root.style.scrollBehavior;
@@ -121,17 +120,15 @@ const reel: ReelModule = {
       if (id === 'playground') v.deskBell(0.07);
       else v.jingle();
       // Reduced motion: the sound, then the browser's own (instant) jump.
-      if (ctx.reducedMotion || !whip) return;
+      if (ctx.reducedMotion) return;
       e.preventDefault();
       if (whipping) return;
       whipping = true;
       v.whoosh();
-      whip.classList.remove('is-on');
-      void whip.offsetWidth;
-      whip.classList.add('is-on');
+      root.classList.add('gb-whipping');
       later(() => land(id), 200);
       later(() => {
-        whip.classList.remove('is-on');
+        root.classList.remove('gb-whipping');
         whipping = false;
       }, 480);
     });

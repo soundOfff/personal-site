@@ -663,46 +663,13 @@
     }
   }
 
-  .gb-whip {
-    position: fixed;
-    inset: 0;
-    z-index: 150;
-    overflow: hidden;
-    pointer-events: none;
-    opacity: 0;
-  }
-  .gb-whip i {
+  /* the whip pan: the picture smears sideways, the frame and chrome stay sharp */
+  .gb-fx {
     position: absolute;
-    left: -30%;
-    right: -30%;
-    height: 24%;
-    filter: blur(22px);
   }
-  .gb-whip i:nth-child(1) {
-    top: -2%;
-    background: var(--gb-pinkbox);
-  }
-  .gb-whip i:nth-child(2) {
-    top: 18%;
-    background: var(--gb-purple);
-  }
-  .gb-whip i:nth-child(3) {
-    top: 38%;
-    background: #f6e9da;
-  }
-  .gb-whip i:nth-child(4) {
-    top: 58%;
-    background: var(--gb-blue);
-  }
-  .gb-whip i:nth-child(5) {
-    top: 78%;
-    background: var(--gb-red);
-  }
-  .gb-whip.is-on {
-    animation: budapest-wfade 0.46s ease both;
-  }
-  .gb-whip.is-on i {
-    animation: budapest-wslide 0.46s cubic-bezier(0.6, 0, 0.3, 1) both;
+  &.gb-whipping .content {
+    filter: url(#gb-hblur);
+    animation: budapest-pan 0.46s cubic-bezier(0.6, 0, 0.3, 1) both;
   }
 
   .gb-grain {
@@ -715,7 +682,7 @@
       0 0 / 160px 160px;
   }
 
-  /* the front desk's progress rule, with a funicular car riding it */
+  /* the front desk's progress rule */
   .gb-prog {
     display: none;
   }
@@ -739,37 +706,11 @@
         animation: budapest-grow linear both;
         animation-timeline: scroll(root);
       }
-      .gb-ride {
-        display: none;
-      }
       @media (min-width: 821px) {
         .gb-prog {
           top: auto;
           bottom: calc(var(--gb-desk) - 1px);
           height: 2px;
-        }
-        .gb-ride {
-          display: block;
-          position: absolute;
-          bottom: 0;
-          left: 8px;
-          width: calc(100% - 40px);
-          height: 0;
-          animation: budapest-ride linear both;
-          animation-timeline: scroll(root);
-        }
-        .gb-car {
-          position: absolute;
-          right: -24px;
-          bottom: 1px;
-          width: 22px;
-          height: 13px;
-          border-radius: 2px 2px 1px 1px;
-          background: var(--gb-red);
-          box-shadow:
-            inset 0 3px 0 #f6e9da,
-            inset 0 -2px 0 rgba(0, 0, 0, 0.25);
-          rotate: -6deg;
         }
       }
     }
@@ -3063,24 +3004,9 @@
     transform: rotate(4deg);
   }
 }
-@keyframes budapest-wfade {
-  0% {
-    opacity: 0;
-  }
-  30%,
-  70% {
-    opacity: 0.96;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-@keyframes budapest-wslide {
-  from {
-    transform: translateX(-36%) scaleX(1.4);
-  }
-  to {
-    transform: translateX(36%) scaleX(1.4);
+@keyframes budapest-pan {
+  50% {
+    translate: -4vw 0;
   }
 }
 @keyframes budapest-grow {
@@ -3089,14 +3015,6 @@
   }
   to {
     transform: scaleX(1);
-  }
-}
-@keyframes budapest-ride {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
   }
 }
 @keyframes budapest-curtain {
