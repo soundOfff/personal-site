@@ -135,9 +135,9 @@ const reel: ReelModule = {
 
     /* ---- a room's lamp comes on as you reach it, and stays on ---- */
     const sections = [...document.querySelectorAll<HTMLElement>('section[data-sec]')];
+    // A jump from the nav passes the rooms before it: their lamps come on too.
     const light = (i: number) => {
-      const sec = sections.find((el) => el.dataset.sec === String(i));
-      if (sec) sec.dataset.moodLit = '';
+      for (const sec of sections) if (Number(sec.dataset.sec) <= i) sec.dataset.moodLit = '';
     };
 
     const year = document.querySelector<HTMLElement>('[data-mood-year]');
