@@ -12,7 +12,7 @@ export const profile = {
   role: 'Full-stack · AI systems',
   // hero lede: the phrase wrapped in <em></em> renders italic + amber
   lede: "Most LLM calls don't need the biggest model. They need a router that knows which one will <em>clear the bar</em>.",
-  sub: "I'm a full-stack engineer, four-plus years in, and I ship AI products end to end: the web and mobile apps and the backend that keeps them running. At Dex I designed the multi-LLM layer behind the CRM's AI features, with fallback across providers, and shipped CRM features to web and mobile in Vue 3 and React Native. At Mint Mobile I built and maintained e-commerce APIs for 2–3M subscribers. The agent below can answer questions about any of it.",
+  sub: "I'm a full-stack engineer, five-plus years in, and I ship AI products end to end: the web and mobile apps and the backend that keeps them running. At Dex I designed the multi-LLM layer behind the CRM's AI features, with fallback across providers, and shipped CRM features to web and mobile in Vue 3 and React Native. At Mint Mobile I built and maintained e-commerce APIs for 2–3M subscribers. The agent below can answer questions about any of it.",
 } as const;
 
 export const contact = [
@@ -50,7 +50,7 @@ export const proofs: { value: string; key: string; accent?: boolean }[] = [
   { value: 'ICPC', key: 'South America finalist' },
   { value: '1st', key: 'GTS algorithmic trading' },
   { value: 'SE II', key: 'at Dex' },
-  { value: '4+', key: 'years full-stack' },
+  { value: '5+', key: 'years full-stack' },
 ];
 
 // 06 · principles: kept from the design; they map exactly to the router work.
