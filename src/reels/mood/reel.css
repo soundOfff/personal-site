@@ -164,12 +164,13 @@
     letter-spacing: 0;
   }
   & .rail .id .rl {
-    font: 10.5px/1.2 var(--font-mono);
-    letter-spacing: 0.12em;
+    font: 400 13px/1.2 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
     color: var(--muted);
   }
 
-  /* the doorplates: 2038 → 2046 */
+  /* the doorplates: each room's name; only 2046 has a number */
   & .railnav {
     order: 1;
     flex-direction: row;
@@ -199,7 +200,7 @@
       inset 0 0 0 4px rgba(216, 176, 114, 0.18),
       0 2px 4px rgba(0, 0, 0, 0.5);
     color: var(--mood-brass-2);
-    font: 400 10px/1.2 var(--font-mono);
+    font: italic 400 13px/1.1 var(--font-sans);
     white-space: nowrap;
     transition:
       transform 0.3s var(--mood-ease),
@@ -401,7 +402,7 @@
   & .reel-label :is(b, span) {
     display: inline;
     margin: 0;
-    font: 400 12px/1.4 var(--font-mono);
+    font: italic 400 14px/1.4 var(--font-sans);
     letter-spacing: 0;
     color: var(--mood-cream);
   }
@@ -412,14 +413,18 @@
     opacity: 1;
     transform: none;
   }
+  /* the rail's controls, and every small label below: Spectral small caps */
+  & :is(.boxoffice-open, .contact-wrap .rail-sec, .reelpick .rail-sec, .snd) {
+    font: 400 14px/1 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+    text-transform: none;
+  }
   & .boxoffice-open {
     margin: 0;
-    padding: 7px 8px;
+    padding: 6px 9px 7px;
     border: 1px solid rgba(180, 138, 74, 0.4);
     border-radius: 3px;
-    font: 400 11px/1 var(--font-mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
     text-decoration: none;
     color: var(--mood-brass-2);
     transition:
@@ -439,11 +444,9 @@
   }
   & .contact-wrap .rail-sec {
     margin: 0;
-    padding: 7px 9px;
+    padding: 6px 10px 7px;
     border: 1px solid rgba(180, 138, 74, 0.4);
     border-radius: 3px;
-    font: 400 11px/1 var(--font-mono);
-    letter-spacing: 0.12em;
     color: var(--mood-brass-2);
     cursor: default;
   }
@@ -472,7 +475,7 @@
     pointer-events: auto;
   }
   & .contact a {
-    font: 400 12.5px/1.3 var(--font-mono);
+    font: 400 14.5px/1.3 var(--font-sans);
     padding: 7px 9px;
     border-radius: 2px;
   }
@@ -494,7 +497,6 @@
     border-color: rgba(180, 138, 74, 0.45);
     border-radius: 3px;
     color: var(--mood-cream-2);
-    font: 500 11px/1 var(--font-mono);
   }
   & .snd:hover {
     background: rgba(216, 176, 114, 0.12);
@@ -679,7 +681,8 @@
       0 3px 6px rgba(0, 0, 0, 0.55);
   }
 
-  /* each room's heading: the section name set in Bodoni, the rest in type */
+  /* each room's heading: the section name set in Bodoni, then the scene's
+     slug the way a script sets it, Courier caps with no tracking */
   & .block:not(#readme) > .keybar {
     display: flex;
     flex-wrap: wrap;
@@ -688,7 +691,7 @@
     margin-top: 0;
     margin-bottom: 30px;
     font: 400 12px/1.4 var(--font-mono);
-    letter-spacing: 0.12em;
+    letter-spacing: 0;
     color: var(--muted);
   }
   & .block:not(#readme) > .keybar b {
@@ -701,7 +704,8 @@
     flex-basis: 100%;
     margin: 0;
     font-family: var(--font-mono), var(--mood-cjk);
-    letter-spacing: 0.12em;
+    font-size: 13px;
+    letter-spacing: 0;
     color: var(--amber-deep);
   }
   & .block > .keybar a {
@@ -1085,11 +1089,11 @@
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45);
     filter: none;
     color: #24160a;
-    font: 700 11px/1.3 var(--font-mono);
-    letter-spacing: 0.06em;
+    font: italic 500 15.5px/1.3 var(--font-display);
+    letter-spacing: 0;
     text-align: center;
     text-decoration: none;
-    text-transform: uppercase;
+    text-transform: none;
     white-space: normal;
     transform: perspective(1400px) rotateY(0deg);
     transform-origin: left center;
@@ -1583,14 +1587,15 @@
   }
   & :is(#playground .console, .a2-panel) .console-bar .who {
     gap: 12px;
-    font: 600 13px/1 var(--font-display);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font: 600 16px/1 var(--font-display);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.06em;
+    text-transform: none;
     color: var(--ink);
   }
   & :is(#playground .console, .a2-panel) :is(.a2-launch-count, .a2-quota, .a2-reset) {
-    font: 400 12px/1 var(--font-mono);
-    letter-spacing: 0.02em;
+    font: italic 400 14px/1 var(--font-sans);
+    letter-spacing: 0;
     text-transform: none;
     color: var(--muted);
   }
@@ -1664,7 +1669,16 @@
     color: var(--ink-2);
   }
   & :is(#playground .console, .a2-panel) :is(.a2-launch-hint, .a2-starter-lbl) {
+    font: italic 400 14px/1.3 var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--muted);
+  }
+  & :is(#playground .console, .a2-panel) .a2-starter-lbl {
+    font-style: normal;
+    font-size: 15px;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
   }
   /* brass: the stall's one button */
   & :is(#playground .console, .a2-panel) .btn-amber,
@@ -1702,14 +1716,14 @@
   & :is(#playground .console, .a2-panel) .btn[disabled] {
     filter: grayscale(0.6) brightness(0.8);
   }
-  /* the orders on the board: chips you can point at */
+  /* the questions you can ask, written up like a stall's orders */
   & :is(#playground .console, .a2-panel) .a2-action {
-    padding: 7px 13px;
+    padding: 6px 13px 7px;
     border: 1px solid rgba(216, 176, 114, 0.45);
     border-radius: 17px;
     background: transparent;
     color: var(--ink-2);
-    font: 400 13px/1.2 var(--font-mono);
+    font: italic 400 14.5px/1.2 var(--font-sans);
     transition:
       background-color 0.15s,
       color 0.15s,
@@ -1728,7 +1742,7 @@
     border-radius: 2px;
     background: transparent;
     color: var(--muted);
-    font: 400 12.5px/1.55 var(--font-mono);
+    font: italic 400 14px/1.55 var(--font-sans);
   }
 
   /* the slideover: the inside of the stall */
@@ -1792,7 +1806,7 @@
     border-top-color: rgba(216, 176, 114, 0.3);
   }
   & .a2-ask {
-    font: 400 13.5px/1.5 var(--font-mono);
+    font: italic 400 15px/1.5 var(--font-sans);
   }
   & :is(#playground .console, .a2-panel) .input {
     height: 44px;
@@ -1920,9 +1934,16 @@
     line-height: 1.6;
     color: var(--ink-2);
   }
-  & #work .idx :is(.stk, .yr) {
-    font: 400 12px/1.5 var(--font-mono);
-    letter-spacing: 0.06em;
+  & #work .idx .stk {
+    font: 400 14px/1.45 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--muted);
+  }
+  & #work .idx .yr {
+    font: italic 400 16px/1.45 var(--font-display);
+    font-variant-numeric: oldstyle-nums;
     color: var(--muted);
   }
   & #work .idx .stk {
@@ -2005,26 +2026,28 @@
     outline-color: #8a1d15;
     outline-offset: -10px;
   }
+  /* the paper's flag over each clipping, ruled off twice */
   & #oss .repo::before {
-    content: 'Open source · github.com';
-    content: 'Open source · github.com' / '';
+    content: 'Open Source · github.com';
+    content: 'Open Source · github.com' / '';
     grid-column: 1 / -1;
     grid-row: 1;
     margin-bottom: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(34, 24, 15, 0.25);
-    font: 400 11.5px/1.3 var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #5e4a36;
+    padding-bottom: 7px;
+    border-bottom: 3px double rgba(34, 24, 15, 0.45);
+    font: 700 15px/1.2 var(--font-display);
+    font-variant-caps: small-caps;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    color: #3a2a1e;
   }
   & #oss .repo .meta {
     grid-column: 2;
     grid-row: 1;
     align-self: start;
-    font: 400 11.5px/1.3 var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font: italic 400 14px/1.3 var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
     color: #5e4a36;
   }
   & #oss .repo .nm {
@@ -2136,9 +2159,12 @@
     padding: 0;
     border: 0;
     font: 400 12px/1.3 var(--font-mono);
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
     text-transform: none;
     color: #6b5440;
+  }
+  & #log .logitem .tag {
+    font: italic 400 14px/1.3 var(--font-sans);
   }
   & #log .logitem .hash {
     color: #8a1d15;
@@ -2296,8 +2322,10 @@
     border-top: 0;
   }
   & #now .spec dt {
-    font: 400 12px/1.5 var(--font-mono);
-    letter-spacing: 0.1em;
+    font: 400 15px/1.45 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+    text-transform: none;
     color: var(--muted);
   }
   & #now .spec dd {
@@ -2633,8 +2661,8 @@
     display: block;
     margin-top: 10px;
     text-align: center;
-    font: 700 13px/1 var(--font-mono);
-    letter-spacing: 0.2em;
+    font: 600 16px/1 var(--font-display);
+    letter-spacing: 0.04em;
     color: var(--mood-amber-l);
     text-shadow: 0 1px 2px #000;
   }
