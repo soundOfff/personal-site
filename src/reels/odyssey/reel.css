@@ -2271,21 +2271,31 @@
     & .reelpick {
       order: 2;
     }
+    /* a 390px phone shows the first three rows whole; past them the strip
+       fades into the gutter, so a cut label reads as more to scroll */
     & .railnav {
       order: 3;
       display: flex;
       flex: 1 0 100%;
       flex-direction: row;
-      gap: 4px;
+      gap: 3px;
       margin: 0 -16px;
       padding: 2px 16px 4px;
       overflow-x: auto;
       scrollbar-width: none;
+      mask-image: linear-gradient(90deg, #000 calc(100% - 16px), transparent);
     }
     & .railnav a {
       flex: none;
-      grid-template-columns: 8px auto;
+      grid-template-columns: 6px auto;
+      gap: 6px;
       height: 34px;
+      padding: 0 6px;
+      letter-spacing: 0.04em;
+    }
+    & .railnav a::before {
+      width: 6px;
+      height: 6px;
     }
     & .railnav a .nx,
     & .od-scr {
