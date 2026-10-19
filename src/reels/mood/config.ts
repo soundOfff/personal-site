@@ -295,7 +295,7 @@ const mood: ReelConfig = {
     title: 'a pizzicato waltz bar under a bowed cello sliding A to D, strings behind',
   },
   credits: 'A fan homage, not affiliated with the film.',
-  announce: 'Now showing: In the Mood for Love, 2000',
+  announce: 'Screening In the Mood for Love, 2000',
 };
 
 export default mood;

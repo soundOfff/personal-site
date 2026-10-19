@@ -217,7 +217,7 @@ const br2049: ReelConfig = {
     foley: 'spinner fly-by, archive drawer, wood knock, melting snow, scanner',
   },
   credits: 'A fan homage, not affiliated with the film.',
-  announce: 'Now showing: Blade Runner 2049, 2017',
+  announce: 'Screening Blade Runner 2049, 2017',
 };
 
 export default br2049;

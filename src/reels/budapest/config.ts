@@ -160,7 +160,7 @@ const budapest: ReelConfig = {
   },
   credits:
     'Inspired by The Grand Budapest Hotel, a film by Wes Anderson. Not affiliated with the film or its makers.',
-  announce: 'Now showing: The Grand Budapest Hotel, 2014',
+  announce: 'Screening The Grand Budapest Hotel, 2014',
 };
 
 export default budapest;

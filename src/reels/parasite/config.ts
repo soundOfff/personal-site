@@ -172,7 +172,7 @@ const parasite: ReelConfig = {
     signature: 'projector + moto perpetuo',
   },
   credits: 'A fan homage. Not affiliated with Bong Joon-ho, Barunson E&A or CJ ENM.',
-  announce: 'Now showing: Parasite, 2019',
+  announce: 'Screening Parasite, 2019',
 };
 
 export default parasite;

@@ -210,7 +210,7 @@ const odyssey: ReelConfig = {
     gate: "rushing noise over the entr'acte's clusters, opening with the scroll",
   },
   credits: 'A fan homage, not affiliated with the film.',
-  announce: 'Now showing 2001: A Space Odyssey, 1968',
+  announce: 'Screening 2001: A Space Odyssey, 1968',
 };
 
 export default odyssey;
