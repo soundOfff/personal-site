@@ -8,9 +8,10 @@
 
 /* ============================================================
    Reel 02 · In the Mood for Love.
-   A corridor of nine rooms, 2038 → 2046. The rail becomes a strip of brass
-   doorplates; every section is a room seen through its doorway, papered in
-   its own cheongsam textile, between two dark walls with sconces.
+   Nine rooms off one corridor. The rail becomes a strip of brass doorplates;
+   every section is a scene seen through its doorway, with its own wallpaper
+   and a lamp if the scene is at night. Courier is kept for the screenplay
+   slugs; everything else is set in the serifs.
    Every rule lives inside :root[data-reel='mood'] (keyframes and @property
    are top level, prefixed 'mood-'), except the title card, which belongs to
    the projector and is scoped to .projector[data-title='mood'].
@@ -36,15 +37,6 @@
   src: url('../../../node_modules/@fontsource-variable/noto-serif-tc/files/noto-serif-tc-122-wght-normal.woff2')
     format('woff2-variations');
   unicode-range: U+5E74;
-}
-@font-face {
-  font-family: 'Mood Serif TC';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 200 900;
-  src: url('../../../node_modules/@fontsource-variable/noto-serif-tc/files/noto-serif-tc-119-wght-normal.woff2')
-    format('woff2-variations');
-  unicode-range: U+7B54;
 }
 
 /* the stairs crossing's progress: 0 at the top of the scene, 1 at the bottom */
@@ -697,88 +689,113 @@
     text-decoration-style: solid;
   }
 
-  /* ---------- the textiles: one cheongsam per room ---------- */
+  /* ---------- the wallpapers: one per room, at full strength in the
+     doorway's margins and washed out behind the words, the way you see
+     the paper round someone standing in a door ---------- */
+  & :is(#playground, #work, #oss, #log, #writing, #principles, #now, .mood-annex) {
+    --wash: linear-gradient(
+      90deg,
+      transparent calc(var(--side) + var(--inset) - 30px),
+      color-mix(in srgb, var(--paper) var(--wash-k, 82%), transparent)
+        calc(var(--side) + var(--inset) + 14px) calc(100% - var(--side) - var(--inset) - 14px),
+      transparent calc(100% - var(--side) - var(--inset) + 30px)
+    );
+  }
   & #playground {
     background-image:
-      repeating-linear-gradient(60deg, rgba(240, 228, 201, 0.045) 0 1px, transparent 1px 22px),
-      repeating-linear-gradient(-60deg, rgba(240, 228, 201, 0.045) 0 1px, transparent 1px 22px);
+      var(--wash),
+      repeating-linear-gradient(60deg, rgba(240, 228, 201, 0.06) 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(-60deg, rgba(240, 228, 201, 0.06) 0 1px, transparent 1px 22px);
   }
+  /* oxblood flora: a four-petal blossom in amber, red at the heart */
   & #work {
     background-image:
-      radial-gradient(circle at 25% 30%, rgba(240, 194, 122, 0.12) 0 2.5px, transparent 3px),
-      radial-gradient(circle at 75% 72%, rgba(176, 40, 31, 0.55) 0 7px, transparent 7.5px),
-      radial-gradient(circle at 75% 72%, rgba(240, 228, 201, 0.1) 0 10px, transparent 10.5px);
-    background-size: 34px 34px;
+      var(--wash),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='%23F0C27A' fill-opacity='.17'%3E%3Cellipse cx='28' cy='19.5' rx='4' ry='6.5'/%3E%3Cellipse cx='28' cy='36.5' rx='4' ry='6.5'/%3E%3Cellipse cx='19.5' cy='28' rx='6.5' ry='4'/%3E%3Cellipse cx='36.5' cy='28' rx='6.5' ry='4'/%3E%3C/g%3E%3Ccircle cx='28' cy='28' r='2.6' fill='%23C22E22' fill-opacity='.7'/%3E%3Cg fill='%23F0E4C9' fill-opacity='.09'%3E%3Ccircle cx='0' cy='0' r='2.4'/%3E%3Ccircle cx='56' cy='0' r='2.4'/%3E%3Ccircle cx='0' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='56' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:
+      auto,
+      56px 56px;
   }
   & #oss {
     background-image:
-      linear-gradient(rgba(240, 228, 201, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(240, 228, 201, 0.06) 1px, transparent 1px),
-      linear-gradient(rgba(0, 0, 0, 0.14) 2px, transparent 2px);
+      var(--wash), linear-gradient(rgba(240, 228, 201, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(240, 228, 201, 0.07) 1px, transparent 1px),
+      linear-gradient(rgba(0, 0, 0, 0.16) 2px, transparent 2px);
     background-size:
+      auto,
       18px 18px,
       18px 18px,
       54px 54px;
   }
+  /* navy blossom: the same flower, smaller, in cream */
   & #log {
     background-image:
-      radial-gradient(circle at 50% 38%, rgba(240, 228, 201, 0.13) 0 3px, transparent 3.5px),
-      radial-gradient(circle at 41% 54%, rgba(240, 228, 201, 0.09) 0 3px, transparent 3.5px),
-      radial-gradient(circle at 59% 54%, rgba(240, 228, 201, 0.09) 0 3px, transparent 3.5px),
-      radial-gradient(circle at 50% 49%, rgba(235, 188, 108, 0.22) 0 1.6px, transparent 2px);
-    background-size: 46px 46px;
+      var(--wash),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='%23F0E4C9' fill-opacity='.15'%3E%3Cellipse cx='28' cy='19.5' rx='4' ry='6.5'/%3E%3Cellipse cx='28' cy='36.5' rx='4' ry='6.5'/%3E%3Cellipse cx='19.5' cy='28' rx='6.5' ry='4'/%3E%3Cellipse cx='36.5' cy='28' rx='6.5' ry='4'/%3E%3C/g%3E%3Ccircle cx='28' cy='28' r='2.4' fill='%23EBBC6C' fill-opacity='.5'/%3E%3C/svg%3E");
+    background-size:
+      auto,
+      42px 42px;
   }
+  /* 原稿紙: rows of red squares, one character to a square, a gutter between rows */
   & #writing {
+    --wash-k: 55%;
     background-image:
-      linear-gradient(
-        90deg,
-        transparent calc(var(--side) + 48px),
-        rgba(176, 40, 31, 0.3) 0 calc(var(--side) + 49px),
-        transparent 0
-      ),
-      repeating-linear-gradient(180deg, transparent 0 31px, rgba(74, 52, 38, 0.13) 31px 32px);
+      var(--wash),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='36'%3E%3Cpath d='M0 .5H28M0 28.5H28M.5 0V29' fill='none' stroke='%238A1D15' stroke-opacity='.24'/%3E%3C/svg%3E");
+    background-size:
+      auto,
+      28px 36px;
+    background-position:
+      0 0,
+      calc(var(--side) + var(--inset)) 6px;
   }
+  /* black pinstripe, a suit's */
   & #principles {
-    background-image: repeating-linear-gradient(
-      90deg,
-      rgba(240, 228, 201, 0.06) 0 2px,
-      transparent 2px 9px
+    background-image:
+      var(--wash),
+      repeating-linear-gradient(90deg, rgba(240, 228, 201, 0.07) 0 2px, transparent 2px 9px);
+  }
+  /* the felt, under the one lamp over the table */
+  & #stack {
+    background-image: radial-gradient(
+      ellipse 70% 360px at 50% 0,
+      rgba(224, 166, 75, 0.16),
+      transparent 70%
     );
   }
-  & #stack {
-    background-image:
-      linear-gradient(135deg, rgba(240, 228, 201, 0.05) 25%, transparent 25%),
-      linear-gradient(225deg, rgba(240, 228, 201, 0.05) 25%, transparent 25%);
-    background-size: 28px 28px;
-  }
+  /* Angkor Wat: sandstone laid in courses, the joints offset */
   & #now,
   & .mood-annex {
-    background-image: repeating-linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.14) 0 18px,
-      rgba(255, 255, 255, 0.025) 18px 30px,
-      rgba(0, 0, 0, 0.07) 30px 44px
-    );
+    background-image:
+      var(--wash),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpath d='M0 29.25H120M0 59.25H120M1 0V29.25M61 29.25V60' fill='none' stroke='%23000' stroke-opacity='.3' stroke-width='1.5'/%3E%3Cpath d='M0 31H120M0 1H120' fill='none' stroke='%23F0E4C9' stroke-opacity='.06'/%3E%3C/svg%3E");
+    background-size:
+      auto,
+      120px 60px;
   }
 
   /* ============================================================
-     2038 · THE CORRIDOR (readme): two lacquered doors
+     THE LANDING (readme): two lacquered doors, side by side, the way
+     the two flats are next door to each other
      ============================================================ */
   & #readme {
     --side: 0px;
     --door-h: clamp(400px, calc(100vh - 230px), 560px);
+    --door-w: clamp(176px, 15vw, 226px);
     --dado: 230px;
     display: grid;
+    /* the title's wall, the words, the window's wall, her door, a strip of
+       wall, his door, the end of the landing */
     grid-template-columns:
-      minmax(0, 1fr) clamp(180px, 17vw, 250px) minmax(0, 500px) clamp(180px, 17vw, 250px)
-      minmax(0, 1fr);
+      minmax(136px, 0.9fr) minmax(0, 500px) minmax(150px, 1fr) var(--door-w)
+      clamp(26px, 2.6vw, 40px) var(--door-w) minmax(36px, 0.5fr);
     grid-template-rows: minmax(40px, 1fr) auto auto auto auto minmax(28px, 1fr) 56px;
-    column-gap: clamp(24px, 3.3vw, 48px);
+    column-gap: 0;
     min-height: min(calc(100vh - var(--mood-strip)), 880px);
     padding: 40px 40px 0;
     overflow: clip;
     background: #14302a;
-    text-align: center;
+    text-align: left;
   }
   & .mood-hall {
     position: absolute;
@@ -1814,7 +1831,7 @@
     background: #1c0f0b;
     color: #a8977a;
   }
-  /* every answer comes on cream paper, with a red chop in the corner */
+  /* every answer comes on cream paper, with Tomas's chop in the corner */
   & .a2-surface {
     --paper: #efe3c8;
     --paper-2: #e4d5b4;
@@ -1845,9 +1862,10 @@
     color: var(--ink);
     box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.8);
   }
+  /* the same seal as the rail's: a chop says who, not what */
   & .a2-surface::after {
-    content: '答';
-    content: '答' / '';
+    content: 'TB';
+    content: 'TB' / '';
     position: absolute;
     right: 12px;
     top: 10px;
@@ -1858,7 +1876,8 @@
     border-radius: 3px;
     background: #a3201a;
     color: #f6e7c8;
-    font: 700 15px/1 var(--mood-cjk);
+    font: 700 12.5px/1 var(--font-display);
+    letter-spacing: 0.04em;
     box-shadow: inset 0 0 0 2px rgba(246, 231, 200, 0.25);
     rotate: 4deg;
   }
@@ -1882,7 +1901,7 @@
   }
 
   /* ============================================================
-     2040 · THE OFFICE (work): smoke curls off a row you linger on
+     INT. SHIPPING OFFICE (work): smoke curls off a row you linger on
      ============================================================ */
   & #work .idx {
     width: calc(100% - 2 * var(--inset));
@@ -1958,7 +1977,7 @@
   }
 
   /* ============================================================
-     2041 · THE NEWSPAPER (open source): clippings
+     INT. NEWSPAPER OFFICE (open source): clippings
      ============================================================ */
   & #oss .repos {
     display: grid;
@@ -2060,7 +2079,7 @@
   }
 
   /* ============================================================
-     2042 · THE CALENDAR (log): tear-off leaves, pinned to the wall
+     INT. MRS. SUEN'S FLAT, DAY (log): tear-off calendar leaves
      ============================================================ */
   & #log .log {
     display: grid;
@@ -2175,41 +2194,35 @@
   }
 
   /* ============================================================
-     2043 · THE SERIAL (writing): manuscript paper, a caret on hover
+     INT. HOTEL ROOM 2046 (writing): the serial, by hand on 原稿紙
      ============================================================ */
+  /* the curtains hang inside the jambs here, so the words sit further in */
+  & #writing {
+    --inset: 110px;
+  }
   & #writing .wrow {
     grid-template-columns: 110px minmax(0, 1fr) auto;
     padding: 14px 0 13px;
-    border-bottom: 1px dashed rgba(74, 52, 38, 0.3);
-  }
-  & #writing .wrow:last-child {
     border-bottom: 0;
   }
   & #writing .wrow :is(.d, .rt) {
-    font: 400 12.5px/1.4 var(--font-mono);
+    font: italic 400 14.5px/1.4 var(--font-sans);
+    font-variant-numeric: tabular-nums;
     color: var(--muted);
   }
   & #writing .wrow .t {
     font: italic 500 23px/1.25 var(--font-display);
     letter-spacing: 0;
     color: var(--ink);
+    transition: color 0.5s var(--mood-slow);
   }
-  & #writing .wrow:hover .t {
-    color: var(--ink);
-  }
-  & #writing .wrow .t::after {
-    content: '';
-    display: inline-block;
-    width: 2px;
-    height: 0.9em;
-    margin-left: 4px;
-    vertical-align: -2px;
-    background: var(--amber-deep);
-    opacity: 0;
+  /* the ink still wet on the title you are over */
+  & #writing .wrow:is(:hover, :focus-visible) .t {
+    color: var(--amber-deep);
   }
 
   /* ============================================================
-     2044 · THE RULES WE KEEP (principles): numbers in outline, inked on hover
+     INT. TAXI (principles): numbers in outline, inked on hover
      ============================================================ */
   & #principles .tenets {
     gap: 32px 34px;
@@ -2235,7 +2248,7 @@
   }
 
   /* ============================================================
-     2045 · THE CUPBOARD (stack): tins on wooden shelves
+     INT. MRS. SUEN'S FLAT, NIGHT (stack): the mahjong tiles
      ============================================================ */
   & #stack .toolbox {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2246,53 +2259,54 @@
   }
   & #stack .toolcol .h {
     margin-bottom: 12px;
-    font: 400 12px/1 var(--font-mono);
-    letter-spacing: 0.16em;
+    font: 400 15px/1 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+    text-transform: none;
     color: var(--muted);
   }
+  /* each column a player's rack of tiles, stood on end along the table's edge */
   & #stack .toolcol ul {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: 10px 6px;
-    padding: 0 0 10px;
-    border-bottom: 8px solid #3a2416;
+    gap: 12px 5px;
+    padding: 0 0 12px;
+    border-bottom: 6px solid #3a2416;
     box-shadow: 0 6px 10px -6px rgba(0, 0, 0, 0.8);
   }
+  /* an ivory face over a green back, the name painted in red, green or blue */
   & #stack .toolcol li {
     display: block;
-    padding: 8px 10px;
-    border-radius: 2px 2px 0 0;
-    background: #efe3c8;
-    color: #2a1712;
-    font: 400 13.5px/1 var(--font-mono);
+    padding: 9px 10px 8px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #f6ecd4, #e6d8b8);
+    color: #a3201a;
+    font: 500 15px/1 var(--font-sans);
     box-shadow:
-      inset 0 3px 0 #a3201a,
-      0 2px 0 rgba(0, 0, 0, 0.3);
-    transition: transform 0.5s var(--mood-slow);
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+      0 4px 0 #2f5d4e,
+      0 5px 0 #1d3d33,
+      0 7px 8px -2px rgba(0, 0, 0, 0.55);
+    transition: translate 0.35s var(--mood-ease);
   }
-  & #stack .toolcol li:nth-child(even) {
-    box-shadow:
-      inset 0 3px 0 #2f5d4e,
-      0 2px 0 rgba(0, 0, 0, 0.3);
+  & #stack .toolcol li:nth-child(3n + 2) {
+    color: #2f5d4e;
   }
   & #stack .toolcol li:nth-child(3n) {
-    padding-top: 15px;
+    color: #22406a;
   }
   & #stack .toolcol li::before {
     content: none;
   }
   & #stack .toolcol li:hover {
-    transform: translateY(-7px) rotate(-2deg);
+    translate: 0 -6px;
   }
 
   /* ============================================================
-     2046 (now): crimson curtains, the wall, the credits
+     EXT. ANGKOR WAT (now): the wall, then the credits
      ============================================================ */
-  & #now,
-  & .mood-annex {
-    --inset: 110px;
-  }
   & #now .specs {
     display: flex;
     flex-direction: column;
@@ -2319,6 +2333,7 @@
     line-height: 1.55;
     color: var(--ink-2);
   }
+  /* 2046: the red curtains of the hotel corridor */
   & .mood-room .curtain {
     position: absolute;
     top: 24px;
@@ -2348,13 +2363,13 @@
     transform-origin: 100% 0;
   }
 
-  /* after the last room: the same crimson, continued */
+  /* after the last room: the same stone, continued */
   & .mood-annex {
-    --paper: #561210;
+    --paper: #33342a;
     --ink: var(--mood-cream);
     --ink-2: var(--mood-cream-2);
-    --muted: #d6bc9f;
-    --amber-deep: #f4cc8e;
+    --muted: #c4b898;
+    --amber-deep: #e6c285;
     position: relative;
     isolation: isolate;
     color: var(--ink);
@@ -2366,27 +2381,35 @@
     gap: 24px;
     align-items: center;
     padding: 22px;
-    background: #2a1712;
-    box-shadow: inset 0 0 0 1px rgba(216, 176, 114, 0.3);
+    background: #24251d;
+    box-shadow: inset 0 0 0 1px rgba(216, 176, 114, 0.26);
   }
+  /* a block of the temple's sandstone, and the hole worn into it */
   & .mood-wallhole {
     position: relative;
     width: 180px;
     height: 150px;
     overflow: hidden;
-    background: radial-gradient(circle at 30% 30%, #a8997f, #8c7c62 60%, #6e604a);
+    background: radial-gradient(circle at 30% 30%, #b09a74, #8a7454 60%, #6a5638);
     box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.5);
   }
   & .mood-wallhole::before {
     content: '';
     position: absolute;
     inset: 0;
+    /* the block's joints, and weather: darker where rain runs down it */
     background-image:
-      radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.2) 0 2px, transparent 3px),
-      radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.1) 0 2px, transparent 3px);
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpath d='M0 29.25H120M0 59.25H120M1 0V29.25M61 29.25V60' fill='none' stroke='%23000' stroke-opacity='.3' stroke-width='1.5'/%3E%3Cpath d='M0 31H120M0 1H120' fill='none' stroke='%23FFF0D2' stroke-opacity='.1'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 30% 60% at 78% 20%, rgba(40, 46, 30, 0.35), transparent 70%),
+      radial-gradient(ellipse 40% 30% at 15% 85%, rgba(40, 46, 30, 0.3), transparent 70%);
     background-size:
-      17px 19px,
-      23px 21px;
+      150px 75px,
+      100% 100%,
+      100% 100%;
+    background-position:
+      -40px 2px,
+      0 0,
+      0 0;
   }
   & .mood-wallhole .hole {
     position: absolute;
@@ -2395,7 +2418,7 @@
     width: 46px;
     height: 34px;
     margin: -17px 0 0 -23px;
-    border-radius: 50%;
+    border-radius: 42% 58% 51% 49% / 55% 44% 56% 45%;
     background: radial-gradient(ellipse at 50% 40%, #0a0605, #2a1c12 70%, #5a4a36);
     box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.8);
   }
@@ -2407,7 +2430,7 @@
     height: 48px;
     margin: -24px 0 0 -30px;
     border-radius: 46% 54% 48% 52%;
-    background: radial-gradient(circle at 40% 35%, #8a7356, #5e4a30 70%);
+    background: radial-gradient(circle at 40% 35%, #7a6040, #4e3a22 70%);
     box-shadow:
       inset -2px -3px 6px rgba(0, 0, 0, 0.4),
       0 2px 3px rgba(0, 0, 0, 0.4);
@@ -2488,45 +2511,41 @@
     padding: 30px 0 40px;
     border-top: 1px solid rgba(240, 228, 201, 0.2);
   }
-  & .mood-credits .cr-cn {
-    margin: 0 0 18px;
-    margin-right: -0.3em;
-    font: 900 30px/1 var(--mood-cjk);
-    letter-spacing: 0.3em;
-    color: var(--mood-amber-l);
-  }
   & .mood-credits .cr {
     display: grid;
     gap: 4px;
-    max-width: 620px;
+    max-width: 680px;
     margin: 0 auto;
   }
   & .mood-credits .cr > div {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
     gap: 18px;
     align-items: baseline;
     padding: 4px 0;
   }
   & .mood-credits .cr dt {
     text-align: right;
-    font: 400 11.5px/1.4 var(--font-mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font: italic 400 14.5px/1.4 var(--font-sans);
     color: var(--muted);
   }
   & .mood-credits .cr dd {
     margin: 0;
     text-align: left;
-    font: italic 500 16px/1.4 var(--font-display);
+    font: 500 17px/1.4 var(--font-display);
     color: var(--mood-cream);
+  }
+  & .mood-credits .cr-note {
+    margin: 22px 0 0;
+    font: italic 400 13.5px/1.5 var(--font-sans);
+    color: var(--muted);
   }
 
   /* the footer: the corridor's last few feet */
   & .content > .foot {
     --side: max(0px, calc((100% - var(--mood-door)) / 2));
-    --muted: #d6bc9f;
-    --amber-deep: #f4cc8e;
+    --muted: #c4b898;
+    --amber-deep: #e6c285;
     justify-content: center;
     gap: 12px 26px;
     margin: 0;
@@ -2536,13 +2555,14 @@
       90deg,
       transparent 0 var(--side),
       var(--mood-wood) 0 calc(var(--side) + 14px),
-      #3e0d0b 0 calc(100% - var(--side) - 14px),
+      #26271f 0 calc(100% - var(--side) - 14px),
       var(--mood-wood) 0 calc(100% - var(--side)),
       transparent 0
     );
-    font: 400 12px/1.4 var(--font-mono);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font: 400 15px/1.4 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+    text-transform: none;
     color: var(--muted);
   }
   & .content > .foot .foot-links {
@@ -2715,7 +2735,7 @@
     & .content > .foot {
       --side: 0px;
       padding-inline: 24px;
-      background: #3e0d0b;
+      background: #26271f;
       border-inline: 6px solid var(--mood-wood);
     }
     & .mood-room::before,
@@ -2896,6 +2916,19 @@
     }
     & .mood-secret-form .srow {
       flex-direction: column;
+    }
+    /* in a column, flex: 1 would size the field's height from zero */
+    & .mood-secret-form .sin {
+      flex: none;
+    }
+    /* the credits roll one name under its role, as a film's do */
+    & .mood-credits .cr > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      padding: 6px 0;
+    }
+    & .mood-credits .cr :is(dt, dd) {
+      text-align: center;
     }
   }
   @media (max-width: 400px) {
