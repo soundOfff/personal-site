@@ -1543,6 +1543,13 @@ html:root[data-reel='parasite'] {
     letter-spacing: 0.14em;
     color: var(--ink);
   }
+  /* the readouts take room only once there is something to read, so the
+     stacked phone layout doesn't hold a gap under the hint */
+  .px-mread .px-msym:empty,
+  .px-mtxt:empty {
+    min-height: 0;
+    margin-top: 0;
+  }
   .px-mread .px-mhint {
     display: flex;
     flex-wrap: wrap;
