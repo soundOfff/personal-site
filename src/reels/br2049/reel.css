@@ -3,6 +3,7 @@
 @import '@fontsource/barlow/latin-500.css';
 @import '@fontsource/barlow/latin-600.css';
 @import '@fontsource/share-tech-mono/latin-400.css';
+@import '@fontsource/courier-prime/latin-400.css';
 
 /* ============================================================
    Reel 03 · Blade Runner 2049.
@@ -703,76 +704,53 @@
   }
 
   /* ============================================================
-     SECTION HEADERS: the keybar becomes a slate. Code line, the section
-     name in Big Shoulders, the descriptor and the scene slug.
+     SECTION HEADERS: the keybar becomes a slate. The scene heading, then
+     the section name in Big Shoulders.
      ============================================================ */
-  #readme {
-    --br-k: 'LV—00';
-  }
-  #playground {
-    --br-k: 'WL—01 · Wallace Corporation';
-  }
-  #work {
-    --br-k: 'LV—02 · Las Vegas';
-  }
-  #oss {
-    --br-k: 'LV—03 · Las Vegas';
-  }
-  #log {
-    --br-k: 'LV—04 · Las Vegas';
-  }
-  #writing {
-    --br-k: 'LA—05 · Los Angeles';
-  }
-  #principles {
-    --br-k: 'LA—06 · Los Angeles';
-  }
-  #stack {
-    --br-k: 'LA—07 · Los Angeles';
-  }
-  #now {
-    --br-k: 'SN—08 · Snow on the steps';
-  }
   .block .keybar {
-    display: flow-root;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
     margin: 0 0 52px;
-    font: 12px/1.7 var(--font-mono);
-    letter-spacing: 0.16em;
+    /* the house line is "// name · descriptor". The slate keeps the name and the
+       scene heading; the slashes and the descriptor shrink to nothing on screen and
+       stay in the text for screen readers. */
+    font-size: 0;
     text-transform: uppercase;
     color: var(--muted);
   }
-  .block .keybar::before {
-    content: var(--br-k) / '';
-    margin-right: 14px;
-    color: var(--amber-deep);
-    letter-spacing: 0.24em;
+  /* the scene heading opens the scene, set the way a script sets it */
+  .block .keybar .reel-slug[data-for='br2049'] {
+    order: -1;
+    flex-basis: 100%;
+    margin: 0;
+    font: 13px/1.6 'Courier Prime', 'Courier New', Courier, monospace;
+    letter-spacing: 0;
+    color: var(--muted);
   }
   .block .keybar b {
-    display: block;
-    margin: 12px 0 16px;
+    margin: 14px 0 0;
     font: 800 clamp(56px, 7.4vw, 108px) / 0.84 var(--font-display);
     letter-spacing: 0.01em;
     color: var(--ink);
   }
   .block .keybar a {
+    margin-left: 22px;
+    font: 13px/1.6 'Courier Prime', 'Courier New', Courier, monospace;
+    letter-spacing: 0;
+    text-transform: none;
     text-decoration-style: solid;
     text-decoration-color: currentColor;
   }
   .block .keybar a:hover {
     color: var(--amber-deep);
   }
-  .block .keybar .reel-slug[data-for='br2049'] {
-    float: right;
-    margin-left: 24px;
-    color: var(--muted);
-    letter-spacing: 0.16em;
-  }
   :is(#work, #oss, #log) .keybar b {
     mask-image: linear-gradient(180deg, #000 52%, rgba(0, 0, 0, 0.38));
   }
 
   /* ============================================================
-     00 · README: the cold open in the haze, then the flight
+     00 · README: the opening in the haze, then the flight
      ============================================================ */
   #readme {
     display: grid;
@@ -934,26 +912,28 @@
     filter: blur(10px);
   }
 
+  /* the page opens the way a screenplay does */
   #readme .keybar {
     grid-row: 2;
-    margin: 0 0 24px;
-    font-size: 12px;
-    letter-spacing: 0.2em;
-    color: var(--ink-2);
+    row-gap: 21px;
+    margin: 0 0 26px;
   }
   #readme .keybar::before {
-    color: var(--ink);
+    content: 'Fade in:' / '';
+    order: -2;
+    flex-basis: 100%;
+    font: 13px/1.6 'Courier Prime', 'Courier New', Courier, monospace;
+    color: var(--ink-2);
   }
   #readme .keybar b {
-    display: inline;
-    margin: 0 0 0 4px;
-    font: inherit;
-    color: var(--ink);
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
   }
   #readme .keybar .reel-slug[data-for='br2049'] {
-    float: none;
-    margin-left: 18px;
-    color: var(--ink-2);
+    color: var(--ink);
   }
   #readme .lede {
     grid-row: 3;
@@ -2356,7 +2336,7 @@
       animation: br2049-cx1 13s ease-in-out infinite alternate;
     }
 
-    /* the cold open breathes while it's on screen */
+    /* the opening breathes while it is on screen */
     &[data-sec='0'] {
       .br-hero .h2 {
         animation: br2049-breathe 12s ease-in-out infinite alternate;
