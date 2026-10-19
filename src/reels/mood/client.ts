@@ -1,312 +1,53 @@
 /**
- * Reel 02 · In the Mood for Love: the reel's behaviour.
+ * Reel 02 · In the Mood for Love: the reel's behaviour. The sounds live in
+ * ./score (a pizzicato waltz, a solo cello, a bolero on the radio); this
+ * decides when they play:
  *
- *   - a 3/4 waltz (an original Dm · Gm · C · A7 progression, pizzicato): one
- *     beat per room as you arrive, a whole bar when the stairs come into view,
- *     an A7 → D minor cadence when the agent's answer lands;
+ *   - the waltz (an original Dm · Gm · C · A7 in 3/4): one beat per room as
+ *     you arrive, never two inside a beat, a whole bar with the cello when the
+ *     stairs come into view; when the agent's answer lands the cello sighs
+ *     once per component and the A7 → D minor cadence resolves it;
  *   - the two doors creak ajar on hover and swing open on click;
+ *   - the radio-dial switcher lands on a bolero while you rest on a station;
  *   - rain plays only while a lamp's cone of rain is on screen;
  *   - rooms step-print in as they are reached; the stairs crossing is
  *     scroll-scrubbed (CSS scroll timelines, or a rAF fallback here);
  *   - the noodle stall's thermos steams while the agent thinks;
- *   - room 2046's wall takes a secret and seals it. Nothing leaves the page.
+ *   - room 2046's wall takes a secret and seals it on an unresolved bar.
+ *     Nothing leaves the page.
  *
  * Loaded on demand while the reel screens; everything is torn down on abort.
  */
 import type { ReelContext, ReelModule } from '../types';
-import type { SoundKit } from '../sound';
+import type { Bed } from '../sound';
+import {
+  beat,
+  breath,
+  cadence,
+  chime,
+  creak,
+  halfCadence,
+  harmonic,
+  hover,
+  key,
+  latch,
+  paper,
+  plaster,
+  press,
+  radio,
+  rain,
+  steam,
+  sting,
+  surface,
+  surfaceSpan,
+  tenet,
+  tickTock,
+  tink,
+  waltz,
+} from './score';
 
-/* ------------------------------------------------------------------ sound */
-
-/** A plucked string, pizzicato: triangle + octave sine through a closing lowpass. */
-function pizz(s: SoundKit, f: number, at = 0, vol = 0.1): void {
-  const ac = s.ctx();
-  if (!ac) return;
-  const t = ac.currentTime + at;
-  const o = ac.createOscillator();
-  o.type = 'triangle';
-  o.frequency.value = f;
-  const o2 = ac.createOscillator();
-  o2.type = 'sine';
-  o2.frequency.value = f * 2;
-  const g2 = ac.createGain();
-  g2.gain.value = 0.3;
-  const lp = ac.createBiquadFilter();
-  lp.type = 'lowpass';
-  lp.Q.value = 1.5;
-  lp.frequency.setValueAtTime(Math.min(8000, f * 8), t);
-  lp.frequency.exponentialRampToValueAtTime(Math.max(220, f * 1.5), t + 0.3);
-  const g = ac.createGain();
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(vol, t + 0.004);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
-  o.connect(lp);
-  o2.connect(g2);
-  g2.connect(lp);
-  lp.connect(g);
-  g.connect(s.out());
-  const send = ac.createGain();
-  send.gain.value = 0.28;
-  g.connect(send);
-  send.connect(s.reverb(1.6));
-  o.start(t);
-  o2.start(t);
-  o.stop(t + 0.6);
-  o2.stop(t + 0.6);
-  s.burst({ dur: 0.008, f: 3200, q: 0.8, vol: vol * 0.5, at });
-}
-
-/** The waltz: [bass, chord, chord] per bar. Dm, Gm, C, A7. */
-const BARS = [
-  [73.42, 349.23, 440],
-  [98, 392, 466.16],
-  [65.41, 392, 523.25],
-  [55, 329.63, 392],
-] as const;
-
-function waltzAt(s: SoundKit, n: number, at = 0): void {
-  const bar = BARS[Math.floor(n / 3) % 4];
-  if (n % 3 === 0) {
-    pizz(s, bar[0] * 2, at, 0.12);
-    pizz(s, bar[0], at + 0.01, 0.06);
-  } else {
-    pizz(s, bar[1], at, 0.055);
-    pizz(s, bar[2], at + 0.014, 0.045);
-  }
-}
-
-/** A7 → D minor, plucked. */
-function cadence(s: SoundKit, at = 0): void {
-  (
-    [
-      [110, 0, 0.11],
-      [329.63, 0.42, 0.06],
-      [392, 0.42, 0.05],
-      [554.37, 0.43, 0.04],
-      [146.83, 0.84, 0.11],
-      [293.66, 1.26, 0.06],
-      [349.23, 1.27, 0.06],
-      [587.33, 1.3, 0.06],
-    ] as const
-  ).forEach(([f, t, v]) => pizz(s, f, at + t, v));
-}
-
-/** Hover: a woodblock tock. */
-function tock(s: SoundKit, hi = false): void {
-  s.burst({ dur: 0.014, f: hi ? 2400 : 1700, q: 6, vol: 0.16 });
-  s.tone({ f0: hi ? 1180 : 860, dur: 0.03, vol: 0.025 });
-}
-
-/** An enamel sign, tapped. */
-function tink(s: SoundKit): void {
-  s.tone({ type: 'triangle', f0: 3150, dur: 0.12, vol: 0.02 });
-  s.tone({ f0: 4720, dur: 0.08, vol: 0.01, at: 0.01 });
-}
-
-function paper(s: SoundKit): void {
-  s.burst({ dur: 0.05, kind: 'highpass', f: 2600, vol: 0.09 });
-  s.burst({ dur: 0.03, kind: 'highpass', f: 3600, vol: 0.06, at: 0.05 });
-}
-
-/** One typewriter key. */
-function key(s: SoundKit, at = 0): void {
-  s.burst({ dur: 0.02, f: 2800 + Math.random() * 1400, q: 1.3, vol: 0.15, at });
-  s.tone({ f0: 170, f1: 90, dur: 0.035, vol: 0.06, at });
-}
-
-function tickTock(s: SoundKit): void {
-  s.burst({ dur: 0.012, f: 2600, q: 7, vol: 0.12 });
-  s.burst({ dur: 0.012, f: 1900, q: 7, vol: 0.1, at: 0.32 });
-}
-
-/** A struck bell: fundamental plus two inharmonic partials. */
-function bell(s: SoundKit, f: number, at = 0, vol = 0.06): void {
-  (
-    [
-      [1, 1],
-      [2.76, 0.4],
-      [5.4, 0.15],
-    ] as const
-  ).forEach(([m, v]) => s.tone({ f0: f * m, dur: 1.8, vol: vol * v, at }));
-}
-
-/** The door: band-passed noise wandering like a dry hinge, over a low groan. */
-function creak(s: SoundKit, long = false): void {
-  const ac = s.ctx();
-  if (!ac) return;
-  const t = ac.currentTime;
-  const dur = long ? 0.9 : 0.5;
-  const n = s.noise(dur);
-  const bp = ac.createBiquadFilter();
-  bp.type = 'bandpass';
-  bp.Q.value = 9;
-  const curve = new Float32Array(16);
-  for (let i = 0; i < 16; i++) curve[i] = 520 + Math.sin(i * 1.7) * 160 + Math.random() * 220;
-  bp.frequency.setValueCurveAtTime(curve, t, dur);
-  const g = ac.createGain();
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.14, t + 0.08);
-  g.gain.setValueAtTime(0.14, t + dur * 0.6);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  n.connect(bp);
-  bp.connect(g);
-  g.connect(s.out());
-  n.start(t);
-  const o = ac.createOscillator();
-  o.type = 'sawtooth';
-  o.frequency.setValueAtTime(70, t);
-  o.frequency.linearRampToValueAtTime(56, t + dur);
-  const lp = ac.createBiquadFilter();
-  lp.type = 'lowpass';
-  lp.frequency.value = 260;
-  const g2 = ac.createGain();
-  g2.gain.setValueAtTime(0.0001, t);
-  g2.gain.exponentialRampToValueAtTime(0.05, t + 0.1);
-  g2.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(lp);
-  lp.connect(g2);
-  g2.connect(s.out());
-  o.start(t);
-  o.stop(t + dur + 0.05);
-}
-
-/** The radio dial: a band-pass sweep through static, and a whistle. */
-function tune(s: SoundKit): void {
-  const ac = s.ctx();
-  if (!ac) return;
-  const t = ac.currentTime;
-  const n = s.noise(0.28);
-  const bp = ac.createBiquadFilter();
-  bp.type = 'bandpass';
-  bp.Q.value = 3;
-  bp.frequency.setValueAtTime(700, t);
-  bp.frequency.exponentialRampToValueAtTime(2600, t + 0.26);
-  const g = ac.createGain();
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.06, t + 0.05);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
-  n.connect(bp);
-  bp.connect(g);
-  g.connect(s.out());
-  n.start(t);
-  s.tone({ f0: 1400, f1: 1900, dur: 0.22, vol: 0.014 });
-}
-
-/** Noise through a filter with a swell; the building block for steam, breath, plaster. */
-function hiss(
-  s: SoundKit,
-  kind: BiquadFilterType,
-  f: number,
-  q: number,
-  peak: number,
-  dur: number,
-) {
-  const ac = s.ctx();
-  if (!ac) return;
-  const t = ac.currentTime;
-  const n = s.noise(dur);
-  const fl = ac.createBiquadFilter();
-  fl.type = kind;
-  fl.frequency.value = f;
-  fl.Q.value = q;
-  const g = ac.createGain();
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(peak, t + dur * 0.35);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  n.connect(fl);
-  fl.connect(g);
-  g.connect(s.out());
-  n.start(t);
-}
-
-const steam = (s: SoundKit) => hiss(s, 'highpass', 3200, 0.7, 0.03, 0.9);
-const breath = (s: SoundKit) => hiss(s, 'bandpass', 1100, 0.6, 0.05, 0.7);
-function plaster(s: SoundKit): void {
-  s.burst({ dur: 0.14, kind: 'lowpass', f: 300, q: 0.7, vol: 0.45 });
-  hiss(s, 'bandpass', 480, 1.2, 0.06, 0.45);
-}
-
-/** Rain in the lamp: looped, filtered noise, faded in. */
-function rainBed(s: SoundKit, signal: AbortSignal) {
-  return s.bed((ac, out) => {
-    const src = s.noise(2.5);
-    src.loop = true;
-    const hp = ac.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 600;
-    const lp = ac.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 5000;
-    const g = ac.createGain();
-    const t = ac.currentTime;
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.035, t + 1);
-    src.connect(hp);
-    hp.connect(lp);
-    lp.connect(g);
-    g.connect(out);
-    src.start(t);
-    return {
-      stop(fade = 0.7) {
-        const now = ac.currentTime;
-        g.gain.cancelScheduledValues(now);
-        g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), now);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + fade);
-        src.stop(now + fade + 0.1);
-      },
-    };
-  }, signal);
-}
-
-/**
- * The title sting: one pizzicato bar of the waltz in D minor while a bowed
- * string draws a breath on A and leans up to D, with a little vibrato.
- */
-function sting(s: SoundKit): void {
-  const ac = s.ctx();
-  if (!ac) return;
-  const t = ac.currentTime + 0.05;
-  pizz(s, 146.83, 0.05, 0.12);
-  pizz(s, 73.42, 0.06, 0.06);
-  pizz(s, 349.23, 0.47, 0.05);
-  pizz(s, 440, 0.48, 0.045);
-  pizz(s, 349.23, 0.89, 0.05);
-  pizz(s, 440, 0.9, 0.045);
-
-  const bow = ac.createOscillator();
-  bow.type = 'sawtooth';
-  bow.frequency.setValueAtTime(220, t);
-  bow.frequency.setValueAtTime(220, t + 0.62);
-  bow.frequency.exponentialRampToValueAtTime(293.66, t + 0.78);
-  const vib = ac.createOscillator();
-  vib.frequency.value = 5.4;
-  const vibDepth = ac.createGain();
-  vibDepth.gain.setValueAtTime(0, t);
-  vibDepth.gain.linearRampToValueAtTime(2.6, t + 0.9);
-  vib.connect(vibDepth);
-  vibDepth.connect(bow.frequency);
-  const lp = ac.createBiquadFilter();
-  lp.type = 'lowpass';
-  lp.frequency.setValueAtTime(700, t);
-  lp.frequency.linearRampToValueAtTime(1500, t + 0.8);
-  lp.Q.value = 0.8;
-  const g = ac.createGain();
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.05, t + 0.45);
-  g.gain.setValueAtTime(0.05, t + 1.05);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 1.75);
-  bow.connect(lp);
-  lp.connect(g);
-  g.connect(s.out());
-  const send = ac.createGain();
-  send.gain.value = 0.4;
-  g.connect(send);
-  send.connect(s.reverb(1.6));
-  bow.start(t);
-  vib.start(t);
-  bow.stop(t + 1.8);
-  vib.stop(t + 1.8);
-}
+/** A beat of the waltz (ms): section changes closer than this wait their turn. */
+const BEAT_MS = 460;
 
 /* --------------------------------------------------------------- helpers */
 
@@ -356,13 +97,28 @@ const reel: ReelModule = {
 
     root.dataset.mood = ctx.reducedMotion ? 'still' : 'on';
 
-    /* ---- the waltz: one beat per room ---- */
-    let beat = 0;
-    const nextBeat = () => waltzAt(s, beat++);
-    const waltzBar = () => {
-      const n0 = beat - (beat % 3);
-      for (let k = 0; k < 3; k++) waltzAt(s, n0 + k, k * 0.42);
-      beat = n0 + 3;
+    /* ---- the waltz: one beat per room, never two inside a beat ---- */
+    let room = ctx.section();
+    let lastBeat = -Infinity;
+    let held = false;
+    // A fast scroll keeps only the room it lands in; a bar holds the beats until it has played.
+    const strike = () => {
+      const wait = lastBeat + BEAT_MS - performance.now();
+      if (wait > 0) return later(strike, wait);
+      held = false;
+      lastBeat = performance.now();
+      beat(s, room);
+    };
+    const nextBeat = (i: number) => {
+      room = i;
+      if (held) return;
+      held = true;
+      strike();
+    };
+    let bar = 0;
+    const waltzBar = (n: number) => {
+      lastBeat = performance.now() + 1100;
+      waltz(s, n);
     };
 
     const year = document.querySelector<HTMLElement>('[data-mood-year]');
@@ -374,7 +130,7 @@ const reel: ReelModule = {
     setRoom(ctx.section());
     ctx.onSection((i) => {
       setRoom(i);
-      nextBeat();
+      nextBeat(i);
     });
 
     /* ---- rooms step-print in as they are reached ---- */
@@ -402,10 +158,10 @@ const reel: ReelModule = {
     /* ---- rain: animate and sound only while a cone is on screen ---- */
     const rains = [...document.querySelectorAll<HTMLElement>('[data-mood-rain]')];
     const raining = new Set<Element>();
-    let bed: ReturnType<typeof rainBed> = null;
+    let bed: Bed | null = null;
     const syncRain = () => {
       if (raining.size && !s.muted) {
-        if (!bed) bed = rainBed(s, signal);
+        if (!bed) bed = rain(s, signal);
       } else if (bed) {
         bed.stop(0.7);
         bed = null;
@@ -460,7 +216,7 @@ const reel: ReelModule = {
           for (const e of entries) {
             if (e.isIntersecting && e.intersectionRatio > 0.35 && !inBar) {
               inBar = true;
-              waltzBar();
+              waltzBar(bar++ % 4);
             }
             if (!e.isIntersecting) inBar = false;
             // the clock belongs to the corridor, not the stairwell
@@ -544,17 +300,27 @@ const reel: ReelModule = {
       leaf.dataset.moodMon = date === 'soon' ? 'soon' : m;
     }
 
-    /* ---- hover and press: the woodblock, and its relatives ---- */
+    /* ---- the radio dial: rest on a station and it lands on a bolero ---- */
+    let station: Bed | null = null;
+    const offAir = (fade?: number) => {
+      station?.stop(fade);
+      station = null;
+    };
+    const tuneIn = (el: Element) => {
+      offAir(0.06);
+      const n = [...document.querySelectorAll('[data-reel-pick]')].indexOf(el);
+      station = radio(s, Math.max(0, n));
+    };
+
+    /* ---- hover and press: the muted string, and its relatives ---- */
     let last: Element | null = null;
     let typing = 0;
     const hoverSound = (el: Element) => {
-      if (el.matches('[data-reel-pick]')) return tune(s);
-      if (el.matches('.railnav a, .toolcol li')) return tock(s, true);
+      if (el.matches('[data-reel-pick]')) return tuneIn(el);
+      if (el.matches('.railnav a, .toolcol li')) return harmonic(s);
       if (el.matches('.metrics .m')) return tink(s);
       if (el.matches('.repo, .logitem')) return paper(s);
-      if (el.matches('.tenet')) {
-        return pizz(s, [293.66, 349.23, 440, 587.33][Math.floor(Math.random() * 4)], 0, 0.045);
-      }
+      if (el.matches('.tenet')) return tenet(s);
       if (el.matches('.wrow')) {
         const run = ++typing;
         for (let k = 0; k < 4; k++) {
@@ -563,7 +329,7 @@ const reel: ReelModule = {
         return;
       }
       if (el.matches('[data-mood-clock]')) return tickTock(s);
-      tock(s, false);
+      hover(s);
     };
     const HOVER = [
       '[data-reel-pick]',
@@ -590,6 +356,8 @@ const reel: ReelModule = {
       (e) => {
         if ((e as PointerEvent).pointerType === 'touch') return;
         const el = (e.target as Element | null)?.closest?.(HOVER) ?? null;
+        // Off the dial, the set goes quiet.
+        if (station && el !== last && !el?.matches('[data-reel-pick]')) offAir(0.35);
         if (el && el !== last) hoverSound(el);
         last = el;
       },
@@ -600,19 +368,17 @@ const reel: ReelModule = {
       'click',
       (e) => {
         const el = (e.target as Element | null)?.closest?.('a[href], button') ?? null;
+        // A station picked: the projector takes over from the radio.
+        if (el?.closest('[data-reel-pick]')) offAir(0.2);
         if (
           !el ||
           el.closest('#readme .startrow, [data-mood-door], [data-reel-pick], [data-sound-toggle]')
         ) {
           return;
         }
-        if (el.matches('[data-mood-clock]')) {
-          bell(s, 523.25, 0, 0.06);
-          bell(s, 392, 0.75, 0.06);
-          return;
-        }
+        if (el.matches('[data-mood-clock]')) return chime(s);
         if (el.closest('[data-mood-secret]')) return;
-        pizz(s, 587.33, 0, 0.08);
+        press(s);
       },
       on,
     );
@@ -627,25 +393,23 @@ const reel: ReelModule = {
         case 'ask':
           agent('think');
           steam(s);
-          pizz(s, 587.33, 0, 0.08);
+          press(s);
           break;
         case 'surface':
           agent('speak');
-          paper(s);
-          s.tone({ f0: 140, f1: 70, dur: 0.08, vol: 0.18, at: 0.12 });
-          cadence(s, 0.3);
+          surface(s, cue.count);
+          cadence(s, surfaceSpan(cue.count));
           later(() => root.dataset.moodAgent === 'speak' && agent('done'), 1400);
           break;
         case 'error':
           agent('');
-          pizz(s, 220, 0, 0.08);
-          pizz(s, 164.81, 0.18, 0.08);
+          halfCadence(s);
           break;
         case 'open':
           creak(s, false);
           break;
         case 'close':
-          tock(s, false);
+          latch(s);
           break;
       }
     });
@@ -672,7 +436,7 @@ const reel: ReelModule = {
           e.preventDefault();
           const text = input.value.trim();
           if (!text) {
-            pizz(s, 220, 0, 0.06);
+            halfCadence(s);
             input.focus();
             return;
           }
@@ -693,7 +457,8 @@ const reel: ReelModule = {
           }, 780 * step);
           later(() => {
             sealed.textContent = 'Sealed in room 2046. Nobody will read it, not even me.';
-            waltzBar();
+            // the A7 bar: left on the dominant, never resolved
+            waltzBar(3);
           }, 1500 * step);
         },
         on,
@@ -705,6 +470,7 @@ const reel: ReelModule = {
       observers.forEach((o) => o.disconnect());
       offSound();
       bed?.stop(0.4);
+      offAir(0.1);
       delete root.dataset.mood;
       delete root.dataset.moodAgent;
       delete root.dataset.moodInside;
