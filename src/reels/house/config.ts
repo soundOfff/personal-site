@@ -5,7 +5,7 @@ const house: ReelConfig = {
   id: 'house',
   n: '00',
   title: 'House lights',
-  meta: 'no film · the default site',
+  meta: 'lights up · no film',
   bands: [
     ['#FBFAF6', 4],
     ['#F2EEE4', 2],
@@ -16,7 +16,7 @@ const house: ReelConfig = {
   ],
   acts: [],
   stages: [],
-  announce: 'House lights: the default site',
+  announce: 'House lights up. No film.',
 };
 
 export default house;

@@ -247,12 +247,19 @@ html:root:not([data-reel='house']) [data-theme-toggle] {
   gap: 2px;
   height: 10px;
 }
+/* uneven at rest, so the button reads as a level meter and not as "…" */
 .snd .w i {
   display: block;
   width: 2px;
-  height: 3px;
+  height: 4px;
   border-radius: 1px;
   background: currentColor;
+}
+.snd .w i:nth-child(2) {
+  height: 7px;
+}
+.snd .w i:nth-child(3) {
+  height: 5px;
 }
 .snd[aria-pressed='true'] .w i {
   animation: snd-eq 0.9s ease-in-out infinite;
@@ -263,11 +270,8 @@ html:root:not([data-reel='house']) [data-theme-toggle] {
 .snd[aria-pressed='true'] .w i:nth-child(3) {
   animation-duration: 0.62s;
 }
+/* no 0%/100%: each bar rises from its own resting height */
 @keyframes snd-eq {
-  0%,
-  100% {
-    height: 3px;
-  }
   50% {
     height: 10px;
   }
@@ -286,7 +290,12 @@ html:root:not([data-reel='house']) [data-theme-toggle] {
     order: 2;
     flex: 1 0 100%;
   }
+  /* the swatches have no names on a phone: say which one is screening */
   .reel-label {
+    min-height: 0;
+    margin-top: 6px;
+  }
+  .reel-label span {
     display: none;
   }
   /* the only way back to the box office on a phone: keep it, as a quiet link */
