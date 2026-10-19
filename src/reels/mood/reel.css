@@ -990,13 +990,14 @@
     color: var(--ink-2);
   }
 
-  /* the figures: one run of type under the words, no boxes */
+  /* the figures: one run of type under the words, no boxes; the run reaches
+     into the gap before the doors rather than orphan one figure */
   & #readme > .metrics {
-    grid-area: 5 / 2;
+    grid-area: 5 / 2 / 6 / 4;
     display: flex;
     flex-wrap: wrap;
     gap: 10px 26px;
-    margin-top: 26px;
+    margin: 26px 18px 0 0;
     padding-top: 16px;
     border: 0;
     border-top: 1px solid rgba(216, 176, 114, 0.22);
@@ -2781,6 +2782,13 @@
   @media (max-width: 1200px) {
     & .mood-clock {
       display: none;
+    }
+  }
+  /* too narrow for one run beside the doors: three and two, not four and one */
+  @media (max-width: 1099px) and (min-width: 961px) {
+    & #readme > .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, max-content);
     }
   }
   @media (max-width: 960px) {
