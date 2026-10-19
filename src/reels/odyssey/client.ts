@@ -11,8 +11,9 @@
  *   - sound (score.ts): the console's ticks, clunks and beeps as foley; harp
  *     under the transmission beeps and a waltz cadence when done; HAL winding
  *     down on a fault; the sunrise for the title, the replay and the credits;
- *     the station waltz at the match cut; a lonely adagio at the intermission;
- *     a Ligeti choir at the monolith and in the room; the star gate's cluster
+ *     the station waltz at the match cut; the adagio in the centrifuge; the
+ *     entr'acte's cluster at the intermission; a Ligeti choir at the monolith
+ *     and in the room; the star gate's cluster
  */
 import type { Bed } from '../sound';
 import type { ReelContext, ReelModule } from '../types';
@@ -27,6 +28,7 @@ import {
   choir,
   clunk,
   dataTick,
+  entracte,
   fault,
   gateBed,
   lensHum,
@@ -308,13 +310,14 @@ function mount(ctx: ReelContext): () => void {
     hovered = null;
   });
 
-  /* ---------- zones: the logic memory hum, the gate, the intermission, the credits ---------- */
+  /* ---------- zones: the adagio, the logic memory hum, the gate, the intermission, the credits ---------- */
   const zones = new Set<string>();
   let redHum: Hum | null = null;
   let pulled = 0;
   let gate: ReturnType<typeof gateBed> = null;
   let gateP = 0;
-  let intPlayed = false;
+  let entr: Bed | null = null;
+  let jogged = false;
   let reprised = false;
   const pullModule = () => {
     thunk(S);
@@ -341,9 +344,15 @@ function mount(ctx: ReelContext): () => void {
       gate.stop(0.8);
       gate = null;
     }
+    if (zones.has('int')) entr ??= entracte(S, signal);
+    else if (entr) {
+      entr.stop(1.6);
+      entr = null;
+    }
   };
   const zoneOf = (el: Element): string | null => {
     const sec = el.getAttribute('data-sec');
+    if (sec === '4') return 'centrifuge';
     if (sec === '5' || sec === '6') return `red${sec}`;
     if (el.matches('.od-sg')) return 'gate';
     return el.getAttribute('data-od-zone');
@@ -355,12 +364,10 @@ function mount(ctx: ReelContext): () => void {
         if (!z) continue;
         if (e.isIntersecting) zones.add(z);
         else zones.delete(z);
-        if (z === 'int') {
-          intOn = e.isIntersecting;
-          if (intOn && !intPlayed) {
-            intPlayed = true;
-            adagio(S);
-          }
+        // the adagio plays where the film plays it: Frank's run around the drum
+        if (z === 'centrifuge' && e.isIntersecting && !jogged && S.ctx()) {
+          jogged = true;
+          adagio(S);
         }
         if (z === 'credits' && e.isIntersecting && !reprised) {
           reprised = true;
@@ -374,13 +381,14 @@ function mount(ctx: ReelContext): () => void {
     { threshold: 0.2 },
   );
   document
-    .querySelectorAll('[data-sec="5"], [data-sec="6"], .od-sg, [data-od-zone]')
+    .querySelectorAll('[data-sec="4"], [data-sec="5"], [data-sec="6"], .od-sg, [data-od-zone]')
     .forEach((el) => zoneIO.observe(el));
   // muting stops every bed; unmuting brings back the ones still on screen
   const offSound = S.onChange((muted) => {
     if (muted) {
       redHum = null;
       gate = null;
+      entr = null;
       monolith = null;
       thinking = null;
     } else syncBeds();
@@ -515,7 +523,7 @@ function mount(ctx: ReelContext): () => void {
     sceneIO.disconnect();
     heroIO?.disconnect();
     offSound();
-    [redHum, gate, monolith, thinking, station].forEach((b) => b?.stop(0.3));
+    [redHum, gate, entr, monolith, thinking, station].forEach((b) => b?.stop(0.3));
     delete root.dataset.odAgent;
     scenes.forEach((el) => {
       el.classList.remove('is-on', 'is-cut');

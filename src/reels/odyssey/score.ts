@@ -3,10 +3,11 @@
  * after the concert music Kubrick laid on the film: Richard Strauss's sunrise
  * (an organ pedal, trumpets climbing in open fifths, timpani) for the title,
  * a Viennese waltz on harp and strings for the station, Ligeti's drifting
- * choir for the monolith and the star gate, a lonely string adagio for the
- * intermission and HAL's last song for a fault. The console (ticks, clunks,
- * beeps) is the ship's foley; it stays electronic, tuned to C so it sits
- * inside every key the music uses (C, its relative A minor, the waltz's G).
+ * choir for the monolith and the star gate, his held string cluster for the
+ * entr'acte, Khachaturian's lonely adagio for the centrifuge and HAL's last
+ * song for a fault. The console (ticks, clunks, beeps) is the ship's foley;
+ * it stays electronic, tuned to C so it sits inside every key the music uses
+ * (C, its relative A minor, the waltz's G).
  */
 import type { Bed, SoundKit } from '../sound';
 import type { ReelScore } from '../types';
@@ -741,7 +742,7 @@ export function waltz(S: SoundKit, at = 0): Bed | null {
   return { stop: (fade = 0.3) => fadeOut(ac, out, fade) };
 }
 
-/** the intermission: a lonely adagio, low strings on A–E, the minor third, a violin far above */
+/** the centrifuge: a lonely adagio, low strings on A–E, the minor third, a violin far above */
 export function adagio(S: SoundKit): void {
   const ac = S.ctx();
   if (!ac) return;
@@ -920,6 +921,55 @@ export function choir(S: SoundKit, signal?: AbortSignal): Bed | null {
   }, signal);
 }
 
+/**
+ * The entr'acte, after Atmosphères: every semitone from D3 to A3 held at
+ * once, very soft, its colour drifting through a slow lowpass. No pulse and
+ * no line. It holds for as long as the intermission card is on screen.
+ */
+export function entracte(S: SoundKit, signal?: AbortSignal): Bed | null {
+  return S.bed((ac, out) => {
+    const t = ac.currentTime;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.028, t + 3.5);
+    const lp = ac.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.Q.value = 0.5;
+    lp.frequency.value = 560;
+    const drift = ac.createOscillator();
+    drift.frequency.value = 0.05;
+    const dg = ac.createGain();
+    dg.gain.value = 280;
+    drift.connect(dg);
+    dg.connect(lp.frequency);
+    const mix = ac.createGain();
+    mix.gain.value = 0.22;
+    mix.connect(lp);
+    lp.connect(g);
+    g.connect(out);
+    const w = ac.createGain();
+    w.gain.value = 0.55;
+    g.connect(w);
+    w.connect(S.reverb(3.2));
+    const nodes: AudioScheduledSourceNode[] = [drift];
+    for (let m = 50; m <= 57; m++) {
+      const o = ac.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = hz(m);
+      o.detune.value = (Math.random() - 0.5) * 14;
+      o.connect(mix);
+      nodes.push(o);
+    }
+    nodes.forEach((n) => n.start(t));
+    return {
+      stop(fade = 1.6) {
+        fadeOut(ac, g, fade);
+        nodes.forEach((n) => n.stop(ac.currentTime + fade + 0.1));
+      },
+    };
+  }, signal);
+}
+
 /** the star gate: rushing noise the scroll tunes, over a low string cluster and a thin high one */
 export function gateBed(S: SoundKit, signal?: AbortSignal): (Bed & { p(v: number): void }) | null {
   let tune: ((v: number) => void) | null = null;
@@ -1030,7 +1080,12 @@ const score: ReelScore = {
         waltz(s);
       },
     },
-    { id: 'intermission', label: 'lonely string adagio', play: adagio },
+    { id: 'centrifuge', label: 'lonely string adagio', play: adagio },
+    {
+      id: 'intermission',
+      label: "the entr'acte: a held string cluster (bed)",
+      play: (s) => entracte(s),
+    },
     {
       id: 'ring',
       label: 'one choir voice per tool',
