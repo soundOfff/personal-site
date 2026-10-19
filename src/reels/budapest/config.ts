@@ -21,7 +21,7 @@ const budapest: ReelConfig = {
   year: 2014,
   director: 'Wes Anderson',
   ratio: '1.37 · 2.35 · 1.85',
-  meta: '2014 · Wes Anderson · 1.37 · 2.35 · 1.85',
+  meta: '2014 · Wes Anderson · 1.37 : 1',
   bands: [
     ['#F2C6D0', 3],
     ['#E8A6B8', 2],
@@ -135,7 +135,7 @@ const budapest: ReelConfig = {
   ],
   layout: { nav: 'keyrack', hero: 'diorama', flow: 'ratios', grid: 'centered' },
   scroll: [
-    'frame matte changes aspect ratio by era (1.37 → 2.35 → 1.85)',
+    "frame matte closes to each era's aspect ratio as its interlude crosses the screen (1.37 → 2.35 → 1.85)",
     'funicular car climbs with scroll',
     'chapter cards and era years resolve on view',
     'telegrams stamp in as they arrive',

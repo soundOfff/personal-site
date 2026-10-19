@@ -13,7 +13,14 @@
 
    One centred axis. The rail becomes the hotel's chrome: a key rack across
    the top, the front desk across the bottom. Between them a matte frames
-   the page in each era's aspect ratio (1.37 → 2.35 → 1.85).
+   the page in each era's aspect ratio (1.37 → 2.35 → 1.85), closing on the
+   cut into the era (html[data-gb-ar], set by client.ts at each interlude).
+
+   Type has four voices: the hotel's signage in wide-tracked Jost capitals
+   (name plate, chapter titles, credits, the rack and the desk); the book's
+   voice in Playfair italic (kickers, captions, notes); small labels in Jost
+   capitals tracked lightly; and the typewriter, Courier Prime, for the
+   screenplay slug and the telegrams.
    ============================================================ */
 
 :root[data-reel='budapest'] {
@@ -45,10 +52,10 @@
   --radius-control: 0px;
   --radius-chip: 0px;
 
-  &[data-act='1'] {
+  &[data-gb-ar='1'] {
     --gb-ar: 2.35;
   }
-  &[data-act='2'] {
+  &[data-gb-ar='2'] {
     --gb-ar: 1.85;
   }
   &[data-sec='1'] {
@@ -316,10 +323,10 @@
     color: var(--gb-rose);
     letter-spacing: 0.22em;
   }
-  &[data-act='1'] .gb-era-roll > span {
+  &[data-gb-ar='1'] .gb-era-roll > span {
     transform: translateY(-14px);
   }
-  &[data-act='2'] .gb-era-roll > span {
+  &[data-gb-ar='2'] .gb-era-roll > span {
     transform: translateY(-28px);
   }
 
@@ -595,7 +602,7 @@
   }
 
   /* ============================================================
-     BACKDROP: the matte, the whip pan, grain, the funicular rule
+     BACKDROP: the matte, the whip pan, grain, the desk's rule
      ============================================================ */
   .gb-matte {
     display: none;
@@ -619,7 +626,7 @@
       display: block;
     }
     .gb-matte i {
-      background: rgba(43, 22, 49, 0.92);
+      background: var(--gb-plum);
       transition:
         width 0.95s var(--gb-ease),
         height 0.95s var(--gb-ease);
@@ -645,23 +652,14 @@
       box-shadow: inset 0 0 0 1px rgba(201, 161, 74, 0.6);
       transition: inset 0.95s var(--gb-ease);
     }
-    .gb-matte .fl::before,
-    .gb-matte .fl::after {
-      content: '';
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      border: 0 solid var(--gb-gold);
-    }
-    .gb-matte .fl::before {
-      left: 6px;
-      top: 6px;
-      border-width: 1px 0 0 1px;
-    }
-    .gb-matte .fl::after {
-      right: 6px;
-      bottom: 6px;
-      border-width: 0 1px 1px 0;
+  }
+  /* a jump is a hard cut: under the whip pan's blur the frame snaps to the new era */
+  &.gb-whipping .gb-matte > * {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gb-matte > * {
+      transition: none;
     }
   }
 

@@ -8,10 +8,11 @@
  *   - the key rack: a brass key tink per key, a key-ring jingle and a whip pan
  *     (pastel smear, stereo whoosh) on every in-page jump
  *   - other hovers: the cimbalom's cotton beater, wandering the scale
- *   - each era change: a projector clunk, then the era's chord (i, iv, V) on
- *     a trembling balalaika over a timpani note
- *   - the diorama: windows that light on hover (CSS) and twinkle while in view
- *   - telegrams stamp in as they scroll into view, with a postmark thump
+ *   - the cut into each era: an interlude crossing the middle of the screen
+ *     closes the matte to the era's ratio (html[data-gb-ar]), with a projector
+ *     clunk and the era's chord (i, iv, V) on a trembling balalaika over timpani
+ *   - the hero diorama: windows that light on hover (CSS) and twinkle in view
+ *   - telegrams stamp in as they scroll into view, with the date stamp's thump
  *   - the playground: a switchboard relay (html[data-gb-relay]) and the desk
  *     bell; a pastry box, tissue paper and a zither run when it composes, a
  *     balalaika accelerando to a dead stop when it is done, and the organ
@@ -20,7 +21,7 @@
  *
  * Everything audible goes through ctx.sound, so it is silent while muted.
  */
-import type { ReelContext, ReelModule } from '../types';
+import { SECTION_IDS, type ReelContext, type ReelModule } from '../types';
 import {
   blip,
   clack,
@@ -66,7 +67,7 @@ function voice(ctx: ReelContext) {
     clack: () => gate('clack', 50) && clack(s),
     squish: () => gate('squish', 160) && squish(s),
     stamp: () => gate('stamp', 90) && stamp(s),
-    /** projector clunk and the era's chord; `i` is the section that moved it */
+    /** projector clunk and the era's chord; `i` is a section of the era cut to */
     era: (i: number) => gate('era', 500) && section(s, i),
     glow: () => gate('glow', 900) && glow(s),
     thud: () => thud(s),
@@ -170,15 +171,37 @@ const reel: ReelModule = {
       { passive: true },
     );
 
-    /* ---------- each era change: clunk + the era's chord ---------- */
-    let era = Number(root.dataset.act ?? 0);
-    ctx.onSection((i) => {
-      // only the nine real sections move the era (see the engine note in the report)
-      if (i < 0 || i >= ctx.reel.acts.flatMap((a) => a.sections).length) return;
-      const next = Number(root.dataset.act ?? 0);
-      if (next !== era) v.era(i);
+    /* ---------- the cut into each era: the matte, the clunk and the chord ---------- */
+    // html[data-act] turns over when the next section's top passes 40% down
+    // the screen, by which time the interlude has scrolled away. The frame
+    // follows the interludes instead, so it changes while the year is in view.
+    const interludes = [...document.querySelectorAll<HTMLElement>('.gb-interlude')];
+    const firstSection = ctx.reel.acts.map((a) =>
+      SECTION_IDS.findIndex((id) => a.sections.includes(id)),
+    );
+    let era = -1;
+    let framing = false;
+    const frame = () => {
+      framing = false;
+      if (signal.aborted) return;
+      const mid = window.innerHeight / 2;
+      const next = interludes.filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.height > 0 && r.top + r.height / 2 < mid;
+      }).length;
+      if (next === era) return;
+      if (era >= 0) v.era(firstSection[next] ?? 0);
       era = next;
-    });
+      root.dataset.gbAr = String(next);
+    };
+    const reframe = () => {
+      if (framing) return;
+      framing = true;
+      requestAnimationFrame(frame);
+    };
+    window.addEventListener('scroll', reframe, { passive: true, signal });
+    window.addEventListener('resize', reframe, { passive: true, signal });
+    frame();
 
     /* ---------- the diorama: a window comes on, another goes off ---------- */
     const dio = document.querySelector<HTMLElement>('[data-gb-dio]');
@@ -311,7 +334,8 @@ const reel: ReelModule = {
       window.clearInterval(clock);
       relay('');
       root.style.removeProperty('--gb-clock');
-      whip?.classList.remove('is-on');
+      delete root.dataset.gbAr;
+      root.classList.remove('gb-whipping');
       log?.classList.remove('gb-armed');
       items.forEach((el) => el.classList.remove('gb-in'));
       wins.forEach((w) => w.classList.toggle('on', lit.has(w)));
