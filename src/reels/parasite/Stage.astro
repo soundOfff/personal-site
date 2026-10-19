@@ -38,40 +38,20 @@ const drops = Array.from({ length: 56 }, () => {
   const de = (rnd() * 1.2).toFixed(2);
   return `left:${left}%;height:${h}px;opacity:${o};animation-duration:${du}s;animation-delay:-${de}s`;
 });
-
-// Which lamp hangs in which section's keybar: stair lights on the way down,
-// one fluorescent tube in the semi-basement, a bare bulb in the bunker.
-const lamps: Partial<Record<StagePoint, { sec: number; kind: 'stair' | 'tube' | 'bulb' }>> = {
-  'in:oss': { sec: 3, kind: 'stair' },
-  'in:log': { sec: 4, kind: 'stair' },
-  'in:writing': { sec: 5, kind: 'tube' },
-  'in:principles': { sec: 6, kind: 'tube' },
-  'in:stack': { sec: 7, kind: 'bulb' },
-  'in:now': { sec: 8, kind: 'bulb' },
-};
-const lamp = lamps[at];
 ---
 
 {at === 'backdrop' && <div class="px-grain" aria-hidden="true" />}
 
 {
   at === 'rail' && (
-    <div class="px-elev" aria-hidden="true">
-      <span class="px-elev-car">
-        <span class="px-elev-roll">
-          {floors.map((f) => (
-            <span>{f.code}</span>
-          ))}
+    <p class="px-floor" aria-hidden="true">
+      {floors.map((f, i) => (
+        <span data-floor={i} title={f.name}>
+          {f.code && <b>{f.code}</b>}
+          <span lang="ko">{f.native}</span>
         </span>
-      </span>
-      <span class="px-elev-name">
-        {floors.map((f, i) => (
-          <span data-floor={i}>
-            <b lang="ko">{f.native}</b> {f.name}
-          </span>
-        ))}
-      </span>
-    </div>
+      ))}
+    </p>
   )
 }
 
@@ -106,22 +86,6 @@ const lamp = lamps[at];
         <span>EXT. garden, seen from inside</span>
       </p>
     </>
-  )
-}
-
-{
-  lamp && (
-    <span class={`px-lamp is-${lamp.kind}`} data-px-lamp={lamp.sec} aria-hidden="true">
-      {lamp.kind === 'stair' ? (
-        <>
-          <i />
-          <i />
-          <i />
-        </>
-      ) : (
-        <i />
-      )}
-    </span>
   )
 }
 

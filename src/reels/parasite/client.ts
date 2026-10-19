@@ -9,7 +9,8 @@
  *   - the walker: a square on the rail's staircase that follows the section in
  *     view one step at a time, a footstep per step, echo deepening per floor,
  *     and a step of the lament bass (C · B♭ · A♭ · G) once it reaches a new floor,
- *   - lamps that click on as you first arrive in each room below ground,
+ *   - the lights below ground, on the first time the walker gets down to them:
+ *     the rail's stair treads, the semi-basement's tube, the bunker's bulb,
  *   - the censor bar on the headline, timed to clear after the title card,
  *   - rain you hear only while the interlude is on screen,
  *   - a harpsichord quill on hover and a key on click,
@@ -46,6 +47,12 @@ import {
 const STEP_MS = 115;
 /** Let the walker settle before the lament takes its step, so a fast scroll is one phrase. */
 const ACT_MS = 160;
+/** The section each light below ground hangs in, as reel.css names it in html[data-px-lit]. */
+const LIGHTS: [sec: number, name: string][] = [
+  [3, 'stairs'],
+  [6, 'tube'],
+  [8, 'bulb'],
+];
 const MORSE: Record<string, string> = {
   '.-': 'A',
   '-...': 'B',
@@ -140,6 +147,23 @@ const reel: ReelModule = {
     const nav = document.querySelector<HTMLElement>('.railnav');
     const place = (i: number) => nav?.style.setProperty('--px-mark', String(i));
     place(mark);
+
+    /* ---- the lights: each comes on as the walker first gets down to it, and stays on ---- */
+    let deep = -1;
+    const reach = (i: number, withSound: boolean) => {
+      if (i <= deep) return;
+      const fresh = LIGHTS.filter(([sec]) => sec > deep && sec <= i);
+      deep = i;
+      nav?.style.setProperty('--px-deep', String(deep));
+      root.dataset.pxLit = LIGHTS.filter(([sec]) => sec <= deep)
+        .map(([, name]) => name)
+        .join(' ');
+      // A jump past several lights plays only the deepest one.
+      const last = fresh.at(-1);
+      if (withSound && last) lamp(s, floorOf(last[0]));
+    };
+    reach(mark, false);
+
     // The lament moves once the walker stops on a new floor: one note per arrival.
     let heard = floorOf(mark);
     let arriving = 0;
@@ -159,23 +183,10 @@ const reel: ReelModule = {
       mark += up ? -1 : 1;
       place(mark);
       footstep(s, floorOf(mark), up);
+      reach(mark, true);
       arrive();
       if (mark !== target) walking = later(step, STEP_MS);
     };
-
-    /* ---- lamps: every room you've been down to stays lit ---- */
-    const lamps = [...document.querySelectorAll<HTMLElement>('[data-px-lamp]')];
-    let deepest = -1;
-    const light = (sec: number, withSound: boolean) => {
-      if (sec <= deepest) return;
-      deepest = sec;
-      lamps.forEach((el) => {
-        if (Number(el.dataset.pxLamp) <= deepest) el.classList.add('is-on');
-      });
-      const floor = floorOf(sec);
-      if (withSound && floor >= 1) lamp(s, floor);
-    };
-    light(mark, false);
 
     ctx.onSection((index) => {
       const i = clampSec(index);
@@ -184,11 +195,11 @@ const reel: ReelModule = {
         if (i !== mark) footstep(s, floorOf(i), i < mark);
         mark = i;
         place(mark);
+        reach(mark, true);
         arrive();
       } else if (!walking) {
         step();
       }
-      light(i, true);
     });
 
     /* ---- rain, only while the interlude is on screen ---- */
@@ -293,8 +304,9 @@ const reel: ReelModule = {
       rainOff();
       offSound();
       rainEl?.classList.remove('is-raining');
-      lamps.forEach((el) => el.classList.remove('is-on'));
       nav?.style.removeProperty('--px-mark');
+      nav?.style.removeProperty('--px-deep');
+      delete root.dataset.pxLit;
       delete root.dataset.pxBar;
       delete root.dataset.pxSignal;
       delete root.dataset.pxKey;

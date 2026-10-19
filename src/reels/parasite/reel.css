@@ -264,28 +264,24 @@ html:root[data-reel='parasite'] {
     pointer-events: none;
     transition: border-color 0.2s;
   }
-  /* the floor each step lands on (decorative: empty alt text) */
+  /* the stair lights: below ground, every tread the walker has been down to
+     stays lit (client.ts keeps --px-deep at the deepest section reached) */
   .railnav a::after {
-    content: '1F';
-    content: '1F' / '';
-    margin-left: auto;
-    padding-left: 8px;
-    font-family: var(--font-mono);
-    font-size: 9.5px;
-    letter-spacing: 0.06em;
-    color: var(--muted);
+    content: '';
+    position: absolute;
+    left: calc(var(--px-i, 0) * var(--px-step));
+    top: 0;
+    width: var(--px-step);
+    height: 100%;
+    border-left: 1.5px solid #f4f8f7;
+    border-bottom: 1.5px solid #f4f8f7;
+    filter: drop-shadow(0 0 2px rgb(244 248 247 / 0.9));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s;
   }
   .railnav a:nth-child(n + 4)::after {
-    content: '↓';
-    content: '↓' / '';
-  }
-  .railnav a:nth-child(n + 6)::after {
-    content: 'B1';
-    content: 'B1' / '';
-  }
-  .railnav a:nth-child(n + 8)::after {
-    content: 'B2';
-    content: 'B2' / '';
+    opacity: clamp(0, var(--px-deep, -1) - var(--px-i) + 1, 1);
   }
   /* scene numbers, counted from 1 like the keybars' S# */
   .railnav a .nx {
@@ -308,9 +304,6 @@ html:root[data-reel='parasite'] {
   .railnav a[aria-current='true'] .nx {
     color: var(--amber-deep);
   }
-  .railnav a[aria-current='true']::after {
-    color: var(--ink);
-  }
   .railnav::after {
     content: '';
     position: absolute;
@@ -331,8 +324,11 @@ html:root[data-reel='parasite'] {
       box-shadow 0.3s;
   }
   /* keying Morse in the bunker lights the whole flight */
-  &[data-px-key='down'] .railnav a::before {
+  &[data-px-key='down'] .railnav a::after {
+    opacity: 1;
     border-color: var(--amber);
+    filter: drop-shadow(0 0 3px var(--amber));
+    transition-duration: 0s;
   }
   &[data-px-key='down'] .railnav::after {
     background: var(--amber);
@@ -342,64 +338,29 @@ html:root[data-reel='parasite'] {
     color: var(--amber);
   }
 
-  /* the elevator readout: which floor you're on, follows html[data-act] */
-  .px-elev {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    margin-top: -4px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: var(--muted);
-  }
-  .px-elev-car {
-    flex: none;
-    height: 24px;
-    min-width: 34px;
-    overflow: hidden;
-    border: 1px solid var(--rule-2);
-    background: var(--paper-2);
-    text-align: center;
-  }
-  .px-elev-roll {
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.55s cubic-bezier(0.34, 1.45, 0.5, 1);
-  }
-  .px-elev-roll span {
-    height: 22px;
-    font-weight: 600;
+  /* the floor sign at the foot of the flight, after html[data-act] */
+  .px-floor {
+    margin: -4px 0 0 15px;
     font-size: 12px;
-    line-height: 22px;
-    color: var(--amber-deep);
+    color: var(--ink-2);
   }
-  &[data-act='1'] .px-elev-roll {
-    transform: translateY(-22px);
-  }
-  &[data-act='2'] .px-elev-roll {
-    transform: translateY(-44px);
-  }
-  &[data-act='3'] .px-elev-roll,
-  &[data-sec='9'] .px-elev-roll {
-    transform: translateY(-66px);
-  }
-  .px-elev-name > span,
-  &[data-sec='9'] .px-elev-name > span:not([data-floor='3']) {
+  .px-floor > span,
+  &[data-sec='9'] .px-floor > span:not([data-floor='3']) {
     display: none;
   }
-  &[data-act='0'] .px-elev-name > [data-floor='0'],
-  &[data-act='1'] .px-elev-name > [data-floor='1'],
-  &[data-act='2'] .px-elev-name > [data-floor='2'],
-  &[data-act='3'] .px-elev-name > [data-floor='3'],
-  &[data-sec='9'] .px-elev-name > [data-floor='3'] {
+  &[data-act='0'] .px-floor > [data-floor='0'],
+  &[data-act='1'] .px-floor > [data-floor='1'],
+  &[data-act='2'] .px-floor > [data-floor='2'],
+  &[data-act='3'] .px-floor > [data-floor='3'],
+  &[data-sec='9'] .px-floor > [data-floor='3'] {
     display: inline;
   }
-  .px-elev-name b {
-    margin-right: 4px;
-    font-family: var(--font-sans);
-    font-weight: 500;
-    font-size: 12px;
+  .px-floor b {
+    margin-right: 7px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-stretch: 125%;
+    letter-spacing: 0.06em;
     color: var(--ink);
   }
 
@@ -431,6 +392,17 @@ html:root[data-reel='parasite'] {
   [data-sec='5']::before,
   [data-sec='7']::before {
     display: none;
+  }
+  /* except in the semi-basement, where the line between its two rooms is the
+     fluorescent tube: the width of the room, on once you get down to it */
+  .block[data-sec='6']::before {
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+  &[data-px-lit~='tube'] .block[data-sec='6']::before {
+    background: #d9e08a;
+    box-shadow: 0 0 18px 2px rgb(198 209 90 / 0.28);
   }
 
   /* the keybar is a screenplay slug: scene number, then the place and time */
@@ -478,58 +450,6 @@ html:root[data-reel='parasite'] {
     letter-spacing: 0;
     text-transform: none;
     color: var(--ink-2);
-  }
-
-  /* lamps: off until you've been here (client.ts adds .is-on) */
-  .px-lamp {
-    float: right;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    height: 17px;
-    margin-left: 14px;
-  }
-  .px-lamp i {
-    display: block;
-    background: var(--rule-2);
-  }
-  .px-lamp.is-stair i {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-  }
-  .px-lamp.is-tube i {
-    width: 30px;
-    height: 5px;
-    border-radius: 3px;
-  }
-  .px-lamp.is-bulb i {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-  }
-  .px-lamp.is-on i {
-    background: var(--amber);
-    box-shadow: 0 0 10px 1px var(--amber);
-  }
-  .px-lamp.is-stair.is-on i {
-    background: #f4f8f7;
-    box-shadow:
-      0 0 0 1px rgb(17 23 21 / 0.35),
-      0 0 9px 2px rgb(244 248 247 / 0.9);
-    animation: parasite-relay 0.45s steps(1) both;
-  }
-  .px-lamp.is-stair.is-on i:nth-child(2) {
-    animation-delay: 0.14s;
-  }
-  .px-lamp.is-stair.is-on i:nth-child(3) {
-    animation-delay: 0.28s;
-  }
-  .px-lamp.is-tube.is-on i {
-    animation: parasite-tube 0.9s linear both;
-  }
-  .px-lamp.is-bulb.is-on i {
-    animation: parasite-tube 0.6s linear both;
   }
 
   /* ---------- S#1 · the living-room window ----------
@@ -1378,24 +1298,23 @@ html:root[data-reel='parasite'] {
     text-shadow: 0 0 18px rgb(198 209 90 / 0.35);
   }
 
-  /* ---------- S#06 · principles, numbered in fluorescent tube ---------- */
+  /* ---------- S#7 · principles, under the tube ---------- */
   .tenets {
     gap: 28px 40px;
   }
   .tenet .nn {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 700;
     font-stretch: 125%;
-    font-size: 46px;
+    font-size: 34px;
     line-height: 1;
     letter-spacing: 0.02em;
-    color: transparent;
-    -webkit-text-stroke: 1px var(--amber);
+    color: var(--muted);
+    transition: color 0.6s;
   }
-  [data-sec='6']:has(.px-lamp.is-on) .tenet .nn {
-    text-shadow: 0 0 14px rgb(198 209 90 / 0.35);
-    animation: parasite-tube 0.9s linear both;
+  &[data-px-lit~='tube'] .tenet .nn {
+    color: var(--ink-2);
   }
   .tenet h3 {
     margin-top: 0;
@@ -1526,11 +1445,11 @@ html:root[data-reel='parasite'] {
     background: #3a372f;
   }
   /* the bulb comes on once you reach the bunker, and flares while you key */
-  [data-sec='8']:has(.px-lamp.is-on) .px-glass {
+  &[data-px-lit~='bulb'] .px-glass {
     background: #c9a66a;
     box-shadow: 0 0 14px 4px rgb(237 182 90 / 0.3);
   }
-  [data-sec='8']:has(.px-lamp.is-on) .px-glow {
+  &[data-px-lit~='bulb'] .px-glow {
     opacity: 0.75;
   }
   &[data-px-key='down'] .px-glass {
@@ -1824,7 +1743,7 @@ html:root[data-reel='parasite'] {
     .px-shafts {
       animation: parasite-shafts 22s linear infinite;
     }
-    [data-sec='8']:has(.px-lamp.is-on) .px-glow {
+    &[data-px-lit~='bulb'] .px-glow {
       animation: parasite-flick 7s linear infinite;
     }
     .projector[data-state='card'] .px-title-bar {
@@ -1896,7 +1815,7 @@ html:root[data-reel='parasite'] {
       border-right: 0;
       border-bottom: 1px solid var(--rule);
     }
-    .px-elev {
+    .px-floor {
       display: none;
     }
     .block {
@@ -2036,14 +1955,6 @@ html:root[data-reel='parasite'] {
   }
   to {
     clip-path: inset(calc(100% - 0.045em) 0 0 0);
-  }
-}
-@keyframes parasite-relay {
-  0% {
-    opacity: 0.15;
-  }
-  100% {
-    opacity: 1;
   }
 }
 @keyframes parasite-tube {
