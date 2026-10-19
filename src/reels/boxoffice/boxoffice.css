@@ -197,7 +197,9 @@ html[data-boxoffice] {
   font-variant-numeric: tabular-nums;
   color: var(--bo-muted);
 }
-.boxoffice .snd,
+/* The lobby's own toggle, not the rail's .snd: a film screening behind the
+   reopened lobby restyles every :root[data-reel] .snd. Meter as in engine.css. */
+.bo-snd,
 .bo-x {
   position: relative;
   flex: none;
@@ -220,13 +222,41 @@ html[data-boxoffice] {
     background-color 0.15s,
     transform 0.12s;
 }
-.boxoffice .snd:hover,
+.bo-snd:hover,
 .bo-x:hover {
   background: rgba(239, 232, 218, 0.08);
 }
-.boxoffice .snd:active,
+.bo-snd:active,
 .bo-x:active {
   transform: scale(0.96);
+}
+.bo-snd .w {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10px;
+}
+.bo-snd .w i {
+  display: block;
+  width: 2px;
+  height: 4px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.bo-snd .w i:nth-child(2) {
+  height: 7px;
+}
+.bo-snd .w i:nth-child(3) {
+  height: 5px;
+}
+.bo-snd[aria-pressed='true'] .w i {
+  animation: snd-eq 0.9s ease-in-out infinite;
+}
+.bo-snd[aria-pressed='true'] .w i:nth-child(2) {
+  animation-duration: 1.26s;
+}
+.bo-snd[aria-pressed='true'] .w i:nth-child(3) {
+  animation-duration: 0.62s;
 }
 .bo-x kbd {
   padding: 0 5px;
@@ -1146,17 +1176,17 @@ html[data-boxoffice] {
   .bo-tr {
     gap: 8px;
   }
-  .boxoffice .snd,
+  .bo-snd,
   .bo-x {
     padding: 0 10px;
   }
   /* the toggle keeps its label for screen readers; on a phone the meter says it */
-  .boxoffice .snd {
+  .bo-snd {
     width: 34px;
     padding: 0;
     justify-content: center;
   }
-  .boxoffice .snd [data-sound-label] {
+  .bo-snd [data-sound-label] {
     position: absolute;
     width: 1px;
     height: 1px;
