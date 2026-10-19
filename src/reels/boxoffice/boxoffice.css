@@ -1,7 +1,1403 @@
 /* ============================================================
    The box office: the first-visit ticket picker.
-   Shown while html[data-first-visit] is set, or when opened from the rail.
+   Shown while html[data-first-visit] is set (from the first frame, before
+   any JS), or when boxoffice.ts opens it as a modal (first visit, or the
+   rail's "box office" button). Everything is scoped to .boxoffice / .bo-*;
+   it looks the same whichever reel is screening behind it.
+   The CJK faces on the tickets ('Nanum Myeongjo', 'Noto Serif TC Variable')
+   are declared by the Parasite and Mood reels; system serifs stand in.
    ============================================================ */
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource-variable/bodoni-moda/wght-italic.css';
+@import '@fontsource-variable/big-shoulders-display/wght';
+@import '@fontsource-variable/jost/wght.css';
+@import '@fontsource/michroma/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+
+/* ---- the first frame: no flash of the site behind a fresh visit ----
+   `:has(:target)` lets the House lights link (href="#readme") dismiss the
+   lobby even if the module script never ran. */
+html[data-first-visit]:not(:has(:target)),
+html[data-first-visit]:not(:has(:target)) body {
+  overflow: hidden;
+  background: #12100d;
+}
+html[data-first-visit]:not(:has(:target)) .shell {
+  visibility: hidden;
+}
+html[data-first-visit]:not(:has(:target)) .boxoffice {
+  display: block;
+}
+html[data-boxoffice] {
+  overflow: hidden;
+}
+
+/* ---- the lobby ---- */
 .boxoffice {
+  --bo-bg: #12100d;
+  --bo-panel: #1e1a15;
+  --bo-ink: #efe8da;
+  --bo-muted: #a79f8e;
+  --bo-line: rgba(239, 232, 218, 0.2);
+  --bo-amber: #e8a33d;
+  --bo-ease: cubic-bezier(0.2, 0.9, 0.2, 1);
+  --bo-serif: 'Newsreader Variable', 'Newsreader', Georgia, serif;
+  --bo-sans: 'Geist Variable', 'Geist', system-ui, sans-serif;
+  --bo-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+  --bo-stub: 'IBM Plex Mono', ui-monospace, monospace;
+  --bo-wide: 'Archivo Variable', 'Archivo', 'Arial Narrow', sans-serif;
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--bo-bg);
+  color: var(--bo-ink);
+  color-scheme: dark;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  font-family: var(--bo-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.boxoffice::backdrop {
+  background: transparent;
+}
+.boxoffice:focus,
+.boxoffice:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.boxoffice :focus-visible {
+  outline: 2px solid var(--bo-amber);
+  outline-offset: 4px;
+  box-shadow: none;
+}
+.boxoffice[data-mode='again'][open] {
+  animation: boxoffice-in 0.32s ease both;
+}
+.boxoffice[data-leaving] {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.boxoffice[data-leaving] .bo-lobby {
+  transform: scale(1.012);
+  transition: transform 0.45s ease;
+}
+
+.bo-lobby {
+  position: relative;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 48px 22px;
+  overflow: hidden;
+}
+/* the marquee's glow on the lobby ceiling */
+.bo-lobby::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 560px;
+  background: radial-gradient(
+    ellipse 60% 70% at 50% 0%,
+    rgba(232, 163, 61, 0.14),
+    rgba(232, 163, 61, 0) 70%
+  );
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+/* lights down: the moment a ticket tears, the ceiling glow goes and the
+   marquee stops chasing and dims, before the screen fades to black */
+.boxoffice:not([data-phase='pick']) .bo-lobby::before {
+  opacity: 0;
+}
+.boxoffice:not([data-phase='pick']) .bo-marquee {
+  box-shadow: inset 0 0 0 1px rgba(239, 232, 218, 0.06);
+}
+.boxoffice:not([data-phase='pick']) .bo-bulbs {
+  opacity: 0.35;
+  transition: opacity 0.45s ease 0.1s;
+}
+.boxoffice:not([data-phase='pick']) .bo-bulbs .bl::after {
+  animation-play-state: paused;
+}
+.bo-grain {
+  position: fixed;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
+    repeat;
+  background-size: 192px 192px;
+}
+
+/* ---- top bar ---- */
+.bo-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.bo-id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.bo-sig {
+  flex: none;
+  width: 38px;
+  height: 30px;
+  color: var(--bo-amber);
+}
+.bo-sig path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bo-nm {
+  font-family: var(--bo-serif);
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.bo-rl {
+  margin-top: 2px;
+  font-family: var(--bo-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bo-muted);
+}
+.bo-tr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bo-clock {
+  font-family: var(--bo-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--bo-muted);
+}
+.boxoffice .snd,
+.bo-x {
+  position: relative;
+  flex: none;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--bo-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bo-ink);
+  font-family: var(--bo-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    transform 0.12s;
+}
+.boxoffice .snd:hover,
+.bo-x:hover {
+  background: rgba(239, 232, 218, 0.08);
+}
+.boxoffice .snd:active,
+.bo-x:active {
+  transform: scale(0.96);
+}
+.bo-x kbd {
+  padding: 0 5px;
+  border: 1px solid var(--bo-line);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 9.5px;
+  line-height: 15px;
+  color: var(--bo-muted);
+}
+
+/* ---- the marquee: chasing bulbs round a letter board ---- */
+.bo-marquee {
+  position: relative;
+  z-index: 1;
+  transition: box-shadow 0.5s ease;
+  width: min(900px, 100%);
+  margin: 16px auto 0;
+  padding: 22px;
+  border-radius: 10px;
+  background: var(--bo-panel);
+  box-shadow:
+    inset 0 0 0 1px rgba(239, 232, 218, 0.06),
+    0 30px 80px -30px rgba(232, 163, 61, 0.4);
+}
+.bo-bulbs {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+}
+.bo-bulbs.top,
+.bo-bulbs.bot {
+  left: 16px;
+  right: 16px;
+}
+.bo-bulbs.top {
+  top: 6px;
+}
+.bo-bulbs.bot {
+  bottom: 6px;
+}
+.bo-bulbs.lft,
+.bo-bulbs.rgt {
+  top: 24px;
+  bottom: 24px;
+  flex-direction: column;
+}
+.bo-bulbs.lft {
+  left: 6px;
+}
+.bo-bulbs.rgt {
+  right: 6px;
+}
+.bo-bulbs .bl {
+  position: relative;
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4a3c26;
+}
+/* the lit filament: opacity only, so the chase stays on the compositor */
+.bo-bulbs .bl::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #ffd47e;
+  box-shadow: 0 0 8px 2px rgba(255, 196, 96, 0.7);
+  opacity: 0;
+}
+.bo-bulbs .bl.k0::after {
+  opacity: 1;
+}
+.bo-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 18px;
+  border-radius: 3px;
+  background-color: #f3eee2;
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(22, 19, 15, 0) 0 calc(var(--bo-row) - 3px),
+    rgba(22, 19, 15, 0.13) calc(var(--bo-row) - 3px) calc(var(--bo-row) - 1px),
+    rgba(22, 19, 15, 0) calc(var(--bo-row) - 1px) calc(var(--bo-row) + 4px)
+  );
+  background-position: 0 12px;
+  --bo-row: 46px;
+  --bo-tw: 29px;
+  --bo-fs: 33px;
+}
+.bo-row {
+  display: flex;
+  align-items: center;
+  height: var(--bo-row);
+}
+.bo-tile {
+  display: inline-block;
+  width: var(--bo-tw);
+  text-align: center;
+  transform: rotate(var(--r)) translateY(var(--y));
+}
+.bo-tile.sp {
+  width: calc(var(--bo-tw) * 0.5);
+}
+.bo-tl {
+  display: inline-block;
+  font-family: var(--bo-wide);
+  font-weight: 800;
+  font-size: var(--bo-fs);
+  font-stretch: 75%;
+  line-height: 1;
+  color: #16130f;
+}
+
+/* ---- the lead ---- */
+.bo-lead {
+  position: relative;
+  z-index: 1;
+  margin-top: 20px;
+  text-align: center;
+}
+.bo-lead h2 {
+  margin: 0;
+  font-family: var(--bo-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--bo-ink);
+  text-wrap: balance;
+}
+.bo-lead p {
+  max-width: 62ch;
+  margin: 8px auto 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--bo-muted);
+  text-wrap: pretty;
+}
+
+/* ---- the tickets: one paper stock per film ---- */
+.bo-tix {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 18px;
+  margin: 18px 0 0;
+  padding: 14px 0 0;
+  list-style: none;
+}
+.bo-tkw {
+  flex: none;
+  transform: rotate(var(--rot)) translateY(var(--ty));
+}
+.bo-tk {
+  --tk-paper: #efe8da;
+  --tk-ink: #16130f;
+  --tk-muted: #5a5246;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 192px;
+  height: 300px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--tk-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  isolation: isolate;
+  transition: transform 0.35s var(--bo-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+/* the shadow under the ticket: a blurred blob kept clear of the side edges,
+   so the notches read as clean bites instead of dark holes */
+.bo-tk::before {
+  content: '';
+  position: absolute;
+  inset: 14px 22px -6px;
+  z-index: -1;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  filter: blur(14px);
+  transform: translateY(12px);
+  transition: transform 0.35s var(--bo-ease);
+  pointer-events: none;
+}
+.bo-tk:hover::before,
+.bo-tk:focus-visible::before {
+  transform: translateY(22px) scale(0.98);
+}
+/* the stub is gone, so is its shadow */
+.bo-tk[data-torn]::before {
+  transform-origin: 50% 0;
+  transform: translateY(22px) scaleY(0.78);
+}
+.bo-tk:hover,
+.bo-tk:focus-visible {
+  transform: translateY(-14px);
+}
+.bo-tk:active {
+  transform: translateY(-10px) scale(0.98);
+}
+.tk-main {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 16px 16px 14px;
+  border-radius: 6px 6px 0 0;
+  background: var(--tk-paper);
+  /* the two notches either side of the perforation */
+  -webkit-mask:
+    radial-gradient(circle at 0 100%, #0000 9px, #000 9.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 100%, #0000 9px, #000 9.5px) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 100%, #0000 9px, #000 9.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 100%, #0000 9px, #000 9.5px) right / 51% 100% no-repeat;
+}
+.tk-main::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  border-bottom: 2px dashed var(--tk-muted);
+  opacity: 0.45;
+}
+.tk-main > span {
+  position: relative;
+  z-index: 1;
+}
+.tk-main > .tk-deco {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.tk-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--bo-stub);
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tk-muted);
+}
+.tk-bc {
+  display: flex;
+  height: 60px;
+  margin: 3px 0 4px;
+  outline: 1px solid rgba(0, 0, 0, 0.12);
+}
+.tk-bc i {
+  display: block;
+  min-width: 1px;
+}
+.tk-ttl {
+  font-family: var(--bo-serif);
+  font-size: 21px;
+  line-height: 1.05;
+  color: var(--tk-ink);
+}
+.tk-ko {
+  font-size: 17px;
+  line-height: 1;
+  color: var(--tk-ink);
+}
+.tk-meta {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+  font-family: var(--bo-stub);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tk-muted);
+}
+.tk-stub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  height: 56px;
+  padding: 0 16px;
+  border-radius: 0 0 6px 6px;
+  background: var(--tk-paper);
+  font-family: var(--bo-stub);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tk-muted);
+  -webkit-mask:
+    radial-gradient(circle at 0 0, #0000 9px, #000 9.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 0, #0000 9px, #000 9.5px) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 0, #0000 9px, #000 9.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 0, #0000 9px, #000 9.5px) right / 51% 100% no-repeat;
+  transition: transform 0.3s var(--bo-ease);
+}
+/* a tug on the stub while the press is held */
+.bo-tk:active:not([data-torn]) .tk-stub {
+  transform: translateY(2px) rotate(1.5deg);
+  transition-duration: 0.12s;
+}
+.bo-tk[data-torn] {
+  transform: translateY(-14px);
+}
+.bo-tk[data-torn] .tk-stub {
+  transform: translate(24px, 200px) rotate(28deg);
+  opacity: 0;
+  transition:
+    transform 0.75s cubic-bezier(0.55, 0, 0.8, 0.3),
+    opacity 0.45s ease 0.3s;
+}
+.tk-hint {
+  position: absolute;
+  left: 50%;
+  bottom: -30px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--bo-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bo-amber);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.bo-tk:hover .tk-hint,
+.bo-tk:focus-visible .tk-hint {
+  opacity: 1;
+}
+.bo-tk[data-torn] .tk-hint {
+  opacity: 0;
+}
+/* the ticket for the reel already screening (when reopened from the rail) */
+.tk-main > .tk-now {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 58px;
   display: none;
+  padding: 3px 8px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  background: var(--tk-paper);
+  box-shadow: 0 0 0 3px var(--tk-paper);
+  font-family: var(--bo-stub);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--tk-ink);
+  transform: translateX(-50%) rotate(-7deg);
+}
+.bo-tk[data-current] .tk-now {
+  display: block;
+}
+.tk-hint .h-seat,
+.bo-tk[data-current] .tk-hint .h-tear {
+  display: none;
+}
+.bo-tk[data-current] .tk-hint .h-seat {
+  display: inline;
+}
+
+/* 01 · Parasite: pale paper, the censor bar */
+.bo-tk[data-stock='parasite'] {
+  --tk-paper: #eceee7;
+  --tk-ink: #151b17;
+  --tk-muted: #4e5850;
+}
+.bo-tk[data-stock='parasite'] .tk-ttl {
+  font-family: var(--bo-wide);
+  font-weight: 700;
+  font-size: 21px;
+  font-stretch: 118%;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.bo-tk[data-stock='parasite'] .tk-ko {
+  font-family: 'Nanum Myeongjo', 'AppleMyungjo', 'Batang', serif;
+  font-weight: 800;
+}
+.bo-tk[data-stock='parasite'] .tk-bc {
+  position: relative;
+}
+.bo-tk[data-stock='parasite'] .tk-bc::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 10px;
+  width: 58%;
+  height: 9px;
+  background: #0a0b0a;
+}
+
+/* 02 · In the Mood for Love: crimson foil, gold lattice */
+.bo-tk[data-stock='mood'] {
+  --tk-paper: #6e1410;
+  --tk-ink: #f3e6cc;
+  --tk-muted: #e2c9a6;
+}
+.bo-tk[data-stock='mood'] .tk-ttl {
+  font-family: 'Bodoni Moda Variable', 'Bodoni Moda', Didot, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.02;
+}
+.bo-tk[data-stock='mood'] .tk-ko {
+  font-family: 'Noto Serif TC Variable', 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #d9b26b;
+}
+.bo-tk[data-stock='mood'] .tk-deco {
+  box-shadow:
+    inset 0 0 0 6px #6e1410,
+    inset 0 0 0 7px rgba(217, 178, 107, 0.75);
+  background:
+    repeating-linear-gradient(45deg, rgba(217, 178, 107, 0.09) 0 1px, #0000 1px 11px),
+    repeating-linear-gradient(-45deg, rgba(217, 178, 107, 0.09) 0 1px, #0000 1px 11px);
+}
+
+/* 03 · Blade Runner 2049: a cut-corner orange stub, scanlines */
+.bo-tk[data-stock='br2049'] {
+  --tk-paper: #e07524;
+  --tk-ink: #1a0d05;
+  --tk-muted: #3e1c08;
+}
+.bo-tk[data-stock='br2049'] .tk-main {
+  clip-path: polygon(16px 0, 100% 0, 100% 100%, 0 100%, 0 16px);
+}
+.bo-tk[data-stock='br2049'] .tk-stub {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+.bo-tk[data-stock='br2049'] .tk-ttl {
+  font-family:
+    'Big Shoulders Display Variable', 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.bo-tk[data-stock='br2049'] .tk-deco {
+  background: repeating-linear-gradient(0deg, rgba(26, 13, 5, 0.09) 0 1px, #0000 1px 3px);
+}
+
+/* 04 · The Grand Budapest Hotel: pastry-box pink, a ribbon, a stamp */
+.bo-tk[data-stock='budapest'] {
+  --tk-paper: #f2c6d0;
+  --tk-ink: #3b1530;
+  --tk-muted: #6a3557;
+}
+.bo-tk[data-stock='budapest'] .tk-ttl {
+  font-family: 'Jost Variable', 'Jost', 'Futura', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.35;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.bo-tk[data-stock='budapest'] :is(.tk-top, .tk-meta) {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.bo-tk[data-stock='budapest'] .tk-top {
+  gap: 10px;
+}
+.bo-tk[data-stock='budapest'] .tk-deco {
+  background: radial-gradient(
+    circle at 78% 63%,
+    rgba(179, 38, 45, 0) 18px,
+    rgba(179, 38, 45, 0.55) 19px 20.5px,
+    rgba(179, 38, 45, 0) 21.5px 24px,
+    rgba(179, 38, 45, 0.4) 25px 26px,
+    rgba(179, 38, 45, 0) 27px
+  );
+}
+.bo-tk[data-stock='budapest'] .tk-stub {
+  background:
+    linear-gradient(
+      90deg,
+      #0000 calc(50% - 9px),
+      #9cc4d8 calc(50% - 9px) calc(50% + 9px),
+      #0000 calc(50% + 9px)
+    ),
+    var(--tk-paper);
+}
+.bo-tk[data-stock='budapest'] .tk-stub > span {
+  padding: 0 1px;
+  background: var(--tk-paper);
+  width: fit-content;
+}
+
+/* 05 · 2001: a punch card with HAL's red lens */
+.bo-tk[data-stock='odyssey'] {
+  --tk-paper: #f2f2f0;
+  --tk-ink: #0a0a0a;
+  --tk-muted: #4a4a48;
+}
+.bo-tk[data-stock='odyssey'] .tk-main {
+  clip-path: polygon(18px 0, 100% 0, 100% 100%, 0 100%, 0 18px);
+}
+.bo-tk[data-stock='odyssey'] .tk-top {
+  padding-right: 24px;
+}
+.bo-tk[data-stock='odyssey'] .tk-ttl {
+  font-family: 'Michroma', 'Eurostile', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.bo-tk[data-stock='odyssey'] .tk-deco {
+  background:
+    radial-gradient(
+      circle at calc(100% - 22px) 22px,
+      #ffd24a 0 2px,
+      #e1261c 3px 6px,
+      rgba(225, 38, 28, 0.25) 7px 9px,
+      #0000 10px
+    ),
+    repeating-linear-gradient(90deg, rgba(10, 10, 10, 0.1) 0 3px, #0000 3px 9px) 16px
+      calc(100% - 46px) / calc(100% - 32px) 26px no-repeat;
+}
+
+/* ---- the foot: how-to, House lights, the fine print ---- */
+.bo-foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px 28px;
+  margin-top: auto;
+  padding-top: 40px;
+  font-family: var(--bo-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bo-muted);
+}
+.bo-house {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 6px 16px 6px 7px;
+  border: 1px solid var(--bo-line);
+  border-radius: 999px;
+  color: var(--bo-ink);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    transform 0.12s;
+}
+.bo-house:hover {
+  border-color: var(--bo-amber);
+  background: var(--bo-amber);
+  color: #12100d;
+}
+.bo-house:active {
+  transform: scale(0.98);
+}
+.bo-house-sw {
+  display: flex;
+  flex: none;
+  width: 46px;
+  height: 28px;
+  padding: 3px;
+  border-radius: 999px;
+  background: #fbfaf6;
+  overflow: hidden;
+}
+.bo-house-sw i {
+  display: block;
+  min-width: 1px;
+}
+.bo-house-sw i:first-child {
+  border-radius: 999px 0 0 999px;
+}
+.bo-house-sw i:last-child {
+  border-radius: 0 999px 999px 0;
+}
+.bo-house-t {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+.bo-house-t b {
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+.bo-house {
+  position: relative;
+}
+/* a tab on the pill's top edge while House lights is what's screening */
+.bo-house-now {
+  position: absolute;
+  top: -8px;
+  right: 22px;
+  display: none;
+  padding: 0 6px;
+  background: var(--bo-bg);
+  font-size: 9.5px;
+  line-height: 15px;
+  letter-spacing: 0.12em;
+  color: var(--bo-amber);
+}
+.bo-house[data-current] .bo-house-now {
+  display: block;
+}
+.bo-fine {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+/* ---- the screening: lights down, the leader, the 2-pop ---- */
+@property --boxoffice-a {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.bo-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.7s ease,
+    visibility 0s linear 0.7s;
+}
+.boxoffice:is([data-phase='dim'], [data-phase='count'], [data-phase='black']) .bo-screen {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.7s ease;
+}
+.bo-leader {
+  position: relative;
+  display: none;
+  width: min(92vw, 1100px, calc(84vh * 2.39));
+  aspect-ratio: 2.39 / 1;
+  overflow: hidden;
+  container-type: size;
+  background: radial-gradient(ellipse 62% 75% at 50% 50%, #0000 55%, rgba(0, 0, 0, 0.32)), #9c9a93;
+}
+.boxoffice[data-phase='count'] .bo-leader {
+  display: block;
+}
+/* dust and a scratch that wander frame to frame (oversized, so a jump never shows an edge) */
+.bo-leader::after {
+  content: '';
+  position: absolute;
+  inset: -12%;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, #0000 31.2%, rgba(255, 255, 255, 0.4) 31.3% 31.4%, #0000 31.5%),
+    radial-gradient(circle at 72% 28%, rgba(20, 20, 18, 0.55) 0 2px, #0000 3px),
+    radial-gradient(circle at 18% 74%, rgba(20, 20, 18, 0.4) 0 1.5px, #0000 2.5px),
+    radial-gradient(circle at 46% 63%, rgba(20, 20, 18, 0.35) 0 1px, #0000 2px);
+}
+.bo-sweep {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 200%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(
+    from 0deg,
+    rgba(0, 0, 0, 0.3) 0deg,
+    rgba(0, 0, 0, 0.3) var(--boxoffice-a),
+    #0000 var(--boxoffice-a)
+  );
+}
+.bo-cross {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      #0000 calc(50% - 1px),
+      rgba(0, 0, 0, 0.55) calc(50% - 1px) calc(50% + 1px),
+      #0000 calc(50% + 1px)
+    ),
+    linear-gradient(
+      180deg,
+      #0000 calc(50% - 1px),
+      rgba(0, 0, 0, 0.55) calc(50% - 1px) calc(50% + 1px),
+      #0000 calc(50% + 1px)
+    );
+}
+.bo-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  aspect-ratio: 1;
+  border: 3px solid #f2f0ea;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.bo-ring.r1 {
+  height: 88%;
+}
+.bo-ring.r2 {
+  height: 70%;
+}
+.bo-num {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-family: var(--bo-wide);
+  font-weight: 800;
+  font-size: 66cqh;
+  font-stretch: 75%;
+  line-height: 1;
+  color: #111;
+}
+.bo-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+.boxoffice[data-flash] .bo-flash {
+  opacity: 1;
+}
+
+/* ---- motion (all of it off under reduced motion) ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .bo-grain {
+    animation: boxoffice-grain 1s steps(6) infinite;
+  }
+  .bo-bulbs .bl::after {
+    animation: boxoffice-chase 1.05s steps(1) infinite;
+  }
+  .bo-bulbs .bl.k1::after {
+    animation-delay: -0.35s;
+  }
+  .bo-bulbs .bl.k2::after {
+    animation-delay: -0.7s;
+  }
+  .bo-tl {
+    animation: boxoffice-hang 0.55s var(--bo-ease) both;
+    animation-delay: var(--d);
+  }
+  .bo-tkw {
+    animation: boxoffice-deal 0.6s var(--bo-ease) both;
+    animation-delay: calc(0.35s + var(--i, 0) * 0.07s);
+  }
+  .bo-leader {
+    animation: boxoffice-flick 0.14s steps(2) infinite;
+  }
+  .bo-leader::after {
+    animation: boxoffice-dust 0.25s steps(3) infinite;
+  }
+  .bo-sweep {
+    animation: boxoffice-sweep 1s linear infinite;
+  }
+}
+@keyframes boxoffice-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes boxoffice-grain {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  17% {
+    transform: translate(-3%, 2%);
+  }
+  33% {
+    transform: translate(2%, -4%);
+  }
+  50% {
+    transform: translate(-4%, -1%);
+  }
+  67% {
+    transform: translate(3%, 3%);
+  }
+  83% {
+    transform: translate(-1%, 4%);
+  }
+}
+@keyframes boxoffice-chase {
+  0% {
+    opacity: 1;
+  }
+  33.33%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes boxoffice-hang {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) rotate(-8deg);
+  }
+}
+@keyframes boxoffice-deal {
+  from {
+    opacity: 0;
+    transform: translateY(70px) rotate(0deg);
+  }
+}
+@keyframes boxoffice-flick {
+  50% {
+    filter: brightness(0.92);
+  }
+}
+@keyframes boxoffice-dust {
+  33% {
+    transform: translate(-7%, 3%);
+  }
+  66% {
+    transform: translate(5%, -4%) scaleX(-1);
+  }
+}
+@keyframes boxoffice-sweep {
+  from {
+    --boxoffice-a: 0deg;
+  }
+  to {
+    --boxoffice-a: 360deg;
+  }
+}
+
+/* ---- smaller screens ---- */
+@media (max-height: 860px) and (min-width: 861px) {
+  .bo-board {
+    --bo-row: 38px;
+    --bo-tw: 24px;
+    --bo-fs: 27px;
+  }
+  .bo-marquee {
+    margin-top: 10px;
+    padding: 20px;
+  }
+  .bo-lead {
+    margin-top: 14px;
+  }
+  .bo-lead h2 {
+    font-size: 28px;
+  }
+  .bo-foot {
+    padding-top: 30px;
+  }
+}
+@media (max-width: 1180px) and (min-width: 861px) {
+  .bo-lobby {
+    padding-inline: 32px;
+  }
+  .bo-tix {
+    zoom: 0.86;
+  }
+}
+@media (max-width: 1000px) and (min-width: 861px) {
+  .bo-tix {
+    zoom: 0.74;
+  }
+}
+/* laptops (1280×720, 1366×768): everything, House lights included, above the fold */
+@media (max-height: 780px) and (min-width: 861px) {
+  .bo-lobby {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  .bo-board {
+    --bo-row: 31px;
+    --bo-tw: 21px;
+    --bo-fs: 23px;
+    padding-block: 8px;
+  }
+  .bo-marquee {
+    padding: 18px;
+  }
+  .bo-lead h2 {
+    font-size: 26px;
+  }
+  .bo-lead p {
+    margin-top: 4px;
+    font-size: 14px;
+  }
+  .bo-tix {
+    zoom: 0.74;
+    margin-top: 10px;
+  }
+  .bo-foot {
+    padding-top: 22px;
+    row-gap: 6px;
+  }
+}
+
+/* phones and narrow tablets: the fan becomes a stack of landscape tickets */
+@media (max-width: 860px) {
+  .bo-lobby {
+    padding: 14px 16px 24px;
+  }
+  .bo-clock {
+    display: none;
+  }
+  .bo-sig {
+    width: 32px;
+    height: 26px;
+  }
+  .bo-rl {
+    font-size: 9.5px;
+  }
+  .bo-tr {
+    gap: 8px;
+  }
+  .boxoffice .snd,
+  .bo-x {
+    padding: 0 10px;
+  }
+  /* the toggle keeps its label for screen readers; on a phone the meter says it */
+  .boxoffice .snd {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+  .boxoffice .snd [data-sound-label] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .bo-marquee {
+    margin-top: 14px;
+    padding: 16px;
+  }
+  .bo-bulbs .bl {
+    width: 6px;
+    height: 6px;
+  }
+  .bo-bulbs.top {
+    top: 5px;
+  }
+  .bo-bulbs.bot {
+    bottom: 5px;
+  }
+  .bo-bulbs.lft {
+    left: 5px;
+  }
+  .bo-bulbs.rgt {
+    right: 5px;
+  }
+  .bo-bulbs.top,
+  .bo-bulbs.bot {
+    left: 12px;
+    right: 12px;
+  }
+  .bo-bulbs.lft,
+  .bo-bulbs.rgt {
+    top: 18px;
+    bottom: 18px;
+  }
+  .bo-board {
+    padding: 8px 6px;
+    background-image: none;
+    --bo-row: 26px;
+    --bo-tw: min(14.5px, calc((100vw - 90px) / 19));
+    --bo-fs: 19px;
+  }
+  .bo-lead {
+    margin-top: 18px;
+  }
+  .bo-lead h2 {
+    font-size: 25px;
+  }
+  .bo-lead p {
+    font-size: 14px;
+  }
+  .bo-tix {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    width: min(100%, 520px);
+    margin: 18px auto 0;
+    padding: 0;
+  }
+  .bo-tkw {
+    transform: none;
+  }
+  .bo-tk {
+    flex-direction: row;
+    width: 100%;
+    height: 148px;
+  }
+  .bo-tk::before {
+    inset: 8px 10px 0;
+    transform: translateY(8px);
+  }
+  .bo-tk:hover,
+  .bo-tk:focus-visible {
+    transform: translateY(-3px);
+  }
+  .bo-tk:active {
+    transform: scale(0.985);
+  }
+  .tk-main {
+    gap: 5px;
+    padding: 12px 18px 12px 14px;
+    border-radius: 6px 0 0 6px;
+    -webkit-mask:
+      radial-gradient(circle at 100% 0, #0000 9px, #000 9.5px) top / 100% 51% no-repeat,
+      radial-gradient(circle at 100% 100%, #0000 9px, #000 9.5px) bottom / 100% 51% no-repeat;
+    mask:
+      radial-gradient(circle at 100% 0, #0000 9px, #000 9.5px) top / 100% 51% no-repeat,
+      radial-gradient(circle at 100% 100%, #0000 9px, #000 9.5px) bottom / 100% 51% no-repeat;
+  }
+  .tk-main::after {
+    left: auto;
+    right: 0;
+    top: 14px;
+    bottom: 14px;
+    border-bottom: 0;
+    border-right: 2px dashed var(--tk-muted);
+  }
+  .tk-bc {
+    height: 22px;
+    margin: 1px 0 2px;
+  }
+  .tk-stub {
+    flex: none;
+    width: 94px;
+    height: auto;
+    padding: 0 10px 0 14px;
+    gap: 6px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    border-radius: 0 6px 6px 0;
+    -webkit-mask:
+      radial-gradient(circle at 0 0, #0000 9px, #000 9.5px) top / 100% 51% no-repeat,
+      radial-gradient(circle at 0 100%, #0000 9px, #000 9.5px) bottom / 100% 51% no-repeat;
+    mask:
+      radial-gradient(circle at 0 0, #0000 9px, #000 9.5px) top / 100% 51% no-repeat,
+      radial-gradient(circle at 0 100%, #0000 9px, #000 9.5px) bottom / 100% 51% no-repeat;
+  }
+  .tk-row {
+    display: flex;
+    flex-direction: column;
+  }
+  .tk-dot {
+    display: none;
+  }
+  .bo-tk[data-torn] {
+    transform: none;
+  }
+  .bo-tk[data-torn] .tk-stub {
+    transform: translate(70px, 50px) rotate(22deg);
+  }
+  .tk-hint {
+    display: none;
+  }
+  .tk-main > .tk-now {
+    left: auto;
+    right: 14px;
+    top: 30px;
+    transform: rotate(-5deg);
+  }
+  .bo-tk[data-stock='parasite'] .tk-ttl {
+    font-size: 19px;
+  }
+  .bo-tk[data-stock='parasite'] .tk-bc::after {
+    top: 6px;
+    height: 7px;
+  }
+  .bo-tk[data-stock='br2049'] .tk-ttl {
+    font-size: 25px;
+  }
+  .bo-tk[data-stock='budapest'] .tk-ttl {
+    font-size: 12.5px;
+    letter-spacing: 0.16em;
+  }
+  .bo-tk[data-stock='budapest'] .tk-stub {
+    align-items: center;
+    text-align: center;
+  }
+  .bo-tk[data-stock='budapest'] .tk-stub > span {
+    padding: 1px 0;
+  }
+  .bo-tk[data-stock='odyssey'] .tk-ttl {
+    font-size: 11.5px;
+  }
+  .bo-tk[data-stock='odyssey'] .tk-deco {
+    background: radial-gradient(
+      circle at calc(100% - 26px) 20px,
+      #ffd24a 0 2px,
+      #e1261c 3px 6px,
+      rgba(225, 38, 28, 0.25) 7px 9px,
+      #0000 10px
+    );
+  }
+  .bo-tk[data-stock='odyssey'] .tk-stub {
+    background:
+      repeating-linear-gradient(180deg, rgba(10, 10, 10, 0.1) 0 3px, #0000 3px 9px) 10px 50% / 8px
+        70% no-repeat,
+      var(--tk-paper);
+    padding-left: 24px;
+  }
+  .bo-foot {
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 28px;
+  }
+  .bo-house {
+    width: min(100%, 520px);
+    border-radius: 22px;
+  }
+  .bo-house-t {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .bo-house-t span {
+    letter-spacing: 0.03em;
+  }
+  .bo-leader {
+    width: min(92vw, calc(78vh * 1.37));
+    aspect-ratio: 1.37 / 1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bo-tkw {
+      animation-name: boxoffice-rise;
+    }
+  }
+}
+@keyframes boxoffice-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
 }
