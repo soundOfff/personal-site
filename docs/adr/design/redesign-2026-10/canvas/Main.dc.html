@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>01 · Living Paper</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&family=Geist:wght@300..700&family=JetBrains+Mono:wght@400..700&display=swap">
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration:none}
+a:hover{color:inherit}
+.lp{
+  --paper:#FBFAF6;--paper-2:#F2EEE4;--ink:#1B1814;--ink-2:#403B33;--muted:#6F685B;
+  --hair:rgba(27,24,20,.13);--hair-2:rgba(27,24,20,.06);
+  --amber:#D8891C;--amber-ink:#A85F10;--amber-soft:#F7E7C8;
+  --serif:'Newsreader','Iowan Old Style',Georgia,serif;
+  --sans:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --spring:linear(0,0.009,0.035 2.1%,0.141 4.4%,0.723 12.9%,0.938 16.7%,1.017,1.077 20.4%,1.121,1.149 24.3%,1.159,1.163 27%,1.154,1.129 32.8%,1.051 39.6%,1.017 43.1%,0.991,0.977 51%,0.974 53.8%,0.975 57.1%,0.997 69.8%,1.003 76.9%,1.004 83.8%,1);
+  background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;
+  display:flex;min-height:100%;position:relative;
+}
+.lp ::selection{background:var(--amber-soft);color:var(--ink)}
+.lp :focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:6px}
+.grain{position:fixed;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:multiply;z-index:40}
+/* ---------- rail ---------- */
+.rail{width:248px;flex:none;padding:28px 20px 20px;border-right:1px solid var(--hair);display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh;box-sizing:border-box;background:var(--paper)}
+.id{display:flex;align-items:center;gap:12px}
+.mono-sig{width:44px;height:36px;flex:none;color:var(--amber-ink)}
+.mono-sig path{fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw .55s ease-in-out both}
+.mono-sig .s1{animation-delay:.35s}.mono-sig .s2{animation-delay:.75s;animation-duration:.45s}.mono-sig .s3{animation-delay:1.1s;animation-duration:.5s}.mono-sig .s4{animation-delay:1.5s;animation-duration:.5s}.mono-sig .s5{animation-delay:1.9s;animation-duration:.5s}
+@keyframes draw{to{stroke-dashoffset:0}}
+.nm{font-family:var(--serif);font-size:19px;font-weight:500;letter-spacing:-.01em;line-height:1.15}
+.rl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:4px;display:flex;gap:0}
+.rl-cycle{display:inline-grid;color:var(--amber-ink)}
+.rl-cycle>*{grid-area:1/1}
+.rl-ghost{visibility:hidden;display:flex;flex-direction:column}
+.ch{display:inline-block;white-space:pre}
+.ch.a{animation:blurin .42s cubic-bezier(.2,.7,.2,1) both}
+.ch.b{animation:blurin2 .42s cubic-bezier(.2,.7,.2,1) both}
+@keyframes blurin{from{opacity:0;filter:blur(5px)}to{opacity:1;filter:blur(0)}}
+@keyframes blurin2{from{opacity:0;filter:blur(5px)}to{opacity:1;filter:blur(0)}}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);padding:6px 12px;border:1px solid var(--hair);border-radius:999px;align-self:flex-start;background:var(--paper-2)}
+.dot{width:7px;height:7px;border-radius:50%;background:#4F8A3C;animation:blip 6s linear infinite}
+@keyframes blip{0%,95%,100%{box-shadow:0 0 0 0 rgba(79,138,60,0)}96.5%{box-shadow:0 0 0 6px rgba(79,138,60,.28)}}
+.railnav{position:relative;display:flex;flex-direction:column;gap:2px}
+.pill{position:absolute;left:0;right:0;top:0;height:34px;border-radius:8px;background:var(--paper-2);transition:transform .55s cubic-bezier(.2,.9,.2,1);transition:transform .55s var(--spring);pointer-events:none}
+.rn{position:relative;z-index:1;display:flex;align-items:center;gap:12px;height:34px;padding:0 10px;border-radius:8px;font-size:14px;color:var(--ink-2);transition:color .15s}
+.rn .nx{font-family:var(--mono);font-size:10.5px;color:var(--muted);width:18px;transition:color .15s}
+.rn.on{color:var(--ink);font-weight:500}.rn.on .nx{color:var(--amber-ink)}
+.rail-sec{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.contact{display:flex;flex-direction:column;gap:6px}
+.contact a{font-size:13px;color:var(--ink-2);padding:3px 6px;margin-left:-6px;border-radius:4px;display:inline-flex;gap:8px;align-items:center;transition:background-color .08s,color .08s;align-self:flex-start}
+.contact a:hover,.contact a:focus-visible{background:var(--amber);color:var(--paper)}
+.contact svg{width:13px;height:13px;flex:none}
+.rail-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.clock{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.snd{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border:1px solid var(--hair);border-radius:999px;background:transparent;color:var(--ink-2);font:500 11px var(--mono);letter-spacing:.06em;cursor:pointer;transition:background-color .15s,color .15s,transform .12s}
+.snd:hover{background:var(--paper-2)}.snd:active{transform:scale(.96)}
+.snd .w{display:inline-flex;align-items:flex-end;gap:2px;height:10px}
+.snd .w i{display:block;width:2px;background:currentColor;border-radius:1px;height:3px}
+.snd.on .w i{animation:eq .9s ease-in-out infinite}
+.snd.on .w i:nth-child(2){animation-duration:1.26s}.snd.on .w i:nth-child(3){animation-duration:.62s}
+@keyframes eq{0%,100%{height:3px}50%{height:10px}}
+/* ---------- content ---------- */
+.content{flex:1;min-width:0;padding:44px 64px 72px;max-width:1010px;box-sizing:border-box}
+.blk{padding:40px 0 48px;position:relative}
+.blk+.blk .rule{height:1px;background:var(--hair);position:absolute;left:0;right:0;top:0;transform-origin:left center}
+@supports (animation-timeline: view()){
+  .blk+.blk .rule{animation:rule-in linear both;animation-timeline:view();animation-range:entry 0% entry 38%}
+}
+@keyframes rule-in{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.keybar{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;margin:0 0 22px}
+.keybar .kn{color:var(--amber-ink)}
+.keybar a{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hair)}
+.keybar a:hover{color:var(--amber-ink)}
+.rv{animation:reveal .55s cubic-bezier(.2,.7,.2,1) both}
+@keyframes reveal{from{opacity:0;filter:blur(4px);transform:translateY(8px)}to{opacity:1;filter:blur(0);transform:none}}
+.hero{position:relative}
+.wash{position:absolute;left:-90px;top:-70px;width:620px;height:420px;background:url(/_blob/e14030ce3975810bde11bda1471c386f) center/cover no-repeat;opacity:.42;mix-blend-mode:multiply;-webkit-mask-image:radial-gradient(ellipse 60% 55% at 35% 40%,#000 15%,transparent 72%);mask-image:radial-gradient(ellipse 60% 55% at 35% 40%,#000 15%,transparent 72%);pointer-events:none;z-index:0;animation:washin 1.6s ease-out both}
+@keyframes washin{from{opacity:0;transform:scale(.96)}to{opacity:.42;transform:none}}
+.lede{position:relative;z-index:1;font-family:var(--serif);font-size:40px;line-height:1.18;font-weight:400;letter-spacing:-.012em;margin:0 0 20px;text-wrap:balance;max-width:17ch;color:var(--ink)}
+.lede em{font-style:italic;color:var(--amber-ink)}
+.sub{position:relative;z-index:1;font-size:16px;line-height:1.65;color:var(--ink-2);max-width:62ch;margin:0 0 24px;text-wrap:pretty}
+.startrow{display:flex;align-items:center;gap:20px;margin-bottom:32px;position:relative;z-index:1}
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:9px;font:500 14px var(--sans);border:1px solid transparent;cursor:pointer;transition:transform .12s cubic-bezier(.2,.9,.2,1),background-color .15s,box-shadow .15s}
+.btn:active{transform:scale(.96)}
+.btn.amber{background:var(--amber);color:#1B1814;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08),0 1px 0 rgba(0,0,0,.06)}
+.btn.amber:hover{background:#E59A2E}
+.btn svg{width:14px;height:14px}
+.arrow{font-size:14px;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px;padding:2px 6px;margin:-2px -6px;border-radius:4px;transition:background-color .08s,color .08s}
+.arrow:hover,.arrow:focus-visible{background:var(--amber);color:var(--paper)}
+.arrow svg{width:13px;height:13px;transition:transform .2s cubic-bezier(.2,.9,.2,1)}
+.arrow:hover svg{transform:translate(2px,-1px)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(120px,100%),1fr));border:1px solid var(--hair);border-radius:10px;overflow:hidden;position:relative;z-index:1}
+.m{padding:14px 16px;border-left:1px solid var(--hair);transition:background-color .15s}
+.m:first-child{border-left:0}
+.m:hover{background:var(--paper-2)}
+.m .v{font-family:var(--mono);font-size:21px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.m .v em{font-style:normal;color:var(--amber-ink)}
+.m .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+/* console */
+.console{border:1px solid var(--hair);border-radius:12px;background:#fff;box-shadow:0 1px 0 rgba(27,24,20,.03)}
+.chead{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--hair);background:var(--paper-2);border-radius:12px 12px 0 0}
+.dots{display:inline-flex;gap:5px}.dots i{width:8px;height:8px;border-radius:50%;background:var(--hair)}.dots i:first-child{background:var(--amber)}
+.ct{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.bars{margin-left:auto;display:inline-flex;align-items:center;gap:3px;height:14px}
+.bars i{display:block;width:3px;height:3px;border-radius:2px;background:var(--muted);transition:height .28s cubic-bezier(.2,.9,.2,1)}
+.bars.think i{animation:think 1s ease-in-out infinite}
+.bars.think i:nth-child(2){animation-delay:.12s}.bars.think i:nth-child(3){animation-delay:.24s}.bars.think i:nth-child(4){animation-delay:.36s}.bars.think i:nth-child(5){animation-delay:.48s}
+.bars.speak i{animation:speak .7s ease-in-out infinite;background:var(--amber-ink)}
+.bars.speak i:nth-child(2){animation-delay:.1s}.bars.speak i:nth-child(3){animation-delay:.2s}.bars.speak i:nth-child(4){animation-delay:.3s}.bars.speak i:nth-child(5){animation-delay:.4s}
+@keyframes think{0%,100%{height:3px}50%{height:9px}}
+@keyframes speak{0%,100%{height:4px}50%{height:14px}}
+.cbody{padding:18px 18px 16px}
+.cintro{margin:0 0 14px;color:var(--ink-2);font-size:15px;max-width:60ch}
+.ask{display:flex;gap:8px;margin-bottom:10px}
+.ain{flex:1;min-width:0;height:40px;padding:0 12px;border:1px solid var(--hair);border-radius:9px;font:14px var(--sans);color:var(--ink);background:var(--paper);transition:border-color .15s,box-shadow .15s}
+.ain:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.chip{height:32px;padding:0 12px;border:1px solid var(--hair);border-radius:999px;background:var(--paper);font:12.5px var(--mono);color:var(--ink-2);cursor:pointer;transition:background-color .12s,transform .12s,border-color .12s}
+.chip:hover{background:var(--paper-2);border-color:rgba(27,24,20,.25)}.chip:active{transform:scale(.96)}
+.thinking{display:flex;align-items:center;gap:10px;font:12px var(--mono);color:var(--muted);padding:12px 2px 4px}
+.eq{display:inline-flex;align-items:flex-end;gap:2px;height:10px}.eq i{display:block;width:2px;background:var(--amber);border-radius:1px;animation:eq .85s ease-in-out infinite}.eq i:nth-child(2){animation-duration:1.26s}.eq i:nth-child(3){animation-duration:.62s}
+.surfaces{display:flex;flex-direction:column;gap:14px;margin-top:12px}
+.surf{animation:surf-in .5s cubic-bezier(.2,.9,.2,1) both;border:1px solid var(--hair);border-radius:10px;padding:12px 14px 14px;background:var(--paper)}
+@keyframes surf-in{from{opacity:0;filter:blur(4px);transform:translateY(8px)}to{opacity:1;filter:blur(0);transform:none}}
+.stag{font:10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--amber-ink);margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.stag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:10px}
+.card{display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid var(--hair);border-radius:8px;background:#fff;transition:transform .2s cubic-bezier(.2,.9,.2,1),box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px -10px rgba(27,24,20,.25)}
+.card .cn{font:10.5px var(--mono);color:var(--amber-ink)}
+.card b{font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.25}
+.card .cd{font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.card .cm{font:10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:auto}
+.tbl{display:grid;gap:0;border:1px solid var(--hair);border-radius:8px;overflow:hidden;font-size:13px}
+.tbl.c3{grid-template-columns:repeat(3,minmax(0,1fr))}.tbl.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.cell{padding:8px 10px;border-top:1px solid var(--hair-2);border-left:1px solid var(--hair-2)}
+.cell.h{font:10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--paper-2);border-top:0}
+.cell.k{font-weight:500}
+.tl{display:flex;flex-direction:column;gap:8px}
+.tl .ev{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:baseline;font-size:13px}
+.tl .ed{font:11px var(--mono);color:var(--amber-ink)}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:10px;align-items:stretch}
+.step{border:1px solid var(--hair);border-radius:8px;padding:10px 12px;position:relative;background:#fff}
+.step b{display:block;font-family:var(--serif);font-size:15px;font-weight:500;margin-bottom:4px}
+.step span{font-size:12.5px;color:var(--ink-2);line-height:1.45}
+.step::after{content:"→";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--amber-ink);font-size:14px;background:var(--paper);padding:0 2px}
+.step:last-child::after{content:none}
+.blist{display:flex;flex-direction:column}
+.blist a{display:grid;grid-template-columns:90px 1fr auto;gap:12px;padding:7px 0;border-top:1px solid var(--hair-2);font-size:13.5px;align-items:baseline}
+.blist a:first-child{border-top:0}
+.blist .d{font:11px var(--mono);color:var(--muted)}
+.blist .t{font-family:var(--serif);font-size:15px}
+.blist .p{font:10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.meta{font:11px var(--mono);color:var(--muted);letter-spacing:.04em;margin-top:12px;padding-top:10px;border-top:1px dashed var(--hair)}
+/* index */
+.idx{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:36px 1fr 200px 48px;gap:16px;padding:16px 10px;margin:0 -10px;border-top:1px solid var(--hair);border-radius:8px;transition:background-color .15s;align-items:start}
+.row:first-child{border-top:0}
+.row:hover{background:var(--paper-2)}
+.row .n{font:11px var(--mono);color:var(--muted);padding-top:5px;transition:color .15s}
+.row:hover .n{color:var(--amber-ink)}
+.row b{font-family:var(--serif);font-size:19px;font-weight:500;letter-spacing:-.01em;display:block;line-height:1.25}
+.row .ds{font-size:13.5px;color:var(--ink-2);margin-top:3px;line-height:1.5;text-wrap:pretty}
+.row .st{font:10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:6px;line-height:1.6}
+.row .yr{font:11px var(--mono);color:var(--muted);padding-top:6px;text-align:right}
+.repos{display:flex;flex-direction:column}
+.repo{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:16px 10px;margin:0 -10px;border-top:1px solid var(--hair);border-radius:8px;transition:background-color .15s}
+.repo:first-child{border-top:0}
+.repo:hover{background:var(--paper-2)}
+.repo .nm2{font:14px var(--mono)}.repo .org{color:var(--muted)}
+.repo .lang{font:11px var(--mono);color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.repo .sw{width:8px;height:8px;border-radius:50%}
+.repo .ds{grid-column:1/-1;font-size:13.5px;color:var(--ink-2);max-width:60ch}
+.log{display:flex;flex-direction:column}
+.li{display:grid;grid-template-columns:20px 1fr;gap:14px;padding:0 0 18px}
+.gut{position:relative}
+.gut .ln{position:absolute;left:9px;top:14px;bottom:-18px;width:1px;background:var(--hair)}
+.li:last-child .gut .ln{display:none}
+.gut .nd{position:absolute;left:5px;top:5px;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--amber);background:var(--paper)}
+.li.up .gut .nd{border-style:dashed;border-color:var(--muted)}
+.li.latest .gut .nd{animation:blip2 6s linear infinite}
+@keyframes blip2{0%,95%,100%{box-shadow:0 0 0 0 rgba(216,137,28,0)}96.5%{box-shadow:0 0 0 6px rgba(216,137,28,.25)}}
+.li .top{display:flex;gap:10px;align-items:center;font:11px var(--mono);color:var(--muted);margin-bottom:4px}
+.li .hash{color:var(--amber-ink)}
+.li .tag{border:1px solid var(--hair);border-radius:4px;padding:1px 6px;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase}
+.li .msg{font-size:14.5px;color:var(--ink-2);line-height:1.55;max-width:66ch;text-wrap:pretty}
+.li.up .msg{font-style:italic;color:var(--muted)}
+.li .msg a{color:var(--amber-ink);text-decoration:underline;text-underline-offset:3px}
+.wlist{display:flex;flex-direction:column}
+.wrow{display:grid;grid-template-columns:100px 1fr 60px;gap:16px;padding:14px 0;border-top:1px solid var(--hair);align-items:baseline}
+.wrow:first-child{border-top:0}
+.wrow .d{font:11px var(--mono);color:var(--muted)}
+.wrow .t{font-family:var(--serif);font-size:19px;font-weight:500;letter-spacing:-.01em;background:linear-gradient(var(--amber),var(--amber)) left bottom/0 1.5px no-repeat;transition:background-size .3s cubic-bezier(.2,.9,.2,1);padding-bottom:1px}
+.wrow:hover .t{background-size:100% 1.5px}
+.wrow .rt{font:11px var(--mono);color:var(--muted);text-align:right}
+.tenets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:28px 40px}
+.tenet .nn{font:11px var(--mono);color:var(--amber-ink);margin-bottom:8px}
+.tenet h3{font-family:var(--serif);font-size:20px;font-weight:500;margin:0 0 6px;letter-spacing:-.01em}
+.tenet p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.55;text-wrap:pretty}
+.toolbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:24px}
+.toolcol .h{font:10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--hair)}
+.toolcol ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.toolcol li{font-size:14px;color:var(--ink-2);padding:2px 0;transition:color .12s,transform .25s cubic-bezier(.2,.9,.2,1)}
+.toolcol li:hover{color:var(--ink);transform:translateX(4px)}
+.specs{margin:0;display:flex;flex-direction:column}
+.spec{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:11px 0;border-top:1px solid var(--hair);align-items:baseline}
+.spec:first-child{border-top:0}
+.spec dt{font:10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.spec dd{margin:0;font-size:14.5px;color:var(--ink-2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sonar{position:relative;width:8px;height:8px;border-radius:50%;background:var(--amber);flex:none}
+.sonar::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1px solid var(--amber);animation:sonar 4s ease-out infinite}
+@keyframes sonar{0%{transform:scale(1);opacity:.9}35%,100%{transform:scale(4);opacity:0}}
+.live{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:28px;border-top:1px solid var(--hair);font:11px var(--mono);color:var(--muted);letter-spacing:.04em;flex-wrap:wrap}
+.foot nav{display:flex;gap:14px}
+.foot a{padding:2px 4px;margin:-2px -4px;border-radius:3px;transition:background-color .08s,color .08s}
+.foot a:hover{background:var(--amber);color:var(--paper)}
+@media (max-width:960px){
+  .lp{flex-direction:column}
+  .rail{width:auto;position:static;height:auto;border-right:0;border-bottom:1px solid var(--hair);padding:20px 20px 16px;gap:16px}
+  .railnav{flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:4px}
+  .pill{display:none}
+  .rn{flex:none;height:32px;padding:0 10px}
+  .rail-foot{margin-top:0}
+  .content{padding:28px 20px 56px}
+  .lede{font-size:30px}
+  .row{grid-template-columns:28px 1fr;gap:8px 12px}
+  .row .st,.row .yr{grid-column:2;text-align:left;padding-top:0}
+  .wrow{grid-template-columns:1fr auto;gap:4px 12px}.wrow .d{grid-column:1/-1}
+  .spec{grid-template-columns:1fr;gap:4px}
+  .wash{left:-60px;width:460px;height:320px}
+}
+@media (prefers-reduced-motion:reduce){
+  .lp *,.lp *::before,.lp *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .mono-sig path{stroke-dashoffset:0}
+}
+</style>
+</helmet>
+
+<div class="lp">
+<svg class="grain" aria-hidden="true" width="100%" height="100%"><filter id="lp-grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"></feTurbulence><feColorMatrix type="matrix" values="0 0 0 0 0.2  0 0 0 0 0.17  0 0 0 0 0.12  0 0 0 0.55 0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#lp-grain)"></rect></svg>
+
+<aside class="rail">
+  <div class="id rv" style="animation-delay: 0ms">
+    <svg class="mono-sig" viewBox="0 0 48 36" aria-hidden="true">
+      <path class="s1" pathLength="1" d="M3 6 H25"></path>
+      <path class="s2" pathLength="1" d="M14 6 V31"></path>
+      <path class="s3" pathLength="1" d="M31 6 V31"></path>
+      <path class="s4" pathLength="1" d="M31 6 H40 A6 6 0 0 1 40 18 H31"></path>
+      <path class="s5" pathLength="1" d="M31 18 H42 A6.5 6.5 0 0 1 42 31 H31"></path>
+    </svg>
+    <div>
+      <div class="nm">Tomas Brasca</div>
+      <div class="rl"><span>Fullstack · </span><span class="rl-cycle"><span class="rl-live"><sc-for list="{{ roleChars }}" as="ch" hint-placeholder-count="10"><span class="ch {{ ch.anim }}" style="animation-delay: {{ ch.delay }}">{{ ch.c }}</span></sc-for></span><span class="rl-ghost" aria-hidden="true"><span>AI systems</span><span>LLM routing</span><span>evals &amp; cost</span><span>backends at scale</span></span></span></div>
+    </div>
+  </div>
+  <div class="status rv" style="animation-delay: 90ms"><span class="dot"></span>Open to work · Rosario, AR</div>
+
+  <nav class="railnav rv" aria-label="Sections" style="animation-delay: 160ms" onMouseLeave="{{ railLeave }}">
+    <span class="pill" style="transform: translateY({{ pillY }})"></span>
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="9">
+      <a class="rn {{ n.cls }}" href="#{{ n.id }}" aria-current="{{ n.cur }}" onMouseEnter="{{ n.enter }}" onClick="{{ n.go }}"><span class="nx">{{ n.num }}</span>{{ n.label }}</a>
+    </sc-for>
+  </nav>
+
+  <div class="rv" style="animation-delay: 240ms">
+    <div class="rail-sec">Contact</div>
+    <div class="contact">
+      <a href="mailto:tomibrasca97@gmail.com" onMouseEnter="{{ tick }}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 3h12v10H2z"></path><path d="m2 4 6 5 6-5"></path></svg>tomibrasca97@gmail.com</a>
+      <a href="https://github.com/soundOfff" onMouseEnter="{{ tick }}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 10 14 2M9 2h5v5M13 9v4H3V3h4"></path></svg>github.com/soundOfff</a>
+      <a href="https://www.linkedin.com/in/tomasbrasca" onMouseEnter="{{ tick }}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 10 14 2M9 2h5v5M13 9v4H3V3h4"></path></svg>linkedin.com/in/tomasbrasca</a>
+      <a href="/cv.pdf" onMouseEnter="{{ tick }}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 2v9m0 0 3-3m-3 3L5 8M3 13h10"></path></svg>Resume</a>
+    </div>
+  </div>
+
+  <div class="rail-foot rv" style="animation-delay: 320ms">
+    <span class="clock">ROSARIO {{ clock }}</span>
+    <button class="snd {{ sndCls }}" type="button" aria-pressed="{{ soundOn }}" onClick="{{ toggleSound }}"><span class="w"><i></i><i></i><i></i></span>{{ sndLabel }}</button>
+  </div>
+</aside>
+
+<main class="content">
+  <section class="blk hero" id="readme" data-sec="0">
+    <div class="wash"></div>
+    <p class="keybar rv" style="animation-delay: 120ms"><span class="kn">00</span><span>readme</span></p>
+    <h1 class="lede rv" style="animation-delay: 220ms">Most LLM calls don't need the biggest model. They need a dispatcher that knows which one will <em>clear the bar</em>.</h1>
+    <p class="sub rv" style="animation-delay: 320ms">I'm a backend engineer who builds the systems that make AI products work in production: routing, scale, evals, the unglamorous middle. Backend is the foundation, LLM infrastructure is the edge, and competitive-programming results are the proof. Below, an agent answers questions about all of it by generating the interface it answers in.</p>
+    <div class="startrow rv" style="animation-delay: 420ms">
+      <a class="btn amber" href="#playground" onMouseEnter="{{ tick }}" onClick="{{ click }}"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"></path></svg>Ask the portfolio</a>
+      <a class="arrow" href="#work" onMouseEnter="{{ tick }}">See the work index <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"></path></svg></a>
+    </div>
+    <div class="metrics rv" style="animation-delay: 520ms">
+      <div class="m"><div class="v"><em>2–3M</em></div><div class="k">users at Mint</div></div>
+      <div class="m"><div class="v">ICPC</div><div class="k">SA finalist</div></div>
+      <div class="m"><div class="v">1st</div><div class="k">GTS alg trading</div></div>
+      <div class="m"><div class="v">SE II</div><div class="k">engineer at Dex</div></div>
+      <div class="m"><div class="v">4+</div><div class="k">yrs fullstack</div></div>
+    </div>
+  </section>
+
+  <section class="blk" id="playground" data-sec="1">
+    <div class="rule"></div>
+    <p class="keybar"><span class="kn">01</span><span>playground · a2ui portfolio agent</span></p>
+    <div class="console">
+      <div class="chead"><span class="dots"><i></i><i></i><i></i></span><span class="ct">portfolio agent · demo transcript</span><span class="bars {{ barsCls }}" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>
+      <div class="cbody">
+        <p class="cintro">Ask a question about the work and an agent answers by composing a user interface for it: components, not paragraphs.</p>
+        <form class="ask" onSubmit="{{ submit }}">
+          <input class="ain" type="text" value="{{ q }}" onChange="{{ onQ }}" placeholder="Ask anything about the work…" aria-label="Ask the portfolio">
+          <button class="btn amber" type="submit" onMouseEnter="{{ tick }}">Ask</button>
+        </form>
+        <div class="chips">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4"><button class="chip" type="button" onClick="{{ c.pick }}" onMouseEnter="{{ tick }}">{{ c.label }}</button></sc-for>
+        </div>
+        <sc-if value="{{ thinking }}" hint-placeholder-val="{{ false }}"><div class="thinking"><span class="eq"><i></i><i></i><i></i></span>composing an answer to “{{ q }}”</div></sc-if>
+        <div class="surfaces">
+          <sc-for list="{{ surfaces }}" as="s" hint-placeholder-count="0">
+            <div class="surf">
+              <div class="stag">{{ s.tag }}</div>
+              <sc-if value="{{ s.isCards }}" hint-placeholder-val="{{ false }}">
+                <div class="cards"><sc-for list="{{ s.cards }}" as="c" hint-placeholder-count="3"><a class="card" href="#work"><span class="cn">{{ c.n }}</span><b>{{ c.title }}</b><span class="cd">{{ c.desc }}</span><span class="cm">{{ c.stack }} · {{ c.year }}</span></a></sc-for></div>
+              </sc-if>
+              <sc-if value="{{ s.isTable }}" hint-placeholder-val="{{ false }}">
+                <div class="tbl {{ s.cls }}"><sc-for list="{{ s.cells }}" as="x" hint-placeholder-count="6"><div class="cell {{ x.cls }}">{{ x.t }}</div></sc-for></div>
+              </sc-if>
+              <sc-if value="{{ s.isTimeline }}" hint-placeholder-val="{{ false }}">
+                <div class="tl"><sc-for list="{{ s.events }}" as="e" hint-placeholder-count="4"><div class="ev"><span class="ed">{{ e.date }}</span><span>{{ e.msg }}</span></div></sc-for></div>
+              </sc-if>
+              <sc-if value="{{ s.isFlow }}" hint-placeholder-val="{{ false }}">
+                <div class="flow"><sc-for list="{{ s.steps }}" as="st" hint-placeholder-count="3"><div class="step"><b>{{ st.t }}</b><span>{{ st.d }}</span></div></sc-for></div>
+              </sc-if>
+              <sc-if value="{{ s.isList }}" hint-placeholder-val="{{ false }}">
+                <div class="blist"><sc-for list="{{ s.items }}" as="p" hint-placeholder-count="4"><a href="#writing"><span class="d">{{ p.date }}</span><span class="t">{{ p.title }}</span><span class="p">{{ p.pillar }}</span></a></sc-for></div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ done }}" hint-placeholder-val="{{ false }}"><div class="meta">{{ meta }}</div></sc-if>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" id="work" data-sec="2">
+    <div class="rule"></div>
+    <p class="keybar"><span class="kn">02</span><span>work · index</span></p>
+    <div class="idx">
+      <sc-for list="{{ work }}" as="w" hint-placeholder-count="3">
+        <a class="row" href="#work" onMouseEnter="{{ tick }}"><span class="n">{{ w.n }}</span><span><b>{{ w.title }}</b><span class="ds">{{ w.desc }}</span></span><span class="st">{{ w.stack }}</span><span class="yr">{{ w.year }}</span></a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="blk" id="oss" data-sec="3">
+    <div class="rule"></div>
+    <p class="keybar"><span class="kn">03</span><span>open source</span></p>
+    <div class="repos">
+      <a class="repo" href="https://github.com/soundOfff/editorial-ui" onMouseEnter="{{ tick }}"><span class="nm2"><span class="org">soundOfff/</span>editorial-ui</span><span class="lang"><span class="sw" style="background: #3178C6"></span>TypeScript</span><span class="ds">The warm-paper, one-amber, hairline-over-shadows React design system this whole site is built on.</span></a>
+      <a class="repo" href="https://github.com/soundOfff/personal-site" onMouseEnter="{{ tick }}"><span class="nm2"><span class="org">soundOfff/</span>personal-site</span><span class="lang"><span class="sw" style="background: #FF5D01"></span>Astro</span><span class="ds">This site. Astro, near-zero JS, with an A2UI conversational portfolio: an agent that answers by generating UI.</span></a>
+    </div>
+  </section>
+
+  <section class="blk" id="log" data-sec="4">
+    <div class="rule"></div>
+    <p class="keybar"><span class="kn">04</span><span>log · recent activity</span></p>
+    <div class="log">
+      <sc-for list="{{ log }}" as="l" hint-placeholder-count="6">
+        <div class="li {{ l.cls }}"><div class="gut"><span class="ln"></span><span class="nd"></span></div><div><div class="top"><span class="hash">{{ l.hash }}</span><span>{{ l.date }}</span><span class="tag">{{ l.tag }}</span></div><div class="msg">{{ l.msg }} <sc-if value="{{ l.hasLink }}" hint-placeholder-val="{{ false }}"><a href="https://danahq.com/">{{ l.link }}</a></sc-if></div></div></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="blk" id="writing" data-sec="5">
+    <div class="rule"></div>
+    <p class="keybar"><span class="kn">05</span><span>writing · <a href="#writing">all posts</a></span></p>
+    <div class="wlist">
+      <sc-for list="{{ posts }}" as="p" hint-placeholder-count="4">
+        <a class="wrow" href="#writing" onMouseEnter="{{ tick }}"><span class="d">{{ p.date }}</span><span class="t">{{ p.title }}</span><span class="rt">{{ p.rt }}</span></a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="blk" id="principles" data-sec="6">
+    <div class="rule"></div>
+    <p class="keybar"><span class="kn">06</span><span>principles · how I build</span></p>
+    <div class="tenets">
+      <div class="tenet"><div class="nn">01</div><h3>Smallest model that passes</h3><p>Capability is a budget, not a flex. Start at the bottom of the ladder and only climb when an eval forces you to.</p></div>
+      <div class="tenet"><div class="nn">02</div><h3>Cache before you call</h3><p>The cheapest token is the one you never send. Memoize aggressively; treat the model as the slow path.</p></div>
+      <div class="tenet"><div class="nn">03</div><h3>Cap the blast radius</h3><p>Every public endpoint gets a rate limit and a kill switch before it gets a launch tweet.</p></div>
+      <div class="tenet"><div class="nn">04</div><h3>Evals are contracts</h3><p>If a behaviour isn't measured, it isn't shipped. Write the contract down, then make it runnable.</p></div>
+    </div>
+  </section>
+
+  <section class="blk" id="stack" data-sec="7">
+    <div class="rule"></div>
+    <p class="keybar"><span class="kn">07</span><span>stack · toolbox</span></p>
+    <div class="toolbox">
+      <div class="toolcol"><div class="h">Languages</div><ul><li>TypeScript</li><li>Python</li><li>C++</li><li>Go</li><li>SQL</li></ul></div>
+      <div class="toolcol"><div class="h">Infra</div><ul><li>Postgres</li><li>Redis</li><li>Docker</li><li>Cloudflare</li><li>Kafka</li></ul></div>
+      <div class="toolcol"><div class="h">LLM</div><ul><li>OpenAI</li><li>Groq</li><li>OpenRouter</li><li>pgvector</li><li>evals</li></ul></div>
+    </div>
+  </section>
+
+  <section class="blk" id="now" data-sec="8">
+    <div class="rule"></div>
+    <p class="keybar"><span class="kn">08</span><span>now</span></p>
+    <dl class="specs">
+      <div class="spec"><dt>Location</dt><dd><span class="sonar"></span>Rosario, Argentina · remote-friendly (ART, UTC−3) · <span class="live">{{ clock }}</span></dd></div>
+      <div class="spec"><dt>Status</dt><dd>Open to senior backend / AI-infra roles &amp; select contract work</dd></div>
+      <div class="spec"><dt>Email</dt><dd><a class="arrow" href="mailto:tomibrasca97@gmail.com">tomibrasca97@gmail.com</a></dd></div>
+      <div class="spec"><dt>Focus</dt><dd>LLM routing, evals, cost control; high-traffic backends</dd></div>
+      <div class="spec"><dt>Reading</dt><dd>AI Engineer</dd></div>
+      <div class="spec"><dt>Built with</dt><dd>Astro · React island · A2UI · editorial-ui · Cloudflare</dd></div>
+    </dl>
+    <footer class="foot" style="margin-top: 40px">
+      <span>© 2026 Tomas Brasca</span>
+      <nav aria-label="Footer"><a href="https://github.com/soundOfff">github</a><a href="https://www.linkedin.com/in/tomasbrasca">linkedin</a><a href="mailto:tomibrasca97@gmail.com">email</a><a href="/rss.xml">rss</a></nav>
+    </footer>
+  </section>
+</main>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"soundDefault":{"editor":"boolean","default":true,"section":"Behaviour"},"roleSeconds":{"editor":"range","default":3.2,"min":1.5,"max":8,"step":0.1,"unit":"s","section":"Behaviour"},"$preview":{"width":1440,"height":3800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sound: props.soundDefault !== false,
+      activeIdx: 0, hoverIdx: null,
+      roleIdx: 0, roleCycle: 0,
+      now: Date.now(),
+      q: '', phase: 'idle', surfaces: [], meta: ''
+    };
+    this._timers = [];
+  }
+  componentDidMount() {
+    this._iv = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    const secs = Math.max(1.5, Number(this.props.roleSeconds || 3.2));
+    this._rv = setInterval(() => this.setState(s => ({ roleIdx: (s.roleIdx + 1) % 4, roleCycle: s.roleCycle + 1 })), secs * 1000);
+    try {
+      const nodes = Array.prototype.slice.call(document.querySelectorAll('[data-sec]'));
+      if (window.IntersectionObserver && nodes.length) {
+        this._io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const i = Number(e.target.getAttribute('data-sec'));
+            if (i !== this.state.activeIdx) this.setState({ activeIdx: i });
+          });
+        }, { rootMargin: '-35% 0px -55% 0px', threshold: 0 });
+        nodes.forEach((n) => this._io.observe(n));
+      }
+    } catch (e) { /* observer unavailable */ }
+  }
+  componentWillUnmount() {
+    clearInterval(this._iv); clearInterval(this._rv);
+    if (this._io) this._io.disconnect();
+    this._timers.forEach(clearTimeout);
+    if (this._ac) { try { this._ac.close(); } catch (e) {} }
+  }
+  later(fn, ms) { const t = setTimeout(fn, ms); this._timers.push(t); return t; }
+
+  /* ---------- synthesized sound kit (no files) ---------- */
+  ac() {
+    if (!this.state.sound) return null;
+    try {
+      if (!this._ac) this._ac = new (window.AudioContext || window.webkitAudioContext)();
+      if (this._ac.state === 'suspended') this._ac.resume();
+      return this._ac;
+    } catch (e) { return null; }
+  }
+  bus(ac) {
+    if (!this._bus) {
+      const comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.knee.value = 20; comp.ratio.value = 6; comp.attack.value = 0.002; comp.release.value = 0.08;
+      const g = ac.createGain(); g.gain.value = 0.7;
+      comp.connect(g); g.connect(ac.destination);
+      this._bus = comp;
+    }
+    return this._bus;
+  }
+  noise(ac, dur) {
+    const n = Math.max(1, Math.floor(ac.sampleRate * dur));
+    const buf = ac.createBuffer(1, n, ac.sampleRate); const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const src = ac.createBufferSource(); src.buffer = buf; return src;
+  }
+  tone(ac, o) {
+    const t = ac.currentTime + (o.at || 0); const dur = o.dur || 0.05;
+    const osc = ac.createOscillator(); const g = ac.createGain();
+    osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(o.f0, t);
+    if (o.f1 && o.f1 !== o.f0) osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.f1), t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(o.vol || 0.2, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g); g.connect(this.bus(ac)); osc.start(t); osc.stop(t + dur + 0.02);
+  }
+  tick() { const ac = this.ac(); if (!ac) return; this.tone(ac, { f0: 1800, f1: 1200, dur: 0.009, vol: 0.05 }); }
+  click() {
+    const ac = this.ac(); if (!ac) return; const t = ac.currentTime;
+    const n = this.noise(ac, 0.03); const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2600; bp.Q.value = 0.9;
+    const g = ac.createGain(); g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+    n.connect(bp); bp.connect(g); g.connect(this.bus(ac)); n.start(t);
+    this.tone(ac, { f0: 180, f1: 90, dur: 0.045, vol: 0.18 });
+  }
+  pop() { const ac = this.ac(); if (!ac) return; this.tone(ac, { f0: 320, f1: 880, dur: 0.07, vol: 0.14 }); }
+  drop() { const ac = this.ac(); if (!ac) return; this.tone(ac, { f0: 620, f1: 160, dur: 0.09, vol: 0.12 }); }
+  wood(i) {
+    const ac = this.ac(); if (!ac) return; const f = 440 * Math.pow(2, ((i || 0) % 10) / 12);
+    this.tone(ac, { f0: f * 2, f1: f, dur: 0.06, vol: 0.14 }); this.tone(ac, { type: 'triangle', f0: f * 4, f1: f * 2.5, dur: 0.03, vol: 0.04 });
+  }
+  chime() { const ac = this.ac(); if (!ac) return; [[523.25, 0], [659.25, 0.07], [987.77, 0.14]].forEach(p => this.tone(ac, { type: 'triangle', f0: p[0], dur: 0.38, vol: 0.09, at: p[1] })); }
+  toggleSound() {
+    const next = !this.state.sound;
+    this.setState({ sound: next }, () => { if (next) this.pop(); });
+    if (!next) { const ac = this._ac; if (ac) { this.state.sound = true; this.drop(); this.state.sound = false; } }
+  }
+
+  /* ---------- content (real facts from src/data and src/content) ---------- */
+  work() {
+    return [
+      { n: '01', title: 'Dex: multi-LLM routing', desc: 'Classify-then-dispatch in front of OpenAI, Groq and OpenRouter, balancing latency, cost and quality.', stack: 'Routing · evals', year: '2025' },
+      { n: '02', title: 'Mint: 2–3M-user scale', desc: 'High-traffic e-commerce APIs serving 2–3M users: the backend that stayed correct and fast under real load.', stack: 'Microservices · WordPress · React · Postgres', year: '2023' },
+      { n: '03', title: 'Flagship: conversational portfolio', desc: 'The agent on this page: ask a question about the work, get back a generated interface. A2UI protocol, custom renderer, edge backend, with the source.', stack: 'A2UI · Astro · TS · serverless', year: '2026' }
+    ];
+  }
+  posts() {
+    return [
+      { date: '2026-04-21', title: 'Evals are contracts', rt: '6 min', pillar: 'Backend & AI systems' },
+      { date: '2026-06-12', title: 'Binary search on the answer', rt: '7 min', pillar: 'Algorithms & CP' },
+      { date: '2026-06-12', title: 'Data structures in TypeScript and Python: what you get, what you build', rt: '10 min', pillar: 'Algorithms & CP' },
+      { date: '2026-06-12', title: 'The unglamorous middle', rt: '5 min', pillar: 'Startup engineering' },
+      { date: '2026-06-12', title: 'Routing beats scaling: a cost study', rt: '8 min', pillar: 'Backend & AI systems' },
+      { date: '2026-06-12', title: 'Rate-limiting a public inference endpoint', rt: '6 min', pillar: 'Backend & AI systems' }
+    ];
+  }
+  logItems() {
+    return [
+      { hash: 'focusq0', date: 'soon', tag: 'coming soon', msg: 'focus-quote, a Chrome extension for focus sessions: capture quotes from the web, set a goal, and get AI insights on which tabs were on-goal vs. distractions.', cls: 'up' },
+      { hash: 'a2ui001', date: 'jul 2026', tag: 'site', msg: 'Replace the router demo with an A2UI conversational portfolio: ask a question, a Claude agent composes the answer as generated UI over a custom renderer.', cls: 'latest' },
+      { hash: 'unglam1', date: 'jun 2026', tag: 'writing', msg: 'Publish “The unglamorous middle”: joining my first startup three and a half years in, and learning the real job is the part nobody demos.', cls: '' },
+      { hash: 'eui010', date: 'jun 2026', tag: 'oss', msg: 'Publish editorial-ui v0.1.0: the warm-paper, one-amber, hairline design system this site is built on.', cls: '' },
+      { hash: 'ship001', date: 'jun 2026', tag: 'site', msg: 'Ship the personal site: Astro shell, editorial-ui design system, router island, Cloudflare Worker deploy.', cls: '' },
+      { hash: 'dana100', date: 'may 2026', tag: 'launch', msg: 'Launch Dana: AI meeting prep that pulls context from calendar, email, and Slack so you walk in already briefed.', cls: '', hasLink: true, link: 'danahq.com' }
+    ];
+  }
+  answer(q) {
+    const s = q.toLowerCase();
+    const cards = { tag: 'ProjectCard × 3', isCards: true, cards: this.work(), pitch: 2 };
+    const timeline = { tag: 'Timeline · 4 events', isTimeline: true, pitch: 7, events: [
+      { date: 'may 2026', msg: 'Dana launches: AI meeting prep from calendar, email and Slack.' },
+      { date: 'jun 2026', msg: 'Personal site ships on Astro + Cloudflare; editorial-ui v0.1.0 published.' },
+      { date: 'jun 2026', msg: '“The unglamorous middle” published.' },
+      { date: 'jul 2026', msg: 'Router demo replaced by the A2UI conversational portfolio.' } ] };
+    const flow = { tag: 'Flow · classify → dispatch → gate', isFlow: true, pitch: 9, steps: [
+      { t: 'Classify', d: 'Bucket the request: extractive, structured, reasoning or creative.' },
+      { t: 'Dispatch', d: 'Walk a cost-ordered catalog and pick the first model that clears that class’s bar.' },
+      { t: 'Gate', d: 'Every class has an eval contract; nothing ships that the eval does not pass.' } ] };
+    const routeTable = { tag: 'Table · 4 classes', isTable: true, cls: 'c3', pitch: 5, cells: [
+      { t: 'Class', cls: 'h' }, { t: 'Where it lands', cls: 'h' }, { t: 'Gate', cls: 'h' },
+      { t: 'Extractive', cls: 'k' }, { t: 'Smallest tier', cls: '' }, { t: 'Eval contract per class', cls: '' },
+      { t: 'Structured', cls: 'k' }, { t: 'Small tier', cls: '' }, { t: 'Schema + eval', cls: '' },
+      { t: 'Reasoning', cls: 'k' }, { t: 'Escalates', cls: '' }, { t: 'Eval, provider fallback', cls: '' },
+      { t: 'Creative', cls: 'k' }, { t: 'Escalates', cls: '' }, { t: 'Eval, provider fallback', cls: '' } ] };
+    const compare = { tag: 'Table · Dex vs Mint', isTable: true, cls: 'c3', pitch: 5, cells: [
+      { t: '', cls: 'h' }, { t: 'Dex', cls: 'h' }, { t: 'Mint', cls: 'h' },
+      { t: 'Problem', cls: 'k' }, { t: 'One big model on every request', cls: '' }, { t: 'Correctness under 2–3M users of load', cls: '' },
+      { t: 'Shape', cls: 'k' }, { t: 'Classify → dispatch → gate', cls: '' }, { t: 'Services in front of a WordPress core; cached reads, queued writes', cls: '' },
+      { t: 'Stack', cls: 'k' }, { t: 'Routing · evals', cls: '' }, { t: 'Microservices · Postgres · React', cls: '' },
+      { t: 'Code shown', cls: 'k' }, { t: 'Narrative only', cls: '' }, { t: 'Narrative only', cls: '' } ] };
+    const list = { tag: 'BlogList · 6 posts', isList: true, items: this.posts(), pitch: 4 };
+    if (s.indexOf('rout') >= 0 || s.indexOf('llm') >= 0 || s.indexOf('dispatch') >= 0) return [flow, routeTable];
+    if (s.indexOf('writ') >= 0 || s.indexOf('blog') >= 0 || s.indexOf('post') >= 0) return [list];
+    if (s.indexOf('compare') >= 0 || s.indexOf('mint') >= 0 || s.indexOf('vs') >= 0) return [compare];
+    if (s.indexOf('ship') >= 0 || s.indexOf('built') >= 0 || s.indexOf('work') >= 0 || s.indexOf('project') >= 0) return [cards, timeline];
+    return [cards];
+  }
+  ask(q) {
+    const text = (q || '').trim(); if (!text) return;
+    this._timers.forEach(clearTimeout); this._timers = [];
+    this.click();
+    this.setState({ q: text, phase: 'thinking', surfaces: [], meta: '' });
+    const plan = this.answer(text);
+    let t = 800;
+    plan.forEach((sf) => {
+      this.later(() => { this.setState(st => ({ phase: 'composing', surfaces: st.surfaces.concat([sf]) })); this.wood(sf.pitch); }, t);
+      t += 560;
+    });
+    this.later(() => {
+      this.setState({ phase: 'done', meta: 'demo transcript · ' + plan.length + (plan.length > 1 ? ' surfaces' : ' surface') + ' · composed locally, no network' });
+      this.chime();
+    }, t + 160);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const roles = ['AI systems', 'LLM routing', 'evals & cost', 'backends at scale'];
+    const role = roles[st.roleIdx % roles.length];
+    const anim = st.roleCycle % 2 ? 'b' : 'a';
+    const roleChars = role.split('').map((c, i) => ({ c: c, anim: anim, delay: (i * 28) + 'ms' }));
+    const navDefs = [['readme', 'readme'], ['playground', 'playground'], ['work', 'work index'], ['oss', 'open source'], ['log', 'log'], ['writing', 'writing'], ['principles', 'principles'], ['stack', 'stack'], ['now', 'now']];
+    const navItems = navDefs.map((d, i) => ({
+      id: d[0], label: d[1], num: (i < 10 ? '0' : '') + i,
+      cls: i === st.activeIdx ? 'on' : '', cur: i === st.activeIdx ? 'true' : null,
+      enter: () => { if (st.hoverIdx !== i) { this.setState({ hoverIdx: i }); this.tick(); } },
+      go: () => { this.click(); this.setState({ activeIdx: i }); }
+    }));
+    const pillIdx = st.hoverIdx === null ? st.activeIdx : st.hoverIdx;
+    let clock = '--:--:--';
+    try { clock = new Date(st.now).toLocaleTimeString('en-GB', { timeZone: 'America/Argentina/Cordoba', hour: '2-digit', minute: '2-digit', second: '2-digit' }); } catch (e) {}
+    const prompts = ['What has he shipped?', 'How does the LLM routing work?', 'What is he writing about?', 'Compare Dex and Mint'];
+    return {
+      roleChars: roleChars,
+      navItems: navItems,
+      pillY: (pillIdx * 36) + 'px',
+      railLeave: () => { if (st.hoverIdx !== null) this.setState({ hoverIdx: null }); },
+      clock: clock,
+      soundOn: st.sound ? 'true' : 'false',
+      sndCls: st.sound ? 'on' : '',
+      sndLabel: st.sound ? 'sound on' : 'muted',
+      toggleSound: () => this.toggleSound(),
+      tick: () => this.tick(),
+      click: () => this.click(),
+      q: st.q,
+      onQ: (e) => this.setState({ q: e.target.value }),
+      submit: (e) => { if (e && e.preventDefault) e.preventDefault(); this.ask(st.q); },
+      chips: prompts.map(p => ({ label: p, pick: () => this.ask(p) })),
+      thinking: st.phase === 'thinking',
+      done: st.phase === 'done',
+      barsCls: st.phase === 'thinking' ? 'think' : (st.phase === 'composing' ? 'speak' : ''),
+      surfaces: st.surfaces,
+      meta: st.meta,
+      work: this.work(),
+      posts: this.posts().slice(0, 4),
+      log: this.logItems()
+    };
+  }
+}
+</script>
+</body>
+</html>

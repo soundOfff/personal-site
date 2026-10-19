@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>03 · Drafting Sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&family=Geist:wght@300..700&family=JetBrains+Mono:wght@400..700&display=swap">
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;-webkit-font-smoothing:antialiased;background:#F7F4EC}
+a{color:inherit;text-decoration:none}
+a:hover{color:inherit}
+.ds{
+  --paper:#F7F4EC;--paper-2:#EFEBE1;--ink:#2A2622;--mid:#57514A;--faint:#6E675C;
+  --line:rgba(42,38,34,.16);--line-2:rgba(42,38,34,.08);--grid:rgba(42,38,34,.045);
+  --amber:#C9811A;--amber-ink:#9A5E0C;--amber-soft:rgba(201,129,26,.12);
+  --serif:'Newsreader','Iowan Old Style',Georgia,serif;
+  --sans:'Geist',ui-sans-serif,system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;position:relative;min-height:100%;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:40px 40px;background-position:-1px -1px;
+}
+.ds ::selection{background:var(--amber-soft);color:var(--ink)}
+.ds :focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:3px}
+.mono{font-family:var(--mono)}
+.k{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.g{filter:url(#graphite)}
+/* rulers */
+.ruler{position:fixed;z-index:50;background:var(--paper);font-family:var(--mono);font-size:8.5px;color:var(--faint);pointer-events:none;font-variant-numeric:tabular-nums}
+.rx{left:0;right:0;top:0;height:20px;border-bottom:1px solid var(--line);background-image:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 50px);background-position:0 bottom;background-size:50px 6px;background-repeat:repeat-x}
+.ry{top:0;bottom:0;left:0;width:20px;border-right:1px solid var(--line);background-image:repeating-linear-gradient(180deg,var(--line) 0 1px,transparent 1px 50px);background-position:right 0;background-size:6px 50px;background-repeat:repeat-y}
+.rnum{position:absolute;top:3px;transform:translateX(3px);white-space:nowrap}
+.ry .rnum{top:auto;left:3px;transform:translateY(-50%) rotate(-90deg);transform-origin:left center}
+.rmark{position:absolute;top:0;bottom:0;width:1px;background:var(--amber);transition:transform .12s linear;left:0}
+.ry .rmark{left:0;right:0;top:0;bottom:auto;height:1px;width:auto}
+.rsel{position:absolute;top:0;bottom:0;background:var(--amber-soft);border-left:1px solid var(--amber);border-right:1px solid var(--amber);transition:left .14s,width .14s,top .14s,height .14s,opacity .2s;box-sizing:border-box}
+.ry .rsel{left:0;right:0;border-left:0;border-right:0;border-top:1px solid var(--amber);border-bottom:1px solid var(--amber)}
+.corner{position:fixed;left:0;top:0;width:20px;height:20px;background:var(--paper);border-right:1px solid var(--line);border-bottom:1px solid var(--line);z-index:51}
+/* sheet rail + minimap */
+.sheetrail{position:fixed;left:30px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;z-index:45}
+.tk{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--faint);transition:color .2s}
+.tk i{display:block;width:10px;height:1px;background:var(--line);transition:width .35s cubic-bezier(.2,.9,.2,1),background-color .2s}
+.tk:hover{color:var(--ink)}.tk:hover i{width:16px;background:var(--ink)}
+.tk.on{color:var(--amber-ink)}.tk.on i{width:22px;background:var(--amber)}
+.minimap{position:fixed;right:18px;top:50%;transform:translateY(-50%);width:54px;z-index:45;display:flex;flex-direction:column;gap:2px}
+.mm{display:block;border:1px solid var(--line);background:var(--paper);position:relative;transition:background-color .2s}
+.mm:hover{background:var(--paper-2)}
+.mm.on{border-color:var(--amber)}
+.mm span{position:absolute;left:4px;top:2px;font-family:var(--mono);font-size:7.5px;color:var(--faint)}
+.thumb{position:absolute;left:-3px;right:-3px;border:1px solid var(--amber);background:var(--amber-soft);transition:top .12s linear,height .2s;pointer-events:none}
+/* sheet */
+.sheet{position:relative;max-width:960px;margin:0 auto;padding:40px 24px 80px;box-sizing:border-box}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0 18px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.top .who{display:flex;align-items:baseline;gap:12px}
+.top .nm{font-family:var(--serif);font-size:20px;font-weight:500;letter-spacing:-.01em}
+.top .rl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink)}
+.top .right{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.top .right a{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line);color:var(--mid)}
+.top .right a:hover{color:var(--amber-ink)}
+.snd{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 10px;border:1px solid var(--line);border-radius:3px;background:transparent;color:var(--mid);font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background-color .15s,transform .12s}
+.snd:hover{background:var(--paper-2)}.snd:active{transform:scale(.96)}
+.snd i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.snd.on i{background:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.guide{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:48px}
+.guide .ln{flex:1;height:1px;background:var(--line);position:relative}
+.guide .ln::before,.guide .ln::after{content:"+";position:absolute;top:-8px;font-size:12px;color:var(--faint);background:var(--paper);padding:0 2px}
+.guide .ln::before{left:-6px}.guide .ln::after{right:-6px}
+.blk{position:relative;padding:0 0 64px}
+.kick{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0 0 20px}
+.kick .dia{width:8px;height:8px;border:1px solid var(--faint);transform:rotate(45deg);display:inline-block}
+.kick b{color:var(--ink);font-weight:500}
+.fig{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.04em;margin-top:12px}
+.rule{height:1px;background:var(--line);margin:0 0 40px}
+.lede{font-family:var(--serif);font-size:42px;line-height:1.15;font-weight:400;letter-spacing:-.014em;margin:0 0 18px;max-width:18ch;text-wrap:balance}
+.lede em{font-style:italic;color:var(--amber-ink)}
+.sub{font-size:16px;line-height:1.65;color:var(--mid);max-width:64ch;margin:0 0 24px;text-wrap:pretty}
+.startrow{display:flex;align-items:center;gap:20px;margin-bottom:32px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:4px;font:500 14px var(--sans);border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;transition:transform .12s cubic-bezier(.2,.9,.2,1),background-color .15s}
+.btn:hover{background:#3a3530}
+.btn:active{transform:scale(.96)}
+.btn svg{width:13px;height:13px}
+.ghost{font-size:14px;color:var(--mid);display:inline-flex;align-items:center;gap:6px;border-bottom:1px solid var(--line);transition:border-color .15s,color .15s}
+.ghost:hover{color:var(--amber-ink);border-color:var(--amber)}
+.ghost svg{width:13px;height:13px;transition:transform .2s}
+.ghost:hover svg{transform:translate(2px,-1px)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(120px,100%),1fr));border:1px solid var(--line);background:var(--paper)}
+.m{padding:14px 16px;border-left:1px solid var(--line);transition:background-color .15s}
+.m:first-child{border-left:0}
+.m:hover{background:var(--paper-2)}
+.m .v{font-family:var(--mono);font-size:21px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.m .v em{font-style:normal;color:var(--amber-ink)}
+.m .k{margin-top:4px}
+.mnote{position:absolute;right:-244px;width:210px;font-family:var(--serif);font-style:italic;font-size:15.5px;line-height:1.4;color:var(--mid);transform:rotate(-1.6deg);display:none}
+.mnote svg{display:block;width:60px;height:34px;margin-bottom:4px;stroke:var(--mid);fill:none;stroke-width:1.2;stroke-linecap:round}
+@media (min-width:1360px){.mnote{display:block}}
+/* console */
+.console{border:1px solid var(--ink);background:var(--paper);box-shadow:4px 4px 0 var(--paper-2)}
+.chead{display:flex;align-items:center;gap:12px;padding:8px 14px;border-bottom:1px solid var(--ink);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid)}
+.chead .right{margin-left:auto;display:inline-flex;align-items:center;gap:10px}
+.bars{display:inline-flex;align-items:center;gap:3px;height:14px}
+.bars i{display:block;width:3px;height:3px;border-radius:1px;background:var(--faint);transition:height .28s}
+.bars.think i{animation:think 1s ease-in-out infinite}
+.bars.think i:nth-child(2){animation-delay:.12s}.bars.think i:nth-child(3){animation-delay:.24s}.bars.think i:nth-child(4){animation-delay:.36s}.bars.think i:nth-child(5){animation-delay:.48s}
+.bars.speak i{animation:speak .7s ease-in-out infinite;background:var(--amber)}
+.bars.speak i:nth-child(2){animation-delay:.1s}.bars.speak i:nth-child(3){animation-delay:.2s}.bars.speak i:nth-child(4){animation-delay:.3s}.bars.speak i:nth-child(5){animation-delay:.4s}
+@keyframes think{0%,100%{height:3px}50%{height:9px}}
+@keyframes speak{0%,100%{height:4px}50%{height:14px}}
+.cbody{padding:18px}
+.cintro{margin:0 0 14px;color:var(--mid);font-size:15px;max-width:60ch}
+.ask{display:flex;gap:8px;margin-bottom:10px}
+.ain{flex:1;min-width:0;height:40px;padding:0 12px;border:1px solid var(--line);border-radius:3px;font:14px var(--sans);color:var(--ink);background:#fff;transition:border-color .15s,box-shadow .15s}
+.ain:focus{outline:none;border-color:var(--ink);box-shadow:3px 3px 0 var(--paper-2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.chip{height:30px;padding:0 12px;border:1px solid var(--line);border-radius:3px;background:var(--paper);font:12px var(--mono);color:var(--mid);cursor:pointer;transition:background-color .12s,transform .12s,border-color .12s,color .12s}
+.chip:hover{background:var(--paper-2);border-color:var(--ink);color:var(--ink)}.chip:active{transform:scale(.96)}
+.thinking{display:flex;align-items:center;gap:10px;font:11px var(--mono);color:var(--faint);padding:12px 2px 4px;letter-spacing:.06em;text-transform:uppercase}
+.surfaces{display:flex;flex-direction:column;gap:16px;margin-top:12px}
+.surf{position:relative;border:1px solid var(--line);padding:12px 14px 14px;background:var(--paper);transition:border-color .3s,background-color .3s}
+.surf.drafting{border:1px dashed var(--amber);background:repeating-linear-gradient(135deg,transparent 0 5px,var(--amber-soft) 5px 6px);animation:bpbox .5s cubic-bezier(.22,.8,.24,1) both}
+.surf.drafting .body,.surf.drafting .stag{visibility:hidden}
+.surf .dtag{position:absolute;left:-1px;top:-18px;font:9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--paper);background:var(--amber);padding:1px 6px;opacity:0;transition:opacity .2s}
+.surf.drafting .dtag{opacity:1}
+.surf .ddim{position:absolute;right:0;bottom:-18px;font:9.5px var(--mono);color:var(--amber-ink);opacity:0;transition:opacity .2s}
+.surf.drafting .ddim{opacity:1}
+.surf.inked .body{animation:ink .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ink{from{opacity:0;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+@keyframes bpbox{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.stag{font:10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber-ink);margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.stag::before{content:"";width:7px;height:7px;border:1px solid var(--amber);transform:rotate(45deg)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:10px}
+.card{display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid var(--line);background:#fff;transition:transform .2s cubic-bezier(.2,.9,.2,1),box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:3px 3px 0 var(--paper-2)}
+.card .cn{font:10px var(--mono);color:var(--amber-ink);letter-spacing:.1em}
+.card b{font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.25}
+.card .cd{font-size:12.5px;color:var(--mid);line-height:1.5}
+.card .cm{font:9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:auto}
+.tbl{display:grid;border:1px solid var(--line);font-size:13px;background:#fff}
+.tbl.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cell{padding:8px 10px;border-top:1px solid var(--line-2);border-left:1px solid var(--line-2)}
+.cell.h{font:9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);background:var(--paper-2);border-top:0}
+.cell.k{font-weight:500}
+.tl{display:flex;flex-direction:column;gap:8px}
+.tl .ev{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:baseline;font-size:13px}
+.tl .ed{font:10.5px var(--mono);color:var(--amber-ink)}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px}
+.step{border:1px solid var(--line);padding:10px 12px;position:relative;background:#fff}
+.step b{display:block;font-family:var(--serif);font-size:15px;font-weight:500;margin-bottom:4px}
+.step span{font-size:12.5px;color:var(--mid);line-height:1.45}
+.step::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--amber-ink);font-size:14px;background:var(--paper);padding:0 2px}
+.step:last-child::after{content:none}
+.blist{display:flex;flex-direction:column}
+.blist a{display:grid;grid-template-columns:90px 1fr auto;gap:12px;padding:7px 0;border-top:1px solid var(--line-2);font-size:13.5px;align-items:baseline}
+.blist a:first-child{border-top:0}
+.blist .d{font:10.5px var(--mono);color:var(--faint)}
+.blist .t{font-family:var(--serif);font-size:15px}
+.blist .p{font:9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.meta{font:10.5px var(--mono);color:var(--faint);letter-spacing:.06em;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
+/* index etc */
+.idx{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:40px 1fr 200px 48px;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);align-items:start;transition:background-color .15s}
+.row:hover{background:var(--paper-2)}
+.row .n{font:10.5px var(--mono);color:var(--faint);padding-top:6px;transition:color .15s}
+.row:hover .n{color:var(--amber-ink)}
+.row b{font-family:var(--serif);font-size:20px;font-weight:500;letter-spacing:-.01em;display:block;line-height:1.25}
+.row .ds2{font-size:13.5px;color:var(--mid);margin-top:3px;line-height:1.5;text-wrap:pretty}
+.row .st{font:10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding-top:7px;line-height:1.6}
+.row .yr{font:10.5px var(--mono);color:var(--faint);padding-top:7px;text-align:right}
+.repos{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.repo{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:16px 0;border-bottom:1px solid var(--line);transition:background-color .15s}
+.repo:hover{background:var(--paper-2)}
+.repo .nm2{font:14px var(--mono)}.repo .org{color:var(--faint)}
+.repo .lang{font:10.5px var(--mono);color:var(--faint);display:inline-flex;align-items:center;gap:6px}
+.repo .sw{width:8px;height:8px;border-radius:50%}
+.repo .ds2{grid-column:1/-1;font-size:13.5px;color:var(--mid);max-width:60ch}
+.log{display:flex;flex-direction:column}
+.li{display:grid;grid-template-columns:20px 1fr;gap:14px;padding:0 0 18px}
+.gut{position:relative}
+.gut .ln{position:absolute;left:9px;top:14px;bottom:-18px;width:1px;background:var(--line)}
+.li:last-child .gut .ln{display:none}
+.gut .nd{position:absolute;left:5px;top:5px;width:9px;height:9px;border:1px solid var(--ink);background:var(--paper);transform:rotate(45deg)}
+.li.up .gut .nd{border-style:dashed;border-color:var(--faint)}
+.li.latest .gut .nd{background:var(--amber);border-color:var(--amber)}
+.li .top2{display:flex;gap:10px;align-items:center;font:10.5px var(--mono);color:var(--faint);margin-bottom:4px}
+.li .hash{color:var(--amber-ink)}
+.li .tag{border:1px solid var(--line);padding:1px 6px;font-size:9px;letter-spacing:.12em;text-transform:uppercase}
+.li .msg{font-size:14.5px;color:var(--mid);line-height:1.55;max-width:66ch;text-wrap:pretty}
+.li.up .msg{font-style:italic;color:var(--faint)}
+.li .msg a{color:var(--amber-ink);text-decoration:underline;text-underline-offset:3px}
+.wlist{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.wrow{display:grid;grid-template-columns:100px 1fr 60px;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.wrow .d{font:10.5px var(--mono);color:var(--faint)}
+.wrow .t{font-family:var(--serif);font-size:19px;font-weight:500;letter-spacing:-.01em;background:linear-gradient(var(--amber),var(--amber)) left bottom/0 1px no-repeat;transition:background-size .3s cubic-bezier(.2,.9,.2,1);padding-bottom:1px}
+.wrow:hover .t{background-size:100% 1px}
+.wrow .rt{font:10.5px var(--mono);color:var(--faint);text-align:right}
+.tenets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:0;border:1px solid var(--line)}
+.tenet{padding:18px 20px;border-left:1px solid var(--line);border-top:1px solid var(--line);margin:-1px 0 0 -1px}
+.tenet .nn{font:10px var(--mono);color:var(--amber-ink);margin-bottom:8px;letter-spacing:.14em}
+.tenet h3{font-family:var(--serif);font-size:20px;font-weight:500;margin:0 0 6px;letter-spacing:-.01em}
+.tenet p{margin:0;font-size:14px;color:var(--mid);line-height:1.55;text-wrap:pretty}
+.toolbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:24px}
+.toolcol .h{font:9.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.toolcol ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.toolcol li{font-size:14px;color:var(--mid);padding:2px 0;transition:color .12s,transform .25s cubic-bezier(.2,.9,.2,1)}
+.toolcol li:hover{color:var(--ink);transform:translateX(4px)}
+.specs{margin:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.spec{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.spec dt{font:9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.spec dd{margin:0;font-size:14.5px;color:var(--mid)}
+.spec dd .live{font-family:var(--mono);font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
+/* title block */
+.tblock{border:1px solid var(--ink);display:grid;grid-template-columns:1.2fr 1fr 1fr;font-family:var(--mono);font-size:10.5px;background:var(--paper);box-shadow:4px 4px 0 var(--paper-2)}
+.tb{padding:10px 12px;border-left:1px solid var(--ink);border-top:1px solid var(--ink);display:flex;flex-direction:column;gap:2px;min-width:0}
+.tb:nth-child(-n+3){border-top:0}
+.tb:nth-child(3n+1){border-left:0}
+.tb .k{font-size:8.5px}
+.tb .v{color:var(--ink);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb.wide{grid-column:1/-1}
+.rev{display:grid;grid-template-columns:36px 90px 90px 1fr;gap:0 12px;font-size:10.5px}
+.rev>span{padding:4px 0;border-top:1px dashed var(--line-2);color:var(--mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rev>span.hd{border-top:0;color:var(--faint);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase}
+.rev .p{color:var(--amber-ink)}
+.replay{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 10px;border:1px solid var(--line);background:transparent;font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mid);cursor:pointer;transition:background-color .15s,transform .12s;align-self:flex-start;margin-top:6px}
+.replay:hover{background:var(--paper-2)}.replay:active{transform:scale(.96)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:24px;font:10.5px var(--mono);color:var(--faint);letter-spacing:.06em;flex-wrap:wrap}
+.foot nav{display:flex;gap:14px}
+.foot a:hover{color:var(--amber-ink)}
+/* plotter overlay */
+.plot{position:absolute;inset:0;z-index:30;background:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:40px 40px;cursor:progress}
+.plot.wipe{animation:wipe 1.1s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
+@keyframes wipe{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(100% 0 0 0)}}
+.plotline{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--amber),#fff 50%,var(--amber));top:0;opacity:0;box-shadow:0 0 12px rgba(201,129,26,.6)}
+.plot.wipe .plotline{animation:pline 1.1s cubic-bezier(.4,0,.2,1) both}
+@keyframes pline{from{top:0;opacity:1}to{top:100%;opacity:1}}
+.bx{position:absolute;box-sizing:border-box;border:1px solid var(--amber);background:repeating-linear-gradient(135deg,transparent 0 5px,var(--amber-soft) 5px 6px);animation:bpbox .55s cubic-bezier(.22,.8,.24,1) both}
+.bx .bt{position:absolute;left:-1px;top:-17px;font:9px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--paper);background:var(--amber);padding:1px 5px;white-space:nowrap}
+.bx .bd{position:absolute;right:0;bottom:-17px;font:9px var(--mono);color:var(--amber-ink);white-space:nowrap;animation:fadein .3s both;background:var(--paper);padding:0 3px}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.pstat{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);font:10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber-ink);background:var(--paper);border:1px solid var(--amber);padding:6px 12px;z-index:60;display:flex;gap:12px;align-items:center}
+.pstat b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+@media (max-width:960px){
+  .ruler,.corner,.sheetrail,.minimap,.mnote{display:none}
+  .sheet{padding:24px 18px 56px}
+  .lede{font-size:31px}
+  .row{grid-template-columns:28px 1fr;gap:8px 12px}
+  .row .st,.row .yr{grid-column:2;text-align:left;padding-top:0}
+  .wrow{grid-template-columns:1fr auto;gap:4px 12px}.wrow .d{grid-column:1/-1}
+  .spec{grid-template-columns:1fr;gap:4px}
+  .tblock{grid-template-columns:1fr 1fr}.tb:nth-child(-n+3){border-top:1px solid var(--ink)}.tb:nth-child(-n+2){border-top:0}.tb:nth-child(3n+1){border-left:1px solid var(--ink)}.tb:nth-child(2n+1){border-left:0}
+  .rev{grid-template-columns:30px 70px 1fr}.rev .hidem{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .ds *,.ds *::before,.ds *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</helmet>
+
+<div class="ds" onMouseMove="{{ onMove }}">
+<svg width="0" height="0" aria-hidden="true" style="position: absolute"><filter id="graphite" x="-2%" y="-20%" width="104%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter></svg>
+
+<div class="corner" aria-hidden="true"></div>
+<div class="ruler rx" aria-hidden="true"><sc-for list="{{ rxNums }}" as="t" hint-placeholder-count="12"><span class="rnum" style="left: {{ t.px }}">{{ t.v }}</span></sc-for><span class="rsel" style="left: {{ selX }}; width: {{ selW }}; opacity: {{ selO }}"></span><span class="rmark" style="transform: translateX({{ mx }})"></span></div>
+<div class="ruler ry" aria-hidden="true"><sc-for list="{{ ryNums }}" as="t" hint-placeholder-count="10"><span class="rnum" style="top: {{ t.px }}">{{ t.v }}</span></sc-for><span class="rsel" style="top: {{ selY }}; height: {{ selH }}; opacity: {{ selO }}"></span><span class="rmark" style="transform: translateY({{ my }})"></span></div>
+
+<nav class="sheetrail" aria-label="Sheets"><sc-for list="{{ ticks }}" as="t" hint-placeholder-count="9"><a class="tk {{ t.cls }}" href="#{{ t.id }}" onMouseEnter="{{ graze }}" onClick="{{ t.go }}"><i></i>{{ t.num }}</a></sc-for></nav>
+<nav class="minimap" aria-label="Minimap"><sc-for list="{{ mm }}" as="b" hint-placeholder-count="9"><a class="mm {{ b.cls }}" href="#{{ b.id }}" style="height: {{ b.h }}" onClick="{{ b.go }}"><span>{{ b.num }}</span></a></sc-for><span class="thumb" style="top: {{ thumbTop }}; height: {{ thumbH }}"></span></nav>
+
+<div class="sheet">
+  <header class="top">
+    <div class="who"><span class="nm">Tomas Brasca</span><span class="rl">Fullstack · AI systems</span></div>
+    <div class="right"><span>Sheet <b>{{ sheetNo }}</b> of 08</span><span>Rosario {{ clock }}</span><a href="mailto:tomibrasca97@gmail.com">Email</a><a href="https://github.com/soundOfff">GitHub</a><button class="snd {{ sndCls }}" type="button" aria-pressed="{{ soundOn }}" onClick="{{ toggleSound }}"><i></i>{{ sndLabel }}</button></div>
+  </header>
+  <div class="guide"><span>Column 960 · Scale 1:1</span><span class="ln g"></span><span>Drawn Oct 2026</span></div>
+
+  <section class="blk" id="readme" data-sec="0">
+    <p class="kick" data-plot="Kicker"><span class="dia"></span>Sheet 00 · <b>Readme</b></p>
+    <h1 class="lede" data-plot="Title" onMouseEnter="{{ selOn }}" onMouseLeave="{{ selOff }}">Most LLM calls don't need the biggest model. They need a dispatcher that knows which one will <em>clear the bar</em>.</h1>
+    <aside class="mnote" style="top: 60px"><svg viewBox="0 0 60 34" class="g"><path d="M58 4 C40 2, 22 10, 4 30"></path><path d="M10 24 L4 30 L12 31"></path></svg>the thesis in two lines, no more. everything below either serves it or gets cut.</aside>
+    <p class="sub" data-plot="Copy">I'm a backend engineer who builds the systems that make AI products work in production: routing, scale, evals, the unglamorous middle. Backend is the foundation, LLM infrastructure is the edge, and competitive-programming results are the proof. Below, an agent answers questions about all of it by generating the interface it answers in.</p>
+    <div class="startrow">
+      <a class="btn" href="#playground" data-plot="Button" onMouseEnter="{{ hover }}" onClick="{{ soft }}"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"></path></svg>Ask the portfolio</a>
+      <a class="ghost" href="#work" onMouseEnter="{{ hover }}">See the work index <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"></path></svg></a>
+    </div>
+    <div class="metrics" data-plot="Proof" onMouseEnter="{{ selOn }}" onMouseLeave="{{ selOff }}">
+      <div class="m"><div class="v"><em>2–3M</em></div><div class="k">users at Mint</div></div>
+      <div class="m"><div class="v">ICPC</div><div class="k">SA finalist</div></div>
+      <div class="m"><div class="v">1st</div><div class="k">GTS alg trading</div></div>
+      <div class="m"><div class="v">SE II</div><div class="k">engineer at Dex</div></div>
+      <div class="m"><div class="v">4+</div><div class="k">yrs fullstack</div></div>
+    </div>
+    <p class="fig">Fig 0.1 · Proof points, framed as fundamentals rather than headline.</p>
+  </section>
+
+  <section class="blk" id="playground" data-sec="1">
+    <div class="rule g"></div>
+    <p class="kick"><span class="dia"></span>Sheet 01 · <b>Playground</b> · a2ui portfolio agent</p>
+    <aside class="mnote" style="top: 120px"><svg viewBox="0 0 60 34" class="g"><path d="M58 6 C44 2, 24 12, 4 28"></path><path d="M10 22 L4 28 L12 29"></path></svg>the agent drafts its own UI before inking it, the same way this sheet drew itself.</aside>
+    <div class="console" data-plot="Console" onMouseEnter="{{ selOn }}" onMouseLeave="{{ selOff }}">
+      <div class="chead"><span>portfolio agent</span><span>demo transcript</span><span class="right"><span>{{ agentLabel }}</span><span class="bars {{ barsCls }}" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></span></div>
+      <div class="cbody">
+        <p class="cintro">Ask a question about the work and an agent answers by composing a user interface for it: components, not paragraphs.</p>
+        <form class="ask" onSubmit="{{ submit }}">
+          <input class="ain" type="text" value="{{ q }}" onChange="{{ onQ }}" placeholder="Ask anything about the work…" aria-label="Ask the portfolio">
+          <button class="btn" type="submit" onMouseEnter="{{ hover }}">Ask</button>
+        </form>
+        <div class="chips"><sc-for list="{{ chips }}" as="c" hint-placeholder-count="4"><button class="chip" type="button" onClick="{{ c.pick }}" onMouseEnter="{{ hover }}">{{ c.label }}</button></sc-for></div>
+        <sc-if value="{{ thinking }}" hint-placeholder-val="{{ false }}"><div class="thinking"><span class="bars think" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>setting out an answer to “{{ q }}”</div></sc-if>
+        <div class="surfaces">
+          <sc-for list="{{ surfaces }}" as="s" hint-placeholder-count="0">
+            <div class="surf {{ s.cls }}">
+              <span class="dtag">{{ s.dtag }}</span><span class="ddim">setting out</span>
+              <div class="stag">{{ s.tag }}</div>
+              <div class="body">
+              <sc-if value="{{ s.isCards }}" hint-placeholder-val="{{ false }}"><div class="cards"><sc-for list="{{ s.cards }}" as="c" hint-placeholder-count="3"><a class="card" href="#work"><span class="cn">{{ c.n }}</span><b>{{ c.title }}</b><span class="cd">{{ c.desc }}</span><span class="cm">{{ c.stack }} · {{ c.year }}</span></a></sc-for></div></sc-if>
+              <sc-if value="{{ s.isTable }}" hint-placeholder-val="{{ false }}"><div class="tbl {{ s.tcls }}"><sc-for list="{{ s.cells }}" as="x" hint-placeholder-count="6"><div class="cell {{ x.cls }}">{{ x.t }}</div></sc-for></div></sc-if>
+              <sc-if value="{{ s.isTimeline }}" hint-placeholder-val="{{ false }}"><div class="tl"><sc-for list="{{ s.events }}" as="e" hint-placeholder-count="4"><div class="ev"><span class="ed">{{ e.date }}</span><span>{{ e.msg }}</span></div></sc-for></div></sc-if>
+              <sc-if value="{{ s.isFlow }}" hint-placeholder-val="{{ false }}"><div class="flow"><sc-for list="{{ s.steps }}" as="st" hint-placeholder-count="3"><div class="step"><b>{{ st.t }}</b><span>{{ st.d }}</span></div></sc-for></div></sc-if>
+              <sc-if value="{{ s.isList }}" hint-placeholder-val="{{ false }}"><div class="blist"><sc-for list="{{ s.items }}" as="p" hint-placeholder-count="4"><a href="#writing"><span class="d">{{ p.date }}</span><span class="t">{{ p.title }}</span><span class="p">{{ p.pillar }}</span></a></sc-for></div></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ done }}" hint-placeholder-val="{{ false }}"><div class="meta">{{ meta }}</div></sc-if>
+      </div>
+    </div>
+    <p class="fig">Fig 1.1 · Every surface is set out as a wireframe with its tag and size, then inked.</p>
+  </section>
+
+  <section class="blk" id="work" data-sec="2">
+    <div class="rule g"></div>
+    <p class="kick"><span class="dia"></span>Sheet 02 · <b>Work</b> · index</p>
+    <div class="idx">
+      <sc-for list="{{ work }}" as="w" hint-placeholder-count="3">
+        <a class="row" href="#work" data-plot="Row" onMouseEnter="{{ rowEnter }}" onMouseLeave="{{ selOff }}"><span class="n">{{ w.n }}</span><span><b>{{ w.title }}</b><span class="ds2">{{ w.desc }}</span></span><span class="st">{{ w.stack }}</span><span class="yr">{{ w.year }}</span></a>
+      </sc-for>
+    </div>
+    <p class="fig">Fig 2.1 · Three case studies. Dex and Mint are narrative only; the Flagship ships with source.</p>
+  </section>
+
+  <section class="blk" id="oss" data-sec="3">
+    <div class="rule g"></div>
+    <p class="kick"><span class="dia"></span>Sheet 03 · <b>Open source</b></p>
+    <div class="repos">
+      <a class="repo" href="https://github.com/soundOfff/editorial-ui" data-plot="Repo" onMouseEnter="{{ rowEnter }}" onMouseLeave="{{ selOff }}"><span class="nm2"><span class="org">soundOfff/</span>editorial-ui</span><span class="lang"><span class="sw" style="background: #3178C6"></span>TypeScript</span><span class="ds2">The warm-paper, one-amber, hairline-over-shadows React design system this whole site is built on.</span></a>
+      <a class="repo" href="https://github.com/soundOfff/personal-site" data-plot="Repo" onMouseEnter="{{ rowEnter }}" onMouseLeave="{{ selOff }}"><span class="nm2"><span class="org">soundOfff/</span>personal-site</span><span class="lang"><span class="sw" style="background: #FF5D01"></span>Astro</span><span class="ds2">This site. Astro, near-zero JS, with an A2UI conversational portfolio: an agent that answers by generating UI.</span></a>
+    </div>
+  </section>
+
+  <section class="blk" id="log" data-sec="4">
+    <div class="rule g"></div>
+    <p class="kick"><span class="dia"></span>Sheet 04 · <b>Log</b> · recent activity</p>
+    <aside class="mnote" style="top: 40px"><svg viewBox="0 0 60 34" class="g"><path d="M58 8 C44 4, 26 14, 4 26"></path><path d="M10 20 L4 26 L12 27"></path></svg>revisions repeat in the title block, like a real drawing set.</aside>
+    <div class="log" data-plot="Log">
+      <sc-for list="{{ log }}" as="l" hint-placeholder-count="6">
+        <div class="li {{ l.cls }}"><div class="gut"><span class="ln"></span><span class="nd"></span></div><div><div class="top2"><span class="hash">{{ l.hash }}</span><span>{{ l.date }}</span><span class="tag">{{ l.tag }}</span></div><div class="msg">{{ l.msg }} <sc-if value="{{ l.hasLink }}" hint-placeholder-val="{{ false }}"><a href="https://danahq.com/">{{ l.link }}</a></sc-if></div></div></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="blk" id="writing" data-sec="5">
+    <div class="rule g"></div>
+    <p class="kick"><span class="dia"></span>Sheet 05 · <b>Writing</b> · <a href="#writing">all posts</a></p>
+    <div class="wlist">
+      <sc-for list="{{ posts }}" as="p" hint-placeholder-count="4">
+        <a class="wrow" href="#writing" data-plot="Post" onMouseEnter="{{ rowEnter }}" onMouseLeave="{{ selOff }}"><span class="d">{{ p.date }}</span><span class="t">{{ p.title }}</span><span class="rt">{{ p.rt }}</span></a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="blk" id="principles" data-sec="6">
+    <div class="rule g"></div>
+    <p class="kick"><span class="dia"></span>Sheet 06 · <b>Principles</b> · how I build</p>
+    <div class="tenets" data-plot="Tenets" onMouseEnter="{{ selOn }}" onMouseLeave="{{ selOff }}">
+      <div class="tenet"><div class="nn">01</div><h3>Smallest model that passes</h3><p>Capability is a budget, not a flex. Start at the bottom of the ladder and only climb when an eval forces you to.</p></div>
+      <div class="tenet"><div class="nn">02</div><h3>Cache before you call</h3><p>The cheapest token is the one you never send. Memoize aggressively; treat the model as the slow path.</p></div>
+      <div class="tenet"><div class="nn">03</div><h3>Cap the blast radius</h3><p>Every public endpoint gets a rate limit and a kill switch before it gets a launch tweet.</p></div>
+      <div class="tenet"><div class="nn">04</div><h3>Evals are contracts</h3><p>If a behaviour isn't measured, it isn't shipped. Write the contract down, then make it runnable.</p></div>
+    </div>
+  </section>
+
+  <section class="blk" id="stack" data-sec="7">
+    <div class="rule g"></div>
+    <p class="kick"><span class="dia"></span>Sheet 07 · <b>Stack</b> · toolbox</p>
+    <div class="toolbox" data-plot="Toolbox">
+      <div class="toolcol"><div class="h">Languages</div><ul><li>TypeScript</li><li>Python</li><li>C++</li><li>Go</li><li>SQL</li></ul></div>
+      <div class="toolcol"><div class="h">Infra</div><ul><li>Postgres</li><li>Redis</li><li>Docker</li><li>Cloudflare</li><li>Kafka</li></ul></div>
+      <div class="toolcol"><div class="h">LLM</div><ul><li>OpenAI</li><li>Groq</li><li>OpenRouter</li><li>pgvector</li><li>evals</li></ul></div>
+    </div>
+  </section>
+
+  <section class="blk" id="now" data-sec="8">
+    <div class="rule g"></div>
+    <p class="kick"><span class="dia"></span>Sheet 08 · <b>Now</b></p>
+    <dl class="specs" data-plot="Specs">
+      <div class="spec"><dt>Location</dt><dd>Rosario, Argentina · remote-friendly (ART, UTC−3) · <span class="live">{{ clock }}</span></dd></div>
+      <div class="spec"><dt>Status</dt><dd>Open to senior backend / AI-infra roles &amp; select contract work</dd></div>
+      <div class="spec"><dt>Email</dt><dd><a class="ghost" href="mailto:tomibrasca97@gmail.com">tomibrasca97@gmail.com</a></dd></div>
+      <div class="spec"><dt>Focus</dt><dd>LLM routing, evals, cost control; high-traffic backends</dd></div>
+      <div class="spec"><dt>Reading</dt><dd>AI Engineer</dd></div>
+      <div class="spec"><dt>Built with</dt><dd>Astro · React island · A2UI · editorial-ui · Cloudflare</dd></div>
+    </dl>
+
+    <div class="tblock" style="margin-top: 48px" data-plot="Title block">
+      <div class="tb"><span class="k">Project</span><span class="v">Tomas Brasca · portfolio</span></div>
+      <div class="tb"><span class="k">Drawn by</span><span class="v">T. Brasca · Rosario, AR</span></div>
+      <div class="tb"><span class="k">Checked by</span><span class="v">whoever reads this far</span></div>
+      <div class="tb"><span class="k">Sheet</span><span class="v">08 of 08 · scale 1:1</span></div>
+      <div class="tb"><span class="k">Column</span><span class="v">960 px · grid 40</span></div>
+      <div class="tb"><span class="k">Issued</span><span class="v">Oct 2026 · rev P6</span></div>
+      <div class="tb wide"><span class="k">Revisions</span>
+        <div class="rev">
+          <span class="hd">Rev</span><span class="hd">Date</span><span class="hd hidem">Tag</span><span class="hd">Description</span>
+          <sc-for list="{{ revs }}" as="r" hint-placeholder-count="6"><span class="p">{{ r.p }}</span><span>{{ r.date }}</span><span class="hidem">{{ r.tag }}</span><span>{{ r.msg }}</span></sc-for>
+        </div>
+        <button class="replay" type="button" onClick="{{ replay }}"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.5-3.6M3 2.5v3h3"></path></svg>Replot this sheet</button>
+      </div>
+    </div>
+    <footer class="foot">
+      <span>© 2026 Tomas Brasca</span>
+      <nav aria-label="Footer"><a href="https://github.com/soundOfff">github</a><a href="https://www.linkedin.com/in/tomasbrasca">linkedin</a><a href="mailto:tomibrasca97@gmail.com">email</a><a href="/rss.xml">rss</a></nav>
+    </footer>
+  </section>
+
+  <sc-if value="{{ plotting }}" hint-placeholder-val="{{ false }}">
+    <div class="plot {{ plotCls }}" onClick="{{ skipPlot }}" aria-hidden="true">
+      <sc-for list="{{ boxes }}" as="b" hint-placeholder-count="0"><div class="bx" style="left: {{ b.x }}; top: {{ b.y }}; width: {{ b.w }}; height: {{ b.h }}; animation-delay: {{ b.d }}"><span class="bt">{{ b.tag }}</span><span class="bd" style="animation-delay: {{ b.d2 }}">{{ b.dim }}</span></div></sc-for>
+      <span class="plotline"></span>
+    </div>
+  </sc-if>
+</div>
+<sc-if value="{{ plotting }}" hint-placeholder-val="{{ false }}"><div class="pstat"><span>Setting out</span><b>{{ pct }}</b><span>click to skip</span></div></sc-if>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"soundDefault":{"editor":"boolean","default":true,"section":"Behaviour"},"plotOnLoad":{"editor":"boolean","default":true,"section":"Behaviour"},"$preview":{"width":1440,"height":4000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sound: props.soundDefault !== false,
+      activeIdx: 0, now: Date.now(),
+      mx: 0, my: 0, sel: { x: 0, y: 0, w: 0, h: 0, o: 0 },
+      sy: 0, vh: 900, ph: 4000, colLeft: 240,
+      secs: [],
+      plotting: false, plotCls: '', boxes: [], pct: 0,
+      q: '', phase: 'idle', surfaces: [], meta: ''
+    };
+    this._timers = [];
+  }
+  componentDidMount() {
+    this._iv = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    this._onScroll = () => { if (this._sraf) return; this._sraf = requestAnimationFrame(() => { this._sraf = 0; this.setState({ sy: window.scrollY || 0, vh: window.innerHeight || 900, ph: Math.max(1, document.documentElement.scrollHeight || 4000) }); }); };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    window.addEventListener('resize', this._onScroll);
+    this._onScroll();
+    try {
+      const nodes = Array.prototype.slice.call(document.querySelectorAll('[data-sec]'));
+      if (window.IntersectionObserver && nodes.length) {
+        this._io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => { if (!e.isIntersecting) return; const i = Number(e.target.getAttribute('data-sec')); if (i !== this.state.activeIdx) { this.setState({ activeIdx: i }); this.clk('step'); } });
+        }, { rootMargin: '-35% 0px -55% 0px', threshold: 0 });
+        nodes.forEach((n) => this._io.observe(n));
+      }
+    } catch (e) {}
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const go = () => { this.measure(); if (this.props.plotOnLoad !== false && !reduced) this.plot(); };
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(() => this.later(go, 120)); this.later(() => { if (!this._measured) go(); }, 1200); }
+    else this.later(go, 350);
+  }
+  componentWillUnmount() {
+    clearInterval(this._iv); this._timers.forEach(clearTimeout);
+    window.removeEventListener('scroll', this._onScroll); window.removeEventListener('resize', this._onScroll);
+    if (this._io) this._io.disconnect();
+    if (this._ac) { try { this._ac.close(); } catch (e) {} }
+  }
+  later(fn, ms) { const t = setTimeout(fn, ms); this._timers.push(t); return t; }
+  measure() {
+    const root = document.querySelector('.ds .sheet'); if (!root) return;
+    this._measured = true;
+    const rr = root.getBoundingClientRect();
+    const els = Array.prototype.slice.call(root.querySelectorAll('[data-plot]'));
+    const counts = {};
+    const boxes = els.map((el, i) => {
+      const r = el.getBoundingClientRect(); const name = el.getAttribute('data-plot') || 'Block';
+      counts[name] = (counts[name] || 0) + 1;
+      return { x: (r.left - rr.left) + 'px', y: (r.top - rr.top) + 'px', w: r.width + 'px', h: r.height + 'px',
+        tag: name + ' ' + (counts[name] < 10 ? '0' : '') + counts[name], dim: Math.round(r.width) + ' × ' + Math.round(r.height),
+        d: (260 + i * 85) + 'ms', d2: (260 + i * 85 + 260) + 'ms' };
+    });
+    const secs = Array.prototype.slice.call(root.querySelectorAll('[data-sec]')).map((s) => ({ id: s.id, h: s.offsetHeight }));
+    this.setState({ boxes: boxes, secs: secs, colLeft: rr.left + 24 });
+  }
+  plot() {
+    this._timers.forEach(clearTimeout); this._timers = [];
+    const n = this.state.boxes.length; if (!n) return;
+    this.setState({ plotting: true, plotCls: '', pct: 0 });
+    this.state.boxes.forEach((b, i) => { this.later(() => { this.clk('pencil'); this.setState({ pct: Math.round(((i + 1) / n) * 88) }); }, 260 + i * 85); });
+    const tWipe = 260 + n * 85 + 420;
+    this.later(() => { this.setState({ plotCls: 'wipe', pct: 100 }); this.whoosh(); }, tWipe);
+    this.later(() => this.setState({ plotting: false, plotCls: '' }), tWipe + 1150);
+  }
+  skipPlot() { this._timers.forEach(clearTimeout); this._timers = []; this.setState({ plotting: false, plotCls: '' }); }
+  replay() { this.clk('soft'); this.measure(); this.later(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); this.plot(); }, 60); }
+
+  /* ---------- sound: imdaryl-style click palette, synthesized ---------- */
+  ac() {
+    if (!this.state.sound) return null;
+    try { if (!this._ac) this._ac = new (window.AudioContext || window.webkitAudioContext)(); if (this._ac.state === 'suspended') this._ac.resume(); return this._ac; } catch (e) { return null; }
+  }
+  bus(ac) {
+    if (!this._bus) { const comp = ac.createDynamicsCompressor(); comp.threshold.value = -18; comp.knee.value = 20; comp.ratio.value = 6; comp.attack.value = 0.002; comp.release.value = 0.08; const g = ac.createGain(); g.gain.value = 0.8; comp.connect(g); g.connect(ac.destination); this._bus = comp; }
+    return this._bus;
+  }
+  clk(kind) {
+    const ac = this.ac(); if (!ac) return;
+    const P = { soft: [1750, 0.030, 0.07], sharp: [2600, 0.028, 0.09], step: [3100, 0.016, 0.05], hover: [4200, 0.011, 0.02], graze: [5200, 0.009, 0.022], pencil: [3600, 0.014, 0.035] }[kind] || [1750, 0.03, 0.07];
+    const t = ac.currentTime; const f = P[0], dur = P[1], vol = P[2];
+    const n = Math.floor(ac.sampleRate * 0.006); const buf = ac.createBuffer(1, n, ac.sampleRate); const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const src = ac.createBufferSource(); src.buffer = buf; const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = 1.2;
+    const g1 = ac.createGain(); g1.gain.setValueAtTime(vol * 1.6, t); g1.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(bp); bp.connect(g1); g1.connect(this.bus(ac)); src.start(t);
+    const o = ac.createOscillator(); o.type = 'triangle'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + dur);
+    const g2 = ac.createGain(); g2.gain.setValueAtTime(0.0001, t); g2.gain.exponentialRampToValueAtTime(vol, t + 0.002); g2.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g2); g2.connect(this.bus(ac)); o.start(t); o.stop(t + dur + 0.02);
+  }
+  whoosh() {
+    const ac = this.ac(); if (!ac) return; const t = ac.currentTime;
+    const n = Math.floor(ac.sampleRate * 0.9); const buf = ac.createBuffer(1, n, ac.sampleRate); const d = buf.getChannelData(0); let b0 = 0;
+    for (let i = 0; i < n; i++) { const w = Math.random() * 2 - 1; b0 = 0.98 * b0 + 0.02 * w; d[i] = b0 * 3; }
+    const src = ac.createBufferSource(); src.buffer = buf; const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.8;
+    bp.frequency.setValueAtTime(500, t); bp.frequency.exponentialRampToValueAtTime(2400, t + 0.5); bp.frequency.exponentialRampToValueAtTime(600, t + 0.95);
+    const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.0);
+    src.connect(bp); bp.connect(g); g.connect(this.bus(ac)); src.start(t);
+  }
+  ding() {
+    const ac = this.ac(); if (!ac) return; const t = ac.currentTime;
+    [[1050, 0.14], [2898, 0.05], [5670, 0.02]].forEach((p) => { const o = ac.createOscillator(); const g = ac.createGain(); o.type = 'sine'; o.frequency.value = p[0]; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(p[1], t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.8); o.connect(g); g.connect(this.bus(ac)); o.start(t); o.stop(t + 0.85); });
+  }
+  toggleSound() { const next = !this.state.sound; this.setState({ sound: next }, () => { if (next) this.clk('sharp'); }); }
+
+  /* ---------- content ---------- */
+  work() {
+    return [
+      { n: '01', title: 'Dex: multi-LLM routing', desc: 'Classify-then-dispatch in front of OpenAI, Groq and OpenRouter, balancing latency, cost and quality.', stack: 'Routing · evals', year: '2025' },
+      { n: '02', title: 'Mint: 2–3M-user scale', desc: 'High-traffic e-commerce APIs serving 2–3M users: the backend that stayed correct and fast under real load.', stack: 'Microservices · WordPress · React · Postgres', year: '2023' },
+      { n: '03', title: 'Flagship: conversational portfolio', desc: 'The agent on this page: ask a question about the work, get back a generated interface. A2UI protocol, custom renderer, edge backend, with the source.', stack: 'A2UI · Astro · TS · serverless', year: '2026' }
+    ];
+  }
+  posts() {
+    return [
+      { date: '2026-04-21', title: 'Evals are contracts', rt: '6 min', pillar: 'Backend & AI systems' },
+      { date: '2026-06-12', title: 'Binary search on the answer', rt: '7 min', pillar: 'Algorithms & CP' },
+      { date: '2026-06-12', title: 'Data structures in TypeScript and Python: what you get, what you build', rt: '10 min', pillar: 'Algorithms & CP' },
+      { date: '2026-06-12', title: 'The unglamorous middle', rt: '5 min', pillar: 'Startup engineering' },
+      { date: '2026-06-12', title: 'Routing beats scaling: a cost study', rt: '8 min', pillar: 'Backend & AI systems' },
+      { date: '2026-06-12', title: 'Rate-limiting a public inference endpoint', rt: '6 min', pillar: 'Backend & AI systems' }
+    ];
+  }
+  logItems() {
+    return [
+      { hash: 'focusq0', date: 'soon', tag: 'coming soon', msg: 'focus-quote, a Chrome extension for focus sessions: capture quotes from the web, set a goal, and get AI insights on which tabs were on-goal vs. distractions.', cls: 'up' },
+      { hash: 'a2ui001', date: 'jul 2026', tag: 'site', msg: 'Replace the router demo with an A2UI conversational portfolio: ask a question, a Claude agent composes the answer as generated UI over a custom renderer.', cls: 'latest' },
+      { hash: 'unglam1', date: 'jun 2026', tag: 'writing', msg: 'Publish “The unglamorous middle”: joining my first startup three and a half years in, and learning the real job is the part nobody demos.', cls: '' },
+      { hash: 'eui010', date: 'jun 2026', tag: 'oss', msg: 'Publish editorial-ui v0.1.0: the warm-paper, one-amber, hairline design system this site is built on.', cls: '' },
+      { hash: 'ship001', date: 'jun 2026', tag: 'site', msg: 'Ship the personal site: Astro shell, editorial-ui design system, router island, Cloudflare Worker deploy.', cls: '' },
+      { hash: 'dana100', date: 'may 2026', tag: 'launch', msg: 'Launch Dana: AI meeting prep that pulls context from calendar, email, and Slack so you walk in already briefed.', cls: '', hasLink: true, link: 'danahq.com' }
+    ];
+  }
+  answer(q) {
+    const s = q.toLowerCase();
+    const cards = { tag: 'ProjectCard × 3', isCards: true, cards: this.work() };
+    const timeline = { tag: 'Timeline · 4 events', isTimeline: true, events: [
+      { date: 'may 2026', msg: 'Dana launches: AI meeting prep from calendar, email and Slack.' },
+      { date: 'jun 2026', msg: 'Personal site ships on Astro + Cloudflare; editorial-ui v0.1.0 published.' },
+      { date: 'jun 2026', msg: '“The unglamorous middle” published.' },
+      { date: 'jul 2026', msg: 'Router demo replaced by the A2UI conversational portfolio.' } ] };
+    const flow = { tag: 'Flow · classify → dispatch → gate', isFlow: true, steps: [
+      { t: 'Classify', d: 'Bucket the request: extractive, structured, reasoning or creative.' },
+      { t: 'Dispatch', d: 'Walk a cost-ordered catalog and pick the first model that clears that class’s bar.' },
+      { t: 'Gate', d: 'Every class has an eval contract; nothing ships that the eval does not pass.' } ] };
+    const routeTable = { tag: 'Table · 4 classes', isTable: true, tcls: 'c3', cells: [
+      { t: 'Class', cls: 'h' }, { t: 'Where it lands', cls: 'h' }, { t: 'Gate', cls: 'h' },
+      { t: 'Extractive', cls: 'k' }, { t: 'Smallest tier', cls: '' }, { t: 'Eval contract per class', cls: '' },
+      { t: 'Structured', cls: 'k' }, { t: 'Small tier', cls: '' }, { t: 'Schema + eval', cls: '' },
+      { t: 'Reasoning', cls: 'k' }, { t: 'Escalates', cls: '' }, { t: 'Eval, provider fallback', cls: '' },
+      { t: 'Creative', cls: 'k' }, { t: 'Escalates', cls: '' }, { t: 'Eval, provider fallback', cls: '' } ] };
+    const compare = { tag: 'Table · Dex vs Mint', isTable: true, tcls: 'c3', cells: [
+      { t: '', cls: 'h' }, { t: 'Dex', cls: 'h' }, { t: 'Mint', cls: 'h' },
+      { t: 'Problem', cls: 'k' }, { t: 'One big model on every request', cls: '' }, { t: 'Correctness under 2–3M users of load', cls: '' },
+      { t: 'Shape', cls: 'k' }, { t: 'Classify → dispatch → gate', cls: '' }, { t: 'Services in front of a WordPress core; cached reads, queued writes', cls: '' },
+      { t: 'Stack', cls: 'k' }, { t: 'Routing · evals', cls: '' }, { t: 'Microservices · Postgres · React', cls: '' },
+      { t: 'Code shown', cls: 'k' }, { t: 'Narrative only', cls: '' }, { t: 'Narrative only', cls: '' } ] };
+    const list = { tag: 'BlogList · 6 posts', isList: true, items: this.posts() };
+    if (s.indexOf('rout') >= 0 || s.indexOf('llm') >= 0 || s.indexOf('dispatch') >= 0) return [flow, routeTable];
+    if (s.indexOf('writ') >= 0 || s.indexOf('blog') >= 0 || s.indexOf('post') >= 0) return [list];
+    if (s.indexOf('compare') >= 0 || s.indexOf('mint') >= 0 || s.indexOf('vs') >= 0) return [compare];
+    if (s.indexOf('ship') >= 0 || s.indexOf('built') >= 0 || s.indexOf('work') >= 0 || s.indexOf('project') >= 0) return [cards, timeline];
+    return [cards];
+  }
+  ask(q) {
+    const text = (q || '').trim(); if (!text) return;
+    this._timers.forEach(clearTimeout); this._timers = [];
+    this.clk('sharp');
+    this.setState({ q: text, phase: 'thinking', surfaces: [], meta: '' });
+    const plan = this.answer(text);
+    let t = 800;
+    plan.forEach((sf, i) => {
+      const item = Object.assign({}, sf, { cls: 'drafting', dtag: 'Surface ' + (i < 9 ? '0' : '') + (i + 1) + ' · ' + sf.tag });
+      this.later(() => { this.setState(st => ({ phase: 'composing', surfaces: st.surfaces.concat([item]) })); this.clk('pencil'); this.later(() => this.clk('pencil'), 90); this.later(() => this.clk('pencil'), 170); }, t);
+      this.later(() => { this.setState(st => ({ surfaces: st.surfaces.map(x => x === item ? Object.assign({}, x, { cls: 'inked' }) : x) })); this.clk('sharp'); }, t + 620);
+      t += 900;
+    });
+    this.later(() => { this.setState({ phase: 'done', meta: 'demo transcript · ' + plan.length + (plan.length > 1 ? ' surfaces' : ' surface') + ' set out, then inked · no network' }); this.ding(); }, t + 120);
+  }
+  onMove(e) {
+    const x = e.clientX, y = e.clientY;
+    if (this._mraf) return; this._mraf = requestAnimationFrame(() => { this._mraf = 0; this.setState({ mx: x, my: y }); });
+  }
+  selFrom(el) { const r = el.getBoundingClientRect(); this.setState({ sel: { x: r.left, y: r.top, w: r.width, h: r.height, o: 1 } }); }
+
+  renderVals() {
+    const st = this.state;
+    const navDefs = [['readme', 'readme'], ['playground', 'playground'], ['work', 'work'], ['oss', 'oss'], ['log', 'log'], ['writing', 'writing'], ['principles', 'principles'], ['stack', 'stack'], ['now', 'now']];
+    const ticks = navDefs.map((d, i) => ({ id: d[0], num: (i < 10 ? '0' : '') + i, cls: i === st.activeIdx ? 'on' : '', go: () => { this.clk('soft'); this.setState({ activeIdx: i }); } }));
+    const total = st.secs.reduce((a, s) => a + s.h, 0) || 1;
+    const mm = navDefs.map((d, i) => { const s = st.secs[i]; const h = s ? Math.max(10, Math.round((s.h / total) * 260)) : 24; return { id: d[0], num: (i < 10 ? '0' : '') + i, h: h + 'px', cls: i === st.activeIdx ? 'on' : '', go: () => { this.clk('step'); this.setState({ activeIdx: i }); } }; });
+    const mmTotal = mm.reduce((a, b) => a + parseInt(b.h, 10) + 2, 0);
+    const thumbTop = Math.round((st.sy / st.ph) * mmTotal), thumbH = Math.max(8, Math.round((st.vh / st.ph) * mmTotal));
+    const rxNums = []; for (let k = -2; k <= 10; k++) rxNums.push({ v: String(k * 100), px: Math.round(st.colLeft + k * 100) + 'px' });
+    const ryNums = []; for (let k = 0; k <= 45; k++) { const y = k * 100 - st.sy; if (y > -20 && y < st.vh + 20) ryNums.push({ v: String(k * 100), px: Math.round(y) + 'px' }); }
+    let clock = '--:--:--';
+    try { clock = new Date(st.now).toLocaleTimeString('en-GB', { timeZone: 'America/Argentina/Cordoba', hour: '2-digit', minute: '2-digit', second: '2-digit' }); } catch (e) {}
+    const prompts = ['What has he shipped?', 'How does the LLM routing work?', 'What is he writing about?', 'Compare Dex and Mint'];
+    const logs = this.logItems().filter(l => l.cls !== 'up');
+    const revs = logs.slice().reverse().map((l, i) => ({ p: 'P' + (i + 1), date: l.date, tag: l.tag, msg: l.msg.split(':')[0] }));
+    const phase = st.phase;
+    return {
+      onMove: (e) => this.onMove(e),
+      rxNums: rxNums, ryNums: ryNums,
+      mx: st.mx + 'px', my: st.my + 'px',
+      selX: st.sel.x + 'px', selW: st.sel.w + 'px', selY: st.sel.y + 'px', selH: st.sel.h + 'px', selO: st.sel.o,
+      selOn: (e) => this.selFrom(e.currentTarget),
+      selOff: () => { if (st.sel.o) this.setState({ sel: Object.assign({}, st.sel, { o: 0 }) }); },
+      rowEnter: (e) => { this.selFrom(e.currentTarget); this.clk('graze'); },
+      hover: () => this.clk('hover'),
+      graze: () => this.clk('graze'),
+      soft: () => this.clk('soft'),
+      ticks: ticks, mm: mm, thumbTop: thumbTop + 'px', thumbH: thumbH + 'px',
+      sheetNo: (st.activeIdx < 10 ? '0' : '') + st.activeIdx,
+      clock: clock,
+      soundOn: st.sound ? 'true' : 'false', sndCls: st.sound ? 'on' : '', sndLabel: st.sound ? 'snd on' : 'snd off',
+      toggleSound: () => this.toggleSound(),
+      plotting: st.plotting, plotCls: st.plotCls, boxes: st.boxes, pct: st.pct + '%',
+      skipPlot: () => this.skipPlot(), replay: () => this.replay(),
+      q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
+      submit: (e) => { if (e && e.preventDefault) e.preventDefault(); this.ask(st.q); },
+      chips: prompts.map(p => ({ label: p, pick: () => this.ask(p) })),
+      thinking: phase === 'thinking', done: phase === 'done',
+      agentLabel: phase === 'thinking' ? 'setting out' : (phase === 'composing' ? 'inking' : (phase === 'done' ? 'issued' : 'idle')),
+      barsCls: phase === 'thinking' ? 'think' : (phase === 'composing' ? 'speak' : ''),
+      surfaces: st.surfaces, meta: st.meta,
+      work: this.work(), posts: this.posts().slice(0, 4), log: this.logItems(), revs: revs
+    };
+  }
+}
+</script>
+</body>
+</html>
