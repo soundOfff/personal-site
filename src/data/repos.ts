@@ -29,7 +29,7 @@ export const repos: Repo[] = [
     name: 'personal-site',
     href: 'https://github.com/soundOfff/personal-site',
     description:
-      'This site. Astro, near-zero JS, with an A2UI conversational portfolio: an agent that answers by generating UI.',
+      'The source of this site: Astro, one React island for the A2UI playground, and five film reels that load on demand.',
     language: 'Astro',
     color: '#FF5D01',
   },

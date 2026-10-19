@@ -58,7 +58,7 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
       id: 'intro',
       type: 'Text',
       props: {
-        text: 'Ask about the work, the writing, or the background. Every answer comes back as generated UI — cards, charts, diagrams, timelines — not as a paragraph.',
+        text: 'Ask about the work, the blog or the background.',
       },
     },
     {
@@ -74,7 +74,7 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
         ],
       },
       props: {
-        caption: 'What a turn does. This surface was built the same way, just ahead of time.',
+        caption: 'What each turn does. Tomas wrote this first surface by hand, in the same format.',
       },
     },
     {
@@ -82,7 +82,7 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
       type: 'Callout',
       props: {
         tone: 'info',
-        text: 'Every question runs a **real agent turn**: Claude composes the surface from scratch and the console under it reports the model, latency, tokens and cost.',
+        text: 'Under every answer, one line reports what that turn cost: the model, latency, tokens and dollars.',
       },
     },
     {
