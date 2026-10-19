@@ -6,13 +6,13 @@
  *   backdrop          film grain, the act strip on the left, the star fields
  *   rail              the console's two screens: mission clock, distance to Jupiter
  *   title             the title card: Sun, Earth and Moon in alignment over "2001"
- *   in:readme         the sky the hero sits in, and the frame tag with a replay
- *   after:readme      the match cut (bone → station), then Act II's intertitle
+ *   in:readme         the sky the hero sits in, and a replay of the alignment
+ *   after:readme      the match cut (bone → station)
  *   in:playground     the red lens beside the launcher, and the station floor
- *   after:work        Act III's intertitle
- *   in:log            the centrifuge ring
- *   after:log         the intermission, with its countdown
- *   after:principles  Act IV's intertitle, then the star gate
+ *   after:work        the "Jupiter mission" intertitle
+ *   in:log            the centrifuge drum
+ *   after:log         the intermission
+ *   after:principles  the "Jupiter and beyond the infinite" intertitle, then the star gate
  *   in:now            the monolith
  *   credits           end credits over the Earth's limb
  */
@@ -141,7 +141,6 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
         </div>
       </div>
       <p class="od-frame">
-        <span>70 mm · Super Panavision · 2.20 : 1</span>
         <button class="od-replay" type="button" data-od-replay>
           <span aria-hidden="true">↻</span> Replay the alignment
         </button>
@@ -180,21 +179,7 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
             <rect x="150" y="14" width="10" height="20" rx="2" />
             <circle cx="222" cy="24" r="7" />
           </svg>
-          <p class="od-mc-hint">Match cut · keep scrolling</p>
-          <p class="od-cap od-cap-a">
-            <b>Tools</b>
-            <span>the first instrument</span>
-          </p>
-          <p class="od-cap od-cap-b">
-            <b>Systems</b>
-            <span>everything since</span>
-          </p>
         </div>
-      </div>
-      <div class="od-card" aria-hidden="true">
-        <p class="od-cx-n">Act II</p>
-        <p class="od-cx-t">TMA-1</p>
-        <p class="od-cx-s">Tycho Magnetic Anomaly · One</p>
       </div>
     </>
   )
@@ -233,7 +218,6 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
 {
   at === 'after:work' && (
     <div class="od-card" aria-hidden="true">
-      <p class="od-cx-n">Act III</p>
       <p class="od-cx-t">Jupiter mission</p>
       <p class="od-cx-s">18 months later</p>
     </div>
@@ -246,10 +230,6 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
   at === 'after:log' && (
     <div class="od-card od-inter" data-od-zone="int" aria-hidden="true">
       <p class="od-cx-t">Intermission</p>
-      <p class="od-int-clock" data-od-int>
-        00:15:00
-      </p>
-      <p class="od-cx-s">The mission resumes below</p>
     </div>
   )
 }
@@ -258,7 +238,6 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
   at === 'after:principles' && (
     <>
       <div class="od-card" aria-hidden="true">
-        <p class="od-cx-n">Act IV</p>
         <p class="od-cx-t">Jupiter and beyond the infinite</p>
       </div>
       <div class="od-sg" data-od-scene="sg" aria-hidden="true">
@@ -272,7 +251,6 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
             <i />
           </div>
           <span class="od-sg-glow" />
-          <p class="od-sg-cap">Star gate · slit-scan · keep scrolling</p>
         </div>
       </div>
     </>

@@ -750,14 +750,12 @@
   & .od-frame {
     order: 10;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+    justify-content: flex-end;
     width: 100%;
     max-width: var(--od-w);
     margin: 12px 0 0;
-    font: 9.5px var(--font-mono);
-    letter-spacing: 0.2em;
+    font: 10.5px var(--font-mono);
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -892,12 +890,6 @@
   & .od-card p {
     margin: 0;
   }
-  & .od-cx-n {
-    font: 10px var(--font-mono);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: #8e918c;
-  }
   & .od-cx-t {
     margin-top: 10px !important;
     font: 400 clamp(16px, 2.2vw, 30px) / 1.45 var(--font-display);
@@ -916,12 +908,6 @@
   }
   & .od-inter {
     height: 300px;
-  }
-  & .od-int-clock {
-    margin-top: 14px !important;
-    font: 400 40px var(--font-display);
-    letter-spacing: 0.12em;
-    font-variant-numeric: tabular-nums;
   }
 
   /* ---------------- the match cut: a bone thrown into the air becomes a station ---------------- */
@@ -1026,59 +1012,11 @@
     fill: #24324f;
     stroke: #8e9bb8;
   }
-  & .od-mc.is-cut :is(.od-mc-dawn, .od-tool, .od-cap-a) {
+  & .od-mc.is-cut :is(.od-mc-dawn, .od-tool) {
     opacity: 0;
   }
-  & .od-mc.is-cut :is(.od-mc-space, .od-station, .od-cap-b) {
+  & .od-mc.is-cut :is(.od-mc-space, .od-station) {
     opacity: 1;
-  }
-  & .od-cap,
-  & .od-mc-hint,
-  & .od-sg-cap {
-    position: absolute;
-    left: calc(50% + var(--od-axis));
-    margin: 0;
-    transform: translateX(-50%);
-    text-align: center;
-    white-space: nowrap;
-  }
-  & .od-cap {
-    bottom: 52px;
-  }
-  & .od-cap b {
-    display: block;
-    font: 400 34px var(--font-display);
-    letter-spacing: 0.5em;
-    padding-left: 0.5em;
-    text-transform: uppercase;
-  }
-  & .od-cap span {
-    display: block;
-    margin-top: 8px;
-    font: 10.5px var(--font-mono);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-  & .od-cap-a {
-    color: #f6e7cf;
-  }
-  & .od-cap-a span {
-    color: #e7c9a0;
-  }
-  & .od-cap-b {
-    opacity: 0;
-    color: #ededea;
-  }
-  & .od-cap-b span {
-    color: #8e918c;
-  }
-  & .od-mc-hint,
-  & .od-sg-cap {
-    top: 28px;
-    font: 9.5px var(--font-mono);
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.72);
   }
 
   /* ---------------- 01 · playground: the lens beside the launcher ---------------- */
@@ -2484,9 +2422,6 @@
     & .od-sg {
       height: 1100px;
     }
-    & .od-cap b {
-      font-size: 24px;
-    }
   }
 
   /* ---------------- phones and tablets: the console becomes a top band ---------------- */
@@ -2599,10 +2534,6 @@
     & .metrics .m:last-child:nth-child(odd) {
       grid-column: 1 / -1;
     }
-    & .od-frame {
-      flex-direction: column;
-      align-items: flex-start;
-    }
     & .od-card {
       height: 200px;
       padding: 0 20px;
@@ -2610,17 +2541,11 @@
     & .od-inter {
       height: 260px;
     }
-    & .od-int-clock {
-      font-size: 30px;
-    }
     & .od-mc {
       height: 1000px;
     }
     & .od-sg {
       height: 900px;
-    }
-    & .od-cap b {
-      font-size: 20px;
     }
     & [data-sec='1'] {
       grid-template-columns: minmax(0, 1fr);
