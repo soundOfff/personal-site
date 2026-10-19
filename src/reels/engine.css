@@ -5,7 +5,7 @@
      2. stage / slug / title-card visibility defaults (the generated head
         CSS shows the active reel's),
      3. the switcher and the sound toggle in the rail,
-     4. the projector: cue marks, letterbox, title card.
+     4. the projector: cue marks, the bars, title card.
    Reel-specific styling lives in src/reels/<id>/reel.css.
    ============================================================ */
 
@@ -332,13 +332,24 @@ html:root:not([data-reel='house']) [data-theme-toggle] {
 .projector:is([data-state='close'], [data-state='card']) .pj-dim {
   opacity: 1;
 }
+/* letterbox when the film is wider than the screen, pillarbox when it is
+   narrower; the engine sets --pj-ratio from the incoming reel */
 .pj-bar {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: max(0px, calc((100vh - 100vw / 2.39) / 2));
   background: #000;
   transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.pj-t,
+.pj-b {
+  left: 0;
+  right: 0;
+  height: max(0px, calc((100vh - 100vw / var(--pj-ratio, 2.39)) / 2));
+}
+.pj-l,
+.pj-r {
+  top: 0;
+  bottom: 0;
+  width: max(0px, calc((100vw - 100vh * var(--pj-ratio, 2.39)) / 2));
 }
 .pj-t {
   top: 0;
@@ -347,6 +358,17 @@ html:root:not([data-reel='house']) [data-theme-toggle] {
 .pj-b {
   bottom: 0;
   transform: translateY(101%);
+}
+.pj-l {
+  left: 0;
+  transform: translateX(-101%);
+}
+.pj-r {
+  right: 0;
+  transform: translateX(101%);
+}
+.projector[data-frameless] .pj-bar {
+  display: none;
 }
 .projector:is([data-state='close'], [data-state='card']) .pj-bar {
   transform: none;

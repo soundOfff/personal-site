@@ -238,6 +238,11 @@ export async function switchReel(id: string, opts: SwitchOptions = {}): Promise<
   switching = true;
   try {
     projector.dataset.title = next.id;
+    // The bars close to the film's own frame, the first ratio it lists (for
+    // Budapest, the 1.37 of its 1932 story). House lights has none: it only dims.
+    const ratio = parseFloat(next.ratio ?? '');
+    if (ratio > 0) projector.style.setProperty('--pj-ratio', String(ratio));
+    projector.toggleAttribute('data-frameless', !(ratio > 0));
     if (!opts.fromBlack) {
       projector.dataset.state = 'cue';
       sound.cueTicks();

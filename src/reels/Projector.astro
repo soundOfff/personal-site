@@ -1,9 +1,9 @@
 ---
 /**
- * The projector: cue marks, letterbox bars and the title card shown between
- * reels. Each reel can bring its own card (a `title` stage); the rest get the
- * default one built from config. Also hosts the aria-live line the engine
- * announces each reel change on.
+ * The projector: cue marks, the bars that close to the incoming film's frame
+ * and the title card shown between reels. Each reel can bring its own card (a
+ * `title` stage); the rest get the default one built from config. Also hosts
+ * the aria-live line the engine announces each reel change on.
  */
 import { REELS } from './registry';
 import Stages from './Stages.astro';
@@ -13,6 +13,8 @@ import Stages from './Stages.astro';
   <div class="pj-dim"></div>
   <div class="pj-bar pj-t"></div>
   <div class="pj-bar pj-b"></div>
+  <div class="pj-bar pj-l"></div>
+  <div class="pj-bar pj-r"></div>
   <span class="pj-cue"></span>
   <div class="pj-card">
     <Stages at="title" />
