@@ -119,14 +119,13 @@ function wire(dlg: HTMLDialogElement): void {
   const projectorBusy = () =>
     !!document.querySelector<HTMLElement>('[data-projector]')?.dataset.state;
 
-  /* -- the lobby clock, Rosario time -- */
+  /* -- the lobby clock, Rosario time: the minute is all a visitor needs -- */
   let fmt: Intl.DateTimeFormat | null = null;
   try {
     fmt = new Intl.DateTimeFormat('en-GB', {
       timeZone: 'America/Argentina/Cordoba',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
       hour12: false,
     });
   } catch {
@@ -144,7 +143,7 @@ function wire(dlg: HTMLDialogElement): void {
       t.toggleAttribute('data-current', on);
       t.setAttribute(
         'aria-label',
-        `${t.dataset.label}. ${on ? 'Now screening: back to your seat' : 'Tear the ticket to start the screening'}`,
+        `${t.dataset.label}. ${on ? 'Screening now. Back to your seat' : 'Tear the ticket to start the screening'}`,
       );
     }
     house?.toggleAttribute('data-current', now === HOUSE);
@@ -164,7 +163,7 @@ function wire(dlg: HTMLDialogElement): void {
       closeLabel.textContent = isFirst ? 'skip' : 'close';
       closeBtn.setAttribute(
         'aria-label',
-        isFirst ? 'Skip: House lights, the default site' : 'Close the box office',
+        isFirst ? 'Skip the films: House lights, no film' : 'Close the box office',
       );
     }
     root.dataset.boxoffice = '';
@@ -182,7 +181,7 @@ function wire(dlg: HTMLDialogElement): void {
     target.focus({ preventScroll: true });
     tickClock();
     window.clearInterval(clockTimer);
-    clockTimer = window.setInterval(tickClock, 1000);
+    clockTimer = window.setInterval(tickClock, 30_000);
     if (!isFirst) sound.whoosh();
   }
 

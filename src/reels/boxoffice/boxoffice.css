@@ -43,7 +43,8 @@ html[data-boxoffice] {
   --bo-ease: cubic-bezier(0.2, 0.9, 0.2, 1);
   --bo-serif: 'Newsreader Variable', 'Newsreader', Georgia, serif;
   --bo-sans: 'Geist Variable', 'Geist', system-ui, sans-serif;
-  --bo-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+  /* the only mono in the lobby: the ticket printer's. The lobby's own chrome
+     is set in the sans, so the printed stubs read as objects, not interface. */
   --bo-stub: 'IBM Plex Mono', ui-monospace, monospace;
   --bo-wide: 'Archivo Variable', 'Archivo', 'Arial Narrow', sans-serif;
   position: fixed;
@@ -181,11 +182,9 @@ html[data-boxoffice] {
   letter-spacing: -0.01em;
 }
 .bo-rl {
-  margin-top: 2px;
-  font-family: var(--bo-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  margin-top: 1px;
+  font-size: 13px;
+  line-height: 1.3;
   color: var(--bo-muted);
 }
 .bo-tr {
@@ -194,10 +193,7 @@ html[data-boxoffice] {
   gap: 12px;
 }
 .bo-clock {
-  font-family: var(--bo-mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
   color: var(--bo-muted);
 }
@@ -215,10 +211,10 @@ html[data-boxoffice] {
   border-radius: 999px;
   background: transparent;
   color: var(--bo-ink);
-  font-family: var(--bo-mono);
-  font-size: 11px;
+  font-family: var(--bo-sans);
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   cursor: pointer;
   transition:
     background-color 0.15s,
@@ -237,9 +233,15 @@ html[data-boxoffice] {
   border: 1px solid var(--bo-line);
   border-radius: 4px;
   font: inherit;
-  font-size: 9.5px;
-  line-height: 15px;
+  font-size: 11px;
+  line-height: 16px;
   color: var(--bo-muted);
+}
+/* no Esc key to press on a phone */
+@media (hover: none) {
+  .bo-x kbd {
+    display: none;
+  }
 }
 
 /* ---- the marquee: chasing bulbs round a letter board ---- */
@@ -565,10 +567,7 @@ html[data-boxoffice] {
   bottom: -30px;
   transform: translateX(-50%);
   white-space: nowrap;
-  font-family: var(--bo-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 13px;
   color: var(--bo-amber);
   opacity: 0;
   transition: opacity 0.2s;
@@ -611,7 +610,8 @@ html[data-boxoffice] {
   display: inline;
 }
 
-/* 01 · Parasite: pale paper, the censor bar */
+/* 01 · Parasite: pale paper, and the line. Above it the band stands in the
+   light; below it the colours sit half underground, like the Kims' window. */
 .bo-tk[data-stock='parasite'] {
   --tk-paper: #eceee7;
   --tk-ink: #151b17;
@@ -635,11 +635,9 @@ html[data-boxoffice] {
 .bo-tk[data-stock='parasite'] .tk-bc::after {
   content: '';
   position: absolute;
-  left: -4px;
-  top: 10px;
-  width: 58%;
-  height: 9px;
-  background: #0a0b0a;
+  inset: 40% 0 0;
+  border-top: 2px solid #0a0b0a;
+  background: rgba(10, 11, 10, 0.34);
 }
 
 /* 02 · In the Mood for Love: crimson foil, gold lattice */
@@ -670,17 +668,11 @@ html[data-boxoffice] {
     repeating-linear-gradient(-45deg, rgba(217, 178, 107, 0.09) 0 1px, #0000 1px 11px);
 }
 
-/* 03 · Blade Runner 2049: a cut-corner orange stub, scanlines */
+/* 03 · Blade Runner 2049: the orange of the Las Vegas haze */
 .bo-tk[data-stock='br2049'] {
   --tk-paper: #e07524;
   --tk-ink: #1a0d05;
   --tk-muted: #3e1c08;
-}
-.bo-tk[data-stock='br2049'] .tk-main {
-  clip-path: polygon(16px 0, 100% 0, 100% 100%, 0 100%, 0 16px);
-}
-.bo-tk[data-stock='br2049'] .tk-stub {
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
 }
 .bo-tk[data-stock='br2049'] .tk-ttl {
   font-family:
@@ -691,11 +683,8 @@ html[data-boxoffice] {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.bo-tk[data-stock='br2049'] .tk-deco {
-  background: repeating-linear-gradient(0deg, rgba(26, 13, 5, 0.09) 0 1px, #0000 1px 3px);
-}
 
-/* 04 · The Grand Budapest Hotel: pastry-box pink, a ribbon, a stamp */
+/* 04 · The Grand Budapest Hotel: Mendl's pink box and its blue ribbon */
 .bo-tk[data-stock='budapest'] {
   --tk-paper: #f2c6d0;
   --tk-ink: #3b1530;
@@ -718,16 +707,6 @@ html[data-boxoffice] {
 .bo-tk[data-stock='budapest'] .tk-top {
   gap: 10px;
 }
-.bo-tk[data-stock='budapest'] .tk-deco {
-  background: radial-gradient(
-    circle at 78% 63%,
-    rgba(179, 38, 45, 0) 18px,
-    rgba(179, 38, 45, 0.55) 19px 20.5px,
-    rgba(179, 38, 45, 0) 21.5px 24px,
-    rgba(179, 38, 45, 0.4) 25px 26px,
-    rgba(179, 38, 45, 0) 27px
-  );
-}
 .bo-tk[data-stock='budapest'] .tk-stub {
   background:
     linear-gradient(
@@ -744,7 +723,7 @@ html[data-boxoffice] {
   width: fit-content;
 }
 
-/* 05 · 2001: a punch card with HAL's red lens */
+/* 05 · 2001: an 80-column punch card, clipped corner and punched rows */
 .bo-tk[data-stock='odyssey'] {
   --tk-paper: #f2f2f0;
   --tk-ink: #0a0a0a;
@@ -764,19 +743,11 @@ html[data-boxoffice] {
   text-transform: uppercase;
 }
 .bo-tk[data-stock='odyssey'] .tk-deco {
-  background:
-    radial-gradient(
-      circle at calc(100% - 22px) 22px,
-      #ffd24a 0 2px,
-      #e1261c 3px 6px,
-      rgba(225, 38, 28, 0.25) 7px 9px,
-      #0000 10px
-    ),
-    repeating-linear-gradient(90deg, rgba(10, 10, 10, 0.1) 0 3px, #0000 3px 9px) 16px
-      calc(100% - 46px) / calc(100% - 32px) 26px no-repeat;
+  background: repeating-linear-gradient(90deg, rgba(10, 10, 10, 0.1) 0 3px, #0000 3px 9px) 16px
+    calc(100% - 46px) / calc(100% - 32px) 26px no-repeat;
 }
 
-/* ---- the foot: how-to, House lights, the fine print ---- */
+/* ---- the foot: House lights and the fine print ---- */
 .bo-foot {
   position: relative;
   z-index: 1;
@@ -787,10 +758,7 @@ html[data-boxoffice] {
   gap: 10px 28px;
   margin-top: auto;
   padding-top: 40px;
-  font-family: var(--bo-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 13px;
   color: var(--bo-muted);
 }
 .bo-house {
@@ -842,9 +810,13 @@ html[data-boxoffice] {
   align-items: baseline;
   gap: 2px 10px;
 }
+/* the same italic serif as the House lights title card */
 .bo-house-t b {
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-family: var(--bo-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.2;
 }
 .bo-house {
   position: relative;
@@ -857,9 +829,8 @@ html[data-boxoffice] {
   display: none;
   padding: 0 6px;
   background: var(--bo-bg);
-  font-size: 9.5px;
+  font-size: 11.5px;
   line-height: 15px;
-  letter-spacing: 0.12em;
   color: var(--bo-amber);
 }
 .bo-house[data-current] .bo-house-now {
@@ -868,9 +839,7 @@ html[data-boxoffice] {
 .bo-fine {
   flex-basis: 100%;
   text-align: center;
-  font-size: 9.5px;
-  letter-spacing: 0.08em;
-  text-transform: none;
+  font-size: 11.5px;
 }
 
 /* ---- the screening: lights down, the leader, the 2-pop ---- */
@@ -1172,7 +1141,7 @@ html[data-boxoffice] {
     height: 26px;
   }
   .bo-rl {
-    font-size: 9.5px;
+    font-size: 12px;
   }
   .bo-tr {
     gap: 8px;
@@ -1307,13 +1276,6 @@ html[data-boxoffice] {
       radial-gradient(circle at 0 0, #0000 9px, #000 9.5px) top / 100% 51% no-repeat,
       radial-gradient(circle at 0 100%, #0000 9px, #000 9.5px) bottom / 100% 51% no-repeat;
   }
-  .tk-row {
-    display: flex;
-    flex-direction: column;
-  }
-  .tk-dot {
-    display: none;
-  }
   .bo-tk[data-torn] {
     transform: none;
   }
@@ -1331,10 +1293,6 @@ html[data-boxoffice] {
   }
   .bo-tk[data-stock='parasite'] .tk-ttl {
     font-size: 19px;
-  }
-  .bo-tk[data-stock='parasite'] .tk-bc::after {
-    top: 6px;
-    height: 7px;
   }
   .bo-tk[data-stock='br2049'] .tk-ttl {
     font-size: 25px;
@@ -1354,13 +1312,7 @@ html[data-boxoffice] {
     font-size: 11.5px;
   }
   .bo-tk[data-stock='odyssey'] .tk-deco {
-    background: radial-gradient(
-      circle at calc(100% - 26px) 20px,
-      #ffd24a 0 2px,
-      #e1261c 3px 6px,
-      rgba(225, 38, 28, 0.25) 7px 9px,
-      #0000 10px
-    );
+    background: none;
   }
   .bo-tk[data-stock='odyssey'] .tk-stub {
     background:
@@ -1381,9 +1333,6 @@ html[data-boxoffice] {
   .bo-house-t {
     flex-direction: column;
     gap: 2px;
-  }
-  .bo-house-t span {
-    letter-spacing: 0.03em;
   }
   .bo-leader {
     width: min(92vw, calc(78vh * 1.37));
