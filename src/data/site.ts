@@ -35,7 +35,7 @@ export const nav = [
   { id: 'work', label: 'work index' },
   { id: 'oss', label: 'open source' },
   { id: 'log', label: 'log' },
-  { id: 'writing', label: 'writing' },
+  { id: 'writing', label: 'blog' },
   { id: 'principles', label: 'principles' },
   { id: 'stack', label: 'stack' },
   { id: 'now', label: 'now' },

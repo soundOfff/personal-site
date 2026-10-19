@@ -119,7 +119,7 @@ export const STARTER_GROUPS: { label: string; prompts: string[] }[] = [
     ],
   },
   {
-    label: 'writing',
+    label: 'blog',
     prompts: ['What is he writing about?', 'What does "evals are contracts" mean?'],
   },
   {

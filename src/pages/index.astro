@@ -45,7 +45,10 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       {/* 00 · readme */}
       <section class="block" id="readme" data-sec="0">
         <Stages at="in:readme" />
-        <p class="keybar">// <b>readme</b><Slugs sec="readme" /></p>
+        <p class="keybar">
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>readme</b><Slugs sec="readme" />
+        </p>
         <p class="lede" set:html={profile.lede} />
         <p class="sub">{profile.sub}</p>
         <div class="startrow">
@@ -70,7 +73,12 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       {/* 01 · playground (the one interactive island) */}
       <section class="block" id="playground" data-sec="1">
         <Stages at="in:playground" />
-        <p class="keybar">// <b>playground</b> · a2ui portfolio agent<Slugs sec="playground" /></p>
+        <p class="keybar">
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>playground</b><span class="kb-d"> · a2ui portfolio agent</span><Slugs
+            sec="playground"
+          />
+        </p>
         <A2UIPlayground client:visible />
       </section>
       <Stages at="after:playground" />
@@ -78,7 +86,10 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       {/* 02 · work · index */}
       <section class="block" id="work" data-sec="2">
         <Stages at="in:work" />
-        <p class="keybar">// <b>work</b> · index<Slugs sec="work" /></p>
+        <p class="keybar">
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>work</b><Slugs sec="work" />
+        </p>
         <table class="idx">
           <tbody>
             {
@@ -104,7 +115,10 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       {/* 03 · open source */}
       <section class="block" id="oss" data-sec="3">
         <Stages at="in:oss" />
-        <p class="keybar">// <b>open source</b><Slugs sec="oss" /></p>
+        <p class="keybar">
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>open source</b><Slugs sec="oss" />
+        </p>
         <div class="repos">
           {
             repos.map((r) => (
@@ -130,7 +144,10 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       {/* 04 · log · recent activity */}
       <section class="block" id="log" data-sec="4">
         <Stages at="in:log" />
-        <p class="keybar">// <b>log</b> · recent activity<Slugs sec="log" /></p>
+        <p class="keybar">
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>log</b><Slugs sec="log" />
+        </p>
         <div class="log">
           {
             log.map((item) => (
@@ -165,7 +182,8 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       <section class="block" id="writing" data-sec="5">
         <Stages at="in:writing" />
         <p class="keybar">
-          // <b>writing</b> · <a href="/blog">all posts</a><Slugs sec="writing" />
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>blog</b> · <a href="/blog">all posts</a><Slugs sec="writing" />
         </p>
         <div class="wlist">
           {
@@ -184,7 +202,10 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       {/* 06 · principles · how I build */}
       <section class="block" id="principles" data-sec="6">
         <Stages at="in:principles" />
-        <p class="keybar">// <b>principles</b> · how I build<Slugs sec="principles" /></p>
+        <p class="keybar">
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>principles</b><Slugs sec="principles" />
+        </p>
         <div class="tenets">
           {
             tenets.map((t, i) => (
@@ -202,7 +223,10 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       {/* 07 · stack · toolbox */}
       <section class="block" id="stack" data-sec="7">
         <Stages at="in:stack" />
-        <p class="keybar">// <b>stack</b> · toolbox<Slugs sec="stack" /></p>
+        <p class="keybar">
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>stack</b><Slugs sec="stack" />
+        </p>
         <div class="toolbox">
           {
             toolbox.map((col) => (
@@ -223,7 +247,10 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
       {/* 08 · now */}
       <section class="block" id="now" data-sec="8">
         <Stages at="in:now" />
-        <p class="keybar">// <b>now</b><Slugs sec="now" /></p>
+        <p class="keybar">
+          <span class="kb-sl" aria-hidden="true">//</span>
+          <b>now</b><Slugs sec="now" />
+        </p>
         <dl class="specs">
           {
             now.map((s) => (
