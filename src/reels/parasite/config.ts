@@ -37,7 +37,7 @@ const parasite: ReelConfig = {
       code: '1F',
       name: 'living room',
       native: '거실',
-      slug: 'INT. LIVING ROOM — DAY',
+      slug: 'Park house (day)',
       sections: ['readme', 'playground', 'work'],
       tokens: tokens({
         bg: '#ECEEE7',
@@ -59,7 +59,7 @@ const parasite: ReelConfig = {
       code: '↓',
       name: 'the stairs',
       native: '계단',
-      slug: 'EXT. STAIRS — NIGHT · RAIN',
+      slug: 'Hillside stairs (night)',
       sections: ['oss', 'log'],
       tokens: tokens({
         bg: '#B8C1BD',
@@ -81,7 +81,7 @@ const parasite: ReelConfig = {
       code: 'B1',
       name: 'semi-basement',
       native: '반지하',
-      slug: 'INT. SEMI-BASEMENT — NIGHT',
+      slug: "Ki-taek's semi-basement (night)",
       sections: ['writing', 'principles'],
       tokens: tokens({
         bg: '#22261C',
@@ -101,9 +101,9 @@ const parasite: ReelConfig = {
     },
     {
       code: 'B2',
-      name: 'the bunker',
+      name: 'bunker',
       native: '벙커',
-      slug: 'INT. BUNKER — NIGHT',
+      slug: 'Park house, bunker (night)',
       sections: ['stack', 'now'],
       tokens: tokens({
         bg: '#0E0F0C',
@@ -129,16 +129,18 @@ const parasite: ReelConfig = {
     // reel.css declares this face from @fontsource/nanum-myeongjo, trimmed to 기 생 충 끝
     title: "'Parasite Myeongjo', 'Nanum Myeongjo', serif",
   },
+  // Korean screenplay order: the place, then the time in parentheses. The
+  // last two put the lowest floor of the page under the richest house.
   sections: {
-    readme: { slug: 'INT. LIVING ROOM — DAY' },
-    playground: { slug: 'INT. LIVING ROOM — CONTINUOUS' },
-    work: { slug: 'EXT. GARDEN — DAY' },
-    oss: { slug: 'INT. STAIRWELL — EVENING' },
-    log: { slug: 'EXT. STAIRS — NIGHT · RAIN' },
-    writing: { slug: 'INT. SEMI-BASEMENT — NIGHT' },
-    principles: { slug: 'INT. SEMI-BASEMENT — CONTINUOUS' },
-    stack: { slug: 'INT. BASEMENT — NIGHT' },
-    now: { slug: 'INT. BUNKER — NIGHT' },
+    readme: { slug: 'Park house, living room (day)' },
+    playground: { slug: 'Park house, living room (continuous)' },
+    work: { slug: 'Park house, garden (day)' },
+    oss: { slug: 'Hillside stairs (night)' },
+    log: { slug: "Stairs down to Ki-taek's alley (night)" },
+    writing: { slug: "Ki-taek's semi-basement (night)" },
+    principles: { slug: "Ki-taek's semi-basement (continuous)" },
+    stack: { slug: 'Park house, basement (night)' },
+    now: { slug: 'Park house, bunker (night)' },
   },
   stages: [
     'backdrop',

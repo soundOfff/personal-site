@@ -214,8 +214,10 @@ html:root[data-reel='parasite'] {
     --px-step: 9px;
     position: relative;
     gap: 0;
+    counter-reset: px-scene;
   }
   .railnav a {
+    counter-increment: px-scene;
     position: relative;
     height: var(--px-row);
     align-items: center;
@@ -285,8 +287,15 @@ html:root[data-reel='parasite'] {
     content: 'B2';
     content: 'B2' / '';
   }
+  /* scene numbers, counted from 1 like the keybars' S# */
   .railnav a .nx {
+    font-size: 0;
     color: var(--muted);
+  }
+  .railnav a .nx::before {
+    content: counter(px-scene);
+    content: counter(px-scene) / '';
+    font-size: 10px;
   }
   .railnav a:hover,
   .railnav a[aria-current='true'] {
@@ -424,7 +433,13 @@ html:root[data-reel='parasite'] {
     display: none;
   }
 
-  /* the keybar is a screenplay slug: scene number, room, INT./EXT. line */
+  /* the keybar is a screenplay slug: scene number, then the place and time */
+  .content {
+    counter-reset: px-scene;
+  }
+  section[data-sec] {
+    counter-increment: px-scene;
+  }
   .keybar {
     display: flex;
     flex-wrap: wrap;
@@ -436,6 +451,8 @@ html:root[data-reel='parasite'] {
     color: var(--muted);
   }
   .keybar::before {
+    content: 'S#' counter(px-scene);
+    content: 'S#' counter(px-scene) / '';
     margin-right: 0.35em;
     font-family: var(--font-display);
     font-weight: 700;
@@ -443,42 +460,6 @@ html:root[data-reel='parasite'] {
     font-stretch: 125%;
     letter-spacing: 0.1em;
     color: var(--ink);
-  }
-  [data-sec='0'] .keybar::before {
-    content: 'S#00';
-    content: 'S#00' / '';
-  }
-  [data-sec='1'] .keybar::before {
-    content: 'S#01';
-    content: 'S#01' / '';
-  }
-  [data-sec='2'] .keybar::before {
-    content: 'S#02';
-    content: 'S#02' / '';
-  }
-  [data-sec='3'] .keybar::before {
-    content: 'S#03';
-    content: 'S#03' / '';
-  }
-  [data-sec='4'] .keybar::before {
-    content: 'S#04';
-    content: 'S#04' / '';
-  }
-  [data-sec='5'] .keybar::before {
-    content: 'S#05';
-    content: 'S#05' / '';
-  }
-  [data-sec='6'] .keybar::before {
-    content: 'S#06';
-    content: 'S#06' / '';
-  }
-  [data-sec='7'] .keybar::before {
-    content: 'S#07';
-    content: 'S#07' / '';
-  }
-  [data-sec='8'] .keybar::before {
-    content: 'S#08';
-    content: 'S#08' / '';
   }
   .keybar b {
     color: var(--ink-2);
@@ -493,8 +474,10 @@ html:root[data-reel='parasite'] {
   }
   .keybar .reel-slug {
     margin-left: auto;
-    letter-spacing: 0.12em;
-    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink-2);
   }
 
   /* lamps: off until you've been here (client.ts adds .is-on) */
@@ -549,7 +532,7 @@ html:root[data-reel='parasite'] {
     animation: parasite-tube 0.6s linear both;
   }
 
-  /* ---------- S#00 · the living-room window ----------
+  /* ---------- S#1 · the living-room window ----------
      The headline is set on the glass. The window and the lede share one grid
      cell, so the lede stays real text in its place and the window grows if
      the lede ever needs more room than 2.39:1 gives it. */
@@ -1140,7 +1123,7 @@ html:root[data-reel='parasite'] {
     }
   }
 
-  /* ---------- S#02 · work, through the garden doors ---------- */
+  /* ---------- S#3 · work, through the garden doors ---------- */
   .idx td {
     padding: 16px 10px;
     border-bottom-color: var(--rule);
@@ -1177,7 +1160,7 @@ html:root[data-reel='parasite'] {
     letter-spacing: 0.08em;
   }
 
-  /* ---------- S#03 · open source, in the stairwell ---------- */
+  /* ---------- S#4 · open source, on the hillside stairs ---------- */
   .repo {
     margin: 0 -10px;
     padding: 16px 10px;
@@ -1207,7 +1190,7 @@ html:root[data-reel='parasite'] {
     border-radius: 0;
   }
 
-  /* ---------- S#04 · the log is a flight of stairs going down ---------- */
+  /* ---------- S#5 · the log is a flight of stairs going down ---------- */
   .logitem {
     display: block;
     position: relative;
@@ -1287,7 +1270,7 @@ html:root[data-reel='parasite'] {
     text-underline-offset: 3px;
   }
 
-  /* ---------- rain, then the flood (between S#04 and S#05) ---------- */
+  /* ---------- rain, then the flood (between S#5 and S#6) ---------- */
   .px-rain {
     position: relative;
     height: 260px;
@@ -1426,7 +1409,7 @@ html:root[data-reel='parasite'] {
     line-height: 1.55;
   }
 
-  /* ---------- S#07 · stack, on the basement shelves ---------- */
+  /* ---------- S#8 · stack, on the basement shelves ---------- */
   .toolbox {
     gap: 24px;
   }
@@ -1462,7 +1445,7 @@ html:root[data-reel='parasite'] {
     color: var(--amber-deep);
   }
 
-  /* ---------- S#08 · now, in the bunker under one bulb ---------- */
+  /* ---------- S#9 · now, in the bunker under one bulb ---------- */
   [data-sec='8'] {
     overflow-x: clip;
   }
