@@ -2291,15 +2291,22 @@
       animation-play-state: paused;
     }
     /* a failing hologram stutters, holds a frame and drops out, the way the
-       casino showroom's do: once a beat after the reel opens, then on hover */
+       casino showroom's do. The lede's plate catches once a beat after the reel
+       opens, then fails under the pointer. The hover lists the arrival first,
+       unchanged, so the browser keeps it and only starts the second one; leaving
+       the plate then doesn't replay the arrival */
     /* the jump is an offset, not a transform: the lede's em is inline */
     :is(#readme .lede em, #work .idx .proj b, #principles .tenet h3) {
       position: relative;
     }
     #readme .lede em {
-      animation: br2049-holo 1.4s steps(1) 1.6s 1 both;
+      animation: br2049-holo-on 1s steps(1) 1.6s both;
     }
-    #readme .lede em:hover,
+    #readme .lede em:hover {
+      animation:
+        br2049-holo-on 1s steps(1) 1.6s both,
+        br2049-holo 0.9s steps(1) 1;
+    }
     #work .idx tr:hover .proj b,
     #principles .tenet:hover h3 {
       animation: br2049-holo 0.9s steps(1) 1;
@@ -2629,6 +2636,25 @@
   100% {
     opacity: 1;
     transform: none;
+  }
+}
+/* the signal catching: two brief drops */
+@keyframes br2049-holo-on {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.1;
+  }
+  26% {
+    opacity: 1;
+  }
+  44% {
+    opacity: 0.4;
+  }
+  48% {
+    opacity: 1;
   }
 }
 @keyframes br2049-holo {
