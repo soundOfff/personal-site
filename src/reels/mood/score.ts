@@ -8,8 +8,8 @@
  *     slide into every note;
  *   - a bolero bar on the landlady's radio: nylon guitar, maracas, bongó and
  *     far-off strings through a small speaker, with wow and static;
- *   - the rooms themselves: doors, rain in the lamp, the clock, the
- *     typewriter, the thermos, the wall in 2046.
+ *   - the rooms themselves: doors, rain in the lamp, the clock, a pen nib in
+ *     2046, mahjong tiles, the thermos, the wall at Angkor Wat.
  *
  * Nothing is quoted. Every cue schedules on the audio clock and plays alone.
  */
@@ -964,10 +964,37 @@ export function chime(s: SoundKit): void {
   bell(s, N.A4, 0.75, 0.055);
 }
 
-/** An enamel sign, tapped. */
-export function tink(s: SoundKit): void {
-  s.tone({ type: 'triangle', f0: 3150, dur: 0.12, vol: 0.02 });
-  s.tone({ f0: 4720, dur: 0.08, vol: 0.01, at: 0.01 });
+/** A mahjong tile set down: the face on the felt, then a knock against its neighbour. */
+export function tile(s: SoundKit): void {
+  s.burst({ dur: 0.018, f: 2300 + Math.random() * 500, q: 2.2, vol: 0.16 });
+  s.tone({ f0: 1250, f1: 980, dur: 0.026, vol: 0.03 });
+  s.burst({ dur: 0.012, f: 3100 + Math.random() * 600, q: 3, vol: 0.07, at: 0.05 + rand(0, 0.02) });
+}
+
+/** A pen nib on manuscript paper: one stroke falling from 5 to 3 kHz, then a flick. */
+export function nib(s: SoundKit): void {
+  const ac = s.ctx();
+  if (!ac) return;
+  const stroke = (at: number, dur: number, peak: number) => {
+    const t = ac.currentTime + at;
+    const n = noise(ac);
+    const bp = ac.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.Q.value = 2.4;
+    bp.frequency.setValueAtTime(5000, t);
+    bp.frequency.exponentialRampToValueAtTime(3000, t + dur);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    n.connect(bp);
+    bp.connect(g);
+    g.connect(s.out());
+    n.start(t, rand(0, 3));
+    n.stop(t + dur + 0.02);
+  };
+  stroke(0, 0.12, 0.05);
+  stroke(0.15, 0.045, 0.03);
 }
 
 /** A page turned. */
@@ -981,7 +1008,7 @@ function chop(s: SoundKit, at = 0): void {
   s.tone({ f0: 140, f1: 70, dur: 0.08, vol: 0.18, at });
 }
 
-/** One typewriter key. */
+/** One typewriter key: what the secret sounds like as you type it. */
 export function key(s: SoundKit, at = 0): void {
   s.burst({ dur: 0.02, f: 2800 + Math.random() * 1400, q: 1.3, vol: 0.15, at });
   s.tone({ f0: 170, f1: 90, dur: 0.035, vol: 0.06, at });
@@ -1021,7 +1048,7 @@ export const steam = (s: SoundKit) => hiss(s, 'highpass', 3200, 0.7, 0.03, 0.9);
 /** A secret whispered into the wall. */
 export const breath = (s: SoundKit) => hiss(s, 'bandpass', 1100, 0.6, 0.05, 0.7);
 
-/** The wall sealed over it. */
+/** The hole stopped with mud. */
 export function plaster(s: SoundKit): void {
   s.burst({ dur: 0.14, kind: 'lowpass', f: 300, q: 0.7, vol: 0.45 });
   hiss(s, 'bandpass', 480, 1.2, 0.06, 0.45);
@@ -1050,12 +1077,13 @@ const score: ReelScore = {
     { id: 'latch', label: 'door pulled to', play: (s) => latch(s) },
     { id: 'clock', label: 'tick, tock', play: (s) => tickTock(s) },
     { id: 'chime', label: 'the clock strikes', play: (s) => chime(s) },
-    { id: 'sign', label: 'enamel sign', play: (s) => tink(s) },
+    { id: 'tile', label: 'a mahjong tile', play: (s) => tile(s) },
     { id: 'paper', label: 'a page turned', play: (s) => paper(s) },
+    { id: 'nib', label: 'a pen nib in 2046', play: (s) => nib(s) },
     { id: 'key', label: 'typewriter key', play: (s) => key(s) },
     { id: 'steam', label: 'thermos steam', play: (s) => steam(s) },
     { id: 'whisper', label: 'a secret into the wall', play: (s) => breath(s) },
-    { id: 'plaster', label: 'the wall sealed', play: (s) => plaster(s) },
+    { id: 'plaster', label: 'the hole stopped with mud', play: (s) => plaster(s) },
   ],
 };
 

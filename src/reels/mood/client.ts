@@ -31,6 +31,7 @@ import {
   hover,
   key,
   latch,
+  nib,
   paper,
   plaster,
   press,
@@ -42,7 +43,7 @@ import {
   surfaceSpan,
   tenet,
   tickTock,
-  tink,
+  tile,
   waltz,
 } from './score';
 
@@ -314,20 +315,14 @@ const reel: ReelModule = {
 
     /* ---- hover and press: the muted string, and its relatives ---- */
     let last: Element | null = null;
-    let typing = 0;
     const hoverSound = (el: Element) => {
       if (el.matches('[data-reel-pick]')) return tuneIn(el);
-      if (el.matches('.railnav a, .toolcol li')) return harmonic(s);
-      if (el.matches('.metrics .m')) return tink(s);
+      if (el.matches('.railnav a')) return harmonic(s);
+      if (el.matches('.toolcol li')) return tile(s);
       if (el.matches('.repo, .logitem')) return paper(s);
       if (el.matches('.tenet')) return tenet(s);
-      if (el.matches('.wrow')) {
-        const run = ++typing;
-        for (let k = 0; k < 4; k++) {
-          later(() => run === typing && key(s), k * 85 + Math.random() * 30);
-        }
-        return;
-      }
+      // 2046: the serial is written by hand
+      if (el.matches('.wrow')) return nib(s);
       if (el.matches('[data-mood-clock]')) return tickTock(s);
       hover(s);
     };
