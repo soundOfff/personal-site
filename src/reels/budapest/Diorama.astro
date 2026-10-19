@@ -1,9 +1,9 @@
 ---
 /**
  * The hotel as a miniature, the way Anderson shot it. 1932 is the hero: pink,
- * domed, snowing, a quarter of the windows lit, the funicular climbing. 1968
- * is the same model a generation on: stripped of its dome and awning,
- * repainted, most rooms dark. The interlude crops it to scope.
+ * domed, snowing, a quarter of the windows lit. 1968 is the same model a
+ * generation on: stripped of its dome and awning, repainted, most rooms dark.
+ * The funicular still climbs in both. The interlude crops 1968 to scope.
  */
 interface Props {
   era: '1932' | '1968';
@@ -11,14 +11,15 @@ interface Props {
 const { era } = Astro.props;
 const aged = era === '1968';
 
-// A seeded scatter so the diorama renders the same on every build.
-let seed = aged ? 68 : 23;
+// A seeded scatter so the diorama renders the same on every build. Both eras
+// light rooms from the same draw, so the few still lit in 1968 were lit in 1932.
+let seed = 23;
 const rnd = () => {
   seed = (seed * 9301 + 49297) % 233280;
   return seed / 233280;
 };
 const windows = (n: number) =>
-  Array.from({ length: n }, () => ({ d: Math.round(rnd() * 650), on: rnd() < (aged ? 0.12 : 0.24) }));
+  Array.from({ length: n }, () => ({ d: Math.round(rnd() * 650), on: rnd() < (aged ? 0.07 : 0.24) }));
 const winsL = windows(12);
 const winsC = windows(15);
 const winsR = windows(12);
@@ -50,13 +51,9 @@ const flakes = aged
   <span class="pines p2" />
   <span class="ledge" />
   <span class="snowbank" />
-  {
-    !aged && (
-      <span class="track">
-        <span class="car" />
-      </span>
-    )
-  }
+  <span class="track">
+    <span class="car" />
+  </span>
   <span class="hotel">
     <span class="wing wl">
       <span class="roof" />

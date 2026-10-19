@@ -1167,9 +1167,14 @@
     .snowbank {
       background: linear-gradient(180deg, #e0d4bf, #eae1d0);
     }
+    .track,
     .roof,
     .door {
       background: #7a3b2e;
+    }
+    .car {
+      background: #9a4a2a;
+      box-shadow: inset 0 3px 0 #efe4cf;
     }
     .wing {
       background: #d6b68a;
@@ -2045,6 +2050,15 @@
         animation: budapest-year linear both;
         animation-timeline: view();
         animation-range: entry 10% cover 45%;
+      }
+      /* the 1968 funicular climbs while its interlude crosses the screen */
+      .gb-interlude[data-era='1'] {
+        view-timeline-name: --gb-1968;
+      }
+      .gb-dio[data-gb-dio='1968'] .car {
+        animation: budapest-climb linear both;
+        animation-timeline: --gb-1968;
+        animation-range: entry 60% exit 40%;
       }
     }
   }
