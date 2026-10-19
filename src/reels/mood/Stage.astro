@@ -110,34 +110,35 @@ const credits: [string, string][] = [
       <div class="pin">
         <div class="shot" data-mood-rain="stairs">
           <i class="sky" />
+          <i class="far" />
           <span class="steps">
             {Array.from({ length: 12 }, () => (
               <i />
             ))}
           </span>
           <i class="slamp" />
-          <span class="mood-cone">
-            {stairRain.map((s) => (
-              <i class="mood-drop" style={s} />
-            ))}
-          </span>
-          <span class="fig him">
-            <b />
-            <i />
-          </span>
           <span class="fig her">
             <b />
             <i />
             <span class="th" />
           </span>
-          <i class="sglow" />
-          {/* last, so it is in front: the camera shoots past this wall */}
+          <span class="fig him">
+            <b />
+            <i />
+          </span>
+          <span class="mood-cone">
+            {stairRain.map((s) => (
+              <i class="mood-drop" style={s} />
+            ))}
+          </span>
+          {/* in front of them both: the camera shoots past this wall, and she slips behind it */}
           <span class="swall">
             <i class="po a">吉屋招租</i>
             <i class="po b">粥粉麵飯</i>
             <i class="po c">跌打</i>
             <i class="po d" />
           </span>
+          <i class="sglow" />
         </div>
         <p class="cap">Hong Kong, 1962</p>
       </div>

@@ -219,8 +219,11 @@ const reel: ReelModule = {
               waltzBar(bar++ % 4);
             }
             // Out of sight, she changes: the next time you pass, it is another evening.
-            if (!e.isIntersecting && inBar) stairs.dataset.dress = String(++walks % DRESSES);
-            if (!e.isIntersecting) inBar = false;
+            // A frame resting exactly on the fold reports intersecting at ratio 0.
+            if (!e.isIntersecting || e.intersectionRatio === 0) {
+              if (inBar) stairs.dataset.dress = String(++walks % DRESSES);
+              inBar = false;
+            }
             // the clock belongs to the corridor, not the stairwell
             if (e.intersectionRatio > 0.2) root.dataset.moodStairs = '';
             else delete root.dataset.moodStairs;

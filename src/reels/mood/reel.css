@@ -1228,6 +1228,9 @@
      pass on the narrow flight. Pinned and scrubbed by the scroll,
      slowest as they pass.
      ============================================================ */
+  /* A tight frame: the near wall blocks half of it, out of focus, and the
+     stairs climb away to the lamp. Geometry is in container units of the
+     1.66:1 shot (cqw across, cqh down). */
   & .mood-stairs {
     --mood-p: 0.5;
     position: relative;
@@ -1251,7 +1254,7 @@
     aspect-ratio: 1.66 / 1;
     container-type: size;
     overflow: hidden;
-    background: linear-gradient(180deg, #0b1416, #142225 38%, #1e1714);
+    background: #0a1012;
     box-shadow:
       0 0 0 1px rgba(216, 176, 114, 0.22),
       0 40px 80px -40px #000;
@@ -1261,81 +1264,85 @@
     position: absolute;
     display: block;
   }
+  /* the lane past the top of the stairs */
   & .mood-stairs .sky {
+    inset: 0;
+    background:
+      radial-gradient(ellipse 24% 46% at 79% 5%, rgba(224, 166, 75, 0.32), transparent 70%),
+      linear-gradient(180deg, #0b1416, #142225 34%, #18130f);
+  }
+  /* the far wall, with the lamp bracketed to it */
+  & .mood-stairs .far {
+    inset: 0;
+    clip-path: polygon(78% 0, 100% 0, 100% 100%, 71.4% 100%, 78.2% 40%);
+    background:
+      radial-gradient(ellipse 22% 34% at 80% 8%, rgba(224, 166, 75, 0.24), transparent 70%),
+      linear-gradient(90deg, #120f0d, #241e19 30%, #17120f);
+  }
+  /* the flight, narrowing as it climbs away from us */
+  & .mood-stairs .steps {
     left: 0;
     right: 0;
-    top: 0;
-    height: 30%;
-    background: radial-gradient(
-      ellipse 30% 70% at 76% 0%,
-      rgba(224, 166, 75, 0.35),
-      transparent 70%
-    );
-  }
-  /* the flight: one step per row, narrowing as it climbs away from us */
-  & .mood-stairs .steps {
-    left: 44%;
-    right: 14%;
-    top: 20%;
+    top: 40%;
     bottom: 0;
+    clip-path: polygon(61% 0, 78.2% 0, 71.4% 100%, 30.5% 100%);
+    background: #2b2622;
   }
+  & .mood-stairs .steps::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 30% 55% at 72% 0%, rgba(224, 166, 75, 0.2), transparent 70%),
+      linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.5));
+  }
+  /* wet stone: a lit nosing, the tread, then the riser in shadow */
   & .mood-stairs .steps i {
     display: block;
-    background: linear-gradient(180deg, #7a7166 0 2px, #3e3731 2px);
+    background: linear-gradient(180deg, #8d8376 0 1.5px, #5d554c 1.5px 32%, #352e28 32%);
   }
   & .mood-stairs .steps i:nth-child(1) {
-    width: 34%;
-    height: 3.33cqh;
+    height: 2.5cqh;
   }
   & .mood-stairs .steps i:nth-child(2) {
-    width: 39%;
-    height: 3.6cqh;
+    height: 2.7cqh;
   }
   & .mood-stairs .steps i:nth-child(3) {
-    width: 44%;
-    height: 4.15cqh;
+    height: 3.1cqh;
   }
   & .mood-stairs .steps i:nth-child(4) {
-    width: 49%;
-    height: 4.71cqh;
+    height: 3.53cqh;
   }
   & .mood-stairs .steps i:nth-child(5) {
-    width: 54%;
-    height: 5.26cqh;
+    height: 3.94cqh;
   }
   & .mood-stairs .steps i:nth-child(6) {
-    width: 60%;
-    height: 5.81cqh;
+    height: 4.36cqh;
   }
   & .mood-stairs .steps i:nth-child(7) {
-    width: 66%;
-    height: 6.64cqh;
+    height: 4.98cqh;
   }
   & .mood-stairs .steps i:nth-child(8) {
-    width: 72%;
-    height: 7.47cqh;
+    height: 5.6cqh;
   }
   & .mood-stairs .steps i:nth-child(9) {
-    width: 79%;
-    height: 8.3cqh;
+    height: 6.23cqh;
   }
   & .mood-stairs .steps i:nth-child(10) {
-    width: 86%;
-    height: 9.14cqh;
+    height: 6.85cqh;
   }
   & .mood-stairs .steps i:nth-child(11) {
-    width: 93%;
-    height: 10.24cqh;
+    height: 7.68cqh;
   }
   & .mood-stairs .steps i:nth-child(12) {
-    width: 100%;
-    height: 11.35cqh;
+    height: 8.53cqh;
   }
   & .mood-stairs .slamp {
-    right: 22%;
+    left: 79%;
     top: 5%;
     width: 10px;
     height: 10px;
+    margin-left: -5px;
     border-radius: 50%;
     background: #ffe3a6;
     box-shadow:
@@ -1345,131 +1352,169 @@
   & .mood-stairs .mood-drop {
     --fall: 110cqh;
   }
-  & .mood-stairs .sglow {
-    inset: 0;
-    background:
-      radial-gradient(ellipse 50% 60% at 60% 30%, rgba(224, 166, 75, 0.14), transparent 70%),
-      radial-gradient(ellipse 110% 90% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.6));
-    pointer-events: none;
-  }
-  /*
-   * The two of them, on one perspective: --n is how near the camera each is
-   * (she comes down to it, he climbs away), --s their size, which grows
-   * faster as they near the lens. Feet sit on the flight's centre line, she
-   * on the wall side, he on the open side, a hand's width apart where they
-   * pass at --mood-p 0.5. Their heads graze the top of the frame there, and
-   * close to the camera it crops them.
-   */
+  /* Feet at the bottom centre of each box. She starts small under the lamp
+     and ends half behind the near wall; he starts close, cut at the knees,
+     and climbs to where she began. At --mood-p 0.5 they share a step. */
   & .mood-stairs .fig {
-    --s: calc(0.8 + 1.2 * var(--n) + var(--n) * var(--n));
-    left: 0;
-    top: 0;
-    width: 6.875cqh;
-    height: 26.56cqh;
+    width: 20cqh;
+    height: 84cqh;
     transform-origin: 50% 100%;
-    scale: var(--s);
   }
   & .mood-stairs .fig b {
     position: absolute;
     left: 50%;
     top: 0;
-    width: 3.75cqh;
-    height: 4.4cqh;
-    margin-left: -1.875cqh;
-    border-radius: 50% 50% 46% 46%;
+    width: 8.6cqh;
+    height: 10.4cqh;
+    margin-left: -4.3cqh;
+    border-radius: 50% 50% 44% 44% / 58% 58% 42% 42%;
     background: #140a08;
   }
   & .mood-stairs .fig > i {
     position: absolute;
-    left: 0.625cqh;
-    right: 0.625cqh;
-    top: 4.7cqh;
-    bottom: 0;
-    border-radius: 2.8cqh 2.8cqh 0.9cqh 0.9cqh;
+    inset: 10cqh 0 0;
   }
   & .mood-stairs .fig.her {
-    --n: var(--mood-p);
-    translate: calc((75.46 + 3.9075 * var(--s)) * 1cqh) calc((-22.51 + 24 * var(--s)) * 1cqh);
+    left: calc(67.2cqw - 10cqh);
+    top: -42cqh;
+    translate: calc(var(--mood-p) * -24.8cqw) calc(var(--mood-p) * 70cqh);
+    scale: calc(0.3 + var(--mood-p) * 0.7);
   }
-  & .mood-stairs .fig.him {
-    --n: calc(1 - var(--mood-p));
-    translate: calc((76.66 + 9.5325 * var(--s)) * 1cqh) calc((-22.51 + 24 * var(--s)) * 1cqh);
+  /* her hair, set high */
+  & .mood-stairs .fig.her b {
+    width: 9.4cqh;
+    height: 11cqh;
+    margin-left: -4.7cqh;
+    border-radius: 50% 50% 40% 40% / 64% 64% 36% 36%;
   }
-  /* her cheongsam: high collar, fitted at the waist, a different one each
-     time she takes the stairs */
+  /* her cheongsam: high collar, fitted waist, a narrow skirt to the calf,
+     and a different one each time she takes the stairs */
   & .mood-stairs .fig.her > i {
     clip-path: polygon(
-      38% 0,
-      62% 0,
-      64% 4%,
-      88% 10%,
-      95% 24%,
-      84% 40%,
-      80% 47%,
-      91% 63%,
-      86% 100%,
-      14% 100%,
-      9% 63%,
-      20% 47%,
-      16% 40%,
-      5% 24%,
-      12% 10%,
-      36% 4%
+      40% 0,
+      60% 0,
+      62% 4%,
+      84% 9%,
+      90% 15%,
+      80% 33%,
+      77% 41%,
+      86% 55%,
+      80% 96%,
+      62% 96%,
+      60% 100%,
+      40% 100%,
+      38% 96%,
+      20% 96%,
+      14% 55%,
+      23% 41%,
+      20% 33%,
+      10% 15%,
+      16% 9%,
+      38% 4%
     );
     background-color: #9c2a1e;
     background-image:
-      radial-gradient(circle at 30% 30%, rgba(240, 194, 122, 0.4) 0 2px, transparent 2.5px),
-      radial-gradient(circle at 70% 70%, rgba(240, 228, 201, 0.28) 0 1.5px, transparent 2px);
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.4),
+        transparent 32%,
+        transparent 62%,
+        rgba(0, 0, 0, 0.5)
+      ),
+      radial-gradient(circle at 30% 30%, rgba(240, 194, 122, 0.6) 0 0.45cqh, transparent 0.6cqh),
+      radial-gradient(circle at 70% 70%, rgba(240, 228, 201, 0.4) 0 0.35cqh, transparent 0.5cqh);
     background-size:
-      10px 10px,
-      13px 13px;
-    box-shadow:
-      inset -6px 0 10px rgba(0, 0, 0, 0.35),
-      0 0 18px rgba(224, 166, 75, 0.22);
+      100% 100%,
+      2.4cqh 2.4cqh,
+      3.1cqh 3.1cqh;
   }
   & .mood-stairs[data-dress='1'] .fig.her > i {
     background-color: #2f5d4e;
     background-image:
-      radial-gradient(circle, rgba(240, 228, 201, 0.5) 0 1.8px, transparent 2.3px),
-      radial-gradient(circle, rgba(235, 188, 108, 0.4) 0 1.2px, transparent 1.7px);
-    background-size:
-      9px 9px,
-      9px 9px;
-    background-position:
-      0 0,
-      4.5px 4.5px;
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.4),
+        transparent 32%,
+        transparent 62%,
+        rgba(0, 0, 0, 0.5)
+      ),
+      repeating-linear-gradient(
+        45deg,
+        rgba(240, 228, 201, 0.32) 0 0.25cqh,
+        transparent 0.25cqh 2.2cqh
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        rgba(240, 228, 201, 0.32) 0 0.25cqh,
+        transparent 0.25cqh 2.2cqh
+      );
+    background-size: 100% 100%;
   }
   & .mood-stairs[data-dress='2'] .fig.her > i {
     background-color: #c98b3a;
     background-image:
-      repeating-linear-gradient(45deg, rgba(42, 23, 18, 0.32) 0 1.2px, transparent 1.2px 6px),
-      repeating-linear-gradient(-45deg, rgba(42, 23, 18, 0.32) 0 1.2px, transparent 1.2px 6px);
-    background-size: auto;
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.35),
+        transparent 32%,
+        transparent 62%,
+        rgba(0, 0, 0, 0.45)
+      ),
+      radial-gradient(circle at 50% 50%, rgba(122, 23, 18, 0.7) 0 0.7cqh, transparent 0.85cqh);
+    background-size:
+      100% 100%,
+      3.2cqh 3.2cqh;
   }
   & .mood-stairs[data-dress='3'] .fig.her > i {
     background-color: #1f3b3a;
     background-image:
-      radial-gradient(circle at 30% 35%, rgba(240, 228, 201, 0.55) 0 2.4px, transparent 2.9px),
-      radial-gradient(circle at 72% 75%, rgba(196, 46, 34, 0.75) 0 1.8px, transparent 2.3px);
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.4),
+        transparent 32%,
+        transparent 62%,
+        rgba(0, 0, 0, 0.5)
+      ),
+      radial-gradient(circle at 25% 25%, rgba(240, 228, 201, 0.6) 0 0.8cqh, transparent 0.95cqh),
+      radial-gradient(circle at 75% 75%, rgba(224, 166, 75, 0.5) 0 0.5cqh, transparent 0.65cqh);
     background-size:
-      14px 14px,
-      14px 14px;
+      100% 100%,
+      4cqh 4cqh,
+      4cqh 4cqh;
   }
+  & .mood-stairs .fig.him {
+    left: calc(51.6cqw - 10cqh);
+    top: 28cqh;
+    translate: calc(var(--mood-p) * 19.2cqw) calc(var(--mood-p) * -70cqh);
+    scale: calc(1 - var(--mood-p) * 0.7);
+  }
+  /* a dark suit, the white of the collar */
   & .mood-stairs .fig.him > i {
-    background: #26262b;
-    box-shadow:
-      inset 6px 0 10px rgba(0, 0, 0, 0.4),
-      inset 0 1.4cqh 0 -0.8cqh #e9e2d2;
+    clip-path: polygon(30% 0, 70% 0, 95% 7%, 100% 36%, 92% 100%, 8% 100%, 0 36%, 5% 7%);
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.45),
+        transparent 35%,
+        transparent 60%,
+        rgba(0, 0, 0, 0.5)
+      ),
+      radial-gradient(ellipse 50% 100% at 50% 0, #e9e2d2 60%, transparent 64%) 50% 0 / 26% 1.8cqh
+        no-repeat,
+      #26262b;
   }
   /* the thermos she takes for the noodles */
   & .mood-stairs .fig .th {
     position: absolute;
-    right: -1.4cqh;
-    top: 14.7cqh;
-    width: 1.56cqh;
-    height: 3.75cqh;
-    border-radius: 3px;
-    background: linear-gradient(90deg, #a3201a, #d8483a, #7a1712);
+    right: -6%;
+    top: 47%;
+    width: 18%;
+    height: 12%;
+    border-radius: 0.8cqh;
+    background:
+      linear-gradient(rgba(240, 228, 201, 0.55), rgba(240, 228, 201, 0.55)) 0 26% / 100% 10%
+        no-repeat,
+      linear-gradient(90deg, #a3201a, #d8483a, #7a1712);
   }
   /* the wall in the foreground, out of focus, with the street's notices on it */
   & .mood-stairs .swall {
@@ -1479,13 +1524,14 @@
     width: 44%;
     background-color: #1a1512;
     background-image:
+      linear-gradient(90deg, transparent 82%, rgba(224, 166, 75, 0.08) 96%, rgba(0, 0, 0, 0.5)),
       radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.3) 0 2px, transparent 3px),
-      radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.04) 0 2px, transparent 3px),
-      linear-gradient(90deg, transparent 72%, rgba(0, 0, 0, 0.6));
+      radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.04) 0 2px, transparent 3px);
     background-size:
+      100% 100%,
       19px 21px,
-      23px 17px,
-      100% 100%;
+      23px 17px;
+    box-shadow: 18px 0 30px -12px rgba(0, 0, 0, 0.85);
     filter: blur(1.5px);
   }
   & .mood-stairs .po {
@@ -1537,6 +1583,11 @@
     opacity: 0.6;
     rotate: -1deg;
     clip-path: polygon(0 4%, 100% 0, 96% 100%, 4% 92%);
+  }
+  & .mood-stairs .sglow {
+    inset: 0;
+    background: radial-gradient(ellipse 110% 90% at 60% 45%, transparent 50%, rgba(0, 0, 0, 0.62));
+    pointer-events: none;
   }
   & .mood-stairs .cap {
     width: min(1062px, 92vw);
