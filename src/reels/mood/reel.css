@@ -1744,9 +1744,9 @@
     border-radius: 3px;
     background: var(--mood-plate);
     color: #24160a;
-    font: 600 13px/1 var(--font-display);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font: 600 16px/1 var(--font-display);
+    letter-spacing: 0.01em;
+    text-transform: none;
     box-shadow:
       inset 0 1px 0 rgba(255, 240, 200, 0.7),
       0 3px 6px rgba(0, 0, 0, 0.5);
@@ -2083,10 +2083,10 @@
     outline-color: #8a1d15;
     outline-offset: -10px;
   }
-  /* the paper's flag over each clipping, ruled off twice */
+  /* over each clipping, the flag of the paper it was cut from, ruled off twice */
   & #oss .repo::before {
-    content: 'Open Source · github.com';
-    content: 'Open Source · github.com' / '';
+    content: 'github.com';
+    content: 'github.com' / '';
     grid-column: 1 / -1;
     grid-row: 1;
     margin-bottom: 10px;
@@ -2263,14 +2263,26 @@
     color: var(--muted);
   }
   & #writing .wrow .t {
+    position: relative;
+    justify-self: start;
     font: italic 500 23px/1.25 var(--font-display);
     letter-spacing: 0;
     color: var(--ink);
-    transition: color 0.5s var(--mood-slow);
   }
-  /* the ink still wet on the title you are over */
-  & #writing .wrow:is(:hover, :focus-visible) .t {
-    color: var(--amber-deep);
+  /* a stroke of red ink under the title you are over, drawn as the nib goes across */
+  & #writing .wrow .t::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    bottom: -5px;
+    width: calc(100% + 6px);
+    height: 7px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5.2 C 30 3.4, 62 6.4, 96 4.4 S 160 2.6, 199 4.6' fill='none' stroke='%238a1d15' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E")
+      0 0 / 100% 100% no-repeat;
+    clip-path: inset(0 100% 0 0);
+  }
+  & #writing .wrow:is(:hover, :focus-visible) .t::after {
+    clip-path: inset(0 0 0 0);
   }
 
   /* ============================================================
@@ -3049,6 +3061,9 @@
     }
     & #work .idx tr:hover .yr::after {
       animation: mood-wisp 2.8s ease-out 0.6s both;
+    }
+    & #writing .wrow .t::after {
+      transition: clip-path 0.55s var(--mood-ease);
     }
 
     /* a room's lamp is out until you reach it; then it warms up and stays lit */
