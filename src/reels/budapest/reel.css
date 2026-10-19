@@ -1282,7 +1282,7 @@
     transform: none;
   }
 
-  /* proof metrics as postage stamps */
+  /* proof metrics as postage stamps: one issue, one ink, five values */
   .metrics {
     display: flex;
     flex-wrap: wrap;
@@ -1293,7 +1293,6 @@
     border-radius: 0;
     overflow: visible;
     background: none;
-    counter-reset: gb-stamp;
   }
   .metrics .m {
     --c: var(--gb-pinkbox);
@@ -1301,7 +1300,7 @@
     flex: none;
     width: 132px;
     min-width: 0;
-    padding: 26px 14px 18px;
+    padding: 20px 14px 18px;
     border: 0;
     background: var(--c);
     color: #2e1430;
@@ -1311,29 +1310,7 @@
     mask:
       radial-gradient(circle 3.4px, transparent 97%, #000) -5px -5px / 10px 10px,
       linear-gradient(#000, #000) 6px 6px / calc(100% - 12px) calc(100% - 12px) no-repeat;
-    counter-increment: gb-stamp;
     transition: transform 0.35s var(--gb-bounce);
-  }
-  .metrics .m::before {
-    content: 'Nº ' counter(gb-stamp) / '';
-    position: absolute;
-    left: 14px;
-    top: 13px;
-    font: 600 8.5px/1 var(--font-sans);
-    letter-spacing: 0.1em;
-    opacity: 0.7;
-  }
-  .metrics .m:nth-child(2) {
-    --c: #bfd6e4;
-  }
-  .metrics .m:nth-child(3) {
-    --c: #d5c3e3;
-  }
-  .metrics .m:nth-child(4) {
-    --c: #cfe3d2;
-  }
-  .metrics .m:nth-child(5) {
-    --c: #ebd39a;
   }
   .metrics .m:hover {
     transform: translateY(-5px) rotate(-2.5deg);
@@ -1928,16 +1905,14 @@
       0 22px 44px -34px rgba(46, 20, 48, 0.5);
   }
   .idx::before {
-    content: 'The register · est. 1932' / '';
+    content: 'Arrivals' / '';
     position: absolute;
     left: 26px;
     right: 26px;
-    top: 16px;
-    padding-bottom: 9px;
+    top: 14px;
+    padding-bottom: 8px;
     border-bottom: 3px double var(--ink);
-    font: 500 10px/1.3 var(--font-sans);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
+    font: italic 400 17px/1.3 var(--gb-serif);
     text-align: center;
     color: var(--muted);
   }
@@ -2069,7 +2044,6 @@
     justify-content: center;
     gap: 56px;
     padding-top: 34px;
-    counter-reset: gb-acq;
   }
   .repo {
     position: relative;
@@ -2090,7 +2064,6 @@
       0 24px 40px -26px rgba(51, 32, 15, 0.75);
     outline: 1px solid var(--gb-gold-lo);
     outline-offset: -9px;
-    counter-increment: gb-acq;
     transform-origin: 50% -50px;
     transition: transform 0.55s var(--gb-bounce);
   }
@@ -2172,18 +2145,20 @@
     text-transform: uppercase;
     color: var(--muted);
   }
+  /* the museum label's credit line: given away, which is what open source is */
   .repo .meta::after {
-    content: 'Acquired · Nº ' counter(gb-acq) / '';
-    padding: 4px 12px;
-    background: linear-gradient(180deg, #e9d08a, #b58a33);
+    content: 'Gift of the artist' / '';
+    padding: 3px 14px 4px;
+    background: linear-gradient(180deg, #e9d08a, #c39a45);
     color: #33200f;
-    font-weight: 600;
-    letter-spacing: 0.22em;
+    font: italic 400 14px/1.3 var(--gb-serif);
+    letter-spacing: 0;
+    text-transform: none;
     box-shadow: 0 1px 0 var(--gb-gold-lo);
   }
 
   /* ============================================================
-     04 · LOG: telegrams, postmarked
+     04 · LOG: telegrams, stamped on receipt
      ============================================================ */
   .log {
     align-items: center;
@@ -2232,25 +2207,27 @@
     text-transform: uppercase;
     color: var(--muted);
   }
+  /* the form's printed head: the office it was sent from, then the class of
+     message; the date goes in the receiving office's stamp */
   .logitem .hash {
+    display: none;
+  }
+  .logitem .top::before {
+    content: 'Telegram · Rosario' / '';
+  }
+  .logitem.upcoming .top::before {
+    content: 'Draft, not sent' / '';
+  }
+  .logitem .tag {
+    order: 2;
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
     font: inherit;
     color: var(--amber-deep);
   }
-  .logitem .hash::before {
-    content: 'Telegram · Nº ' / '';
-    color: var(--muted);
-  }
-  .logitem.upcoming .hash::before {
-    content: 'Draft · Nº ' / '';
-  }
   .logitem .date {
-    order: 2;
-    margin-left: auto;
-    font: inherit;
-    color: var(--muted);
-  }
-  /* the postmark */
-  .logitem .tag {
     position: absolute;
     right: 18px;
     top: 50px;
@@ -2258,28 +2235,24 @@
     height: 70px;
     display: grid;
     place-content: center;
-    gap: 2px;
-    padding: 0;
+    padding: 0 14px;
     border: 2px solid rgba(163, 33, 43, 0.75);
     border-radius: 50%;
     color: #8e1b26;
-    font: 700 8.5px/1.25 var(--font-sans);
-    letter-spacing: 0.12em;
+    font: 700 11px/1.15 var(--font-mono);
+    letter-spacing: 0.04em;
     text-align: center;
     rotate: -12deg;
   }
-  .logitem .tag::before {
-    content: 'Rosario' / '';
-    font-weight: 500;
-    font-size: 7.5px;
-    letter-spacing: 0.18em;
-  }
-  .logitem .tag::after {
+  .logitem .date::after {
     content: '';
     position: absolute;
     inset: 4px;
     border: 1px dashed rgba(163, 33, 43, 0.55);
     border-radius: 50%;
+  }
+  .logitem.upcoming :is(.tag, .date) {
+    display: none;
   }
   .logitem .msg,
   .logitem.upcoming .msg {
@@ -2309,9 +2282,6 @@
     color: var(--ink-2);
     font-style: normal;
   }
-  .logitem.upcoming .tag {
-    border-style: dashed;
-  }
   .log.gb-armed .logitem:not(.gb-in) {
     opacity: 0;
     transform: scale(1.06) translateY(-10px);
@@ -2319,7 +2289,7 @@
   .logitem.gb-in {
     animation: budapest-stampin 0.5s var(--gb-bounce) both;
   }
-  .logitem.gb-in .tag {
+  .logitem.gb-in .date {
     animation: budapest-postmark 0.38s 0.36s var(--gb-bounce) both;
   }
 
@@ -2342,14 +2312,6 @@
     margin-bottom: 14px;
     font: italic 400 32px/1.1 var(--gb-serif);
     color: var(--ink);
-  }
-  .wlist::after {
-    content: 'Four courses · served with evals' / '';
-    margin-top: 16px;
-    font: 500 10px/1.4 var(--font-sans);
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
-    color: var(--muted);
   }
   .wrow,
   .wrow:last-child {
@@ -2379,12 +2341,14 @@
     color: var(--ink);
     transition: color 0.15s;
   }
+  /* the reading time sits where the price would */
   .wrow .rt {
     grid-area: rt;
     align-self: end;
-    font: 500 11px/1.4 var(--font-sans);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font: 400 16px/1.3 var(--gb-serif);
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
     color: var(--amber-deep);
   }
   .wrow .d {
@@ -2411,7 +2375,6 @@
   }
   .tenet {
     position: relative;
-    overflow: hidden;
     padding: 28px 26px 24px;
     background: var(--paper-3);
     box-shadow:
@@ -2419,11 +2382,23 @@
       inset 0 0 0 5px var(--paper-3),
       inset 0 0 0 6px var(--rule);
     counter-increment: gb-rule;
+    transition: box-shadow 0.2s;
   }
   .tenet .nn {
     font-size: 0;
     line-height: 1;
     color: var(--amber-deep);
+    transition: color 0.2s;
+  }
+  /* on hover the card's inner rule and numeral take a darker ink */
+  .tenet:hover {
+    box-shadow:
+      inset 0 0 0 1px var(--rule),
+      inset 0 0 0 5px var(--paper-3),
+      inset 0 0 0 6px var(--rule-2);
+  }
+  .tenet:hover .nn {
+    color: var(--gb-red);
   }
   .tenet .nn::before {
     content: counter(gb-rule, upper-roman) / '';
@@ -2441,29 +2416,10 @@
     font-size: 15px;
     line-height: 1.6;
   }
-  .tenet::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -40%;
-    width: 30%;
-    background: linear-gradient(
-      100deg,
-      rgba(255, 255, 255, 0),
-      rgba(255, 255, 255, 0.7),
-      rgba(255, 255, 255, 0)
-    );
-    transform: skewX(-14deg) translateX(-120%);
-    transition: transform 0.9s var(--gb-ease);
-    pointer-events: none;
-  }
-  .tenet:hover::after {
-    transform: skewX(-14deg) translateX(560%);
-  }
 
   /* ============================================================
-     07 · STACK: the pastry tower (top tier: LLM)
+     07 · STACK: Mendl's Courtesan au chocolat. Three glazed choux of
+     falling size on a plate, a cocoa bean on top (top bun: LLM)
      ============================================================ */
   .toolbox {
     display: flex;
@@ -2474,80 +2430,82 @@
     margin: 0 auto;
     padding-top: 28px;
   }
-  /* the cherry on top (last item of a reversed column) */
+  /* the cocoa bean (last item of a reversed column) */
   .toolbox::after {
     content: '';
     position: relative;
     z-index: 2;
-    width: 28px;
-    height: 28px;
-    margin-bottom: -6px;
+    width: 13px;
+    height: 22px;
+    margin-bottom: -5px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #f0606a, #a3212b 60%, #6e141c);
+    background: #5a3a1e;
+    box-shadow: inset -3px -2px 0 rgba(0, 0, 0, 0.28);
+    rotate: 20deg;
     transition: transform 0.45s var(--gb-bounce);
   }
   .toolbox:hover::after {
     transform: translateY(-8px);
   }
-  /* the cake stand */
+  /* the plate */
   .toolbox::before {
     content: '';
     width: 100%;
     height: 16px;
+    margin-top: -6px;
     border-radius: 50%;
     background: #f4f7fa;
     box-shadow:
       0 2px 0 rgba(36, 21, 50, 0.3),
       inset 0 -3px 0 rgba(36, 21, 50, 0.08);
   }
+  /* each bun: golden choux under a pastel glaze that drips at its edge */
   .toolcol {
-    --icing: #fff6f8;
+    --glaze: #f2b8c6;
+    --choux: #d39a5a;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    width: 580px;
+    justify-content: center;
+    gap: 6px;
+    width: 560px;
     max-width: 100%;
-    padding: 24px 18px 16px;
-    border-radius: 14px 14px 10px 10px;
-    background: #f2b8c6;
+    min-height: 124px;
+    padding: 22px 48px 40px;
+    border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+    background:
+      radial-gradient(circle at 50% 0, var(--glaze) 6px, transparent 6.5px) 0 calc(100% - 14px) /
+        18px 12px repeat-x,
+      linear-gradient(var(--glaze), var(--glaze)) top / 100% calc(100% - 26px) no-repeat,
+      var(--choux);
     box-shadow:
-      inset 0 -10px 0 rgba(0, 0, 0, 0.06),
-      0 2px 0 rgba(36, 21, 50, 0.28);
+      inset 0 10px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -8px 0 rgba(90, 58, 30, 0.22),
+      0 2px 0 rgba(36, 21, 50, 0.24);
     transform-origin: 50% 100%;
   }
-  .toolcol::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 18px;
-    border-radius: 14px 14px 0 0;
-    background:
-      linear-gradient(var(--icing), var(--icing)) top / 100% 8px no-repeat,
-      radial-gradient(circle at 50% 8px, var(--icing) 6px, transparent 6.5px) 0 0 / 14px 18px
-        repeat-x;
+  .toolcol + .toolcol {
+    margin-bottom: -12px;
   }
   .toolcol:nth-child(2) {
-    --icing: #fbfdfe;
-    width: 440px;
-    background: #bfd6e4;
+    --glaze: #bfd6e4;
+    width: 420px;
   }
   .toolcol:nth-child(3) {
-    --icing: #f8f2fb;
+    --glaze: #cdb8de;
     width: 300px;
-    background: #cdb8de;
+    min-height: 132px;
+    padding-inline: 38px;
   }
   .toolcol:hover {
     animation: budapest-wobble 0.7s var(--gb-bounce);
   }
   .toolcol .h {
     position: relative;
-    margin: 0 -0.3em 0 0;
-    font: 500 11px/1.3 var(--font-sans);
-    letter-spacing: 0.3em;
+    margin: 0 -0.16em 0 0;
+    font: 500 10.5px/1.3 var(--font-sans);
+    letter-spacing: 0.16em;
     color: #241532;
   }
   .toolcol ul {
@@ -2555,14 +2513,13 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px;
+    gap: 0 16px;
   }
   .toolcol li {
-    padding: 3px 11px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.62);
+    padding: 0;
+    background: none;
     color: #241532;
-    font: 500 13.5px/1.4 var(--font-sans);
+    font: italic 400 16px/1.45 var(--gb-serif);
   }
   .toolcol li::before {
     display: none;
@@ -2592,13 +2549,12 @@
     text-align: center;
     color: var(--ink);
   }
+  /* no fallback on purpose: until client.ts sets the clock there is no line */
   .specs::after {
-    content: 'Checked in at the front desk · Rosario ' var(--gb-clock, '') / '';
+    content: 'Local time in Rosario, ' var(--gb-clock) / '';
     display: block;
     margin-top: 12px;
-    font: 500 9.5px/1.4 var(--font-sans);
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
+    font: italic 400 14px/1.4 var(--gb-serif);
     text-align: center;
     color: var(--muted);
   }
@@ -2685,10 +2641,7 @@
     animation: budapest-ring 0.7s ease-out;
   }
   .gb-bell .bbl {
-    font: 500 11px/1.3 var(--font-sans);
-    letter-spacing: 0.28em;
-    margin-right: -0.28em;
-    text-transform: uppercase;
+    font: italic 400 16px/1.3 var(--gb-serif);
   }
   .gb-bell .bbm {
     padding-bottom: 2px;
@@ -2727,19 +2680,23 @@
     gap: 22px;
   }
   .gb-cr dt {
-    padding-top: 2px;
+    padding-top: 4px;
     text-align: right;
-    font: 500 10px/1.5 var(--font-sans);
-    letter-spacing: 0.26em;
+    font: 500 10.5px/1.5 var(--font-sans);
+    letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--muted);
   }
   .gb-cr dd {
     margin: 0;
     text-align: left;
-    font: 500 12px/1.5 var(--font-sans);
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    font: 400 16px/1.45 var(--gb-serif);
+    text-wrap: balance;
+  }
+  .gb-disc {
+    margin: 22px 0 0;
+    font: italic 400 14px/1.5 var(--gb-serif);
+    color: var(--muted);
   }
 
   .foot,
@@ -2811,32 +2768,41 @@
     .tenets {
       grid-template-columns: minmax(0, 1fr);
     }
+    .toolcol {
+      padding-inline: 34px;
+    }
     .toolcol:nth-child(1) {
       width: 100%;
     }
     .toolcol:nth-child(2) {
-      width: 82%;
+      width: 84%;
     }
     .toolcol:nth-child(3) {
-      width: 64%;
+      width: 70%;
+      padding-inline: 28px;
     }
     .logitem .msg,
     .logitem.upcoming .msg {
       padding-right: 0;
     }
     .log {
-      gap: 30px;
+      gap: 34px;
     }
     .logitem {
-      padding-bottom: 34px;
+      padding-bottom: 46px;
     }
-    /* the postmark lands on the corner, half on the card */
-    .logitem .tag {
+    .logitem.upcoming {
+      padding-bottom: 18px;
+    }
+    /* the stamp lands on the corner, half on the card, clear of the message */
+    .logitem .date {
       top: auto;
       right: 14px;
-      bottom: -16px;
-      width: 58px;
-      height: 58px;
+      bottom: -22px;
+      width: 60px;
+      height: 60px;
+      padding: 0 12px;
+      font-size: 10px;
     }
     .wlist {
       padding: 26px 20px 20px;
@@ -2910,15 +2876,6 @@
     stroke: currentColor;
     stroke-width: 2.6;
     stroke-linecap: round;
-  }
-  .t-k {
-    font:
-      500 clamp(8px, 1.5vw, 11px) / 1.3 'Jost Variable',
-      system-ui,
-      sans-serif;
-    letter-spacing: 0.44em;
-    margin-right: -0.44em;
-    text-transform: uppercase;
   }
   .t-n {
     display: flex;

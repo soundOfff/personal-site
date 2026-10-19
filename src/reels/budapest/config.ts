@@ -41,7 +41,7 @@ const budapest: ReelConfig = {
     {
       code: '1932',
       name: 'The golden age',
-      slug: 'PART 1–3 · 1.37 : 1',
+      slug: 'Parts 1 to 3 · 1.37 : 1',
       sections: ['readme', 'playground', 'work'],
       tokens: tokens({
         bg: '#F6D7DE',
@@ -61,7 +61,7 @@ const budapest: ReelConfig = {
     {
       code: '1968',
       name: 'The faded years',
-      slug: 'PART 4–6 · 2.35 : 1',
+      slug: 'Parts 4 to 6 · 2.35 : 1',
       sections: ['oss', 'log', 'writing'],
       tokens: tokens({
         bg: '#EED9AE',
@@ -81,7 +81,7 @@ const budapest: ReelConfig = {
     {
       code: '1985',
       name: 'The author',
-      slug: 'PART 7–9 · 1.85 : 1',
+      slug: 'Parts 7 to 9 · 1.85 : 1',
       sections: ['principles', 'stack', 'now'],
       tokens: tokens({
         bg: '#DCE6EE',
@@ -132,33 +132,33 @@ const budapest: ReelConfig = {
   ],
   motifs: [
     'key rack nav with swinging keys',
-    'whip-pan section jumps',
-    'pastel diorama hero with windows that light up',
-    'PART chapter cards',
-    'postage-stamp proof metrics',
+    'whip-pan section jumps: the page smears sideways, the frame stays sharp',
+    'pastel diorama hero with windows that light up, aged and cropped to scope in 1968',
+    'Part chapter cards',
+    "postage-stamp proof metrics, one issue in Mendl's pink",
     'pastry boxes tied with a ribbon',
     'switchboard relay agent state',
     'guest register ledger',
     'gilded portrait gallery',
-    'telegrams with postmarks',
+    'telegrams with a received-date stamp',
     'menu du jour',
     'house rules',
-    'three-tier pastry tower',
+    "Mendl's Courtesan au chocolat: three choux, a cocoa bean on top",
     'registration card',
     'service bell',
   ],
   sound: {
     score: 'after Alexandre Desplat: balalaika, cimbalom, zither, organ, timpani; E harmonic minor',
     hover: 'cimbalom, cotton beater, wandering the scale; brass key tink on the rack',
-    click: 'the concierge’s desk bell, on B',
+    click: "the concierge's desk bell, on B",
     section: 'projector clunk + balalaika tremolo chord over timpani: i, iv, V by era',
     surface: 'box thud + tissue paper + a zither run to E, a string per component',
     done: 'balalaika strokes accelerating, i to V, dead stop on E major + handbell',
     error: 'the hotel organ losing its wind on a sour cluster',
-    signature: 'key ring, whip pan, postmark, switchboard relay, service bell',
+    signature: 'key ring, whip pan, date stamp, switchboard relay, service bell',
     title: 'timpani roll into an organ chord, a trembling balalaika over it, dead stop',
   },
-  credits: 'A fan homage, not affiliated with the film.',
+  credits: 'Inspired by The Grand Budapest Hotel (Wes Anderson, 2014). Not affiliated with the film.',
   announce: 'Now showing: The Grand Budapest Hotel, 2014',
 };
 
