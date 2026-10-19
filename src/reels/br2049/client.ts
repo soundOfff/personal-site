@@ -35,7 +35,8 @@ const NAMES = [
 const LAST = NAMES.length - 1;
 
 const pad = (n: number) => String(n).padStart(2, '0');
-const clock = (s: number) => `${Math.floor(s / 3600)}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`;
+const clock = (s: number) =>
+  `${Math.floor(s / 3600)}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`;
 
 /** A small seeded generator, so the particles fall the same way every visit. */
 function seeded(seed: number): () => number {

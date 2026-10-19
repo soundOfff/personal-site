@@ -757,7 +757,11 @@
     order: -1;
     flex-basis: 100%;
     margin: 0;
-    font: 13px/1.6 'Courier Prime', 'Courier New', Courier, monospace;
+    font:
+      13px/1.6 'Courier Prime',
+      'Courier New',
+      Courier,
+      monospace;
     letter-spacing: 0;
     color: var(--muted);
   }
@@ -769,7 +773,11 @@
   }
   .block .keybar a {
     margin-left: 22px;
-    font: 13px/1.6 'Courier Prime', 'Courier New', Courier, monospace;
+    font:
+      13px/1.6 'Courier Prime',
+      'Courier New',
+      Courier,
+      monospace;
     letter-spacing: 0;
     text-transform: none;
     text-decoration-style: solid;
@@ -955,7 +963,11 @@
     content: 'Fade in:' / '';
     order: -2;
     flex-basis: 100%;
-    font: 13px/1.6 'Courier Prime', 'Courier New', Courier, monospace;
+    font:
+      13px/1.6 'Courier Prime',
+      'Courier New',
+      Courier,
+      monospace;
     color: var(--ink-2);
   }
   #readme .keybar b {
