@@ -1182,11 +1182,12 @@ html:root[data-reel='parasite'] {
     z-index: 2;
     left: var(--px-pad);
     top: 22px;
-    max-width: 46ch;
-    margin: 0 var(--px-pad) 0 0;
+    max-width: min(62ch, calc(100% - 2 * var(--px-pad)));
+    margin: 0;
     font-family: var(--font-mono);
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1.6;
+    text-wrap: balance;
     color: #111715;
   }
 
