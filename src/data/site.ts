@@ -82,55 +82,53 @@ export const toolbox = [
 ] as const;
 
 /**
- * 04 · log · recent activity: git-style changelog, newest first. Short
- * mono hashes are illustrative; dates are real milestones.
+ * 04 · log · recent activity: git-style changelog, newest first. Messages
+ * read as commit subjects, so no trailing full stop. `hash` is a real commit
+ * in this repo or absent: a made-up one would pass for evidence it isn't.
  */
 export const log: {
-  hash: string;
+  hash?: string;
   date: string;
   tag: string;
   msg: string;
-  /** Optional external link rendered after the message. */
+  /** Optional link rendered after the message (a new tab when external). */
   link?: { label: string; href: string };
   /** Renders as a "coming soon" node: dashed dot, muted text. */
   upcoming?: boolean;
 }[] = [
   {
-    hash: 'focusq0',
     date: 'soon',
-    tag: 'coming soon',
-    msg: 'focus-quote, a Chrome extension for focus sessions: capture quotes from the web, set a goal, and get AI insights on which tabs were on-goal vs. distractions.',
+    tag: 'launch',
+    msg: 'focus-quote, a Chrome extension for focus sessions: set a goal, save quotes from the web, and have a model sort your tabs into on-goal and distractions',
     upcoming: true,
   },
   {
-    hash: 'a2ui001',
+    hash: '0ade814',
     date: 'jul 2026',
     tag: 'site',
-    msg: 'Replace the router demo with an A2UI conversational portfolio: ask a question, a Claude agent composes the answer as generated UI over a custom renderer.',
+    msg: 'Replace the router demo with a conversational portfolio, where a Claude agent answers in A2UI and a custom renderer draws the answer',
   },
   {
-    hash: 'unglam1',
     date: 'jun 2026',
-    tag: 'writing',
-    msg: 'Publish “The unglamorous middle”: joining my first startup three and a half years in, and learning the real job is the part nobody demos.',
+    tag: 'blog',
+    msg: 'Publish "The unglamorous middle", about joining my first startup three and a half years into my career and finding out the real job was the part nobody demos',
+    link: { label: 'read it', href: '/blog/the-unglamorous-middle' },
   },
   {
-    hash: 'eui010',
     date: 'jun 2026',
     tag: 'oss',
-    msg: 'Publish editorial-ui v0.1.0: the warm-paper, one-amber, hairline design system this site is built on.',
+    msg: 'Publish editorial-ui v0.1.0, the design system this site is built on',
   },
   {
-    hash: 'ship001',
+    hash: 'ead2d68',
     date: 'jun 2026',
     tag: 'site',
-    msg: 'Ship the personal site: Astro shell, editorial-ui design system, router island, Cloudflare Worker deploy.',
+    msg: 'Ship this site: an Astro shell on editorial-ui, the router demo as an island, deployed as a Cloudflare Worker',
   },
   {
-    hash: 'dana100',
     date: 'may 2026',
     tag: 'launch',
-    msg: 'Launch Dana: AI meeting prep that pulls context from calendar, email, and Slack so you walk in already briefed.',
+    msg: 'Launch Dana, AI meeting prep that pulls context from your calendar, email and Slack so you walk into the meeting already briefed',
     link: { label: 'danahq.com', href: 'https://danahq.com/' },
   },
 ];

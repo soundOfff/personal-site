@@ -33,6 +33,7 @@ const byId = new Map(
 const posts = FEATURED.map((id) => byId.get(id)).filter((p) => p !== undefined);
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
+const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
 ---
 
 <BaseLayout>
@@ -158,16 +159,35 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
                 </div>
                 <div class="lbody">
                   <div class="top">
-                    <span class="hash">{item.hash}</span>
+                    {item.hash && (
+                      <a
+                        class="hash"
+                        href={`${COMMITS}${item.hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`commit ${item.hash} on GitHub`}
+                      >
+                        {item.hash}
+                      </a>
+                    )}
                     <span class="date">{item.date}</span>
                     <span class="tag">{item.tag}</span>
                   </div>
                   <div class="msg">
                     {item.msg}
                     {item.link && (
-                      <a href={item.link.href} target="_blank" rel="noopener noreferrer">
-                        {item.link.label}
-                      </a>
+                      <>
+                        <span class="sep"> · </span>
+                        <a
+                          href={item.link.href}
+                          target={item.link.href.startsWith('http') ? '_blank' : undefined}
+                          rel={
+                            item.link.href.startsWith('http') ? 'noopener noreferrer' : undefined
+                          }
+                        >
+                          {item.link.label}
+                        </a>
+                      </>
                     )}
                   </div>
                 </div>

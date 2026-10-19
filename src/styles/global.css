@@ -1638,9 +1638,6 @@ a.a2-post:hover .a2-post-t {
   opacity: 0.4;
   animation: ping 2.4s ease-out infinite;
 }
-.logitem.upcoming .hash {
-  color: var(--muted-2);
-}
 .logitem.upcoming .msg {
   color: var(--muted);
   font-style: italic;
@@ -1672,6 +1669,10 @@ a.a2-post:hover .a2-post-t {
   font-size: 10.5px;
   color: var(--amber-deep);
 }
+a.hash:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .logitem .date {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -1699,6 +1700,9 @@ a.a2-post:hover .a2-post-t {
 }
 .logitem .msg a:hover {
   text-decoration: underline;
+}
+.logitem .msg .sep {
+  color: var(--muted);
 }
 
 /* ============================================================
