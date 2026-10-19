@@ -205,8 +205,9 @@ const odyssey: ReelConfig = {
     waltz: 'the station waltz at the match cut: oom–pah–pah, beat two early, harp and strings',
     monolith: 'a Ligeti choir: neighbouring semitones entering one by one, drifting',
     centrifuge: 'a lonely string adagio, A minor, after Khachaturian',
-    intermission: "the entr'acte, after Ligeti's Atmosphères: a soft cluster held in the strings",
-    gate: 'rushing noise over a low string cluster',
+    intermission:
+      "the entr'acte, after Ligeti's Atmosphères: a low and a high string cluster, held dark",
+    gate: "rushing noise over the entr'acte's clusters, opening with the scroll",
   },
   credits: 'A fan homage, not affiliated with the film.',
   announce: 'Now showing 2001: A Space Odyssey, 1968',

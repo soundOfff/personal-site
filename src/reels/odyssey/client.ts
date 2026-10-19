@@ -13,8 +13,8 @@
  *     under the transmission beeps and a waltz cadence when done; HAL winding
  *     down on a fault; the sunrise for the title, the replay and the credits;
  *     the station waltz at the match cut; the adagio in the centrifuge; the
- *     entr'acte's cluster at the intermission; a Ligeti choir at the monolith
- *     and in the room; the star gate's cluster
+ *     entr'acte's clusters at the intermission; a Ligeti choir at the monolith
+ *     and in the room; the same clusters under the star gate's rush
  */
 import type { Bed } from '../sound';
 import type { ReelContext, ReelModule } from '../types';

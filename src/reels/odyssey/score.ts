@@ -2,10 +2,10 @@
  * Reel 05 · 2001: A Space Odyssey: the score. Every sound the reel makes,
  * after the concert music Kubrick laid on the film: Richard Strauss's sunrise
  * (an organ pedal, trumpets climbing in open fifths, timpani) for the title,
- * a Viennese waltz on harp and strings for the station, Ligeti's drifting
- * choir for the monolith and the star gate, his held string cluster for the
- * entr'acte, Khachaturian's lonely adagio for the centrifuge and HAL's last
- * song for a fault. The console (ticks, clunks, beeps) is the ship's foley;
+ * a Viennese waltz on harp and strings for the station, Khachaturian's lonely
+ * adagio for the centrifuge, Ligeti's drifting choir for the monolith, his
+ * string clusters for the entr'acte and the star gate, and HAL's last song
+ * for a fault. The console (ticks, clunks, beeps) is the ship's foley;
  * it stays electronic, tuned to C so it sits inside every key the music uses
  * (C, its relative A minor, the waltz's G).
  */
@@ -922,72 +922,40 @@ export function choir(S: SoundKit, signal?: AbortSignal): Bed | null {
 }
 
 /**
- * The entr'acte, after Atmosphères: every semitone from D3 to A3 held at
- * once, very soft, its colour drifting through a slow lowpass. No pulse and
- * no line. It holds for as long as the intermission card is on screen.
+ * Ligeti's clusters: a low string cluster and a thin high one that the scroll
+ * opens. With `rush` it is the star gate, rushing noise over them; without,
+ * it is the entr'acte, since the film plays Atmosphères after its
+ * intermission and again through the star gate. `swell` is the fade in.
  */
-export function entracte(S: SoundKit, signal?: AbortSignal): Bed | null {
-  return S.bed((ac, out) => {
-    const t = ac.currentTime;
-    const g = ac.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.028, t + 3.5);
-    const lp = ac.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.Q.value = 0.5;
-    lp.frequency.value = 560;
-    const drift = ac.createOscillator();
-    drift.frequency.value = 0.05;
-    const dg = ac.createGain();
-    dg.gain.value = 280;
-    drift.connect(dg);
-    dg.connect(lp.frequency);
-    const mix = ac.createGain();
-    mix.gain.value = 0.22;
-    mix.connect(lp);
-    lp.connect(g);
-    g.connect(out);
-    const w = ac.createGain();
-    w.gain.value = 0.55;
-    g.connect(w);
-    w.connect(S.reverb(3.2));
-    const nodes: AudioScheduledSourceNode[] = [drift];
-    for (let m = 50; m <= 57; m++) {
-      const o = ac.createOscillator();
-      o.type = 'sawtooth';
-      o.frequency.value = hz(m);
-      o.detune.value = (Math.random() - 0.5) * 14;
-      o.connect(mix);
-      nodes.push(o);
-    }
-    nodes.forEach((n) => n.start(t));
-    return {
-      stop(fade = 1.6) {
-        fadeOut(ac, g, fade);
-        nodes.forEach((n) => n.stop(ac.currentTime + fade + 0.1));
-      },
-    };
-  }, signal);
-}
-
-/** the star gate: rushing noise the scroll tunes, over a low string cluster and a thin high one */
-export function gateBed(S: SoundKit, signal?: AbortSignal): (Bed & { p(v: number): void }) | null {
+function clusters(
+  S: SoundKit,
+  rush: boolean,
+  swell: number,
+  signal?: AbortSignal,
+): (Bed & { p(v: number): void }) | null {
   let tune: ((v: number) => void) | null = null;
   const bed = S.bed((ac, out) => {
     const t = ac.currentTime;
-    const src = ac.createBufferSource();
-    src.buffer = noiseBuf(ac);
-    src.loop = true;
-    const bp = ac.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.Q.value = 2.4;
-    bp.frequency.value = 400;
-    const g = ac.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.045, t + 1);
-    src.connect(bp);
-    bp.connect(g);
-    g.connect(out);
+    const gains: GainNode[] = [];
+    const nodes: AudioScheduledSourceNode[] = [];
+    let bp: BiquadFilterNode | null = null;
+    if (rush) {
+      const src = ac.createBufferSource();
+      src.buffer = noiseBuf(ac);
+      src.loop = true;
+      bp = ac.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.Q.value = 2.4;
+      bp.frequency.value = 400;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.045, t + 1);
+      src.connect(bp);
+      bp.connect(g);
+      g.connect(out);
+      gains.push(g);
+      nodes.push(src);
+    }
     const lp = ac.createBiquadFilter();
     lp.type = 'lowpass';
     lp.frequency.value = 450;
@@ -996,7 +964,7 @@ export function gateBed(S: SoundKit, signal?: AbortSignal): (Bed & { p(v: number
     mix.gain.value = 0.7;
     const og = ac.createGain();
     og.gain.setValueAtTime(0.0001, t);
-    og.gain.exponentialRampToValueAtTime(0.03, t + 1.2);
+    og.gain.exponentialRampToValueAtTime(0.03, t + swell);
     mix.connect(lp);
     lp.connect(og);
     og.connect(out);
@@ -1006,45 +974,42 @@ export function gateBed(S: SoundKit, signal?: AbortSignal): (Bed & { p(v: number
     hiLvl.gain.value = 0.15;
     const hg = ac.createGain();
     hg.gain.setValueAtTime(0.0001, t);
-    hg.gain.exponentialRampToValueAtTime(0.012, t + 2);
+    hg.gain.exponentialRampToValueAtTime(0.012, t + swell * 1.6);
     hiMix.connect(hiLvl);
     hiLvl.connect(hg);
     hg.connect(out);
+    gains.push(og, hg);
     const w = ac.createGain();
     w.gain.value = 0.5;
     og.connect(w);
     hg.connect(w);
     w.connect(S.reverb(3.2));
-    const oscs = [
-      ...[45, 46, 47, 48, 49, 50].map((m, i) => {
-        const o = ac.createOscillator();
-        o.type = 'sawtooth';
-        o.frequency.value = hz(m) * (i % 2 ? 1.0025 : 0.998);
-        o.connect(mix);
-        return o;
-      }),
-      ...[88, 89, 90, 91].map((m, i) => {
-        const o = ac.createOscillator();
-        o.type = 'triangle';
-        o.frequency.value = hz(m) * (1 + i * 0.0013);
-        o.connect(hiMix);
-        return o;
-      }),
-    ];
-    src.start(t);
-    oscs.forEach((o) => o.start(t));
+    [45, 46, 47, 48, 49, 50].forEach((m, i) => {
+      const o = ac.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = hz(m) * (i % 2 ? 1.0025 : 0.998);
+      o.connect(mix);
+      nodes.push(o);
+    });
+    [88, 89, 90, 91].forEach((m, i) => {
+      const o = ac.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = hz(m) * (1 + i * 0.0013);
+      o.connect(hiMix);
+      nodes.push(o);
+    });
+    nodes.forEach((n) => n.start(t));
     tune = (v) => {
       const now = ac.currentTime;
-      bp.frequency.setTargetAtTime(300 + v * 3200, now, 0.1);
+      bp?.frequency.setTargetAtTime(300 + v * 3200, now, 0.1);
       lp.frequency.setTargetAtTime(450 + v * 2000, now, 0.2);
       hiLvl.gain.setTargetAtTime(0.15 + v * 0.85, now, 0.2);
     };
     return {
       stop(fade = 0.8) {
-        [g, og, hg].forEach((x) => fadeOut(ac, x, fade));
+        gains.forEach((x) => fadeOut(ac, x, fade));
         const end = ac.currentTime + fade + 0.1;
-        src.stop(end);
-        oscs.forEach((o) => o.stop(end));
+        nodes.forEach((n) => n.stop(end));
       },
     };
   }, signal);
@@ -1055,6 +1020,16 @@ export function gateBed(S: SoundKit, signal?: AbortSignal): (Bed & { p(v: number
       tune?.(v);
     },
   };
+}
+
+/** the star gate: rushing noise the scroll tunes, over the clusters */
+export const gateBed = (S: SoundKit, signal?: AbortSignal) => clusters(S, true, 1.2, signal);
+
+/** the entr'acte: the clusters alone, swelling in slowly and held dark */
+export function entracte(S: SoundKit, signal?: AbortSignal): Bed | null {
+  const bed = clusters(S, false, 3, signal);
+  bed?.p(0.12);
+  return bed;
 }
 
 /* ============================================================
@@ -1083,7 +1058,7 @@ const score: ReelScore = {
     { id: 'centrifuge', label: 'lonely string adagio', play: adagio },
     {
       id: 'intermission',
-      label: "the entr'acte: a held string cluster (bed)",
+      label: "the entr'acte: Ligeti's string clusters, no rush (bed)",
       play: (s) => entracte(s),
     },
     {
@@ -1094,7 +1069,7 @@ const score: ReelScore = {
     { id: 'monolith', label: 'Ligeti choir (bed)', play: (s) => choir(s) },
     {
       id: 'gate',
-      label: 'star gate rush over a string cluster (bed)',
+      label: "star gate rush over the entr'acte's clusters (bed)",
       play: (s) => {
         const g = gateBed(s);
         g?.p(0.4);
