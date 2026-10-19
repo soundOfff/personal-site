@@ -2,8 +2,10 @@ import type { ReelConfig } from '../types';
 import { tokens } from '../tokens';
 
 /**
- * Reel 02. A corridor of nine rooms, 2038 → 2046, each papered in a different
- * cheongsam textile. Seeded from the design canvas board MoodForLove.dc.html.
+ * Reel 02. Nine rooms off one corridor, each a scene with its own slug, from
+ * the landing with the two doors to the wall at Angkor Wat. Only one room has
+ * a number, 2046, and it is the one where they write the serial. Seeded from
+ * the design canvas board MoodForLove.dc.html.
  *
  * Every act is checked: ink ≥ 9:1, muted / muted2 / accentInk ≥ 4.5:1 on `bg`.
  * `surface` (→ --paper-3, the hover fill) is a raised tone of the room's own
@@ -40,8 +42,8 @@ const mood: ReelConfig = {
   ],
   acts: [
     {
-      code: '2038',
-      name: 'the corridor',
+      code: '1962',
+      name: 'the landing',
       native: '走廊',
       slug: 'jade wallpaper, oxblood wainscot',
       sections: ['readme'],
@@ -59,7 +61,7 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '2039',
+      code: '1963',
       name: 'the noodle stall',
       native: '麵檔',
       slug: 'jade lattice',
@@ -78,9 +80,9 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '2040',
-      name: 'the office',
-      native: '辦公室',
+      code: '1963',
+      name: 'the shipping office',
+      native: '船務公司',
       slug: 'oxblood flora',
       sections: ['work'],
       tokens: tokens({
@@ -97,7 +99,7 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '2041',
+      code: '1964',
       name: 'the newspaper',
       native: '報館',
       slug: 'ochre grid',
@@ -116,8 +118,8 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '2042',
-      name: 'the calendar',
+      code: '1964',
+      name: "the landlady's calendar",
       native: '月曆',
       slug: 'navy blossom',
       sections: ['log'],
@@ -135,10 +137,10 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '2043',
-      name: 'the serial',
-      native: '連載',
-      slug: 'ruled manuscript paper',
+      code: '2046',
+      name: 'room 2046',
+      native: '二〇四六',
+      slug: 'red-ruled 原稿紙, crimson curtains',
       sections: ['writing'],
       tokens: tokens({
         bg: '#E8DBBE',
@@ -154,9 +156,8 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '2044',
-      name: 'the rules we keep',
-      native: '規矩',
+      code: '1965',
+      name: "we won't be like them",
       slug: 'black pinstripe',
       sections: ['principles'],
       tokens: tokens({
@@ -173,10 +174,10 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '2045',
-      name: 'the cupboard',
-      native: '櫥櫃',
-      slug: 'teal chevron',
+      code: '1966',
+      name: 'the mahjong table',
+      native: '麻將',
+      slug: 'teal felt under one lamp',
       sections: ['stack'],
       tokens: tokens({
         bg: '#11363A',
@@ -192,28 +193,28 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '2046',
-      name: 'room 2046',
-      native: '二〇四六',
-      slug: 'crimson curtain folds',
+      code: '1966',
+      name: 'Angkor Wat',
+      native: '吳哥窟',
+      slug: 'sandstone courses',
       sections: ['now'],
       tokens: tokens({
-        bg: '#561210',
-        surface: '#671C17',
+        bg: '#33342A',
+        surface: '#3E3F33',
         ink: CREAM,
         ink2: CREAM_2,
-        muted: '#D6BC9F',
-        muted2: '#C7AB8E',
-        line: 'rgba(240,228,201,.18)',
+        muted: '#C4B898',
+        muted2: '#B3A88A',
+        line: LINE,
         accent: '#B0281F',
-        accentInk: '#F4CC8E',
+        accentInk: '#E6C285',
         onAccent: CREAM,
       }),
     },
   ],
-  // 'Mood Serif TC' is declared in reel.css for the handful of glyphs the title
-  // needs (花樣年華, 答); every other hanzi falls through to the system's own
-  // Song / Ming serif instead of pulling a 90 KB subset per character.
+  // 'Mood Serif TC' is declared in reel.css for the four glyphs of the title
+  // (花樣年華); every other hanzi falls through to the system's own Song / Ming
+  // serif instead of pulling a 90 KB subset per character.
   type: {
     display:
       "'Bodoni Moda Variable', 'Mood Serif TC', 'Songti TC', 'Noto Serif CJK TC', 'PMingLiU', Georgia, serif",
@@ -221,16 +222,18 @@ const mood: ReelConfig = {
     mono: "'Courier Prime', 'Courier New', ui-monospace, monospace",
     title: "'Mood Serif TC', 'Songti TC', 'Noto Serif CJK TC', serif",
   },
+  // Screenplay slugs: INT./EXT., the place, then the time of day after a
+  // hyphen, the way a shooting script sets them. NIGHT rooms get a lamp.
   sections: {
-    readme: { slug: 'room 2038 · Hong Kong, 1962' },
-    playground: { slug: 'the noodle stall · 麵檔' },
-    work: { slug: 'the office · 辦公室' },
-    oss: { slug: 'the newspaper · 報館' },
-    log: { slug: 'the calendar · 月曆' },
-    writing: { slug: 'the serial · 連載' },
-    principles: { slug: 'the rules we keep · 規矩' },
-    stack: { slug: 'the cupboard · 櫥櫃' },
-    now: { slug: 'room 2046 · 二〇四六' },
+    readme: { slug: 'INT. APARTMENT LANDING - NIGHT' },
+    playground: { slug: 'EXT. NOODLE STALL - NIGHT · 麵檔' },
+    work: { slug: 'INT. SHIPPING OFFICE - DAY' },
+    oss: { slug: 'INT. NEWSPAPER OFFICE - NIGHT · 報館' },
+    log: { slug: "INT. MRS. SUEN'S FLAT - DAY" },
+    writing: { slug: 'INT. HOTEL ROOM 2046 - NIGHT' },
+    principles: { slug: 'INT. TAXI - NIGHT' },
+    stack: { slug: "INT. MRS. SUEN'S FLAT - NIGHT · 麻將" },
+    now: { slug: 'EXT. ANGKOR WAT - DAY' },
   },
   stages: [
     'backdrop',
@@ -248,34 +251,39 @@ const mood: ReelConfig = {
     'credits',
     'title',
   ],
-  layout: { nav: 'doorplates', hero: 'diptych', flow: 'corridor', grid: 'narrow' },
+  layout: {
+    nav: 'brass doorplates; only 2046 has a number',
+    hero: 'two doors side by side, the words off-centre',
+    flow: 'corridor',
+    grid: 'narrow',
+  },
   scroll: [
-    'stairs crossing: pinned, scroll-scrubbed, step-printed with ghost trails',
+    'stairs crossing: pinned, scroll-scrubbed, slowing as they pass',
+    'a NIGHT room lights its lamp when you reach it',
     'sconce light pools parallax on the corridor walls',
     'wall clock hands on scroll(root)',
-    'rooms reveal in step-printed slow motion',
     'walls close in after the hero (clock appears)',
   ],
   motifs: [
-    'two lacquered doors as the CTAs',
-    'one cheongsam textile per room',
+    'two lacquered doors side by side as the CTAs',
+    'a different cheongsam each time she takes the stairs',
+    'one wallpaper per room, seen in the margins',
     'rain only inside the lamp cone',
-    'enamel street-sign metrics',
     'thermos steam agent state',
-    'red chop on every answer',
+    "Tomas's chop on every answer",
     'cigarette smoke on hover',
     'newspaper clippings',
     'tear-off calendar leaves',
-    'manuscript with a blinking caret',
-    'cupboard shelves',
+    'red-ruled manuscript paper in 2046',
+    'mahjong tiles',
     'crimson curtains in 2046',
-    'secret sealed in the wall',
+    'a secret covered with mud at Angkor Wat',
     'radio dial reel switcher',
-    'room-number doorplates',
   ],
   sound: {
     after: "Shigeru Umebayashi's waltz, and the boleros on the radio",
-    hover: 'a muted pizzicato on a D minor chord tone; a string harmonic on the doorplates',
+    hover:
+      'a muted pizzicato on a D minor chord tone; a string harmonic on the doorplates; a pen nib in 2046; a mahjong tile',
     click: 'pizzicato D',
     section: 'one beat of a pizzicato waltz per room, two and three hesitating',
     surface: 'paper, the chop, then the solo cello sighing down a step per component',
