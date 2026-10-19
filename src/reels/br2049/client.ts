@@ -80,9 +80,13 @@ function sprinkle(root: HTMLElement, motion: boolean): () => void {
     fill('data-br-dust', (el) => {
       el.style.cssText = `left:${pct(rnd())};top:${pct(0.1 + rnd() * 0.85)};animation-duration:${(10 + rnd() * 12).toFixed(1)}s;animation-delay:-${(rnd() * 20).toFixed(1)}s;--o:${(0.3 + rnd() * 0.6).toFixed(2)}`;
     });
+    // depth of field: the big flakes are near the lens, soft and quicker across the
+    // frame; the small ones are far back, a little soft and slow
     fill('data-br-snow', (el) => {
-      const size = (3 + rnd() * 5).toFixed(1);
-      el.style.cssText = `left:${pct(rnd())};width:${size}px;height:${size}px;animation-duration:${(9 + rnd() * 10).toFixed(1)}s;animation-delay:-${(rnd() * 19).toFixed(1)}s`;
+      const size = 3 + rnd() * 5;
+      const blur = size > 6.4 ? 1.6 : size < 3.8 ? 0.4 : 0;
+      const dur = 23 - size * 1.7 + rnd() * 4;
+      el.style.cssText = `left:${pct(rnd())};width:${size.toFixed(1)}px;height:${size.toFixed(1)}px;filter:blur(${blur}px);animation-duration:${dur.toFixed(1)}s;animation-delay:-${(rnd() * 19).toFixed(1)}s`;
     });
   }
 

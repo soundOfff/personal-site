@@ -266,6 +266,8 @@
   .br-bd-snow {
     background: linear-gradient(180deg, #d5dde0, #e6ecee 40%);
   }
+  /* against a bright overcast sky a flake shows as a soft grey edge round a
+     white core, not a lit ball */
   .br-snow i {
     position: absolute;
     top: -20px;
@@ -273,10 +275,12 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #fff;
-    box-shadow:
-      0 0 0 1px rgba(15, 26, 32, 0.14),
-      0 1px 3px rgba(15, 26, 32, 0.2);
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.95) 0 38%,
+      rgba(120, 136, 144, 0.42) 72%,
+      rgba(120, 136, 144, 0) 100%
+    );
     transition: opacity 0.5s ease;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
@@ -360,9 +364,7 @@
   }
   .reel[aria-pressed='true'] {
     border-color: var(--br-amber);
-    box-shadow:
-      0 0 0 1px var(--br-amber),
-      0 0 14px -2px rgba(242, 162, 94, 0.7);
+    box-shadow: 0 0 0 1px var(--br-amber);
   }
   .reel-label {
     margin: 0;
@@ -983,15 +985,11 @@
     transition:
       background-color 0.2s,
       color 0.2s,
-      box-shadow 0.25s,
       transform 0.12s;
   }
   #readme .btn-amber:hover {
-    background: #0e171c;
+    background: #2e1306;
     color: #ffe9d2;
-    box-shadow:
-      0 0 0 1px var(--br-mag),
-      0 0 26px -4px rgba(228, 77, 155, 0.8);
   }
   #readme .btn-amber:active {
     transform: scale(0.97);
@@ -1602,37 +1600,36 @@
   #log .logitem :is(.lbody, .top) {
     display: contents;
   }
+  /* the dates are cut into the surface, like the one under the wooden horse:
+     a lit lower lip and a shadowed upper edge */
   #log .logitem .date {
     grid-column: 1;
     grid-row: 1 / span 2;
     justify-self: start;
     margin-right: 12px;
-    padding: 8px 12px 7px;
-    font: 700 21px/1 var(--font-display);
-    letter-spacing: 0.14em;
+    padding: 0;
+    font: 800 26px/1 var(--font-display);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #2a1206;
-    background-color: #c4844f;
-    background-image: repeating-linear-gradient(
-      176deg,
-      rgba(90, 40, 12, 0.16) 0 2px,
-      rgba(90, 40, 12, 0) 2px 7px
-    );
-    text-shadow: 0 1px 0 rgba(255, 226, 190, 0.45);
-    box-shadow:
-      inset 0 0 0 1px rgba(42, 18, 6, 0.25),
-      inset 0 -3px 0 rgba(42, 18, 6, 0.12);
+    color: #5a2a0e;
+    background: none;
+    text-shadow:
+      0 1px 0 rgba(255, 226, 190, 0.55),
+      0 -1px 0 rgba(26, 11, 4, 0.35);
+    box-shadow: none;
     transition: transform 0.3s var(--br-ease);
   }
   #log .logitem:hover .date {
     transform: rotate(-2deg) translateY(-2px);
   }
+  /* not cut yet: only the scored guide line */
   #log .logitem.upcoming .date {
-    background: transparent;
-    border: 1px dashed var(--ink-2);
+    padding-bottom: 4px;
+    border: 0;
+    border-bottom: 1px dashed var(--ink-2);
+    font-weight: 500;
     color: var(--ink-2);
     text-shadow: none;
-    box-shadow: none;
   }
   #log .logitem .hash {
     grid-column: 2;
@@ -1695,13 +1692,10 @@
     letter-spacing: 0.01em;
     text-transform: uppercase;
     color: var(--ink);
-    transition:
-      color 0.2s,
-      text-shadow 0.2s;
+    transition: color 0.2s;
   }
   #writing .wrow:hover .t {
     color: var(--amber-deep);
-    text-shadow: 0 0 22px rgba(228, 77, 155, 0.6);
   }
   #writing .wrow .rt {
     font: 13px/1.4 var(--font-mono);
@@ -2255,15 +2249,15 @@
     &[data-br-wave='done'] .console-bar::before {
       animation-play-state: paused;
     }
+    /* a failing hologram stutters, holds a frame and drops out, the way the
+       casino showroom's do: once a beat after the reel opens, then on hover */
     #readme .lede em {
-      animation: br2049-holo 4.2s steps(1) infinite;
+      animation: br2049-holo 1.4s steps(1) 1.6s 1 both;
     }
+    #readme .lede em:hover,
     #work .idx tr:hover .proj b,
     #principles .tenet:hover h3 {
-      animation: br2049-glitch 0.38s steps(2) 2;
-    }
-    #principles .tenet:hover {
-      animation: br2049-flick 0.45s steps(3) 1;
+      animation: br2049-holo 0.9s steps(1) 1;
     }
     .a2-surface {
       position: relative;
@@ -2594,57 +2588,26 @@
 }
 @keyframes br2049-holo {
   0%,
-  86%,
-  92%,
-  96%,
   100% {
-    text-shadow: none;
-  }
-  88% {
-    text-shadow:
-      -3px 0 rgba(228, 77, 155, 0.85),
-      3px 0 rgba(79, 195, 217, 0.85);
-  }
-  90% {
-    text-shadow:
-      2px 1px rgba(228, 77, 155, 0.85),
-      -2px -1px rgba(79, 195, 217, 0.85);
-  }
-  94% {
-    text-shadow:
-      -1px 0 rgba(228, 77, 155, 0.85),
-      2px 0 rgba(79, 195, 217, 0.85);
-  }
-}
-@keyframes br2049-glitch {
-  0% {
-    text-shadow:
-      -3px 0 rgba(228, 77, 155, 0.8),
-      3px 0 rgba(79, 195, 217, 0.8);
-    transform: translateX(1px);
-  }
-  50% {
-    text-shadow:
-      2px 1px rgba(228, 77, 155, 0.8),
-      -2px -1px rgba(79, 195, 217, 0.8);
-    transform: translateX(-1px) skewX(-3deg);
-  }
-  100% {
-    text-shadow: none;
+    opacity: 1;
     transform: none;
   }
-}
-@keyframes br2049-flick {
-  0% {
+  8% {
+    opacity: 0.2;
+  }
+  10% {
     opacity: 1;
+    transform: translateX(-3px);
   }
-  33% {
-    opacity: 0.5;
+  /* held: the freeze */
+  22% {
+    transform: translateX(-3px);
   }
-  66% {
-    opacity: 0.95;
+  24% {
+    opacity: 0;
+    transform: none;
   }
-  100% {
+  28% {
     opacity: 1;
   }
 }
