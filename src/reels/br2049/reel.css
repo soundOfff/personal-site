@@ -1884,12 +1884,6 @@
     text-align: center;
     color: var(--ink);
   }
-  .br-end {
-    margin: 0 -0.6em 22px 0;
-    font: 200 30px/1 var(--font-display);
-    letter-spacing: 0.6em;
-    text-transform: uppercase;
-  }
   .br-credits dl {
     display: grid;
     gap: 10px;
@@ -1903,19 +1897,48 @@
     gap: 22px;
     align-items: baseline;
   }
+  /* the end credits are set in the title card's face, not the HUD's */
   .br-credits dt {
     text-align: right;
-    font: 12px/1.5 var(--font-mono);
-    letter-spacing: 0.18em;
+    font: 500 12px/1.6 var(--font-display);
+    letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--muted);
   }
   .br-credits dd {
     margin: 0;
     text-align: left;
-    font: 700 17px/1.3 var(--font-display);
-    letter-spacing: 0.12em;
+    font: 400 18px/1.3 var(--font-display);
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+  }
+  .br-note {
+    margin: 14px 0 0;
+    font: 13px/1.5 var(--font-sans);
+    color: var(--muted);
+  }
+  /* and the page closes on the film's name, as the card opened on it */
+  .br-end {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 64px 0 0;
+    font-family: var(--font-display);
+    font-weight: 200;
+    text-transform: uppercase;
+  }
+  .br-end-t {
+    font-size: clamp(24px, 3.4vw, 46px);
+    line-height: 1;
+    letter-spacing: 0.5em;
+    margin-right: -0.5em;
+  }
+  .br-end-n {
+    font-size: clamp(17px, 2vw, 28px);
+    line-height: 1;
+    letter-spacing: 0.9em;
+    margin-right: -0.9em;
   }
   .content .foot {
     margin: 0;
