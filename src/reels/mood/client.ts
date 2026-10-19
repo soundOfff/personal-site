@@ -10,11 +10,12 @@
  *   - the two doors creak ajar on hover and swing open on click;
  *   - the radio-dial switcher lands on a bolero while you rest on a station;
  *   - rain plays only while a lamp's cone of rain is on screen;
- *   - rooms step-print in as they are reached; the stairs crossing is
- *     scroll-scrubbed (CSS scroll timelines, or a rAF fallback here);
+ *   - a room's lamp comes on, with its beat, when you reach it;
+ *   - the stairs crossing is scroll-scrubbed (CSS scroll timelines, or a rAF
+ *     fallback here), and she wears a different cheongsam each time;
  *   - the noodle stall's thermos steams while the agent thinks;
- *   - room 2046's wall takes a secret and seals it on an unresolved bar.
- *     Nothing leaves the page.
+ *   - the wall at Angkor Wat takes a secret and stops it with mud on an
+ *     unresolved bar. Nothing leaves the page.
  *
  * Loaded on demand while the reel screens; everything is torn down on abort.
  */
@@ -49,6 +50,16 @@ import {
 
 /** A beat of the waltz (ms): section changes closer than this wait their turn. */
 const BEAT_MS = 460;
+
+/** Her cheongsams, one per walk down the stairs. */
+const DRESSES = 4;
+
+/**
+ * The crossing's pace: quick at either end, slow as they pass, the way the
+ * film slows the walk to the noodle stall. reel.css draws the same curve with
+ * linear() for the scroll timeline.
+ */
+const pace = (p: number) => p + (0.75 * Math.sin(2 * Math.PI * p)) / (2 * Math.PI);
 
 /* --------------------------------------------------------------- helpers */
 
@@ -122,6 +133,13 @@ const reel: ReelModule = {
       waltz(s, n);
     };
 
+    /* ---- a room's lamp comes on as you reach it, and stays on ---- */
+    const sections = [...document.querySelectorAll<HTMLElement>('section[data-sec]')];
+    const light = (i: number) => {
+      const sec = sections.find((el) => el.dataset.sec === String(i));
+      if (sec) sec.dataset.moodLit = '';
+    };
+
     const year = document.querySelector<HTMLElement>('[data-mood-year]');
     const setRoom = (n: number) => {
       const i = Math.min(8, Math.max(0, n));
@@ -129,32 +147,12 @@ const reel: ReelModule = {
       if (year) year.textContent = String(1962 + Math.round(i / 2));
     };
     setRoom(ctx.section());
+    light(ctx.section());
     ctx.onSection((i) => {
       setRoom(i);
+      light(i);
       nextBeat(i);
     });
-
-    /* ---- rooms step-print in as they are reached ---- */
-    const sections = [...document.querySelectorAll<HTMLElement>('section[data-sec]')];
-    if (!ctx.reducedMotion) {
-      const vh = window.innerHeight;
-      sections.forEach((sec) => {
-        if (sec.getBoundingClientRect().top > vh * 0.92) sec.dataset.moodWait = '';
-      });
-      const reveal = io(
-        (entries) => {
-          for (const e of entries) {
-            const el = e.target as HTMLElement;
-            if (!e.isIntersecting || !('moodWait' in el.dataset)) continue;
-            delete el.dataset.moodWait;
-            el.dataset.moodIn = '';
-            reveal.unobserve(el);
-          }
-        },
-        { threshold: 0.08 },
-      );
-      sections.forEach((sec) => reveal.observe(sec));
-    }
 
     /* ---- rain: animate and sound only while a cone is on screen ---- */
     const rains = [...document.querySelectorAll<HTMLElement>('[data-mood-rain]')];
@@ -208,10 +206,11 @@ const reel: ReelModule = {
       ).observe(hero);
     }
 
-    /* ---- the stairs: a bar of the waltz, and a scrub where CSS can't ---- */
+    /* ---- the stairs: a bar of the waltz, a new dress each walk, and a scrub where CSS can't ---- */
     const stairs = document.querySelector<HTMLElement>('[data-mood-stairs]');
     if (stairs) {
       let inBar = false;
+      let walks = 0;
       io(
         (entries) => {
           for (const e of entries) {
@@ -219,6 +218,8 @@ const reel: ReelModule = {
               inBar = true;
               waltzBar(bar++ % 4);
             }
+            // Out of sight, she changes: the next time you pass, it is another evening.
+            if (!e.isIntersecting && inBar) stairs.dataset.dress = String(++walks % DRESSES);
             if (!e.isIntersecting) inBar = false;
             // the clock belongs to the corridor, not the stairwell
             if (e.intersectionRatio > 0.2) root.dataset.moodStairs = '';
@@ -235,7 +236,7 @@ const reel: ReelModule = {
           const r = stairs.getBoundingClientRect();
           const span = r.height - window.innerHeight;
           const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
-          stairs.style.setProperty('--mood-p', String(Math.floor(p * 26) / 26));
+          stairs.style.setProperty('--mood-p', pace(p).toFixed(4));
         };
         const onScroll = () => {
           if (!ticking) {
@@ -472,10 +473,7 @@ const reel: ReelModule = {
       delete root.dataset.moodStairs;
       root.style.removeProperty('--mood-room');
       if (!root.getAttribute('style')) root.removeAttribute('style');
-      sections.forEach((sec) => {
-        delete sec.dataset.moodWait;
-        delete sec.dataset.moodIn;
-      });
+      sections.forEach((sec) => delete sec.dataset.moodLit);
       leaves.forEach((leaf) => {
         delete leaf.dataset.moodMonth;
         delete leaf.dataset.moodMon;
@@ -483,6 +481,7 @@ const reel: ReelModule = {
       document.querySelectorAll('[data-mood-door]').forEach((d) => d.classList.remove('is-ajar'));
       if (readme) delete readme.dataset.moodOpen;
       stairs?.style.removeProperty('--mood-p');
+      if (stairs) delete stairs.dataset.dress;
       rains.forEach((r) => delete r.dataset.on);
       hole?.classList.remove('is-sealed', 'is-whisper');
       if (sealed) sealed.textContent = '';

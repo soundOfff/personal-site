@@ -4,11 +4,11 @@
  * listed in config.stages; the engine hides it unless this reel is screening.
  *
  *   backdrop          film grain
- *   in:readme         the corridor: wallpaper, wainscot, a rain window, two doorways
- *   after:readme      the stairs crossing (pinned, step-printed, scroll-scrubbed)
- *   in:<room>         the corridor walls, sconces and the lintel's room plate
- *   in:now            + crimson curtains
- *   after:now         the wall you tell a secret to (client-side only)
+ *   in:readme         the landing: wallpaper, wainscot, a rain window, two doorways
+ *   after:readme      the stairs crossing (pinned, scroll-scrubbed)
+ *   in:<room>         the doorway's jambs, and a lamp on the wall if the scene is at night
+ *   in:writing        + the lintel's one room plate, 2046, and the crimson curtains
+ *   after:now         the wall at Angkor Wat you tell a secret to (client-side only)
  *   credits           end credits and the wall clock
  *   title             花樣年華 in the projector: a lamp, rain in its cone
  */
@@ -37,17 +37,19 @@ const drops = (count: number, minH: number, maxH: number) =>
     return `left:${l}%;height:${h}px;opacity:${o};animation-duration:${du}s;animation-delay:-${de}s;--y:${y}%`;
   });
 
-const rooms: Partial<Record<StagePoint, string>> = {
-  'in:playground': '2039',
-  'in:work': '2040',
-  'in:oss': '2041',
-  'in:log': '2042',
-  'in:writing': '2043',
-  'in:principles': '2044',
-  'in:stack': '2045',
-  'in:now': '2046',
+// Which walls carry a lit sconce, after the slug's time of day: none by day,
+// one at night, both in the hotel corridor outside 2046.
+const rooms: Partial<Record<StagePoint, ('l' | 'r')[]>> = {
+  'in:playground': ['r'],
+  'in:work': [],
+  'in:oss': ['l'],
+  'in:log': [],
+  'in:writing': ['l', 'r'],
+  'in:principles': ['r'],
+  'in:stack': ['l'],
+  'in:now': [],
 };
-const room = rooms[at];
+const lamps = rooms[at];
 const heroRain = at === 'in:readme' ? drops(26, 12, 26) : [];
 const stairRain = at === 'after:readme' ? drops(34, 16, 34) : [];
 const titleRain = at === 'title' ? drops(40, 18, 40) : [];
@@ -108,12 +110,6 @@ const credits: [string, string][] = [
       <div class="pin">
         <div class="shot" data-mood-rain="stairs">
           <i class="sky" />
-          <span class="swall">
-            <i class="po a" />
-            <i class="po b" />
-            <i class="po c" />
-            <i class="po d" />
-          </span>
           <span class="steps">
             {Array.from({ length: 12 }, () => (
               <i />
@@ -125,11 +121,7 @@ const credits: [string, string][] = [
               <i class="mood-drop" style={s} />
             ))}
           </span>
-          <span class="fig her g2">
-            <b />
-            <i />
-          </span>
-          <span class="fig her g1">
+          <span class="fig him">
             <b />
             <i />
           </span>
@@ -138,58 +130,35 @@ const credits: [string, string][] = [
             <i />
             <span class="th" />
           </span>
-          <span class="fig him g2">
-            <b />
-            <i />
-          </span>
-          <span class="fig him g1">
-            <b />
-            <i />
-          </span>
-          <span class="fig him">
-            <b />
-            <i />
-          </span>
           <i class="sglow" />
-          <span class="ratio">1.66 : 1</span>
+          {/* last, so it is in front: the camera shoots past this wall */}
+          <span class="swall">
+            <i class="po a">吉屋招租</i>
+            <i class="po b">粥粉麵飯</i>
+            <i class="po c">跌打</i>
+            <i class="po d" />
+          </span>
         </div>
-        <p class="cap">
-          <span>1962 · the stairs to the noodle stall</span>
-          <span class="go">step-printed · keep scrolling</span>
-        </p>
+        <p class="cap">Hong Kong, 1962</p>
       </div>
     </div>
   )
 }
 
 {
-  room && (
+  lamps && (
     <span class="mood-room" aria-hidden="true">
-      <span class="wall is-l">
-        <i class="pool" />
-        <i class="sconce" />
-      </span>
-      <span class="wall is-r">
-        <i class="pool" />
-        <i class="sconce" />
-      </span>
-      <span class="lintel">
-        <svg class="knot" viewBox="0 0 60 20">
-          <path d="M2 10 C 10 0, 20 0, 25 10 C 20 20, 10 20, 2 10 Z" />
-          <path d="M58 10 C 50 0, 40 0, 35 10 C 40 20, 50 20, 58 10 Z" />
-          <path d="M25 10 H35" />
-          <circle cx="30" cy="10" r="2.6" />
-        </svg>
-        <b class="plate">{room}</b>
-        <svg class="knot" viewBox="0 0 60 20">
-          <path d="M2 10 C 10 0, 20 0, 25 10 C 20 20, 10 20, 2 10 Z" />
-          <path d="M58 10 C 50 0, 40 0, 35 10 C 40 20, 50 20, 58 10 Z" />
-          <path d="M25 10 H35" />
-          <circle cx="30" cy="10" r="2.6" />
-        </svg>
-      </span>
-      {at === 'in:now' && (
+      {lamps.map((side) => (
+        <span class={`wall is-${side}`}>
+          <i class="pool" />
+          <i class="sconce" />
+        </span>
+      ))}
+      {at === 'in:writing' && (
         <>
+          <span class="lintel">
+            <b class="plate">2046</b>
+          </span>
           <i class="curtain is-l" />
           <i class="curtain is-r" />
         </>
@@ -201,16 +170,7 @@ const credits: [string, string][] = [
 {
   at === 'after:now' && (
     <div class="mood-annex mood-secret">
-      <span class="mood-room" aria-hidden="true">
-        <span class="wall is-l">
-          <i class="pool" />
-          <i class="sconce" />
-        </span>
-        <span class="wall is-r">
-          <i class="pool" />
-          <i class="sconce" />
-        </span>
-      </span>
+      <span class="mood-room" aria-hidden="true" />
       <div class="mood-secret-panel">
         <div class="mood-wallhole" aria-hidden="true" data-mood-hole>
           <i class="hole" />
