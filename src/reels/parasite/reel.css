@@ -949,30 +949,6 @@ html:root[data-reel='parasite'] {
   .a2-quota.is-spent {
     color: var(--peach);
   }
-  /* every question is a take */
-  .a2-thread {
-    counter-reset: px-take -1;
-  }
-  .a2-turn {
-    counter-increment: px-take;
-  }
-  .a2-ask {
-    align-items: center;
-  }
-  .a2-ask::before {
-    content: 'Take ' counter(px-take, decimal-leading-zero);
-    content: 'Take ' counter(px-take, decimal-leading-zero) / '';
-    flex: none;
-    padding: 2px 7px;
-    background: var(--bar);
-    color: var(--plaster);
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-stretch: 125%;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
   .a2-sk-line,
   .a2-sk-block,
   .a2-bar-track,
@@ -1340,6 +1316,10 @@ html:root[data-reel='parasite'] {
   .toolbox {
     gap: 24px;
   }
+  /* keeps the left grid on phones, where the shared sheet centres the shelves */
+  .toolcol {
+    text-align: left;
+  }
   .toolcol .h {
     margin-bottom: 10px;
     font-size: 10.5px;
@@ -1687,7 +1667,9 @@ html:root[data-reel='parasite'] {
     color: #0e0f0c;
   }
 
-  /* ---------- film grain, six frames a second ---------- */
+  /* ---------- grain, six frames a second ----------
+     None in the Park house, which is all clean glass: the dirt comes with the
+     descent, from the semi-basement down. */
   .px-grain {
     position: fixed;
     left: -50%;
@@ -1696,10 +1678,18 @@ html:root[data-reel='parasite'] {
     width: 200%;
     height: 200%;
     pointer-events: none;
-    opacity: 0.08;
+    opacity: 0;
+    transition: opacity 1.2s;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.6 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
     background-size: 192px 192px;
+  }
+  &[data-act='2'] .px-grain {
+    opacity: 0.06;
+  }
+  &[data-act='3'] .px-grain,
+  &[data-sec='9'] .px-grain {
+    opacity: 0.09;
   }
 
   /* ---------- the title card ---------- */
@@ -1750,7 +1740,10 @@ html:root[data-reel='parasite'] {
   /* ---------- motion: only for those who want it ---------- */
   @media (prefers-reduced-motion: no-preference) {
     .px-grain {
-      animation: parasite-grain 1s steps(6) infinite;
+      animation: parasite-grain 1s steps(6) infinite paused;
+    }
+    &:is([data-act='2'], [data-act='3'], [data-sec='9']) .px-grain {
+      animation-play-state: running;
     }
     &[data-px-lit~='tube'] .block[data-sec='6']::before {
       animation: parasite-tube 0.9s linear both;
@@ -1946,8 +1939,13 @@ html:root[data-reel='parasite'] {
     .metrics .m .v {
       font-size: 22px;
     }
-    .toolcol ul {
-      justify-content: center;
+    /* the longer wifi lines take their own row instead of squeezing the label */
+    .console-bar .who {
+      flex-wrap: wrap;
+      row-gap: 2px;
+    }
+    .console-bar .who::after {
+      white-space: nowrap;
     }
     .px-morse {
       grid-template-columns: minmax(0, 1fr);
