@@ -165,3 +165,29 @@ export interface ReelModule {
   /** The film's own sting for its title card. */
   titleSound?(ctx: ReelContext): void;
 }
+
+/**
+ * A reel's score: every sound it makes, voiced after the film's soundtrack
+ * (its instruments, harmony and gestures, never its melodies). It lives in
+ * src/reels/<id>/score.ts; client.ts fires the cues, and an audition sheet
+ * can play each one on its own.
+ */
+export interface ScoreCue {
+  /** stable id: hover, click, section, surface, done, error, title, then the reel's own */
+  id: string;
+  /** what it is, in a few words (e.g. 'harpsichord quill') */
+  label: string;
+  /**
+   * Play it on the shared kit. `n` is the section index for 'section' and the
+   * component count for 'surface'. A bed returns its handle so it can be stopped.
+   */
+  play(s: import('./sound').SoundKit, n?: number): import('./sound').Bed | null | void;
+}
+
+export interface ReelScore {
+  /** whose music the voices are after, e.g. 'after Jung Jae-il' */
+  after: string;
+  /** one line: what the sounds borrow from the soundtrack */
+  idea: string;
+  cues: ScoreCue[];
+}
