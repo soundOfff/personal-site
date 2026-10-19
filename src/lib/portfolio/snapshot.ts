@@ -50,7 +50,8 @@ export interface RepoItem {
   name: string;
   description: string;
   language: string;
-  href: string;
+  href?: string;
+  private: boolean;
 }
 
 export interface LogItem {
@@ -150,11 +151,12 @@ export async function buildSnapshot(): Promise<PortfolioSnapshot> {
     proofs: proofs.map(({ value, key }) => ({ value, label: key })),
     work,
     posts,
-    repos: repos.map(({ org, name, description, language, href }) => ({
-      name: `${org}${name}`,
+    repos: repos.map(({ name, description, language, href, private: isPrivate }) => ({
+      name,
       description,
       language,
-      href,
+      ...(!isPrivate ? { href } : {}),
+      private: isPrivate === true,
     })),
     log: log.map((item) => ({
       date: item.date,

@@ -91,6 +91,45 @@ const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60)
           <i class="g" />
           <i class="h" />
         </div>
+        <svg class="br-ruin-scene" viewBox="0 0 900 900" preserveAspectRatio="xMaxYMax meet">
+          <defs>
+            <linearGradient
+              id="br-stone"
+              x1="120"
+              y1="80"
+              x2="690"
+              y2="900"
+              gradientUnits="userSpaceOnUse"
+            >
+              <>
+                <stop stop-color="#7d381f" />
+                <stop offset="1" stop-color="#b95f2d" stop-opacity="0.15" />
+              </>
+            </linearGradient>
+          </defs>
+          <path
+            d="M460 900V355l-20-10 10-31 18-8 8-144 24-17 21 12 11 146 29 13 6 32-22 10 13 542Z"
+            fill="url(#br-stone)"
+          />
+          <path
+            d="M530 900 611 481 674 378 735 353 798 377 862 472 900 900Zm132-49 37-299 34-58 35 62 35 295Z"
+            fill="url(#br-stone)"
+            fill-rule="evenodd"
+          />
+          <path
+            d="M630 490 679 416 735 389 789 414 842 489M644 516l45-72 45-21 45 21 46 72M656 543l40-70 38-18 37 18 40 70"
+            stroke="#e0a16b"
+            stroke-opacity="0.16"
+            stroke-width="3"
+            fill="none"
+          />
+          <path
+            d="M492 197v129m20-112 5 103m103 250-49 307m250-305 48 305"
+            stroke="#e7a976"
+            stroke-opacity="0.12"
+            stroke-width="3"
+          />
+        </svg>
         <div class="br-dust" data-br-dust="34" />
         <div class="br-fog" />
       </div>

@@ -257,8 +257,8 @@ const reel: ReelModule = {
     const readme = document.getElementById('readme');
     const doors = readme
       ? ([
-          ['l', readme.querySelector<HTMLAnchorElement>('.startrow > a:first-child')],
-          ['r', readme.querySelector<HTMLAnchorElement>('.startrow > a:last-child')],
+          ['l', readme.querySelector<HTMLAnchorElement>('[data-mood-door="l"]')],
+          ['r', readme.querySelector<HTMLAnchorElement>('[data-mood-door="r"]')],
         ] as const)
       : [];
     for (const [side, link] of doors) {
@@ -275,7 +275,7 @@ const reel: ReelModule = {
         hovering = Math.max(0, hovering - 1);
         if (hovering === 0) way.classList.remove('is-ajar');
       };
-      for (const el of [link, way]) {
+      for (const el of new Set([link, way])) {
         el.addEventListener('pointerenter', enter, on);
         el.addEventListener('pointerleave', leave, on);
       }
@@ -283,7 +283,12 @@ const reel: ReelModule = {
       link.addEventListener('blur', leave, on);
       link.addEventListener(
         'click',
-        () => {
+        (event) => {
+          if (side === 'l') {
+            if (root.hasAttribute('data-playground-ready')) event.preventDefault();
+            else root.setAttribute('data-playground-want', '');
+            document.dispatchEvent(new Event('playground:open'));
+          }
           readme.dataset.moodOpen = side;
           creak(s, true);
           later(() => {
@@ -292,8 +297,6 @@ const reel: ReelModule = {
         },
         on,
       );
-      // The light behind a door that has swung ajar is still the door.
-      way.addEventListener('click', () => link.click(), on);
     }
 
     /* ---- the calendar leaves: the month, in the film's hand ---- */

@@ -326,6 +326,9 @@ const reel: ReelModule = {
       }
     });
 
+    /* ---- the bunker: a hanging bulb responds to a nearby pointer ---- */
+    const stopLamp = swayLamp(ctx);
+
     /* ---- the bunker: the light switch keys Morse ---- */
     const stopMorse = morse(ctx, later, cancel);
 
@@ -333,6 +336,7 @@ const reel: ReelModule = {
       timers.forEach((id) => window.clearTimeout(id));
       timers.clear();
       stopMorse();
+      stopLamp();
       rainOff();
       offSound();
       rainEl?.classList.remove('is-raining');
@@ -351,6 +355,59 @@ const reel: ReelModule = {
     overture(ctx.sound);
   },
 };
+
+/** A gently damped pendulum; it rests when the pointer and the page leave. */
+function swayLamp(ctx: ReelContext): () => void {
+  const bulb = document.querySelector<HTMLElement>('.px-bulb');
+  const room = document.getElementById('now');
+  if (!bulb || !room || ctx.reducedMotion) return () => {};
+
+  let angle = 0;
+  let velocity = 0;
+  let target = 0;
+  let frame = 0;
+  let previous = 0;
+  const animate = (time: number) => {
+    const dt = previous ? Math.min((time - previous) / 16.67, 2) : 1;
+    previous = time;
+    velocity += ((target - angle) * 0.012 - velocity * 0.24) * dt;
+    angle += velocity * dt;
+    bulb.style.setProperty('--px-sway', `${angle.toFixed(3)}deg`);
+    if (Math.abs(target - angle) > 0.003 || Math.abs(velocity) > 0.003) {
+      frame = requestAnimationFrame(animate);
+    } else {
+      frame = 0;
+      previous = 0;
+      if (!target) bulb.style.removeProperty('--px-sway');
+    }
+  };
+  const aim = (value: number) => {
+    target = value;
+    if (!frame) frame = requestAnimationFrame(animate);
+  };
+  const rest = () => aim(0);
+  window.addEventListener(
+    'pointermove',
+    (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const bounds = room.getBoundingClientRect();
+      if (bounds.bottom < 0 || bounds.top > innerHeight) return;
+      const dx = bounds.left + bulb.offsetLeft + bulb.offsetWidth / 2 - e.clientX;
+      const dy = bounds.top + bulb.offsetTop + 120 - e.clientY;
+      const proximity = Math.max(0, 1 - Math.hypot(dx, dy) / 260);
+      aim(Math.max(-1, Math.min(1, dx / 95)) * proximity * -14);
+    },
+    { passive: true, signal: ctx.signal },
+  );
+  document.addEventListener('pointerleave', rest, { signal: ctx.signal });
+  window.addEventListener('blur', rest, { signal: ctx.signal });
+  window.addEventListener('scroll', rest, { passive: true, signal: ctx.signal });
+
+  return () => {
+    cancelAnimationFrame(frame);
+    bulb.style.removeProperty('--px-sway');
+  };
+}
 
 /**
  * The Morse key: tap (< 200 ms) for a dot, hold for a dash. A letter commits

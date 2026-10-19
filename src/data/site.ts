@@ -12,7 +12,7 @@ export const profile = {
   role: 'Full-stack · AI systems',
   // hero lede: the phrase wrapped in <em></em> renders italic + amber
   lede: "Most LLM calls don't need the biggest model. They need a router that knows which one will <em>clear the bar</em>.",
-  sub: "I'm a full-stack engineer, five-plus years in, and I ship AI products end to end: the web and mobile apps and the backend that keeps them running. At Dex I designed the multi-LLM layer behind the CRM's AI features, with fallback across providers, and shipped CRM features to web and mobile in Vue 3 and React Native. At Mint Mobile I built and maintained e-commerce APIs for 2–3M subscribers. The agent below can answer questions about any of it.",
+  sub: 'I build AI products end to end, from web and mobile to the systems behind them. At Dex, I shipped multi-LLM routing and CRM features. At Mint Mobile, I built e-commerce APIs serving 2–3M subscribers.',
 } as const;
 
 export const contact = [
@@ -33,7 +33,7 @@ export const nav = [
   { id: 'readme', label: 'readme' },
   { id: 'playground', label: 'playground' },
   { id: 'work', label: 'work index' },
-  { id: 'oss', label: 'open source' },
+  { id: 'oss', label: 'projects' },
   { id: 'log', label: 'log' },
   { id: 'writing', label: 'blog' },
   { id: 'principles', label: 'principles' },
@@ -97,10 +97,25 @@ export const log: {
   upcoming?: boolean;
 }[] = [
   {
-    date: 'soon',
-    tag: 'launch',
-    msg: 'focus-quote, a Chrome extension for focus sessions: set a goal, save quotes from the web, and have a model sort your tabs into on-goal and distractions',
-    upcoming: true,
+    date: '15 oct 2026',
+    tag: 'build',
+    msg: 'Build Sift: a YouTube companion that saves concept notes, source frames and diagrams to a local notebook. The Chrome extension MVP is implemented',
+  },
+  {
+    date: '11 oct 2026',
+    tag: 'build',
+    msg: 'Keep developing Second Brain, an agent-maintained wiki with a reading queue, feed triage and linked, cited pages',
+    link: { label: 'source', href: 'https://github.com/soundOfff/second-brain' },
+  },
+  {
+    date: '21 sep 2026',
+    tag: 'build',
+    msg: 'Build On-Call: monitoring events become incidents with timelines, escalation policies and responder rotations',
+  },
+  {
+    date: '01 sep 2026',
+    tag: 'build',
+    msg: 'Develop Curation Archive, a visual archive scored by a personal taste model with image deduplication and source provenance',
   },
   {
     hash: '0ade814',

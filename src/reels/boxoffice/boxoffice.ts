@@ -5,7 +5,7 @@
  * already on screen from the head bootstrap's html[data-first-visit]. This
  * upgrades it to a modal and runs the screening:
  *
- *   tear a ticket → lights down → leader 3 → 2 (the 2-pop) → black
+ *   tear a ticket → lights down → leader 3 → 2 (the 2-pop) → 1 → 0 → black
  *   → hand over to the engine's projector (title card, then it opens).
  *
  * Esc / the close button: on a first visit it means House lights (and is
@@ -13,12 +13,28 @@
  * Esc skips straight to the projector.
  */
 
-import { REELS, currentReel, hasChosen, onReelChange, sound, switchReel } from '../engine';
+import {
+  REELS,
+  currentReel,
+  hasChosen,
+  onReelChange,
+  restartAtTop,
+  sound,
+  switchReel,
+} from '../engine';
 
 type Phase = 'pick' | 'tear' | 'dim' | 'count' | 'black';
 
-/** ms from the tear. The board's timing: stub falls, lights down, 3, 2, black. */
-const CUE = { dim: 560, three: 1300, two: 2300, flashOff: 2345, black: 3300, handover: 3480 };
+/** Milliseconds from the tear. Each number holds for a complete second. */
+const CUE = {
+  dim: 560,
+  three: 1700,
+  two: 2700,
+  one: 3700,
+  zero: 4700,
+  black: 5700,
+  handover: 5920,
+};
 const LEAVE_MS = 460;
 const HOUSE = REELS[0].id;
 
@@ -221,6 +237,7 @@ function wire(dlg: HTMLDialogElement): void {
   function chooseHouse(): void {
     if (state !== 'open' || phase() !== 'pick' || dlg.dataset.leaving !== undefined) return;
     sound.click();
+    restartAtTop();
     if (!hasChosen() || currentReel().id !== HOUSE) void switchReel(HOUSE, { instant: true });
     finish(true);
   }
@@ -231,6 +248,7 @@ function wire(dlg: HTMLDialogElement): void {
 
     // Already screening this one: just back to your seat.
     if (hasChosen() && currentReel().id === id) {
+      restartAtTop();
       sound.click();
       finish(true);
       return;
@@ -261,10 +279,16 @@ function wire(dlg: HTMLDialogElement): void {
     });
     later(CUE.two, () => {
       if (num) num.textContent = '2';
-      dlg.dataset.flash = '';
       sfx.twoPop();
     });
-    later(CUE.flashOff, () => delete dlg.dataset.flash);
+    later(CUE.one, () => {
+      if (num) num.textContent = '1';
+      sfx.leaderTick();
+    });
+    later(CUE.zero, () => {
+      if (num) num.textContent = '0';
+      sfx.leaderTick();
+    });
     later(CUE.black, () => setPhase('black'));
     later(CUE.handover, () => handover(id));
   }

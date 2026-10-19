@@ -2873,3 +2873,144 @@
     transform: scaleX(0);
   }
 }
+
+/* A full-bleed opening and a landscape for the match cut, rather than an empty gradient. */
+:root[data-reel='odyssey'] {
+  background: #050608;
+  body {
+    background: #050608;
+  }
+  [data-sec='0'] {
+    min-height: max(850px, 100svh);
+    padding-top: clamp(48px, 7vh, 90px);
+  }
+  [data-sec='0'] .lede {
+    position: relative;
+    z-index: 1;
+    max-width: 23ch;
+    font-size: clamp(44px, 4.2vw, 66px);
+    line-height: 1.08;
+    letter-spacing: -0.028em;
+  }
+  [data-sec='0'] .sub {
+    position: relative;
+    z-index: 1;
+    max-width: 60ch;
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: #b7bbb8;
+  }
+  .od-earth {
+    width: 1000px;
+    height: 1000px;
+    margin-left: -500px;
+    bottom: -740px;
+    background: radial-gradient(
+      ellipse 58% 14% at 50% 1%,
+      #6a9fc8 0,
+      #2d5d92 14%,
+      #102e57 47%,
+      #040c18 100%
+    );
+    box-shadow:
+      0 -7px 55px rgb(88 148 218 / 0.38),
+      inset 0 3px 2px #a5d2ee;
+  }
+  .od-moon {
+    bottom: -1395px;
+    box-shadow: inset 0 2px 1px rgb(200 207 204 / 0.5);
+  }
+  .od-sun {
+    bottom: 287px;
+    width: 30px;
+    height: 30px;
+    margin-left: -15px;
+  }
+  .od-align > .od-flare {
+    bottom: 301px;
+  }
+  .od-sunglow {
+    bottom: 80px;
+  }
+  [data-sec='0'] .metrics {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    padding-top: 235px;
+    gap: 0;
+  }
+  [data-sec='0'] .metrics .m {
+    border-radius: 0;
+    border-width: 1px 0 1px 1px;
+    background: rgb(7 10 14 / 0.88);
+    box-shadow: none;
+    padding: 16px 18px;
+  }
+  [data-sec='0'] .metrics .m:last-child {
+    border-right-width: 1px;
+  }
+  .od-mc {
+    height: 145svh;
+  }
+  .od-mc-dawn {
+    background: linear-gradient(180deg, #101728, #433346 36%, #ad633f 67%, #d4a166 85%, #704b36);
+  }
+  .od-mc-dawn::after {
+    display: none;
+  }
+  .od-mc-dawn::before {
+    top: 62%;
+    width: 64px;
+    height: 64px;
+    filter: blur(1px);
+  }
+  .od-landscape {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .od-mc-dust {
+    opacity: 0.14;
+  }
+  .od-tool {
+    width: 235px;
+    height: 47px;
+    transform: translate(-50%, -50%) translateY(calc((0.5 - var(--p)) * 280px))
+      rotate(calc(var(--p) * 360deg - 35deg));
+    filter: drop-shadow(3px 4px 5px rgb(0 0 0 / 0.24));
+  }
+  .od-tool path {
+    fill: #d2c6aa;
+    stroke: #a39478;
+    stroke-width: 0.8;
+  }
+  @media (max-width: 1100px) {
+    [data-sec='0'] .lede {
+      font-size: 44px;
+    }
+  }
+  @media (max-width: 820px) {
+    [data-sec='0'] {
+      min-height: 940px;
+    }
+    [data-sec='0'] .lede {
+      font-size: clamp(34px, 7vw, 48px);
+    }
+    [data-sec='0'] .metrics {
+      padding-top: 190px;
+    }
+    .od-earth {
+      width: 760px;
+      height: 760px;
+      margin-left: -380px;
+      bottom: -500px;
+    }
+    .od-mc {
+      height: 120svh;
+    }
+    .od-mc-stage {
+      height: 80svh;
+    }
+  }
+}

@@ -114,7 +114,7 @@ html[data-boxoffice] {
     rgba(232, 163, 61, 0) 70%
   );
   pointer-events: none;
-  transition: opacity 0.5s ease;
+  transition: opacity 1.2s ease;
 }
 /* lights down: the moment a ticket tears, the ceiling glow goes and the
    marquee stops chasing and dims, before the screen fades to black */
@@ -274,19 +274,17 @@ html[data-boxoffice] {
   }
 }
 
-/* ---- the marquee: chasing bulbs round a letter board ---- */
+/* A painted cinema sign: continuous lettering, warm filaments, no card chrome. */
 .bo-marquee {
   position: relative;
   z-index: 1;
-  transition: box-shadow 0.5s ease;
-  width: min(900px, 100%);
-  margin: 16px auto 0;
-  padding: 22px;
-  border-radius: 10px;
-  background: var(--bo-panel);
-  box-shadow:
-    inset 0 0 0 1px rgba(239, 232, 218, 0.06),
-    0 30px 80px -30px rgba(232, 163, 61, 0.4);
+  width: min(790px, 100%);
+  margin: 24px auto 0;
+  padding: 20px;
+  background: oklch(23% 0.016 75);
+  box-shadow: 0 22px 65px -30px oklch(65% 0.09 75 / 0.3);
+  transform: rotate(-0.35deg);
+  transition: box-shadow 1.2s ease;
 }
 .bo-bulbs {
   position: absolute;
@@ -319,65 +317,39 @@ html[data-boxoffice] {
 .bo-bulbs .bl {
   position: relative;
   display: block;
-  width: 9px;
-  height: 9px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #4a3c26;
+  background: oklch(48% 0.055 78);
 }
-/* the lit filament: opacity only, so the chase stays on the compositor */
 .bo-bulbs .bl::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: #ffd47e;
-  box-shadow: 0 0 8px 2px rgba(255, 196, 96, 0.7);
-  opacity: 0;
-}
-.bo-bulbs .bl.k0::after {
-  opacity: 1;
+  background: oklch(88% 0.1 80);
+  box-shadow: 0 0 10px 2px oklch(80% 0.12 75 / 0.4);
+  opacity: 0.65;
 }
 .bo-board {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 12px 18px;
-  border-radius: 3px;
-  background-color: #f3eee2;
-  background-image: repeating-linear-gradient(
-    180deg,
-    rgba(22, 19, 15, 0) 0 calc(var(--bo-row) - 3px),
-    rgba(22, 19, 15, 0.13) calc(var(--bo-row) - 3px) calc(var(--bo-row) - 1px),
-    rgba(22, 19, 15, 0) calc(var(--bo-row) - 1px) calc(var(--bo-row) + 4px)
-  );
-  background-position: 0 12px;
-  --bo-row: 46px;
-  --bo-tw: 29px;
-  --bo-fs: 33px;
-}
-.bo-row {
-  display: flex;
-  align-items: center;
-  height: var(--bo-row);
-}
-.bo-tile {
-  display: inline-block;
-  width: var(--bo-tw);
+  gap: 12px;
+  padding: clamp(18px, 3vh, 32px) 16px;
+  background: oklch(91% 0.02 85);
+  color: oklch(21% 0.01 75);
   text-align: center;
-  transform: rotate(var(--r)) translateY(var(--y));
+  text-transform: uppercase;
 }
-.bo-tile.sp {
-  width: calc(var(--bo-tw) * 0.5);
+.bo-billing {
+  font: 500 12px/1.3 var(--bo-stub);
+  letter-spacing: 0.24em;
 }
-.bo-tl {
-  display: inline-block;
-  font-family: var(--bo-wide);
-  font-weight: 800;
-  font-size: var(--bo-fs);
-  font-stretch: 75%;
-  line-height: 1;
-  color: #16130f;
+.bo-feature {
+  font: 750 clamp(29px, 3.6vw, 49px)/1.05 var(--bo-wide);
+  font-stretch: 85%;
+  letter-spacing: 0.08em;
 }
 
 /* ---- the lead ---- */
@@ -888,13 +860,13 @@ html[data-boxoffice] {
   opacity: 0;
   visibility: hidden;
   transition:
-    opacity 0.7s ease,
-    visibility 0s linear 0.7s;
+    opacity 1.1s ease,
+    visibility 0s linear 1.1s;
 }
 .boxoffice:is([data-phase='dim'], [data-phase='count'], [data-phase='black']) .bo-screen {
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.7s ease;
+  transition: opacity 1.1s ease;
 }
 .bo-leader {
   position: relative;
@@ -997,17 +969,13 @@ html[data-boxoffice] {
     animation: boxoffice-grain 1s steps(6) infinite;
   }
   .bo-bulbs .bl::after {
-    animation: boxoffice-chase 1.05s steps(1) infinite;
+    animation: boxoffice-chase 6s ease-in-out infinite;
   }
   .bo-bulbs .bl.k1::after {
-    animation-delay: -0.35s;
+    animation-delay: -2s;
   }
   .bo-bulbs .bl.k2::after {
-    animation-delay: -0.7s;
-  }
-  .bo-tl {
-    animation: boxoffice-hang 0.55s var(--bo-ease) both;
-    animation-delay: var(--d);
+    animation-delay: -4s;
   }
   .bo-tkw {
     animation: boxoffice-deal 0.6s var(--bo-ease) both;
@@ -1050,18 +1018,12 @@ html[data-boxoffice] {
   }
 }
 @keyframes boxoffice-chase {
-  0% {
-    opacity: 1;
-  }
-  33.33%,
+  0%,
   100% {
-    opacity: 0;
+    opacity: 0.45;
   }
-}
-@keyframes boxoffice-hang {
-  from {
-    opacity: 0;
-    transform: translateY(-16px) rotate(-8deg);
+  50% {
+    opacity: 1;
   }
 }
 @keyframes boxoffice-deal {
@@ -1094,11 +1056,6 @@ html[data-boxoffice] {
 
 /* ---- smaller screens ---- */
 @media (max-height: 860px) and (min-width: 861px) {
-  .bo-board {
-    --bo-row: 38px;
-    --bo-tw: 24px;
-    --bo-fs: 27px;
-  }
   .bo-marquee {
     margin-top: 10px;
     padding: 20px;
@@ -1133,10 +1090,7 @@ html[data-boxoffice] {
     padding-bottom: 16px;
   }
   .bo-board {
-    --bo-row: 31px;
-    --bo-tw: 21px;
-    --bo-fs: 23px;
-    padding-block: 8px;
+    padding-block: 16px;
   }
   .bo-marquee {
     padding: 18px;
@@ -1225,11 +1179,14 @@ html[data-boxoffice] {
     bottom: 18px;
   }
   .bo-board {
-    padding: 8px 6px;
-    background-image: none;
-    --bo-row: 26px;
-    --bo-tw: min(14.5px, calc((100vw - 90px) / 19));
-    --bo-fs: 19px;
+    padding: 24px 10px;
+    gap: 10px;
+  }
+  .bo-billing {
+    font-size: 10px;
+  }
+  .bo-feature {
+    font-size: clamp(24px, 6.6vw, 38px);
   }
   .bo-lead {
     margin-top: 18px;

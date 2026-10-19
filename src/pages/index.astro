@@ -1,10 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
-import { Link } from 'editorial-ui';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Rail from '../components/Rail.astro';
 import Footer from '../components/Footer.astro';
-import Icon from '../components/Icon.astro';
 import Keybar from '../components/Keybar.astro';
 import A2UIPlayground from '../islands/A2UIPlayground';
 import { profile, proofs, tenets, toolbox, log, now } from '../data/site';
@@ -49,12 +47,6 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
         <Keybar sec="readme" label="readme" />
         <p class="lede" set:html={profile.lede} />
         <p class="sub">{profile.sub}</p>
-        <div class="startrow">
-          <a class="btn btn-amber btn-md" href="#playground" data-playground-open>
-            <Icon name="i-play" size={15} />Ask the agent
-          </a>
-          <Link variant="arrow" href="#work">See the work index</Link>
-        </div>
         <div class="metrics">
           {
             proofs.map((m) => (
@@ -102,27 +94,33 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
       </section>
       <Stages at="after:work" />
 
-      {/* 03 · open source */}
+      {/* 03 · recent projects */}
       <section class="block" id="oss" data-sec="3">
         <Stages at="in:oss" />
-        <Keybar sec="oss" label="open source" />
+        <Keybar sec="oss" label="recent projects" />
         <div class="repos">
           {
-            repos.map((r) => (
-              <a class="repo" href={r.href} target="_blank" rel="noopener noreferrer">
-                <span class="nm">
-                  <span class="org">{r.org}</span>
-                  {r.name}
-                </span>
-                <span class="meta">
-                  <span class="lang">
-                    <span class="sw" style={`background:${r.color}`} />
-                    {r.language}
+            repos.map((r) => {
+              const Tag = r.private ? 'article' : 'a';
+              return (
+                <Tag
+                  class="repo"
+                  href={r.private ? undefined : r.href}
+                  target={r.private ? undefined : '_blank'}
+                  rel={r.private ? undefined : 'noopener noreferrer'}
+                >
+                  <span class="nm">{r.name}</span>
+                  <span class="meta">
+                    {r.private && <span class="repo-visibility">Private</span>}
+                    <span class="lang">
+                      <span class="sw" style={`background:${r.color}`} />
+                      {r.language}
+                    </span>
                   </span>
-                </span>
-                <span class="desc">{r.description}</span>
-              </a>
-            ))
+                  <span class="desc">{r.description}</span>
+                </Tag>
+              );
+            })
           }
         </div>
       </section>
@@ -269,22 +267,6 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
     import { bootBoxOffice } from '../reels/boxoffice/boxoffice';
     boot();
     bootBoxOffice();
-  </script>
-
-  {
-    /* progressive enhancement: the hero button opens the playground panel in one
-      click. Before the island hydrates it scrolls there and leaves a flag the
-      island picks up; without JS it is a plain anchor. */
-  }
-  <script is:inline>
-    document.querySelectorAll('[data-playground-open]').forEach((a) => {
-      a.addEventListener('click', (e) => {
-        const root = document.documentElement;
-        if (root.hasAttribute('data-playground-ready')) e.preventDefault();
-        else root.setAttribute('data-playground-want', '');
-        document.dispatchEvent(new Event('playground:open'));
-      });
-    });
   </script>
 
   {/* progressive enhancement: make work-index rows clickable */}

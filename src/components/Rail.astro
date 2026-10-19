@@ -12,13 +12,9 @@ const { active } = Astro.props;
 ---
 
 <aside class="rail">
-  <div class="id">
-    <span class="tile">{profile.monogram}</span>
-    <div>
-      <div class="nm">{profile.name}</div>
-      <div class="rl">{profile.role}</div>
-    </div>
-  </div>
+  <a class="id" href="/#readme" aria-label="Tomas Brasca, home">
+    <span class="nm">{profile.name}</span>
+  </a>
 
   <Switcher />
 

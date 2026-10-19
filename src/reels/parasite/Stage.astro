@@ -65,11 +65,39 @@ const drops = Array.from({ length: 56 }, () => {
         <span class="px-shafts" />
         <span class="px-hedge" />
         <span class="px-lawn" />
-        <span class="px-tree">
-          <i />
-          <i />
-          <i />
-        </span>
+        <svg class="px-tree" viewBox="0 0 240 300" fill="none">
+          <defs>
+            <linearGradient
+              id="px-canopy"
+              x1="44"
+              y1="35"
+              x2="190"
+              y2="244"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stop-color="#65765a" />
+              <stop offset="0.48" stop-color="#3d543b" />
+              <stop offset="1" stop-color="#263e2c" />
+            </linearGradient>
+          </defs>
+          <ellipse cx="126" cy="282" rx="86" ry="10" fill="#233a27" opacity="0.18" />
+          <path d="M120 280 124 169 132 130 138 132 132 193 135 280Z" fill="#514c3d" />
+          <path d="m128 224-35-42 3-4 34 29 29-45 4 3-29 61Z" fill="#514c3d" />
+          <path
+            d="M36 157c-12-18-9-39 6-53-7-18 4-37 21-42 1-24 24-37 44-31 16-19 45-16 57 2 23-4 44 13 42 34 22 11 28 37 14 55 13 23 0 48-22 54-8 27-38 38-60 24-20 16-51 12-64-9-24 4-44-11-38-34Z"
+            fill="url(#px-canopy)"
+          />
+          <path
+            d="M47 110c-2-15 9-28 24-31 0-23 24-36 43-27 17-17 40-14 52 0 21-3 40 13 36 32-18-10-31-8-47-2-16-12-34-10-48 1-24-6-42 7-60 27Z"
+            fill="#879174"
+            opacity="0.22"
+          />
+          <path
+            d="M38 153c17 13 34 9 46 0 17 16 43 14 57 3 22 12 47 5 62-9 2 26-23 48-49 45-21 20-54 14-68-4-26 7-47-9-48-35Z"
+            fill="#243e2c"
+            opacity="0.45"
+          />
+        </svg>
         <span class="px-dusk" />
         <span class="px-glare" />
         <span class="px-mull">

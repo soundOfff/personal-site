@@ -7,15 +7,14 @@
  * Prettier's reach in `.prettierignore`, because a leading whitespace node
  * prints as a gap after a reel's `.keybar::before`.
  */
-import Slugs from '../reels/Slugs.astro';
 import type { SectionId } from '../reels/types';
 
 interface Props {
   sec: SectionId;
   label: string;
 }
-const { sec, label } = Astro.props;
+const { label } = Astro.props;
 const described = Astro.slots.has('default');
 ---
 
-<p class="keybar"><span class="kb-sl" aria-hidden="true">//</span> <b>{label}</b>{described && <span class="kb-d"><slot /></span>}<Slugs sec={sec} /></p>
+<p class="keybar"><span class="kb-sl" aria-hidden="true">//</span> <b>{label}</b>{described && <span class="kb-d"><slot /></span>}</p>

@@ -93,7 +93,12 @@ html:root:not([data-reel='house']) section[data-sec] {
   display: none;
 }
 .sr-only {
-  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
   width: 1px;
   height: 1px;
   overflow: hidden;

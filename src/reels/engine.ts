@@ -215,6 +215,13 @@ export interface SwitchOptions {
   instant?: boolean;
 }
 
+/** Start a screening at its opening frame, without retaining a previous section hash. */
+export function restartAtTop(): void {
+  history.replaceState(history.state, '', `${location.pathname}${location.search}#readme`);
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  setSection(0);
+}
+
 /**
  * Screen the page through `id`. Resolves when the projector has opened on
  * the new reel. Calls made mid-switch are ignored.
@@ -222,15 +229,20 @@ export interface SwitchOptions {
 export async function switchReel(id: string, opts: SwitchOptions = {}): Promise<void> {
   const next = reelById(id);
   if (!next || switching) return;
-  if (next.id === currentReel().id && mounted?.id === next.id) return;
+  if (next.id === currentReel().id && mounted?.id === next.id) {
+    restartAtTop();
+    return;
+  }
 
   const projector = document.querySelector<HTMLElement>('[data-projector]');
   // Module, stylesheet and title face load while the projector runs; all land before the reel applies.
   const preload = prepare(next.id);
 
   if (opts.instant || reducedMotion.matches || !projector) {
+    const mod = await preload;
     apply(next);
-    await mount(next, await preload);
+    restartAtTop();
+    await mount(next, mod);
     announce(next.announce);
     return;
   }
@@ -260,6 +272,7 @@ export async function switchReel(id: string, opts: SwitchOptions = {}): Promise<
     projector.dataset.state = 'card';
     const mod = await preload;
     apply(next);
+    restartAtTop();
     const ctx = await mount(next, mod);
     if (mod?.titleSound && ctx) mod.titleSound(ctx);
     else sound.chime();

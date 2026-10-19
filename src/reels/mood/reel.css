@@ -3390,3 +3390,118 @@
     filter: blur(2px);
   }
 }
+
+/* Shorter room index and doors that remain usable without the removed hero links. */
+:root[data-reel='mood'] {
+  .railnav {
+    flex: 0 1 auto;
+    gap: 4px;
+  }
+  .railnav a {
+    min-width: 42px;
+    height: 36px;
+    padding-inline: 9px;
+  }
+  .railnav a:is([href='#playground'], [href='#log'], [href='#principles'], [href='#stack']) {
+    display: none;
+  }
+  #readme .mood-doorway {
+    perspective: 1400px;
+    outline-offset: 12px;
+  }
+  .mood-door-leaf {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(90deg, rgb(6 17 13 / 0.45), transparent 30%, rgb(6 17 13 / 0.2)),
+      repeating-linear-gradient(0deg, transparent 0 23%, rgb(5 15 12 / 0.25) 23% 24%), #234a3c;
+    box-shadow:
+      inset 0 0 0 2px #142e26,
+      inset 0 0 0 12px rgb(13 26 19 / 0.2);
+    transform-origin: left center;
+    transition: transform 1.2s var(--mood-slow);
+  }
+  .is-r .mood-door-leaf {
+    background-color: #66271d;
+    transform-origin: right center;
+  }
+  .mood-door-leaf b {
+    position: absolute;
+    top: 17%;
+    left: 50%;
+    translate: -50% 0;
+    padding: 7px 14px;
+    border: 1px solid #7e582d;
+    background: linear-gradient(115deg, #a4773b, #dec38a 40%, #a77c43);
+    color: #302110;
+    font: italic 500 16px/1.2 var(--font-display);
+    box-shadow: 0 2px 5px rgb(0 0 0 / 0.35);
+  }
+  .mood-door-leaf .handle {
+    right: 12%;
+    top: 48%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #c5a367;
+    box-shadow: 0 2px 4px #140e08;
+  }
+  .is-r .mood-door-leaf .handle {
+    right: auto;
+    left: 12%;
+  }
+  .mood-doorway.is-l:is(:hover, :focus-visible, .is-ajar) .mood-door-leaf {
+    transform: rotateY(-24deg);
+  }
+  .mood-doorway.is-r:is(:hover, :focus-visible, .is-ajar) .mood-door-leaf {
+    transform: rotateY(24deg);
+  }
+  #readme[data-mood-open='l'] .is-l .mood-door-leaf {
+    transform: rotateY(-76deg);
+  }
+  #readme[data-mood-open='r'] .is-r .mood-door-leaf {
+    transform: rotateY(76deg);
+  }
+  .mood-stairs {
+    --mood-dress: #843426;
+  }
+  .mood-stairs[data-dress='1'] {
+    --mood-dress: #33564a;
+  }
+  .mood-stairs[data-dress='2'] {
+    --mood-dress: #9b8251;
+  }
+  .mood-stairs[data-dress='3'] {
+    --mood-dress: #545f68;
+  }
+  .mood-stairs .mood-person {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(3px 4px 4px rgb(0 0 0 / 0.35));
+  }
+  .mood-stairs .swall {
+    background-size:
+      100% 100%,
+      5px 7px,
+      9px 11px;
+    filter: blur(2px);
+  }
+  .mood-stairs .steps i {
+    background: linear-gradient(180deg, #706c5b 0 1px, #443f35 1px 30%, #252923 32%);
+  }
+  .mood-stairs .sglow {
+    background:
+      radial-gradient(ellipse 38% 90% at 76% 0%, rgb(235 185 106 / 0.13), transparent 80%),
+      radial-gradient(ellipse 95% 90% at 62% 45%, transparent 38%, rgb(0 0 0 / 0.64));
+  }
+  .block {
+    scroll-margin-top: calc(var(--mood-strip) + 16px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-reel='mood'] .mood-door-leaf {
+    transition: none;
+  }
+}

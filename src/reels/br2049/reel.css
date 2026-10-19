@@ -1508,12 +1508,9 @@
     column-gap: 32px;
     padding: 28px 0 30px;
     border-bottom: 1px solid var(--rule);
-    transition:
-      padding-left 0.45s var(--br-ease),
-      background-color 0.3s;
+    transition: background-color 0.3s;
   }
   #work .idx tr:hover {
-    padding-left: 16px;
     background: rgba(255, 236, 214, 0.14);
   }
   #work .idx td {
@@ -2025,9 +2022,7 @@
       grid-template-columns: minmax(0, 1fr) auto;
       padding: 24px 0;
     }
-    #work .idx tr:hover {
-      padding-left: 8px;
-    }
+
     #work .idx .n {
       grid-column: 1 / -1;
       grid-row: 1;
@@ -2353,7 +2348,6 @@
         br2049-holo-on 1s steps(1) 1.6s both,
         br2049-holo 0.9s steps(1) 1;
     }
-    #work .idx tr:hover .proj b,
     #principles .tenet:hover h3 {
       animation: br2049-holo 0.9s steps(1) 1;
     }
@@ -2781,5 +2775,116 @@
 @keyframes br2049-line {
   to {
     width: min(520px, 64vw);
+  }
+}
+
+/* The desert has scale and depth; the night-city proof reads as one panorama. */
+:root[data-reel='br2049'] {
+  .br-haze.h1 {
+    background: linear-gradient(180deg, #d99563, #e69b59 24%, #d47b3e 66%, #b55b2c);
+  }
+  .br-haze.h2 {
+    background:
+      radial-gradient(ellipse 65% 80% at 15% 30%, rgb(255 210 151 / 0.28), transparent 65%),
+      radial-gradient(ellipse 28% 40% at 77% 20%, rgb(250 200 135 / 0.65), transparent 72%);
+  }
+  .br-hero::before {
+    content: '';
+    position: absolute;
+    top: 13%;
+    right: 14%;
+    width: clamp(110px, 16vw, 260px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgb(249 204 143 / 0.66) 0 47%,
+      rgb(248 190 119 / 0.2) 50%,
+      transparent 70%
+    );
+    filter: blur(2px);
+  }
+  .br-mono {
+    opacity: 0.35;
+  }
+  .br-ruin-scene {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 65%;
+    height: 94%;
+    opacity: 0.8;
+  }
+  .br-fog {
+    opacity: 0.7;
+  }
+  .br-flight {
+    height: 100svh;
+  }
+  #readme .metrics {
+    position: relative;
+    top: auto;
+    grid-column: main;
+    grid-row: flight-start;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-self: end;
+    align-items: start;
+    align-content: normal;
+    height: auto;
+    min-height: 0;
+    gap: 22px;
+    margin: 0 0 24svh;
+    padding: 32px 0;
+    border-block: 1px solid rgb(131 185 196 / 0.2);
+  }
+  #readme .metrics .m:nth-child(n) {
+    --v: clamp(42px, 5vw, 76px);
+    position: relative;
+    inset: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 0;
+    background: none;
+    color: #e5c1a0;
+    animation: none;
+    text-shadow: 0 0 24px rgb(239 156 94 / 0.2);
+  }
+  #readme .metrics .m:nth-child(even) {
+    color: #80c3cd;
+    text-shadow: 0 0 24px rgb(68 182 204 / 0.25);
+  }
+  #readme .metrics .m:nth-child(4) {
+    color: #d599a9;
+  }
+  #readme .metrics .m .k {
+    max-width: 19ch;
+    color: #b4bfc0;
+    font: 400 10px/1.5 var(--font-mono);
+    letter-spacing: 0.07em;
+  }
+  #work .idx tr:is(:hover, :focus-within) .proj b {
+    animation: none;
+  }
+  #work .idx tr:is(:hover, :focus-within) td {
+    background: transparent;
+  }
+  #work .idx tr {
+    cursor: pointer;
+  }
+  @media (max-width: 820px) {
+    #readme .metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+      margin-bottom: 18svh;
+    }
+    #readme .metrics .m:nth-child(n) {
+      --v: 52px;
+    }
+    .br-ruin-scene {
+      width: 92%;
+      opacity: 0.6;
+    }
   }
 }

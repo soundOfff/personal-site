@@ -464,7 +464,7 @@ html:root[data-reel='parasite'] {
     position: relative;
     overflow: hidden;
     aspect-ratio: 2.39 / 1;
-    border-block: 12px solid var(--frame);
+    border-block: 9px solid var(--frame);
     background: #dce4da;
     view-timeline: --px-window block;
     container-type: inline-size;
@@ -478,14 +478,14 @@ html:root[data-reel='parasite'] {
     align-self: start;
     position: relative;
     z-index: 2;
-    max-width: 43%;
+    max-width: 46%;
     /* % of the window's width: the bottom margin keeps the garden (sized in
        cqi below) clear of the text, so a long lede grows the window instead */
     margin: calc(12px + 3.9%) 0 calc(14.5% + 28px) 4.6%;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: clamp(30px, 3.05vw, 46px);
-    line-height: 1.07;
+    font-size: clamp(30px, 2.9vw, 46px);
+    line-height: 1.11;
     letter-spacing: -0.028em;
     color: var(--ink);
   }
@@ -523,69 +523,59 @@ html:root[data-reel='parasite'] {
 
   .px-sky {
     inset: 0;
-    background: linear-gradient(180deg, #e7ece4 0%, #dce4da 60%, #d2dcce 100%);
+    background: linear-gradient(180deg, oklch(92% 0.014 100), oklch(86% 0.025 125) 75%);
   }
   .px-shafts {
     inset: 0;
-    background: repeating-linear-gradient(
-      112deg,
-      rgb(255 255 255 / 0) 0 120px,
-      rgb(255 255 255 / 0.22) 120px 190px,
-      rgb(255 255 255 / 0) 190px 330px
+    opacity: 0.4;
+    background: linear-gradient(
+      113deg,
+      transparent 28%,
+      oklch(98% 0.01 95 / 0.3) 29% 41%,
+      transparent 42% 77%,
+      oklch(98% 0.01 95 / 0.2) 78% 83%,
+      transparent 84%
     );
   }
   .px-hedge {
     left: 0;
     right: 0;
-    bottom: 11cqi;
-    height: 2.8cqi;
-    background: #3e5b32;
-    box-shadow: 0 -5px 0 #48673b;
+    bottom: 8.5cqi;
+    height: 3cqi;
+    background:
+      radial-gradient(ellipse at 20% 120%, oklch(40% 0.035 135) 55%, transparent 56%) 0 0 / 120px
+        100%,
+      linear-gradient(oklch(47% 0.04 135), oklch(36% 0.04 140));
+    clip-path: polygon(
+      0 14%,
+      7% 8%,
+      16% 15%,
+      28% 4%,
+      41% 12%,
+      55% 5%,
+      69% 11%,
+      83% 0,
+      94% 9%,
+      100% 4%,
+      100% 100%,
+      0 100%
+    );
   }
   .px-lawn {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 11cqi;
-    background-color: #7e9f55;
-    background-image: repeating-linear-gradient(
-      96deg,
-      rgb(255 255 255 / 0.09) 0 70px,
-      rgb(255 255 255 / 0) 70px 140px
-    );
+    height: 8.5cqi;
+    background:
+      radial-gradient(ellipse at 74% 0%, oklch(35% 0.04 140 / 0.24), transparent 45%),
+      linear-gradient(180deg, oklch(64% 0.075 126), oklch(70% 0.07 120));
   }
   .px-tree {
-    left: 58%;
-    bottom: 10cqi;
-    width: 17%;
-    height: 22cqi;
-  }
-  .px-tree i {
-    position: absolute;
-    display: block;
-    border-radius: 50%;
-    background: #2f4a27;
-  }
-  .px-tree i:nth-child(1) {
-    left: 0;
-    top: 22%;
-    width: 64%;
-    height: 60%;
-  }
-  .px-tree i:nth-child(2) {
-    left: 28%;
-    top: 0;
-    width: 72%;
-    height: 70%;
-    background: #38562d;
-  }
-  .px-tree i:nth-child(3) {
-    left: 47%;
-    top: 62%;
-    width: 6%;
-    height: 40%;
-    border-radius: 0;
-    background: #3a3026;
+    left: 62%;
+    bottom: 6cqi;
+    width: 20%;
+    height: 25cqi;
+    overflow: visible;
   }
   /* dusk: a veil that comes down over the garden as the window scrolls away */
   .px-dusk {
@@ -624,29 +614,29 @@ html:root[data-reel='parasite'] {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 9px;
+    width: 6px;
     background: var(--frame);
   }
   .px-mull i:nth-child(1) {
-    left: 50%;
+    left: 56%;
   }
   .px-mull i:nth-child(2) {
-    left: 66%;
+    left: 84%;
   }
   .px-mull i:nth-child(3) {
-    left: 83%;
+    display: none;
   }
   .px-mull .px-transom {
     display: none;
   }
   .px-kr {
     right: 3.2%;
-    top: 10%;
+    top: 9%;
     z-index: 2;
     writing-mode: vertical-rl;
     font-family: var(--font-title);
     font-weight: 800;
-    font-size: clamp(38px, 4.2vw, 60px);
+    font-size: clamp(32px, 3.6vw, 50px);
     line-height: 1;
     letter-spacing: 0.12em;
     color: #151b17;
@@ -1399,6 +1389,8 @@ html:root[data-reel='parasite'] {
     width: 40px;
     height: 170px;
     pointer-events: none;
+    transform-origin: 50% 0;
+    transform: rotate(var(--px-sway, 0deg));
   }
   .px-bulb > * {
     position: absolute;
