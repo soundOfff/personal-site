@@ -3,8 +3,8 @@
  * Reel 05 · 2001: A Space Odyssey: reel-only markup. Rendered once per point listed in
  * config.stages; the engine hides it unless this reel is screening.
  *
- *   backdrop          film grain, the act strip on the left, the star fields
- *   rail              the console's two screens: mission clock, distance to Jupiter
+ *   backdrop          the act strip on the left, the star fields
+ *   rail              the console's screen: Rosario's time, the way from Earth to Jupiter
  *   title             the title card: Sun, Earth and Moon in alignment over "2001"
  *   in:readme         the sky the hero sits in, and a replay of the alignment
  *   after:readme      the match cut (bone → station)
@@ -83,26 +83,19 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
 
 {
   at === 'rail' && (
-    <>
-      <div class="od-scr od-met" aria-hidden="true">
-        <span class="od-lbl">Mission elapsed</span>
-        <span class="od-big">
-          T+ <span data-od-met>00:00:00</span>
-        </span>
-        <span class="od-small">
-          Rosario <span data-od-clock>--:--:--</span>
-        </span>
-      </div>
-      <div class="od-scr od-dist" aria-hidden="true">
-        <span class="od-lbl">Distance to Jupiter</span>
-        <span class="od-big">
-          <span data-od-dist>628,000,000</span> km
-        </span>
+    <div class="od-scr" aria-hidden="true">
+      <span class="od-lbl">Rosario</span>
+      <span class="od-big" data-od-clock>
+        --:--
+      </span>
+      <span class="od-plot">
+        <span class="od-lbl">Earth</span>
         <span class="od-gauge">
           <i />
         </span>
-      </div>
-    </>
+        <span class="od-lbl">Jupiter</span>
+      </span>
+    </div>
   )
 }
 
@@ -204,11 +197,6 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
           <i />
           <i />
           <i />
-        </span>
-        <span class="od-hal-cap">
-          Portfolio agent
-          <br />
-          live channel
         </span>
       </div>
     </>

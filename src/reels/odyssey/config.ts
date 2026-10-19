@@ -179,14 +179,7 @@ const odyssey: ReelConfig = {
     'credits',
   ],
   layout: { nav: 'console', hero: 'alignment', flow: 'odyssey', grid: 'axial' },
-  scroll: [
-    'alignment parallax',
-    'match cut',
-    'centrifuge ring',
-    'intermission countdown',
-    'star gate',
-    'distance to Jupiter',
-  ],
+  scroll: ['alignment parallax', 'match cut', 'centrifuge drum', 'star gate', 'Earth to Jupiter'],
   motifs: [
     'red lens agent',
     'act intertitles',
@@ -196,7 +189,8 @@ const odyssey: ReelConfig = {
     'star gate',
     'luminous floor',
     'monolith 1:4:9',
-    'mission clock',
+    'Rosario clock',
+    'quota lamps',
   ],
   sound: {
     hover: 'console tick, tuned to C',

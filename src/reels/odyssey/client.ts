@@ -3,11 +3,12 @@
  * Loaded on demand when the reel starts screening; everything registered
  * against ctx.signal is torn down when it stops.
  *
- *   - the ship console: mission clock, Rosario time, distance to Jupiter
- *   - the red lens: tracks the cursor, and answers the playground's cues
+ *   - the ship console: Rosario's time, and the page as the way from Earth to Jupiter
+ *   - the red lens: tracks the cursor, and answers the playground's cues; its
+ *     five lamps are the visitor's five questions a day
  *   - the hero: Sun, Earth and Moon parallax, a replay of the alignment
  *   - the match cut (bone → station) and the star gate, scrubbed by scroll
- *   - the intermission countdown, the logic memory hum, the monolith
+ *   - the logic memory hum, the monolith
  *   - sound (score.ts): the console's ticks, clunks and beeps as foley; harp
  *     under the transmission beeps and a waltz cadence when done; HAL winding
  *     down on a fault; the sunrise for the title, the replay and the credits;
@@ -45,23 +46,19 @@ import {
   type Hum,
 } from './score';
 
-const JUPITER_KM = 628_000_000;
-const INTERMISSION_S = 15 * 60;
-
 type AgentState = 'idle' | 'listen' | 'think' | 'speak' | 'done' | 'error';
 const AGENT_LABEL: Record<AgentState, string> = {
   idle: 'Standing by',
-  listen: 'Listening',
-  think: 'Thinking',
+  listen: 'Go ahead',
+  think: 'Computing',
   speak: 'Transmitting',
-  done: 'Complete',
-  error: 'AE-35 fault',
+  done: 'Received',
+  error: 'AE-35 unit fault',
 };
+/** the lamps beside the lens, one per question a visitor gets each day */
+const LAMPS = 5;
 
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
-const pad = (n: number) => String(n).padStart(2, '0');
-const hms = (s: number) =>
-  `${pad(Math.floor(s / 3600))}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`;
 
 /* ============================================================
    mount
@@ -85,35 +82,25 @@ function mount(ctx: ReelContext): () => void {
     timers.add(id);
   };
 
-  /* ---------- the mission clock ---------- */
-  const metEl = $('[data-od-met]');
+  /* ---------- the console clock: the time where Tomas is ---------- */
   const clockEl = $('[data-od-clock]');
-  const intEl = $('[data-od-int]');
-  const t0 = Date.now();
   let rosario: Intl.DateTimeFormat | null = null;
   try {
     rosario = new Intl.DateTimeFormat('en-GB', {
       timeZone: 'America/Argentina/Cordoba',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
       hour12: false,
     });
   } catch {
     rosario = null;
   }
-  let intOn = false;
-  let intLeft = INTERMISSION_S;
-  const second = () => {
-    if (metEl) metEl.textContent = hms(Math.floor((Date.now() - t0) / 1000));
-    if (clockEl && rosario) clockEl.textContent = rosario.format(new Date());
-    if (intOn && intLeft > 0 && intEl) {
-      intLeft -= 1;
-      intEl.textContent = hms(intLeft);
-    }
+  const tickClock = () => {
+    const now = rosario?.format(new Date());
+    if (clockEl && now && clockEl.textContent !== now) clockEl.textContent = now;
   };
-  second();
-  const clockId = window.setInterval(second, 1000);
+  tickClock();
+  const clockId = window.setInterval(tickClock, 1000);
 
   /* ---------- the agent: lens state and the playground's cues ---------- */
   const stateEl = $('[data-od-state]');
@@ -134,6 +121,14 @@ function mount(ctx: ReelContext): () => void {
     thinking = null;
   };
   setAgent('idle');
+  /* The lamps follow the quota the playground prints once the server has
+     counted ("4 of 5 left today"). Until then all five stay lit. */
+  const readQuota = () => {
+    const text = $('.a2-launch-count, .a2-quota')?.textContent ?? '';
+    const m = /(\d+)\s*(?:of|\/)\s*(\d+)/.exec(text);
+    if (m) root.dataset.odLeft = String(Math.min(LAMPS, Number(m[1])));
+  };
+  readQuota();
   ctx.onCue((cue) => {
     switch (cue.name) {
       case 'open':
@@ -164,6 +159,8 @@ function mount(ctx: ReelContext): () => void {
         cadence(S, n * 0.15 + 0.12);
         later(() => setAgent('done'), n * 150 + 500);
         settleLater(n * 150 + 3200);
+        // the island renders the new count just after it cues
+        later(readQuota, 60);
         break;
       }
       case 'error':
@@ -171,6 +168,7 @@ function mount(ctx: ReelContext): () => void {
         fault(S);
         setAgent('error');
         settleLater(2600);
+        later(readQuota, 60);
         break;
     }
   });
@@ -216,32 +214,14 @@ function mount(ctx: ReelContext): () => void {
   });
 
   /* ---------- hover: console ticks and the per-object voices ---------- */
-  const metricsScrambling = new WeakSet<Element>();
-  const scramble = (m: Element) => {
-    const val = m.querySelector<HTMLElement>('.v');
-    if (!val || metricsScrambling.has(val)) return;
-    if (reducedMotion) {
-      dataTick(S);
-      return;
-    }
-    metricsScrambling.add(val);
-    const real = val.textContent ?? '';
-    const chars = '0123456789ABCDEF·';
-    let n = 0;
-    const step = () => {
-      n += 1;
-      if (n > 8 || signal.aborted) {
-        delete val.dataset.odScr;
-        metricsScrambling.delete(val);
-        return;
-      }
-      val.dataset.odScr = [...real]
-        .map((c) => (c === ' ' ? ' ' : chars[Math.floor(Math.random() * chars.length)]))
-        .join('');
-      dataTick(S);
-      later(step, 45);
-    };
-    step();
+  /** a metric's screen cuts out for a few frames and back, the way Discovery's displays change */
+  const cutScreen = (m: Element) => {
+    dataTick(S);
+    if (reducedMotion || !(m instanceof HTMLElement) || 'odCut' in m.dataset) return;
+    m.dataset.odCut = '';
+    later(() => {
+      delete m.dataset.odCut;
+    }, 70);
   };
   /** the suit's breathing, at most once per breath */
   let lastBreath = 0;
@@ -261,7 +241,7 @@ function mount(ctx: ReelContext): () => void {
   const indexIn = (el: Element) =>
     el.parentElement ? [...el.parentElement.children].indexOf(el) : 0;
   const HOVER: [string, (el: Element) => void][] = [
-    ['.metrics .m', scramble],
+    ['.metrics .m', cutScreen],
     ['.lede em', () => sweep(S)],
     ['.idx tbody tr', (el) => beep2(S, indexIn(el))],
     ['.repo', breathe],
@@ -394,9 +374,8 @@ function mount(ctx: ReelContext): () => void {
     } else syncBeds();
   });
 
-  /* ---------- scroll: distance to Jupiter, the match cut, the star gate ---------- */
-  const distEl = $('[data-od-dist]');
-  const distBox = $('.od-dist');
+  /* ---------- scroll: the way to Jupiter, the match cut, the star gate ---------- */
+  const plot = $('.od-scr');
   const scenes = reducedMotion
     ? []
     : [...document.querySelectorAll<HTMLElement>('[data-od-scene]')];
@@ -416,11 +395,7 @@ function mount(ctx: ReelContext): () => void {
     const prog = clamp01(y / max);
     if (Math.abs(prog - lastProg) > 0.0004) {
       lastProg = prog;
-      if (distEl)
-        distEl.textContent = (Math.round(((1 - prog) * JUPITER_KM) / 1000) * 1000).toLocaleString(
-          'en-US',
-        );
-      distBox?.style.setProperty('--od-g', prog.toFixed(4));
+      plot?.style.setProperty('--od-g', prog.toFixed(4));
     }
     for (const [el, r] of rects) {
       const p = clamp01(-r.top / Math.max(1, r.height - vh));
@@ -467,7 +442,7 @@ function mount(ctx: ReelContext): () => void {
   const sky = $('.od-sky');
   const hero = $('[data-sec="0"]');
   let heroOn = true;
-  const lenses = [...document.querySelectorAll<HTMLElement>('.rail .tile, .od-lens')];
+  const lenses = [...document.querySelectorAll<HTMLElement>('.od-lens')];
   const moved = () => {
     praf = 0;
     const composer = $('.a2-drawer[open] .a2-composer');
@@ -525,6 +500,11 @@ function mount(ctx: ReelContext): () => void {
     offSound();
     [redHum, gate, entr, monolith, thinking, station].forEach((b) => b?.stop(0.3));
     delete root.dataset.odAgent;
+    delete root.dataset.odLeft;
+    document
+      .querySelectorAll<HTMLElement>('[data-od-cut]')
+      .forEach((el) => delete el.dataset.odCut);
+    plot?.style.removeProperty('--od-g');
     scenes.forEach((el) => {
       el.classList.remove('is-on', 'is-cut');
       el.style.removeProperty('--p');

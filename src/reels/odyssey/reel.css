@@ -22,8 +22,10 @@
   --od-gx: max(0px, (100% - var(--od-pl) - var(--od-pr) - var(--od-w)) / 2);
   --od-ease: cubic-bezier(0.22, 0.8, 0.2, 1);
   --od-cyan: #5fd4db;
-  --od-amber: #ffb547;
   --od-screen: #0b0c0e;
+  /* one indicator colour outside the star gate: HAL's red when lit */
+  --od-lit: #e1261c;
+  --od-unlit: #c9cbc7;
   --focus-ring: 0 0 0 2px var(--paper), 0 0 0 4px #e1261c;
 
   & body {
@@ -119,26 +121,27 @@
     letter-spacing: 0.08em;
     color: var(--muted);
   }
-  /* the monogram tile becomes the agent's small lens (the monogram repeats the name beside it) */
+  /* the monogram on a dark console key */
   & .rail .tile {
     width: 40px;
     height: 40px;
     flex: none;
     border: 0;
-    color: transparent;
-    font-size: 0;
+    border-radius: 3px;
+    background: var(--od-screen);
+    color: #e8e8e4;
+    font: 400 12px var(--font-display);
+    letter-spacing: 0.06em;
+    padding-left: 0.06em;
     box-shadow:
-      0 0 0 3px #cfd1cd,
-      0 0 0 4px #9ea19c;
+      inset 0 0 0 1px #000,
+      0 1px 0 #fff;
   }
-  & .od-met {
+  & .od-scr {
     order: 2;
   }
   & .railnav {
     order: 3;
-  }
-  & .od-dist {
-    order: 4;
   }
   & .reelpick {
     order: 5;
@@ -151,10 +154,10 @@
     order: 7;
   }
 
-  /* the two instrument screens */
+  /* the console's screen: Rosario's time over the way from Earth to Jupiter */
   & .od-scr {
     display: block;
-    padding: 8px 10px;
+    padding: 9px 10px 10px;
     border-radius: 3px;
     background: var(--od-screen);
     color: #e8e8e4;
@@ -164,32 +167,30 @@
   }
   & .od-lbl {
     display: block;
-    font: 8.5px var(--font-mono);
-    letter-spacing: 0.16em;
+    font: 10.5px var(--font-mono);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: #9a9d98;
   }
   & .od-big {
     display: block;
     margin-top: 4px;
-    font: 400 12.5px var(--font-display);
-    letter-spacing: 0.04em;
+    font: 400 18px var(--font-display);
+    letter-spacing: 0.06em;
     color: var(--od-cyan);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
-  & .od-small {
-    display: block;
-    margin-top: 3px;
-    font: 9.5px var(--font-mono);
-    letter-spacing: 0.06em;
-    color: var(--od-amber);
-    font-variant-numeric: tabular-nums;
+  & .od-plot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 9px;
   }
   & .od-gauge {
     display: block;
+    flex: 1;
     height: 3px;
-    margin-top: 7px;
     background: #25282c;
     overflow: hidden;
   }
@@ -202,13 +203,13 @@
     transform: scaleX(var(--od-g, 0));
   }
 
-  /* nav: one lit row per section, with its act */
+  /* nav: the current section's row lights */
   & .railnav {
     gap: 2px;
   }
   & .railnav a {
     display: grid;
-    grid-template-columns: 8px 18px minmax(0, 1fr) auto;
+    grid-template-columns: 8px 18px minmax(0, 1fr);
     gap: 8px;
     align-items: center;
     height: 27px;
@@ -228,40 +229,15 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: color-mix(in srgb, var(--od-led) 38%, transparent);
+    background: var(--od-unlit);
     transition:
       background-color 0.3s,
       box-shadow 0.3s;
-  }
-  & .railnav a::after {
-    content: var(--od-an);
-    font: 10px var(--font-mono);
-    color: var(--muted);
   }
   & .railnav a .nx {
     width: auto;
     font: 10px var(--font-mono);
     color: var(--muted);
-  }
-  & .railnav a:nth-child(1) {
-    --od-led: #ffd24a;
-    --od-an: 'I';
-  }
-  & .railnav a:is(:nth-child(2), :nth-child(3)) {
-    --od-led: #e1261c;
-    --od-an: 'II';
-  }
-  & .railnav a:is(:nth-child(4), :nth-child(5)) {
-    --od-led: #2d6cdf;
-    --od-an: 'III';
-  }
-  & .railnav a:is(:nth-child(6), :nth-child(7)) {
-    --od-led: #ff3b2f;
-    --od-an: 'III';
-  }
-  & .railnav a:is(:nth-child(8), :nth-child(9)) {
-    --od-led: #4e8b3a;
-    --od-an: 'IV';
   }
   & .railnav a:hover {
     background: var(--paper-3);
@@ -272,10 +248,9 @@
     color: #f2f2f0;
   }
   & .railnav a[aria-current='true']::before {
-    background: var(--od-led);
-    box-shadow: 0 0 8px var(--od-led);
+    background: var(--od-lit);
+    box-shadow: 0 0 8px var(--od-lit);
   }
-  & .railnav a[aria-current='true']::after,
   & .railnav a[aria-current='true'] .nx {
     color: #9a9d98;
   }
@@ -408,15 +383,14 @@
     transform: translateX(12px);
   }
 
-  /* ---------------- the red lens (shared by the console, the launcher, the composer) ---------------- */
-  & :is(.rail .tile, .od-lens) {
+  /* ---------------- the red lens (the launcher; the composer draws its own) ---------------- */
+  & .od-lens {
     --lx: 0;
     --ly: 0;
     position: relative;
     border-radius: 50%;
     background: radial-gradient(circle, #1a1a1a 0 56%, #090909 57%);
   }
-  & .rail .tile::before,
   & .od-lens .g {
     content: '';
     position: absolute;
@@ -432,7 +406,6 @@
     animation: odyssey-breathe 4.2s ease-in-out infinite;
   }
   /* hot spot (follows the cursor) and glint (drifts against it) */
-  & .rail .tile::after,
   & .od-lens .h {
     content: '';
     position: absolute;
@@ -650,9 +623,8 @@
     border-color: rgba(237, 237, 234, 0.6);
   }
 
-  /* the metrics, as five instrument screens in light bezels */
+  /* the metrics, as five instrument screens */
   & .metrics {
-    counter-reset: od-sys;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 12px;
@@ -665,60 +637,26 @@
     overflow: visible;
   }
   & .metrics .m {
-    counter-increment: od-sys;
-    position: relative;
     min-width: 0;
-    padding: 10px 12px;
+    padding: 12px 14px;
     text-align: left;
     background: var(--od-screen);
-    border: 3px solid #d9dad6;
+    border: 1px solid rgba(237, 237, 234, 0.18);
     border-radius: 4px;
     box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.85);
     transition:
       transform 0.2s var(--od-ease),
       border-color 0.2s;
   }
-  & .metrics .m::before {
-    content: 'Sys 0' counter(od-sys);
-    display: block;
-    font: 9.5px var(--font-mono);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #9a9d98;
-  }
-  & .metrics .m::after {
-    content: '';
-    position: absolute;
-    top: 14px;
-    right: 12px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--od-led);
-    box-shadow: 0 0 8px var(--od-led);
-  }
-  & .metrics .m:nth-child(5n + 1) {
-    --od-led: #e1261c;
-  }
-  & .metrics .m:nth-child(5n + 2) {
-    --od-led: #ffd24a;
-  }
-  & .metrics .m:nth-child(5n + 3) {
-    --od-led: #7cd97a;
-  }
-  & .metrics .m:nth-child(5n + 4) {
-    --od-led: #f07b1d;
-  }
-  & .metrics .m:nth-child(5n) {
-    --od-led: #5fa0ff;
-  }
   & .metrics .m:hover {
     transform: translateY(-3px);
-    border-color: #fff;
+    border-color: rgba(237, 237, 234, 0.5);
+  }
+  /* on hover the screen cuts out for a few frames and back (client.ts) */
+  & .metrics .m[data-od-cut] > * {
+    visibility: hidden;
   }
   & .metrics .m .v {
-    position: relative;
-    margin-top: 6px;
     font: 400 19px var(--font-display);
     letter-spacing: 0.04em;
     color: #f2f2f0;
@@ -726,20 +664,6 @@
   }
   & .metrics .m .v em {
     color: #ff5a4e;
-  }
-  /* the hover read-out scramble: the real figure stays in the DOM, a copy flickers over it */
-  & .metrics .m .v[data-od-scr] {
-    color: transparent;
-  }
-  & .metrics .m .v[data-od-scr] em {
-    color: transparent;
-  }
-  & .metrics .m .v[data-od-scr]::after {
-    content: attr(data-od-scr);
-    position: absolute;
-    left: 0;
-    top: 0;
-    color: var(--od-cyan);
   }
   & .metrics .m .k {
     margin-top: 2px;
@@ -1057,46 +981,33 @@
     border-right: 0;
     border-radius: 6px 0 0 6px;
   }
+  /* two lines held open, so "AE-35 unit fault" doesn't push the lamps down */
   & .od-hal-state {
-    min-height: 14px;
-    font: 400 9.5px var(--font-display);
+    display: grid;
+    place-items: center;
+    min-height: 2.9em;
+    font: 400 10.5px/1.45 var(--font-display);
     letter-spacing: 0.24em;
     text-transform: uppercase;
     text-align: center;
+    text-wrap: balance;
     color: #111214;
   }
   & .od-leds {
     display: flex;
     gap: 6px;
   }
+  /* one lamp per question left today; until the server counts, all five */
   & .od-leds i {
     display: block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #c9cbc7;
-  }
-  & .od-leds i:nth-child(1) {
-    --c: #e1261c;
-  }
-  & .od-leds i:nth-child(2) {
-    --c: #ffd24a;
-  }
-  & .od-leds i:nth-child(3) {
-    --c: #4e8b3a;
-  }
-  & .od-leds i:nth-child(4) {
-    --c: #f07b1d;
-  }
-  & .od-leds i:nth-child(5) {
-    --c: #2d6cdf;
-  }
-  & .od-hal-cap {
-    font: 9.5px/1.5 var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-align: center;
-    color: var(--muted);
+    background: var(--od-lit);
+    box-shadow: 0 0 6px var(--od-lit);
+    transition:
+      background-color 0.3s,
+      box-shadow 0.3s;
   }
 
   /* the launcher card */
@@ -1242,14 +1153,11 @@
     border-radius: 2px;
     color: rgba(0, 0, 0, 0.7);
   }
+  & .a2-lamp {
+    background: var(--od-unlit);
+  }
   & .a2-lamp.is-close {
-    background: #e1261c;
-  }
-  & .a2-lamp.is-min {
-    background: #ffd24a;
-  }
-  & .a2-lamp.is-max {
-    background: #4e8b3a;
+    background: var(--od-lit);
   }
   & .a2-quota,
   & .a2-reset {
@@ -1257,12 +1165,6 @@
   }
   & .a2-panel-foot {
     background: #ecedea;
-  }
-  & .a2-thread {
-    counter-reset: od-tx;
-  }
-  & .a2-turn {
-    counter-increment: od-tx;
   }
   & .a2-ask {
     font: 13px var(--font-mono);
@@ -1296,7 +1198,7 @@
     color: var(--ink);
   }
   & .a2-surface::before {
-    content: 'Transmission ' counter(od-tx, decimal-leading-zero);
+    content: 'Transmission';
     display: block;
     margin-bottom: 12px;
     font: 10px var(--font-mono);
@@ -1422,15 +1324,6 @@
       box-shadow 0.2s,
       border-color 0.2s;
   }
-  & .idx tbody tr:nth-child(3n + 1) {
-    --od-suit: #e1261c;
-  }
-  & .idx tbody tr:nth-child(3n + 2) {
-    --od-suit: #e8b820;
-  }
-  & .idx tbody tr:nth-child(3n) {
-    --od-suit: #2d6cdf;
-  }
   & .idx tbody tr:hover {
     transform: translateY(-2px);
     border-color: var(--rule-2);
@@ -1446,26 +1339,9 @@
     background: none;
   }
   & .idx .n {
-    display: flex;
-    align-items: center;
-    gap: 8px;
     padding-top: 5px;
     font: 11px var(--font-mono);
     color: var(--muted);
-  }
-  & .idx .n::before {
-    content: '';
-    width: 9px;
-    height: 9px;
-    background: var(--od-suit);
-    opacity: 0.4;
-    transition:
-      opacity 0.2s,
-      box-shadow 0.2s;
-  }
-  & .idx tr:hover .n::before {
-    opacity: 1;
-    box-shadow: 0 0 8px var(--od-suit);
   }
   & .idx .proj b {
     font: 500 20px/1.25 var(--font-sans);
@@ -1548,8 +1424,8 @@
     box-shadow: 0 20px 34px -26px rgba(15, 16, 18, 0.6);
   }
   & .repo:hover::after {
-    background: #ffd24a;
-    box-shadow: 0 0 8px #ffd24a;
+    background: var(--od-lit);
+    box-shadow: 0 0 8px var(--od-lit);
   }
   & .repo .nm {
     grid-column: 2;
@@ -1672,11 +1548,9 @@
       );
   }
   & .wlist {
-    counter-reset: od-mem;
     gap: 10px;
   }
   & .wrow {
-    counter-increment: od-mem;
     grid-template-columns: 190px minmax(0, 1fr) 64px;
     gap: 18px;
     padding: 16px 20px;
@@ -1707,9 +1581,6 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
-  }
-  & .wrow .d::before {
-    content: 'Memory 05.' counter(od-mem) ' · ';
   }
   & .wrow .t {
     font: 500 19px/1.3 var(--font-sans);
@@ -1769,9 +1640,6 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
-  }
-  & .tenet .nn::before {
-    content: 'Module 06.';
   }
   & .tenet h3 {
     margin: 0;
@@ -2369,7 +2237,6 @@
     & .railnav a {
       height: 23px;
     }
-    & .od-small,
     & .reel-label {
       display: none;
     }
@@ -2472,7 +2339,6 @@
       height: 34px;
     }
     & .railnav a .nx,
-    & .railnav a::after,
     & .od-scr {
       display: none;
     }
@@ -2489,10 +2355,6 @@
     & .idx tbody tr {
       grid-template-columns: 30px minmax(0, 1fr);
       padding: 16px;
-    }
-    & .idx .n {
-      gap: 0;
-      font-size: 0;
     }
     & .od-monolith {
       width: 120px;
@@ -2567,9 +2429,6 @@
       box-shadow:
         0 0 0 3px #cfd1cd,
         0 0 0 4px #9ea19c;
-    }
-    & .od-hal-cap {
-      display: none;
     }
     & .a2-launch {
       grid-column: 1;
@@ -2685,46 +2544,40 @@
   transform: none;
 }
 
-/* ---------------- the agent: the lens and the LEDs answer the playground's cues ---------------- */
+/* ---------------- the agent: the lens and the lamps answer the playground's cues ---------------- */
 :root[data-reel='odyssey'][data-od-agent='think'] .od-lens .g,
-:root[data-reel='odyssey'][data-od-agent='think'] .rail .tile::before,
 :root[data-reel='odyssey'][data-od-agent='think'] .a2-composer::before {
   animation-duration: 0.8s;
 }
 :root[data-reel='odyssey'][data-od-agent='speak'] .od-lens .g,
-:root[data-reel='odyssey'][data-od-agent='speak'] .rail .tile::before,
 :root[data-reel='odyssey'][data-od-agent='speak'] .a2-composer::before {
   animation: odyssey-flash 0.32s steps(2) infinite;
 }
 :root[data-reel='odyssey'][data-od-agent='error'] .od-lens .g,
-:root[data-reel='odyssey'][data-od-agent='error'] .rail .tile::before,
 :root[data-reel='odyssey'][data-od-agent='error'] .a2-composer::before {
   animation: odyssey-flash 0.16s steps(2) 6;
   opacity: 0.4;
 }
-:root[data-reel='odyssey'][data-od-agent='think'] .od-leds i {
-  animation: odyssey-led 1s steps(1) infinite;
+/* the questions already spent today go dark */
+:root[data-reel='odyssey'][data-od-left='0'] .od-leds i,
+:root[data-reel='odyssey'][data-od-left='1'] .od-leds i:nth-child(n + 2),
+:root[data-reel='odyssey'][data-od-left='2'] .od-leds i:nth-child(n + 3),
+:root[data-reel='odyssey'][data-od-left='3'] .od-leds i:nth-child(n + 4),
+:root[data-reel='odyssey'][data-od-left='4'] .od-leds i:nth-child(n + 5) {
+  background: var(--od-unlit);
+  box-shadow: none;
 }
-:root[data-reel='odyssey'][data-od-agent='think'] .od-leds i:nth-child(2) {
-  animation-delay: 0.2s;
-}
-:root[data-reel='odyssey'][data-od-agent='think'] .od-leds i:nth-child(3) {
-  animation-delay: 0.4s;
-}
-:root[data-reel='odyssey'][data-od-agent='think'] .od-leds i:nth-child(4) {
-  animation-delay: 0.6s;
-}
-:root[data-reel='odyssey'][data-od-agent='think'] .od-leds i:nth-child(5) {
-  animation-delay: 0.8s;
-}
-:root[data-reel='odyssey']:is([data-od-agent='speak'], [data-od-agent='done']) .od-leds i {
-  background: var(--c);
-  box-shadow: 0 0 6px var(--c);
-}
-:root[data-reel='odyssey'][data-od-agent='listen'] .od-leds i:first-child,
-:root[data-reel='odyssey'][data-od-agent='error'] .od-leds i:first-child {
-  background: var(--c);
-  box-shadow: 0 0 6px var(--c);
+/* while the agent computes, the lamp this question spends blinks */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-reel='odyssey'][data-od-agent='think']:is(:not([data-od-left]), [data-od-left='5'])
+    .od-leds
+    i:nth-child(5),
+  :root[data-reel='odyssey'][data-od-agent='think'][data-od-left='4'] .od-leds i:nth-child(4),
+  :root[data-reel='odyssey'][data-od-agent='think'][data-od-left='3'] .od-leds i:nth-child(3),
+  :root[data-reel='odyssey'][data-od-agent='think'][data-od-left='2'] .od-leds i:nth-child(2),
+  :root[data-reel='odyssey'][data-od-agent='think'][data-od-left='1'] .od-leds i:nth-child(1) {
+    animation: odyssey-spend 0.6s steps(1) infinite;
+  }
 }
 
 /* ---------------- the title card, inside the projector ---------------- */
@@ -2909,15 +2762,9 @@
     transform: scale(0.97);
   }
 }
-@keyframes odyssey-led {
-  0%,
-  19% {
-    background: var(--c);
-    box-shadow: 0 0 6px var(--c);
-  }
-  20%,
-  100% {
-    background: #c9cbc7;
+@keyframes odyssey-spend {
+  50% {
+    background: var(--od-unlit);
     box-shadow: none;
   }
 }
