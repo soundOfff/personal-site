@@ -260,7 +260,7 @@ function setSection(i: number): void {
 }
 
 function watchSections(): void {
-  const secs = [...document.querySelectorAll<HTMLElement>('[data-sec]')];
+  const secs = [...document.querySelectorAll<HTMLElement>('section[data-sec]')];
   if (!secs.length) return;
   const io = new IntersectionObserver(
     (entries) => {
