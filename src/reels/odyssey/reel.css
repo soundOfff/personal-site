@@ -2172,60 +2172,6 @@
     }
   }
 
-  /* reduced motion: the scenes become stills */
-  @media (prefers-reduced-motion: reduce) {
-    & .od-grain,
-    & .od-orb,
-    & .od-sg-pl i {
-      animation: none;
-    }
-    & .od-mc,
-    & .od-sg {
-      height: auto;
-    }
-    & :is(.od-mc-stage, .od-sg-stage) {
-      position: relative;
-      height: 560px;
-    }
-    & .od-mc-dawn {
-      clip-path: inset(0 50% 0 0);
-    }
-    & .od-mc-space {
-      opacity: 1;
-      clip-path: inset(0 0 0 50%);
-    }
-    & .od-mc-stage::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: rgba(255, 255, 255, 0.4);
-    }
-    & .od-tool,
-    & .od-station {
-      opacity: 1;
-      transform: translate(-50%, -50%) rotate(150deg);
-    }
-    & .od-tool,
-    & .od-cap-a {
-      left: 25%;
-    }
-    & .od-station,
-    & .od-cap-b {
-      left: 75%;
-      opacity: 1;
-    }
-    & .od-mc-hint,
-    & .od-sg-cap {
-      display: none;
-    }
-    & .od-sg-pl {
-      opacity: 1;
-    }
-  }
-
   /* ---------------- short laptop screens: a tighter console ---------------- */
   @media (min-width: 821px) and (max-height: 820px) {
     & .rail {
@@ -2317,6 +2263,11 @@
       order: 1;
       margin: 0 0 0 auto;
     }
+    /* tight enough to share the name's line on a 390px phone */
+    & .snd {
+      padding-right: 8px;
+      letter-spacing: 0.06em;
+    }
     & .reelpick {
       order: 2;
     }
@@ -2377,7 +2328,7 @@
       font-size: 15.5px;
     }
     & .startrow {
-      margin-bottom: 250px;
+      margin-bottom: clamp(160px, 30vh, 260px);
     }
     & .od-align {
       inset: auto 0 330px;
@@ -2403,6 +2354,15 @@
     }
     & .od-mc {
       height: 1000px;
+    }
+    /* a narrower bone and station; both still meet at p = 0.5, so the cut stays matched */
+    & :is(.od-tool, .od-station) {
+      width: 200px;
+      height: 40px;
+    }
+    & .od-station {
+      transform: translate(-50%, -50%) translateX(calc((var(--p) - 0.5) * 120px))
+        rotate(calc(510deg + (var(--p) - 0.5) * 50deg));
     }
     & .od-sg {
       height: 900px;
@@ -2520,6 +2480,62 @@
     }
     & .content > .foot {
       align-items: center;
+    }
+  }
+
+  /* reduced motion: the scenes become stills. Last in the block, so the
+     narrower layouts' scene heights and the phone's station path don't undo it.
+     The split sits on the content axis, clear of the console. */
+  @media (prefers-reduced-motion: reduce) {
+    --od-col: calc(100% - var(--od-pl) - var(--od-pr));
+
+    & .od-orb,
+    & .od-sg-pl i {
+      animation: none;
+    }
+    & .od-mc,
+    & .od-sg {
+      height: auto;
+    }
+    & :is(.od-mc-stage, .od-sg-stage) {
+      position: relative;
+      height: 560px;
+    }
+    & .od-mc-dawn {
+      clip-path: inset(0 calc(50% - var(--od-axis)) 0 0);
+    }
+    & .od-mc-space {
+      opacity: 1;
+      clip-path: inset(0 0 0 calc(50% + var(--od-axis)));
+    }
+    & .od-mc-stage::after {
+      content: '';
+      position: absolute;
+      left: calc(50% + var(--od-axis));
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+    & .od-tool,
+    & .od-station {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(150deg);
+    }
+    & .od-tool {
+      left: calc(var(--od-pl) + var(--od-col) * 0.25);
+    }
+    & .od-station {
+      left: calc(var(--od-pl) + var(--od-col) * 0.75);
+    }
+    & .od-sg-pl {
+      opacity: 1;
+    }
+    @media (max-width: 820px) {
+      & :is(.od-tool, .od-station) {
+        width: 150px;
+        height: 30px;
+      }
     }
   }
 }
