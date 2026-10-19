@@ -280,28 +280,38 @@ function setSection(i: number): void {
   sectionListeners.forEach((l) => l(i, prev));
 }
 
+/**
+ * The section in view is the last one whose top has passed a line 40% down
+ * the viewport, so interludes between sections keep the one above, and any
+ * jump (a reload mid-page, an anchor, the End key) lands on the right one.
+ */
 function watchSections(): void {
   const secs = [...document.querySelectorAll<HTMLElement>('section[data-sec]')];
   if (!secs.length) return;
-  const io = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries)
-        if (e.isIntersecting) setSection(Number(e.target.getAttribute('data-sec')));
-    },
-    // a thin band ~40% down the viewport: the section crossing it is "in view"
-    { rootMargin: '-38% 0px -52% 0px', threshold: 0 },
-  );
-  secs.forEach((s) => io.observe(s));
-  // At the very bottom the last section wins even when it is short.
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
-        setSection(secs.length - 1);
-      }
-    },
-    { passive: true },
-  );
+  let ticking = false;
+  const probe = () => {
+    ticking = false;
+    const doc = document.documentElement;
+    // At the very bottom the last section wins even when it is short.
+    if (window.innerHeight + window.scrollY >= doc.scrollHeight - 2) {
+      setSection(secs.length - 1);
+      return;
+    }
+    const line = window.innerHeight * 0.4;
+    let current = 0;
+    secs.forEach((s, i) => {
+      if (s.getBoundingClientRect().top <= line) current = i;
+    });
+    setSection(current);
+  };
+  const schedule = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(probe);
+  };
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule, { passive: true });
+  schedule();
 }
 
 /* ---------- the switcher and the sound toggle ---------- */
