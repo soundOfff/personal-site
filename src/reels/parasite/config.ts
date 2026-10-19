@@ -1,6 +1,9 @@
 import type { ReelConfig } from '../types';
 import { tokens } from '../tokens';
 
+/** Shared by every floor: the censor bar, the plaster wall, the steel window frame, the peach. */
+const VARS = { peach: '#E9A283', bar: '#0A0B0A', plaster: '#ECEEE7', frame: '#161916' };
+
 /** Reel 01. Scroll is a descent: living room → stairs in the rain → semi-basement → bunker. */
 const parasite: ReelConfig = {
   id: 'parasite',
@@ -44,11 +47,12 @@ const parasite: ReelConfig = {
         ink2: '#323A34',
         muted: '#59625B',
         line: 'rgba(21,27,23,.16)',
-        line2: 'rgba(21,27,23,.07)',
+        line2: 'rgba(21,27,23,.3)',
+        muted2: '#7A827B',
         accent: '#5E8A3A',
         accentInk: '#3B6324',
         accentSoft: '#DCE6CF',
-        vars: { peach: '#E9A283', bar: '#0A0B0A' },
+        vars: VARS,
       }),
     },
     {
@@ -65,11 +69,12 @@ const parasite: ReelConfig = {
         ink2: '#232C29',
         muted: '#39443F',
         line: 'rgba(17,23,21,.22)',
-        line2: 'rgba(17,23,21,.1)',
+        line2: 'rgba(17,23,21,.34)',
+        muted2: '#56615C',
         accent: '#2E5E5A',
         accentInk: '#1F4746',
         accentSoft: '#A9B6B2',
-        vars: { peach: '#E9A283', bar: '#0A0B0A' },
+        vars: VARS,
       }),
     },
     {
@@ -86,11 +91,12 @@ const parasite: ReelConfig = {
         ink2: '#CAC9B4',
         muted: '#9D9E86',
         line: 'rgba(230,229,211,.15)',
-        line2: 'rgba(230,229,211,.07)',
+        line2: 'rgba(230,229,211,.26)',
+        muted2: '#7E806A',
         accent: '#C6D15A',
         accentInk: '#D3DD6B',
         accentSoft: 'rgba(198,209,90,.12)',
-        vars: { peach: '#E9A283', bar: '#0A0B0A' },
+        vars: VARS,
       }),
     },
     {
@@ -107,11 +113,12 @@ const parasite: ReelConfig = {
         ink2: '#CFC8B5',
         muted: '#958E7C',
         line: 'rgba(233,227,211,.14)',
-        line2: 'rgba(233,227,211,.06)',
+        line2: 'rgba(233,227,211,.24)',
+        muted2: '#6E695C',
         accent: '#E3A83E',
         accentInk: '#EDB65A',
         accentSoft: 'rgba(227,168,62,.12)',
-        vars: { peach: '#E9A283', bar: '#0A0B0A' },
+        vars: VARS,
       }),
     },
   ],
@@ -119,7 +126,8 @@ const parasite: ReelConfig = {
     display: "'Archivo Variable', 'IBM Plex Sans KR', system-ui, sans-serif",
     body: "'IBM Plex Sans KR', system-ui, sans-serif",
     mono: "'IBM Plex Mono', 'IBM Plex Sans KR', ui-monospace, monospace",
-    title: "'Nanum Myeongjo', serif",
+    // reel.css declares this face from @fontsource/nanum-myeongjo, trimmed to 기 생 충 끝
+    title: "'Parasite Myeongjo', 'Nanum Myeongjo', serif",
   },
   sections: {
     readme: { slug: 'INT. LIVING ROOM — DAY' },
@@ -132,7 +140,21 @@ const parasite: ReelConfig = {
     stack: { slug: 'INT. BASEMENT — NIGHT' },
     now: { slug: 'INT. BUNKER — NIGHT' },
   },
-  stages: [],
+  stages: [
+    'backdrop',
+    'rail',
+    'in:readme',
+    'in:oss',
+    'in:log',
+    'after:log',
+    'in:writing',
+    'in:principles',
+    'in:stack',
+    'in:now',
+    'after:now',
+    'credits',
+    'title',
+  ],
   layout: { nav: 'rail', hero: 'window', flow: 'descent', grid: 'left' },
   scroll: ['window-to-dusk', 'staircase-rail', 'flood-interlude'],
   motifs: ['bar', 'descent', 'lamps', 'window', 'wifi', 'rain', 'morse'],
@@ -140,6 +162,9 @@ const parasite: ReelConfig = {
     hover: 'tick',
     click: 'click',
     section: 'footstep + reverb by floor',
+    lamp: 'relay · tube · bulb',
+    rain: 'rain loop while the interlude is on screen',
+    morse: '620 Hz key tone',
     surface: 'slate + pluck',
     done: 'cadence',
     signature: 'projector + cadence',

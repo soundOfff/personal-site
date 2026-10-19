@@ -2,13 +2,242 @@
 /**
  * Reel 01 · Parasite: reel-only markup. Rendered once per point listed in
  * config.stages; the engine hides it unless this reel is screening.
+ *
+ * The page is a house and scrolling goes down it: the living-room window
+ * (the hero), the stairs in the rain, the semi-basement, the bunker. Every
+ * piece here is scenery (aria-hidden) except the Morse key, which is a real
+ * button, and the end credits, which carry the homage line.
  */
 import type { StagePoint } from '../types';
+import parasite from './config';
+import { contact, now, profile } from '../../data/site';
 
 interface Props {
   at: StagePoint;
 }
 const { at } = Astro.props;
+
+// The credits name the stack straight from the `now` section's spec sheet.
+const builtWith = now.find((s) => s.dt === 'Built with')?.dd;
+// The Morse key's nudge points at the same address as the rail's contact list.
+const mail = contact.find((c) => c.href.startsWith('mailto:'));
+
+const floors = parasite.acts.map((a) => ({ code: a.code, native: a.native, name: a.name }));
+
+// The rain: one seeded scatter, so every build draws the same storm.
+let seed = 11;
+const rnd = () => {
+  seed = (seed * 9301 + 49297) % 233280;
+  return seed / 233280;
+};
+const drops = Array.from({ length: 56 }, () => {
+  const left = (rnd() * 100).toFixed(2);
+  const h = Math.round(16 + rnd() * 36);
+  const o = (0.25 + rnd() * 0.6).toFixed(2);
+  const du = (0.5 + rnd() * 0.45).toFixed(2);
+  const de = (rnd() * 1.2).toFixed(2);
+  return `left:${left}%;height:${h}px;opacity:${o};animation-duration:${du}s;animation-delay:-${de}s`;
+});
+
+// Which lamp hangs in which section's keybar: stair lights on the way down,
+// one fluorescent tube in the semi-basement, a bare bulb in the bunker.
+const lamps: Partial<Record<StagePoint, { sec: number; kind: 'stair' | 'tube' | 'bulb' }>> = {
+  'in:oss': { sec: 3, kind: 'stair' },
+  'in:log': { sec: 4, kind: 'stair' },
+  'in:writing': { sec: 5, kind: 'tube' },
+  'in:principles': { sec: 6, kind: 'tube' },
+  'in:stack': { sec: 7, kind: 'bulb' },
+  'in:now': { sec: 8, kind: 'bulb' },
+};
+const lamp = lamps[at];
 ---
 
-{at === 'backdrop' && null}
+{at === 'backdrop' && <div class="px-grain" aria-hidden="true" />}
+
+{
+  at === 'rail' && (
+    <div class="px-elev" aria-hidden="true">
+      <span class="px-elev-car">
+        <span class="px-elev-roll">
+          {floors.map((f) => (
+            <span>{f.code}</span>
+          ))}
+        </span>
+      </span>
+      <span class="px-elev-name">
+        {floors.map((f, i) => (
+          <span data-floor={i}>
+            <b lang="ko">{f.native}</b> {f.name}
+          </span>
+        ))}
+      </span>
+    </div>
+  )
+}
+
+{
+  at === 'in:readme' && (
+    <>
+      <div class="px-window" aria-hidden="true">
+        <span class="px-sky" />
+        <span class="px-shafts" />
+        <span class="px-hedge" />
+        <span class="px-lawn" />
+        <span class="px-tree">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span class="px-dusk" />
+        <span class="px-glare" />
+        <span class="px-mull">
+          <i />
+          <i />
+          <i />
+          <i class="px-transom" />
+        </span>
+        <span class="px-kr" lang="ko">
+          기생충
+        </span>
+        <span class="px-kr-sub">Parasite · 2019</span>
+      </div>
+      <p class="px-ratio" aria-hidden="true">
+        <span>2.39 : 1 · the living-room window</span>
+        <span>EXT. garden, seen from inside</span>
+      </p>
+    </>
+  )
+}
+
+{
+  lamp && (
+    <span class={`px-lamp is-${lamp.kind}`} data-px-lamp={lamp.sec} aria-hidden="true">
+      {lamp.kind === 'stair' ? (
+        <>
+          <i />
+          <i />
+          <i />
+        </>
+      ) : (
+        <i />
+      )}
+    </span>
+  )
+}
+
+{
+  at === 'after:log' && (
+    <div class="px-rain" data-px-rain aria-hidden="true">
+      <div class="px-rainbox">
+        {drops.map((style) => (
+          <i class="px-drop" style={style} />
+        ))}
+      </div>
+      <div class="px-steps">
+        {Array.from({ length: 10 }, (_, i) => (
+          <i style={`margin-top:${i * 18}px`} />
+        ))}
+      </div>
+      <div class="px-water" />
+      <p class="px-il-a">
+        S#04 → S#05 · <span lang="ko">비</span> · rain all night
+      </p>
+      <p class="px-il-b">
+        ↓ B1 · <span lang="ko">반지하</span> · semi-basement
+      </p>
+    </div>
+  )
+}
+
+{
+  at === 'in:now' && (
+    <div class="px-bulb" aria-hidden="true">
+      <span class="px-glow" />
+      <span class="px-cord" />
+      <span class="px-glass" />
+    </div>
+  )
+}
+
+{
+  at === 'after:now' && (
+    <div class="px-bunker">
+      <div class="px-morse" data-px-morse>
+        <button
+          class="px-key"
+          type="button"
+          data-px-key
+          aria-label="Morse key: tap for a dot, hold for a dash"
+          aria-describedby="px-morse-hint"
+        >
+          <span class="px-plate" />
+        </button>
+        <div class="px-mread">
+          <p class="px-mk">Signal upstairs · the switch keys Morse</p>
+          <p class="px-msym" data-px-msym aria-hidden="true">
+            · · · ·
+          </p>
+          <p class="px-mtxt" data-px-mtxt aria-live="polite">
+            —
+          </p>
+          <p class="px-mhint" id="px-morse-hint">
+            <span>tap = dot</span>
+            <span>hold = dash</span>
+            <button class="px-lnk" type="button" data-px-hi>
+              play “HI”
+            </button>
+          </p>
+        </div>
+        <p class="px-mdone" data-px-mdone hidden>
+          Message received upstairs. Now say it in words:{' '}
+          {mail && <a href={mail.href}>{mail.label}</a>}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+{
+  at === 'credits' && (
+    <aside class="px-credits" aria-label="End credits">
+      <p class="px-end" lang="ko" aria-hidden="true">
+        끝
+      </p>
+      <dl class="px-cr">
+        <div>
+          <dt>A portfolio by</dt>
+          <dd>{profile.name}</dd>
+        </div>
+        <div>
+          <dt>Screened through</dt>
+          <dd>
+            Parasite (<span lang="ko">기생충</span>) · 2019 · dir. Bong Joon-ho
+          </dd>
+        </div>
+        <div>
+          <dt>Palette &amp; motifs</dt>
+          <dd>A fan homage, not affiliated with the film</dd>
+        </div>
+        {builtWith && (
+          <div>
+            <dt>Built with</dt>
+            <dd>{builtWith}</dd>
+          </div>
+        )}
+      </dl>
+    </aside>
+  )
+}
+
+{
+  at === 'title' && (
+    <div class="px-title">
+      <div class="px-title-ko" lang="ko">
+        기생충
+        <span class="px-title-bar" />
+      </div>
+      <div class="px-title-en">Parasite</div>
+      <div class="px-title-sub">2019 · Bong Joon-ho · the portfolio of Tomas Brasca</div>
+    </div>
+  )
+}
