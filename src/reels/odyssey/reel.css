@@ -889,6 +889,15 @@
     height: 26%;
     background: linear-gradient(180deg, #1e140b, #0b0705);
   }
+  /* the desert is the one plate with texture: the cut lands on clean black */
+  & .od-mc-dust {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.55;
+    mix-blend-mode: overlay;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
   & .od-mc-space {
     background: #000;
     opacity: 0;
@@ -1464,12 +1473,14 @@
     height: 880px;
     margin: -440px 0 0 -440px;
     border-radius: 50%;
+    /* the drum seen end-on: wide pale panels and thin seams */
     background: repeating-conic-gradient(
       from 0deg,
-      rgba(15, 16, 18, 0.16) 0 0.7deg,
-      rgba(15, 16, 18, 0) 0.7deg 6deg
+      #f6f7f4 0 11deg,
+      rgba(15, 16, 18, 0.18) 11deg 11.6deg
     );
-    mask: radial-gradient(circle, transparent 0 62%, #000 62.5% 70%, transparent 70.5%);
+    mask: radial-gradient(circle, transparent 0 62%, #000 62.5% 74%, transparent 74.5%);
+    opacity: 0.55;
     pointer-events: none;
   }
   & .log {
@@ -1754,7 +1765,7 @@
     opacity: calc(0.5 + var(--p) * 0.5);
   }
 
-  /* ---------------- 07 · 08: the room and its luminous floor ---------------- */
+  /* ---------------- 07 · 08: the room and its floor of lit white tiles ---------------- */
   & :is([data-sec='7'], [data-sec='8'])::before {
     content: '';
     position: absolute;
@@ -1763,14 +1774,15 @@
     right: -30%;
     bottom: 0;
     height: 60%;
-    transform: perspective(560px) rotateX(64deg);
+    transform: perspective(560px) rotateX(58deg);
     transform-origin: 50% 100%;
-    background-color: #e3eed9;
+    background-color: #fbfdf8;
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.95) 0 3px, rgba(255, 255, 255, 0) 3px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0 3px, rgba(255, 255, 255, 0) 3px);
-    background-size: 140px 140px;
+      linear-gradient(rgba(16, 20, 15, 0.1) 0 2px, rgba(16, 20, 15, 0) 2px),
+      linear-gradient(90deg, rgba(16, 20, 15, 0.1) 0 2px, rgba(16, 20, 15, 0) 2px);
+    background-size: 160px 160px;
     background-position: 50% 0;
+    box-shadow: inset 0 0 120px rgba(255, 255, 255, 0.9);
     mask-image: linear-gradient(180deg, transparent, #000 35%);
     pointer-events: none;
   }
@@ -2056,16 +2068,7 @@
     color: #050608;
   }
 
-  /* ---------------- backdrop: grain and the act strip ---------------- */
-  & .od-grain {
-    position: fixed;
-    inset: -50%;
-    z-index: 70;
-    pointer-events: none;
-    opacity: 0.07;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    animation: odyssey-grain 1s steps(6) infinite;
-  }
+  /* ---------------- backdrop: the act strip ---------------- */
   & .od-acts {
     position: fixed;
     left: 30px;
@@ -2696,29 +2699,6 @@
 }
 
 /* ---------------- keyframes ---------------- */
-@keyframes odyssey-grain {
-  0% {
-    transform: translate(0, 0);
-  }
-  17% {
-    transform: translate(-3%, 2%);
-  }
-  33% {
-    transform: translate(2%, -4%);
-  }
-  50% {
-    transform: translate(-4%, -1%);
-  }
-  67% {
-    transform: translate(3%, 3%);
-  }
-  83% {
-    transform: translate(-1%, 4%);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
 @keyframes odyssey-tw {
   50% {
     opacity: 0.25;

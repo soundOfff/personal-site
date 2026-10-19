@@ -46,7 +46,6 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
   at === 'backdrop' && (
     <>
       <style is:inline set:html={sky} />
-      <div class="od-grain" aria-hidden="true" />
       <div class="od-acts" aria-hidden="true">
         <span class="od-rn" data-a="0">
           I
@@ -147,7 +146,9 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
     <>
       <div class="od-mc" data-od-scene="mc" aria-hidden="true">
         <div class="od-mc-stage">
-          <div class="od-mc-dawn" />
+          <div class="od-mc-dawn">
+            <i class="od-mc-dust" />
+          </div>
           <div class="od-mc-space">
             <div class="od-stars">
               <i />
