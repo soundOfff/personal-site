@@ -1563,7 +1563,7 @@
     gap: 10px;
   }
   & .wrow {
-    grid-template-columns: 190px minmax(0, 1fr) 64px;
+    grid-template-columns: 112px minmax(0, 1fr) 64px;
     gap: 18px;
     padding: 16px 20px;
     border: 1px solid rgba(255, 190, 180, 0.3);
