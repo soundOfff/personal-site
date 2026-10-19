@@ -263,7 +263,6 @@ export default function A2UIPlayground() {
       }
     } else if (!open && dialog.open) {
       dialog.close();
-      cue('close');
     }
   }, [open]);
 
@@ -344,7 +343,11 @@ export default function A2UIPlayground() {
         className={maxed ? 'a2-drawer is-max' : 'a2-drawer'}
         ref={dialogRef}
         aria-label="Portfolio agent playground"
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          // every way out (Esc, the backdrop, the buttons) ends in the native close event
+          setOpen(false);
+          cue('close');
+        }}
         onClick={(event) => {
           // Clicks that land on the dialog itself are backdrop clicks; the
           // panel fills the dialog, so anything inside stops here.
