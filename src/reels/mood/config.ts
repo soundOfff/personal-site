@@ -42,7 +42,7 @@ const mood: ReelConfig = {
   ],
   acts: [
     {
-      code: '1962',
+      code: 'landing',
       name: 'the landing',
       native: '走廊',
       slug: 'jade wallpaper, oxblood wainscot',
@@ -61,7 +61,7 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '1963',
+      code: 'stall',
       name: 'the noodle stall',
       native: '麵檔',
       slug: 'jade lattice',
@@ -80,7 +80,7 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '1963',
+      code: 'office',
       name: 'the shipping office',
       native: '船務公司',
       slug: 'oxblood flora',
@@ -99,7 +99,7 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '1964',
+      code: 'paper',
       name: 'the newspaper',
       native: '報館',
       slug: 'ochre grid',
@@ -118,7 +118,7 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '1964',
+      code: 'calendar',
       name: "the landlady's calendar",
       native: '月曆',
       slug: 'navy blossom',
@@ -156,7 +156,7 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '1965',
+      code: 'taxi',
       name: "we won't be like them",
       slug: 'black pinstripe',
       sections: ['principles'],
@@ -174,7 +174,7 @@ const mood: ReelConfig = {
       }),
     },
     {
-      code: '1966',
+      code: 'mahjong',
       name: 'the mahjong table',
       native: '麻將',
       slug: 'teal felt under one lamp',
@@ -194,7 +194,7 @@ const mood: ReelConfig = {
     },
     {
       // Out of doors, in daylight: dark ink on sandstone (ink 9.2, muted 4.8, accentInk 5.6).
-      code: '1966',
+      code: 'angkor',
       name: 'Angkor Wat',
       native: '吳哥窟',
       slug: 'sandstone courses',
