@@ -141,7 +141,9 @@ const reel: ReelModule = {
     const setInd = (v: number) => nav?.style.setProperty('--br-ind', v.toFixed(4));
     const playhead = () => {
       if (!secs.length) return;
-      const probe = window.innerHeight * 0.4;
+      // the probe line rides down from the top edge over the first scroll, so the
+      // top of the page reads 0:00:00 instead of starting part-way into the readme
+      const probe = Math.min(window.scrollY, window.innerHeight * 0.4);
       const atEnd =
         window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
       let pos = secs.length - 1;
