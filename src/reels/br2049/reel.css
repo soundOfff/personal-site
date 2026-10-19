@@ -267,8 +267,8 @@
   .br-bd-snow {
     background: linear-gradient(180deg, #d5dde0, #e6ecee 40%);
   }
-  /* against a bright overcast sky a flake shows as a soft grey edge round a
-     white core, not a lit ball */
+  /* against the bright overcast sky a flake reads as a grey speck, darker than
+     the sky. A white one vanishes into it */
   .br-snow i {
     position: absolute;
     top: -20px;
@@ -276,12 +276,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.95) 0 38%,
-      rgba(120, 136, 144, 0.42) 72%,
-      rgba(120, 136, 144, 0) 100%
-    );
+    background: rgba(120, 136, 144, 0.5);
     transition: opacity 0.5s ease;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
