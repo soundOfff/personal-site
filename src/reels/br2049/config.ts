@@ -3,11 +3,11 @@ import type { ReelConfig } from '../types';
 import { tokens } from '../tokens';
 
 /**
- * Reel 03 · Blade Runner 2049. No rail: the rail becomes a viewfinder HUD
- * (plates in the corners, a scrubber dock along the bottom). Full-bleed acts:
- * the cold open in the Las Vegas haze, a pinned flight into Los Angeles where
- * the proof numbers are billboards, Wallace's water-light on the agent, the
- * ruins, the rain, and snow on the steps at the end.
+ * Reel 03 · Blade Runner 2049. No rail: plates along the top edge and a
+ * scrubber dock along the bottom. Full-bleed acts: the opening in the Las
+ * Vegas haze, a pinned flight into Los Angeles where the proof numbers are
+ * billboards, Wallace's water-light on the agent, the ruins, the rain, and
+ * snow on the steps at the end.
  *
  * Contrast (WCAG, on `paper`): Las Vegas ink 7.0, muted 6.3, accent ink 6.4 ·
  * Wallace ink 15.1, muted 6.6, accent ink 11.2 · Los Angeles ink 15.1,
@@ -38,6 +38,9 @@ const haze: ActInput = {
     'clay-ink': '#5A1606',
   },
 };
+
+/** The film runs 163 minutes; the scrubber's readout counts the page against it. */
+export const RUNTIME = 163 * 60;
 
 const br2049: ReelConfig = {
   id: 'br2049',
@@ -191,8 +194,9 @@ const br2049: ReelConfig = {
     'sticky-act-backdrops',
   ],
   motifs: [
-    'viewfinder',
-    'holo-glitch',
+    'runtime-timecode',
+    'billboards',
+    'holo-freeze',
     'caustics',
     'baseline-waveform',
     'carved-dates',

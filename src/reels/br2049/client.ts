@@ -3,8 +3,9 @@
  * Loaded on demand when the reel starts screening; everything registered
  * against ctx.signal is torn down when it stops.
  *
- *   - the HUD: the scrubber's playhead follows the scroll, the readout names
- *     the section (code, altitude, distance) and runs a timecode,
+ *   - the scrubber: the playhead follows the scroll, and the readout names the
+ *     section and the timecode under the playhead, counted against the
+ *     film's running time (the tick under the pointer, when there is one),
  *   - particles for the act backdrops (dust in the haze, rain, snow) and the
  *     flight; snow melts under the pointer,
  *   - the agent's baseline readout follows the playground's cues,
@@ -17,9 +18,9 @@
 import type { ReelContext, ReelModule } from '../types';
 import type { Bed } from '../sound';
 import { actOf } from '../registry';
+import { RUNTIME } from './config';
 import * as sfx from './score';
 
-const CODES = ['LV-00', 'WL-01', 'LV-02', 'LV-03', 'LV-04', 'LA-05', 'LA-06', 'LA-07', 'SN-08'];
 const NAMES = [
   'readme',
   'playground',
@@ -31,8 +32,10 @@ const NAMES = [
   'stack',
   'now',
 ];
-const ALTS = ['1200', '0980', '0640', '0520', '0410', '0260', '0180', '0090', '0000'];
-const DSTS = ['00.0', '02.4', '09.8', '11.2', '12.6', '20.1', '21.0', '22.3', '24.9'];
+const LAST = NAMES.length - 1;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const clock = (s: number) => `${Math.floor(s / 3600)}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`;
 
 /** A small seeded generator, so the particles fall the same way every visit. */
 function seeded(seed: number): () => number {
@@ -110,21 +113,23 @@ const reel: ReelModule = {
     /* ---------- the readout and the playhead ---------- */
     const ro = (key: string) => document.querySelector<HTMLElement>(`[data-br-ro='${key}']`);
     const roName = ro('name');
-    const roAlt = ro('alt');
-    const roDst = ro('dst');
     const roTc = ro('tc');
     const nav = document.querySelector<HTMLElement>('.railnav');
     // The engine's section watcher also counts <html data-sec>, so at the very bottom it
     // can report a tenth section for a frame: clamp to the nine that exist.
-    const section = () => Math.min(Math.max(ctx.section(), 0), CODES.length - 1);
+    const section = () => Math.min(Math.max(ctx.section(), 0), LAST);
+    // where the playhead stands, in sections: 0 is the first tick, LAST the last
+    let at = section();
+    const timecode = (p: number) => {
+      if (roTc) roTc.textContent = clock(Math.round((p / LAST) * RUNTIME));
+    };
     // the readout names the tick under the pointer (or focus), else the section in view
     let hovered = -1;
     let focused = -1;
     const readout = () => {
-      const i = hovered >= 0 ? hovered : focused >= 0 ? focused : section();
-      if (roName) roName.textContent = `${CODES[i]} · ${NAMES[i]}`;
-      if (roAlt) roAlt.textContent = ALTS[i];
-      if (roDst) roDst.textContent = DSTS[i];
+      const i = hovered >= 0 ? hovered : focused;
+      if (roName) roName.textContent = NAMES[i >= 0 ? i : section()];
+      timecode(i >= 0 ? i : at);
     };
     readout();
 
@@ -143,7 +148,9 @@ const reel: ReelModule = {
         const span = i < tops.length - 1 ? tops[i + 1] - tops[i] : 1;
         pos = i + (i < tops.length - 1 ? Math.min(1, Math.max(0, (probe - tops[i]) / span)) : 0);
       }
-      setInd((Math.min(pos, secs.length - 1) + 0.5) / secs.length);
+      at = Math.min(pos, secs.length - 1);
+      setInd((at + 0.5) / secs.length);
+      if (hovered < 0 && focused < 0) timecode(at);
     };
     if (ctx.reducedMotion) {
       setInd((section() + 0.5) / 9);
@@ -162,16 +169,6 @@ const reel: ReelModule = {
       playhead();
     }
     cleanups.push(() => nav?.style.removeProperty('--br-ind'));
-
-    // the timecode: seconds since the reel started screening (frames run in CSS)
-    const started = performance.now();
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const timer = window.setInterval(() => {
-      if (!roTc) return;
-      const s = Math.floor((performance.now() - started) / 1000);
-      roTc.textContent = `${pad(Math.floor(s / 3600))}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`;
-    }, 1000);
-    cleanups.push(() => window.clearInterval(timer));
 
     /* ---------- sections and acts ---------- */
     let act = actOf(ctx.reel, section());
@@ -198,7 +195,10 @@ const reel: ReelModule = {
     cleanups.push(() => window.clearTimeout(swell));
     ctx.onSection(() => {
       const i = section();
-      if (ctx.reducedMotion) setInd((i + 0.5) / 9);
+      if (ctx.reducedMotion) {
+        at = i;
+        setInd((i + 0.5) / 9);
+      }
       readout();
       const next = actOf(ctx.reel, i);
       if (next !== act) {

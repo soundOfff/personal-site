@@ -31,24 +31,10 @@
   --br-gut: 72px;
   --br-max: 1096px;
   --br-pad: max(var(--br-gut), calc((100% - var(--br-max)) / 2));
-  --br-act: 'LV-0';
   --br-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='20'%3E%3Cpolyline points='0,10 52,10 56,4 60,15 64,10 120,10' fill='none' stroke='%23E8C46F' stroke-width='1.4'/%3E%3C/svg%3E");
   --br-bl: 'Baseline · stable';
   --br-caustic-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='.012 .018' numOctaves='1' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .8 0 0 0 0 .4 -6 0 0 0 1.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
   --br-caustic-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='.016 .011' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .86 0 0 0 0 .56 -7 0 0 0 1.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
-
-  &[data-act='1'] {
-    --br-act: 'WLC';
-  }
-  &[data-act='2'] {
-    --br-act: 'LV';
-  }
-  &[data-act='3'] {
-    --br-act: 'LA';
-  }
-  &:is([data-act='4'], [data-sec='9']) {
-    --br-act: 'SNW';
-  }
 
   /* the agent's baseline readout, driven by playground cues (client.ts) */
   &[data-br-wave='think'] {
@@ -298,70 +284,6 @@
     opacity: 0;
   }
 
-  /* the viewfinder: corner brackets + a faint centre cross, inverted over whatever is under */
-  .br-vf {
-    position: fixed;
-    inset: 16px;
-    z-index: 39;
-    pointer-events: none;
-    mix-blend-mode: difference;
-  }
-  .br-vf i {
-    position: absolute;
-    display: block;
-    width: 30px;
-    height: 30px;
-    border: 0 solid #fff;
-  }
-  .br-vf .c1 {
-    left: 0;
-    top: 0;
-    border-left-width: 1px;
-    border-top-width: 1px;
-  }
-  .br-vf .c2 {
-    right: 0;
-    top: 0;
-    border-right-width: 1px;
-    border-top-width: 1px;
-  }
-  .br-vf .c3 {
-    left: 0;
-    bottom: 0;
-    border-left-width: 1px;
-    border-bottom-width: 1px;
-  }
-  .br-vf .c4 {
-    right: 0;
-    bottom: 0;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-  }
-  .br-vf .x {
-    left: 50%;
-    top: 50%;
-    width: 14px;
-    height: 14px;
-    margin: -7px 0 0 -7px;
-    background:
-      linear-gradient(#fff, #fff) center / 1px 100% no-repeat,
-      linear-gradient(#fff, #fff) center / 100% 1px no-repeat;
-    opacity: 0.22;
-  }
-  .br-grain {
-    position: fixed;
-    left: -50%;
-    top: -50%;
-    width: 200%;
-    height: 200%;
-    z-index: 60;
-    pointer-events: none;
-    opacity: 0.07;
-    mix-blend-mode: overlay;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='192' height='192' filter='url(%23n)'/%3E%3C/svg%3E")
-      0 0 / 192px 192px repeat;
-  }
-
   /* ============================================================
      THE HUD: the rail, restyled. Plates use the HUD's own colours in
      every act, so the tokens are re-pointed inside it.
@@ -406,29 +328,11 @@
     letter-spacing: 0.12em;
     color: var(--br-hud2);
   }
-  .rail .id > div::after {
-    content: '24 fps · 2.39:1 · ' var(--br-act) / '';
-    display: block;
-    font: 10.5px/1.5 var(--font-mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--br-hud2);
-  }
   .reelpick .rail-sec {
     margin: 0;
     font: 10.5px/1.4 var(--font-mono);
     letter-spacing: 0.14em;
     color: var(--br-hud2);
-  }
-  .reelpick .rail-sec > span:first-child::before {
-    content: '';
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin-right: 8px;
-    border-radius: 50%;
-    background: #e5532e;
-    vertical-align: 1px;
   }
   .reelpick .rail-sec [data-reel-no]::before {
     content: 'reel ' / '';
@@ -636,29 +540,8 @@
     letter-spacing: 0.14em;
     color: var(--br-hud);
   }
-  .br-tc {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .br-rec {
-    display: block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #e5532e;
-  }
-  .br-ff {
-    display: inline-block;
-    height: 1.35em;
-    overflow: hidden;
-  }
-  .br-ff-strip {
-    display: flex;
-    flex-direction: column;
-  }
-  .br-ff-strip span {
-    height: 1.35em;
+  .br-ro [data-br-ro='tc'] {
+    color: var(--br-hud);
   }
 
   /* ---- desktop: plates in the corners, the dock along the bottom ---- */
@@ -751,18 +634,6 @@
     .rail-foot .mono {
       display: none;
     }
-    .railnav a .nx::before {
-      content: 'LV-' / '';
-    }
-    .railnav a:nth-child(2) .nx::before {
-      content: 'WL-' / '';
-    }
-    .railnav a:nth-child(n + 6) .nx::before {
-      content: 'LA-' / '';
-    }
-    .railnav a:nth-child(9) .nx::before {
-      content: 'SN-' / '';
-    }
     .br-ro {
       position: absolute;
       right: calc(var(--dock-x) + 18px);
@@ -787,9 +658,6 @@
     .rail .id .nm {
       font-size: 16px;
       letter-spacing: 0.14em;
-    }
-    .rail .id > div::after {
-      display: none;
     }
     .rail .contact-wrap {
       display: block;
@@ -2441,16 +2309,6 @@
    ============================================================ */
 @media (prefers-reduced-motion: no-preference) {
   :root[data-reel='br2049'] {
-    .br-grain {
-      animation: br2049-grain 1s steps(6) infinite;
-    }
-    .reelpick .rail-sec > span:first-child::before,
-    .br-rec {
-      animation: br2049-rec 1.6s steps(1) infinite;
-    }
-    .br-ff-strip {
-      animation: br2049-ff 1s steps(24) infinite;
-    }
     .console-bar::before {
       animation: br2049-wv 2.4s linear infinite;
     }
@@ -2631,39 +2489,6 @@
 }
 
 /* ---------- keyframes ---------- */
-@keyframes br2049-grain {
-  0% {
-    transform: translate(0, 0);
-  }
-  17% {
-    transform: translate(-3%, 2%);
-  }
-  33% {
-    transform: translate(2%, -4%);
-  }
-  50% {
-    transform: translate(-4%, -1%);
-  }
-  67% {
-    transform: translate(3%, 3%);
-  }
-  83% {
-    transform: translate(-1%, 4%);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-@keyframes br2049-rec {
-  50% {
-    opacity: 0.25;
-  }
-}
-@keyframes br2049-ff {
-  to {
-    transform: translateY(-32.4em);
-  }
-}
 @keyframes br2049-wv {
   to {
     background-position-x: -120px;

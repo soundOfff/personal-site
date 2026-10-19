@@ -15,12 +15,13 @@
  * never screen this reel don't download a few hundred empty elements.
  */
 import type { StagePoint } from '../types';
-import reel from './config';
+import reel, { RUNTIME } from './config';
 
 interface Props {
   at: StagePoint;
 }
 const { at } = Astro.props;
+const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60) % 60).padStart(2, '0')}:00`;
 ---
 
 {
@@ -50,14 +51,6 @@ const { at } = Astro.props;
           <div class="br-snow" data-br-snow="46" />
         </div>
       </div>
-      <div class="br-vf" aria-hidden="true">
-        <i class="c1" />
-        <i class="c2" />
-        <i class="c3" />
-        <i class="c4" />
-        <i class="x" />
-      </div>
-      <div class="br-grain" aria-hidden="true" />
     </>
   )
 }
@@ -65,20 +58,9 @@ const { at } = Astro.props;
 {
   at === 'rail' && (
     <div class="br-ro" aria-hidden="true">
-      <b data-br-ro="name">LV-00 · readme</b>
+      <b data-br-ro="name">readme</b>
       <span>
-        alt <span data-br-ro="alt">1200</span> m · dst <span data-br-ro="dst">00.0</span> km
-      </span>
-      <span class="br-tc">
-        <i class="br-rec" />
-        rec <span data-br-ro="tc">00:00:00</span>:
-        <span class="br-ff">
-          <span class="br-ff-strip">
-            {Array.from({ length: 24 }, (_, i) => (
-              <span>{String(i).padStart(2, '0')}</span>
-            ))}
-          </span>
-        </span>
+        <span data-br-ro="tc">0:00:00</span> / {runtime}
       </span>
     </div>
   )
