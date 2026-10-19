@@ -1,7 +1,44 @@
+import type { ActInput } from '../tokens';
 import type { ReelConfig } from '../types';
 import { tokens } from '../tokens';
 
-/** Reel 03. Seeded from the design canvas board BladeRunner.dc.html; tune freely. */
+/**
+ * Reel 03 · Blade Runner 2049. No rail: the rail becomes a viewfinder HUD
+ * (plates in the corners, a scrubber dock along the bottom). Full-bleed acts:
+ * the cold open in the Las Vegas haze, a pinned flight into Los Angeles where
+ * the proof numbers are billboards, Wallace's water-light on the agent, the
+ * ruins, the rain, and snow on the steps at the end.
+ *
+ * Contrast (WCAG, on `paper`): Las Vegas ink 7.0, muted 6.3, accent ink 6.4 ·
+ * Wallace ink 15.1, muted 6.6, accent ink 11.2 · Los Angeles ink 15.1,
+ * muted 6.8, accent ink 7.3 · snow ink 14.8, muted 5.8, accent ink 5.9.
+ */
+
+/** The haze: a touch lighter than the board's #DD7A3C so ink clears 7:1. */
+const haze: ActInput = {
+  bg: '#E3853F',
+  bg2: '#DB7C39',
+  surface: '#EC9A5A',
+  ink: '#1A0B04',
+  ink2: '#2E1306',
+  muted: '#331204',
+  muted2: '#7A3A14',
+  line: 'rgba(26,11,4,.22)',
+  line2: 'rgba(26,11,4,.42)',
+  accent: '#7A2E0E',
+  accentInk: '#2E1306',
+  accentSoft: 'rgba(122,46,14,.14)',
+  onAccent: '#FFE9D2',
+  vars: {
+    'br-glow': 'rgba(255,226,186,.5)',
+    'blue-soft': 'rgba(26,11,4,.08)',
+    'blue-ink': '#2E1306',
+    'blue-edge': 'rgba(26,11,4,.3)',
+    'sage-ink': '#1F3A14',
+    'clay-ink': '#5A1606',
+  },
+};
+
 const br2049: ReelConfig = {
   id: 'br2049',
   n: '03',
@@ -33,16 +70,7 @@ const br2049: ReelConfig = {
       name: 'Cold open · Las Vegas haze',
       slug: 'EXT. LAS VEGAS — HAZE',
       sections: ['readme'],
-      tokens: tokens({
-        bg: '#DD7A3C',
-        surface: '#E89254',
-        ink: '#1A0B04',
-        ink2: '#2E1306',
-        muted: '#331204',
-        line: 'rgba(26,11,4,.24)',
-        accent: '#7A2E0E',
-        accentInk: '#2E1306',
-      }),
+      tokens: tokens(haze),
     },
     {
       code: 'WLC',
@@ -51,13 +79,30 @@ const br2049: ReelConfig = {
       sections: ['playground'],
       tokens: tokens({
         bg: '#16120B',
-        surface: '#211A10',
+        bg2: '#1C170E',
+        surface: '#241C11',
         ink: '#F1E6CF',
         ink2: '#D9CBAE',
         muted: '#A8987B',
+        muted2: '#7E705A',
         line: 'rgba(241,230,207,.14)',
+        line2: 'rgba(232,196,110,.34)',
         accent: '#E0B354',
         accentInk: '#E8C46F',
+        accentSoft: 'rgba(224,179,84,.12)',
+        onAccent: '#16120B',
+        vars: {
+          'br-glow': 'rgba(232,196,110,.4)',
+          'blue-soft': 'rgba(232,196,110,.07)',
+          'blue-ink': '#E8C46F',
+          'blue-edge': 'rgba(232,196,110,.3)',
+          'sage-soft': 'rgba(184,206,140,.1)',
+          'sage-ink': '#C3D49A',
+          'sage-edge': 'rgba(195,212,154,.32)',
+          'clay-soft': 'rgba(240,138,106,.12)',
+          'clay-ink': '#F29A7C',
+          'clay-edge': 'rgba(242,154,124,.36)',
+        },
       }),
     },
     {
@@ -65,16 +110,7 @@ const br2049: ReelConfig = {
       name: 'Las Vegas',
       slug: 'EXT. LAS VEGAS — RUINS IN THE HAZE',
       sections: ['work', 'oss', 'log'],
-      tokens: tokens({
-        bg: '#DD7A3C',
-        surface: '#E89254',
-        ink: '#1A0B04',
-        ink2: '#2E1306',
-        muted: '#331204',
-        line: 'rgba(26,11,4,.24)',
-        accent: '#7A2E0E',
-        accentInk: '#2E1306',
-      }),
+      tokens: tokens(haze),
     },
     {
       code: 'LA',
@@ -83,13 +119,26 @@ const br2049: ReelConfig = {
       sections: ['writing', 'principles', 'stack'],
       tokens: tokens({
         bg: '#0E171C',
+        bg2: '#111C22',
         surface: '#15222A',
         ink: '#E3ECEE',
         ink2: '#B9C8CD',
         muted: '#8FA2A9',
+        muted2: '#62777F',
         line: 'rgba(227,236,238,.14)',
+        line2: 'rgba(227,236,238,.26)',
         accent: '#E44D9B',
         accentInk: '#F27DB8',
+        accentSoft: 'rgba(228,77,155,.14)',
+        onAccent: '#0E171C',
+        vars: {
+          'br-glow': 'rgba(228,77,155,.55)',
+          'blue-soft': 'rgba(79,195,217,.08)',
+          'blue-ink': '#7FD6E4',
+          'blue-edge': 'rgba(79,195,217,.32)',
+          'sage-ink': '#9FD6A8',
+          'clay-ink': '#F27DB8',
+        },
       }),
     },
     {
@@ -99,13 +148,19 @@ const br2049: ReelConfig = {
       sections: ['now'],
       tokens: tokens({
         bg: '#E6ECEE',
+        bg2: '#DCE4E7',
         surface: '#F4F7F8',
         ink: '#0F1A20',
         ink2: '#2A3A42',
         muted: '#4C5D65',
+        muted2: '#8C9BA2',
         line: 'rgba(15,26,32,.16)',
+        line2: 'rgba(15,26,32,.3)',
         accent: '#1F5F7A',
         accentInk: '#1F5F7A',
+        accentSoft: 'rgba(31,95,122,.1)',
+        onAccent: '#F4F7F8',
+        vars: { 'br-glow': 'rgba(255,255,255,.7)' },
       }),
     },
   ],
@@ -115,7 +170,18 @@ const br2049: ReelConfig = {
     mono: "'Share Tech Mono', ui-monospace, monospace",
     title: "'Big Shoulders Display Variable', sans-serif",
   },
-  stages: [],
+  sections: {
+    readme: { slug: 'EXT. LAS VEGAS — HAZE' },
+    playground: { slug: 'INT. WALLACE — WATER LIGHT' },
+    work: { slug: 'EXT. LAS VEGAS — RUINS IN THE HAZE' },
+    oss: { slug: 'EXT. LAS VEGAS — TWO MONUMENTS' },
+    log: { slug: 'EXT. LAS VEGAS — DATES CARVED IN WOOD' },
+    writing: { slug: 'EXT. LOS ANGELES — NIGHT · RAIN' },
+    principles: { slug: 'EXT. LOS ANGELES — HOLOGRAMS' },
+    stack: { slug: 'INT. RECORDS ARCHIVE — ONE DRAWER PER TOOL' },
+    now: { slug: 'EXT. STEPS — SNOW' },
+  },
+  stages: ['backdrop', 'rail', 'in:readme', 'credits', 'title'],
   layout: { nav: 'hud', hero: 'fog', flow: 'drift', grid: 'wide' },
   scroll: [
     'hero-parallax-monoliths',
@@ -135,7 +201,7 @@ const br2049: ReelConfig = {
     'snow',
   ],
   sound: {
-    hover: 'tick',
+    hover: 'hud tick',
     click: 'hud click',
     section: 'brass swell per act',
     surface: 'hologram blip + brass stab',
