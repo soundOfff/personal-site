@@ -6,12 +6,13 @@
  */
 import { REELS, REEL_KEY, DEFAULT_REEL } from './registry';
 import { reelCss } from './css';
+import { REEL_CSS } from './stylesheets';
 
 const ids = REELS.map((r) => r.id);
 const css = reelCss(REELS);
 ---
 
-<script is:inline define:vars={{ key: REEL_KEY, ids, fallback: DEFAULT_REEL }}>
+<script is:inline define:vars={{ key: REEL_KEY, ids, fallback: DEFAULT_REEL, sheets: REEL_CSS }}>
   (function () {
     const root = document.documentElement;
     let picked = null;
@@ -21,6 +22,16 @@ const css = reelCss(REELS);
       picked = fallback;
     }
     root.dataset.reel = ids.indexOf(picked) >= 0 ? picked : fallback;
+    // The saved reel's stylesheet, parser-blocking so its first frame is already the film.
+    if (sheets[root.dataset.reel]) {
+      document.write(
+        '<link rel="stylesheet" href="' +
+          sheets[root.dataset.reel] +
+          '" data-reel-css="' +
+          root.dataset.reel +
+          '">',
+      );
+    }
     root.dataset.act = '0';
     root.dataset.sec = '0';
     // Nothing picked yet, and not a deep link: the box office opens.

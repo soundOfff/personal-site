@@ -279,9 +279,14 @@ html:root:not([data-reel='house']) [data-theme-toggle] {
     order: 2;
     flex: 1 0 100%;
   }
-  .reel-label,
-  .boxoffice-open {
+  .reel-label {
     display: none;
+  }
+  /* the only way back to the box office on a phone: keep it, as a quiet link */
+  .boxoffice-open {
+    display: block;
+    margin-top: 10px;
+    min-height: 24px;
   }
 }
 

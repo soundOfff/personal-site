@@ -15,10 +15,12 @@
 
 import { REELS, REEL_KEY, DEFAULT_REEL, actOf, reelById } from './registry';
 import { sound } from './sound';
+import { REEL_CSS } from './stylesheets';
 import type { Cue, ReelConfig, ReelContext, ReelModule } from './types';
 
 const loaders = import.meta.glob<{ default: ReelModule }>('./*/client.ts');
 const loaderFor = (id: string) => loaders[`./${id}/client.ts`];
+const cssLoads = new Map<string, Promise<void>>();
 
 type ReelListener = (reel: ReelConfig) => void;
 
@@ -53,6 +55,51 @@ export function onReelChange(cb: ReelListener): () => void {
 }
 
 export { sound };
+
+/* ---------- loading ---------- */
+
+/**
+ * Attach a reel's stylesheet (once) and resolve when it has applied. Its
+ * rules are scoped to `html[data-reel]`, so it can stay after a switch away.
+ * Errors and slow networks resolve too: a reel without its CSS still reads.
+ */
+export function loadCss(id: string): Promise<void> {
+  const href = REEL_CSS[id];
+  if (!href) return Promise.resolve();
+  let pending = cssLoads.get(id);
+  if (pending) return pending;
+  if (document.querySelector(`link[data-reel-css='${id}']`)) {
+    // written by the head bootstrap, parser-blocking: already applied
+    pending = Promise.resolve();
+  } else {
+    pending = new Promise<void>((resolve) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      link.dataset.reelCss = id;
+      link.addEventListener('load', () => resolve(), { once: true });
+      link.addEventListener(
+        'error',
+        () => {
+          cssLoads.delete(id);
+          link.remove();
+          resolve();
+        },
+        { once: true },
+      );
+      setTimeout(resolve, 5000);
+      document.head.appendChild(link);
+    });
+  }
+  cssLoads.set(id, pending);
+  return pending;
+}
+
+/** Fetch a reel's module and stylesheet ahead of a likely switch (hover, focus). */
+export function prefetch(id: string): void {
+  void loadCss(id);
+  void loadModule(id);
+}
 
 /* ---------- mounting ---------- */
 
@@ -157,7 +204,8 @@ export async function switchReel(id: string, opts: SwitchOptions = {}): Promise<
   if (next.id === currentReel().id && mounted?.id === next.id) return;
 
   const projector = document.querySelector<HTMLElement>('[data-projector]');
-  const preload = loadModule(next.id);
+  // Module and stylesheet load while the projector runs; both land before the reel applies.
+  const preload = Promise.all([loadModule(next.id), loadCss(next.id)]).then(([mod]) => mod);
 
   if (opts.instant || reducedMotion.matches || !projector) {
     apply(next);
@@ -263,8 +311,12 @@ function wireSwitcher(): void {
     b.addEventListener('pointerenter', () => {
       label(reel);
       sound.tick();
+      prefetch(reel.id);
     });
-    b.addEventListener('focus', () => label(reel));
+    b.addEventListener('focus', () => {
+      label(reel);
+      prefetch(reel.id);
+    });
     b.addEventListener('pointerleave', () => label(currentReel()));
     b.addEventListener('blur', () => label(currentReel()));
   });
@@ -309,7 +361,10 @@ export function boot(): void {
     if (cue) cueListeners.forEach((l) => l(cue));
   });
 
-  if (reel.id !== DEFAULT_REEL) void mount(reel);
+  if (reel.id !== DEFAULT_REEL) {
+    void loadCss(reel.id); // no-op when the bootstrap already wrote its <link>
+    void mount(reel);
+  }
 }
 
 /** For the box office and tests: every reel, in switcher order. */
