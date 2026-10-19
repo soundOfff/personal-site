@@ -95,10 +95,31 @@ export function loadCss(id: string): Promise<void> {
   return pending;
 }
 
-/** Fetch a reel's module and stylesheet ahead of a likely switch (hover, focus). */
+/**
+ * Warm the reel's title-card face once its CSS (and so its @font-face) is in,
+ * so the card never shows before its glyphs. Bounded: a slow font never
+ * holds up the projector for long.
+ */
+function warmFonts(id: string): Promise<void> {
+  const reel = reelById(id);
+  const face = reel?.type?.title ?? reel?.type?.display;
+  if (!reel || !face || !document.fonts) return Promise.resolve();
+  const text = `${reel.native ?? ''}${reel.title}`;
+  const load = document.fonts.load(`1em ${face}`, text).then(
+    () => undefined,
+    () => undefined,
+  );
+  return Promise.race([load, wait(900)]);
+}
+
+/** Everything a switch needs before the reel can apply. */
+function prepare(id: string): Promise<ReelModule | null> {
+  return Promise.all([loadModule(id), loadCss(id).then(() => warmFonts(id))]).then(([mod]) => mod);
+}
+
+/** Fetch a reel's module, stylesheet and title face ahead of a likely switch (hover, focus). */
 export function prefetch(id: string): void {
-  void loadCss(id);
-  void loadModule(id);
+  void prepare(id);
 }
 
 /* ---------- mounting ---------- */
@@ -204,8 +225,8 @@ export async function switchReel(id: string, opts: SwitchOptions = {}): Promise<
   if (next.id === currentReel().id && mounted?.id === next.id) return;
 
   const projector = document.querySelector<HTMLElement>('[data-projector]');
-  // Module and stylesheet load while the projector runs; both land before the reel applies.
-  const preload = Promise.all([loadModule(next.id), loadCss(next.id)]).then(([mod]) => mod);
+  // Module, stylesheet and title face load while the projector runs; all land before the reel applies.
+  const preload = prepare(next.id);
 
   if (opts.instant || reducedMotion.matches || !projector) {
     apply(next);

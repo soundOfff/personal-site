@@ -66,10 +66,12 @@
   initial-value: #fbe6c8;
 }
 
-/* Only while a film is screening: House lights keeps editorial-ui's own timing. */
+/* Only while a film is screening: House lights keeps editorial-ui's own timing.
+   One ease per change: body eases the root's act tokens for everything that
+   inherits them, sections ease their own. Any element further down that also
+   transitioned would stack a second ease on top (the rail used to). */
 html:root:not([data-reel='house']) body,
-html:root:not([data-reel='house']) .rail,
-html:root:not([data-reel='house']) [data-sec] {
+html:root:not([data-reel='house']) section[data-sec] {
   transition:
     --paper 0.8s,
     --paper-2 0.8s,
