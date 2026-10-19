@@ -2213,11 +2213,13 @@
         animation: br2049-bb linear both;
         animation-timeline: --br-flight;
       }
-      /* nearer signs are bigger, and the nearest runs off the frame */
+      /* nearer signs are bigger, and the nearest runs off the frame. Its padding
+         on the cut side keeps the words inside the frame */
       #readme .metrics .m:nth-child(1) {
         --v: clamp(110px, 13vw, 200px);
-        left: -14px;
+        left: -28px;
         top: 15%;
+        padding-left: 58px;
         animation-range: entry 70% contain 12%;
       }
       #readme .metrics .m:nth-child(2) {
@@ -2247,8 +2249,9 @@
       @media (max-width: 820px) {
         #readme .metrics .m:nth-child(1) {
           --v: 84px;
-          left: -10px;
+          left: -16px;
           top: 9%;
+          padding-left: 32px;
         }
         #readme .metrics .m:nth-child(2) {
           --v: 70px;
