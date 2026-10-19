@@ -335,9 +335,6 @@
     letter-spacing: 0.14em;
     color: var(--br-hud2);
   }
-  .reelpick .rail-sec [data-reel-no]::before {
-    content: 'reel ' / '';
-  }
   .reels {
     gap: 6px;
   }
