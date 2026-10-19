@@ -6,8 +6,10 @@
 /* ============================================================
    Reel 05 · 2001: A Space Odyssey.
    Axial symmetry: every section centres on one axis between the act strip
-   (left) and the ship console (the rail, moved to the right). Michroma for
-   titles and labels, Hanken Grotesk for reading, DM Mono for instruments.
+   (left) and the ship console (the rail, moved to the right). Michroma is the
+   ship (console, screens, HAL, section names); Gill Sans is the film's own
+   titles (title card, intertitles, credits); DM Mono is the screenplay's
+   sluglines and the instruments' data; Hanken Grotesk is for reading.
    Every rule lives inside :root[data-reel='odyssey'] (keyframes and
    @property are the exception: top level, prefixed 'odyssey-').
    ============================================================ */
@@ -215,7 +217,7 @@
     height: 27px;
     padding: 0 8px;
     border-radius: 3px;
-    font: 400 9.5px var(--font-display);
+    font: 400 10.5px var(--font-display);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     white-space: nowrap;
@@ -258,8 +260,8 @@
   /* the switcher, as a reel select */
   & .rail-sec {
     margin-bottom: 6px;
-    font: 8.5px var(--font-mono);
-    letter-spacing: 0.16em;
+    font: 10.5px var(--font-mono);
+    letter-spacing: 0.12em;
     color: var(--muted);
   }
   & .reels {
@@ -297,8 +299,8 @@
     margin: 4px -6px 0;
     padding: 4px 6px;
     border-radius: 3px;
-    font: 400 8.5px var(--font-display);
-    letter-spacing: 0.12em;
+    font: 400 10.5px var(--font-display);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
     color: var(--ink-2);
@@ -344,8 +346,8 @@
     border-radius: 3px;
     background: #dfe1dc;
     color: var(--ink);
-    font: 400 8.5px var(--font-display);
-    letter-spacing: 0.12em;
+    font: 400 10.5px var(--font-display);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
   & .snd:hover {
@@ -577,9 +579,9 @@
     align-items: center;
     height: 48px;
     border-radius: 24px;
-    font: 400 10.5px var(--font-display);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    font: 500 15px var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
     text-decoration: none;
     transition:
       transform 0.15s var(--od-ease),
@@ -815,8 +817,7 @@
     margin: 0;
   }
   & .od-cx-t {
-    margin-top: 10px !important;
-    font: 400 clamp(16px, 2.2vw, 30px) / 1.45 var(--font-display);
+    font: 300 clamp(20px, 2.6vw, 36px) / 1.4 var(--font-title);
     letter-spacing: 0.42em;
     padding-left: 0.42em;
     text-transform: uppercase;
@@ -824,7 +825,7 @@
   }
   & .od-cx-s {
     margin-top: 12px !important;
-    font: 400 10.5px var(--font-display);
+    font: 400 13px var(--font-title);
     letter-spacing: 0.38em;
     padding-left: 0.38em;
     text-transform: uppercase;
@@ -1065,9 +1066,9 @@
     color: #f2f2f0;
     box-shadow: none;
     filter: none;
-    font: 400 10.5px var(--font-display);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    font: 500 15px var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
     transition:
       background-color 0.15s,
       transform 0.12s;
@@ -1791,7 +1792,7 @@
   & .toolcol .h {
     margin: 0;
     padding-right: 6px;
-    font: 400 9.5px var(--font-display);
+    font: 400 10.5px var(--font-display);
     letter-spacing: 0.28em;
     color: var(--muted);
     text-align: right;
@@ -1915,7 +1916,7 @@
   }
   & .od-mono-cap {
     margin: 0;
-    font: 400 10px/1.8 var(--font-display);
+    font: 400 10.5px/1.8 var(--font-display);
     letter-spacing: 0.24em;
     text-transform: uppercase;
     text-align: center;
@@ -1943,7 +1944,7 @@
     border-top: 0;
   }
   & .spec dt {
-    font: 400 9.5px var(--font-display);
+    font: 400 10.5px var(--font-display);
     letter-spacing: 0.16em;
     color: var(--muted);
   }
@@ -2080,7 +2081,7 @@
     pointer-events: none;
   }
   & .od-rn {
-    font: 400 10px var(--font-display);
+    font: 400 10.5px var(--font-display);
     letter-spacing: 0.06em;
     opacity: 0.38;
     transition: opacity 0.3s;
@@ -2105,7 +2106,7 @@
     margin-top: 14px;
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font: 400 9px var(--font-display);
+    font: 400 10.5px var(--font-display);
     letter-spacing: 0.34em;
     text-transform: uppercase;
     white-space: nowrap;
@@ -2649,18 +2650,12 @@
     box-shadow: inset 0 2px 1px rgba(255, 250, 235, 0.35);
   }
   & .od-t-n {
-    font:
-      400 clamp(40px, 7vw, 68px) / 1 'Michroma',
-      system-ui,
-      sans-serif;
+    font: 300 clamp(48px, 8vw, 84px) / 1 var(--font-title);
     letter-spacing: 0.5em;
     padding-left: 0.5em;
   }
   & .od-t-s {
-    font:
-      400 clamp(11px, 1.5vw, 15px) / 1.3 'Michroma',
-      system-ui,
-      sans-serif;
+    font: 400 clamp(13px, 1.7vw, 17px) / 1.3 var(--font-title);
     letter-spacing: 0.5em;
     padding-left: 0.5em;
     text-transform: uppercase;
@@ -2672,11 +2667,8 @@
     background: linear-gradient(90deg, rgba(237, 237, 234, 0), #ededea, rgba(237, 237, 234, 0));
   }
   & .od-t-c {
-    font:
-      10.5px 'DM Mono',
-      ui-monospace,
-      monospace;
-    letter-spacing: 0.18em;
+    font: 400 11.5px var(--font-title);
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: #c4c6c2;
   }
@@ -2689,7 +2681,7 @@
       animation: odyssey-earthup 0.8s cubic-bezier(0.2, 0.7, 0.1, 1) both;
     }
     &[data-state='card'] .od-t-n {
-      animation: odyssey-spread 1.2s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+      animation: odyssey-fade 0.6s 0.3s both;
     }
     &[data-state='card'] .od-t-s {
       animation: odyssey-fade 0.5s 0.3s both;
@@ -2827,7 +2819,6 @@
 @keyframes odyssey-cardin {
   from {
     opacity: 0;
-    letter-spacing: 0.9em;
   }
 }
 @keyframes odyssey-spin {
@@ -2867,12 +2858,6 @@
 @keyframes odyssey-earthup {
   from {
     transform: translateY(40px);
-  }
-}
-@keyframes odyssey-spread {
-  from {
-    opacity: 0;
-    letter-spacing: 1.1em;
   }
 }
 @keyframes odyssey-fade {

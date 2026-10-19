@@ -151,7 +151,8 @@ const odyssey: ReelConfig = {
     display: "'Michroma', 'Hanken Grotesk Variable', system-ui, sans-serif",
     body: "'Hanken Grotesk Variable', system-ui, sans-serif",
     mono: "'DM Mono', ui-monospace, Menlo, monospace",
-    title: "'Michroma', system-ui, sans-serif",
+    // the film's own titles and intertitles are Gill Sans; Michroma is the ship's
+    title: "'Gill Sans', 'Gill Sans MT', 'Hanken Grotesk Variable', system-ui, sans-serif",
   },
   sections: {
     readme: { slug: slug('EXT. SPACE', 'BEHIND THE MOON', 'SUNRISE') },
