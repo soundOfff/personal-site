@@ -20,6 +20,12 @@
     'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
+/* editorial-ui's light --muted (#807A6F) is 4.1:1 on paper and 3.5:1 on
+   paper-3. This one holds 4.5:1 on all three grounds; dark mode keeps its own. */
+:root {
+  --muted: #6e685e;
+}
+
 /* ---- 2. base ---- */
 *,
 *::before,
@@ -189,7 +195,7 @@ a {
 .railnav a .nx {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--muted-2);
+  color: var(--muted);
   width: 18px;
 }
 .railnav a:hover,
@@ -200,10 +206,10 @@ a {
 
 .rail-sec {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   margin-bottom: 6px;
 }
 .contact {
@@ -239,10 +245,10 @@ a {
 }
 .rail-foot .mono {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 
 /* ── content column ── */
@@ -393,6 +399,12 @@ a {
   display: inline-flex;
   gap: 5px;
 }
+/* On House lights the launcher's three dots would be traffic lights with
+   nothing behind them (the panel's are real buttons). The markup stays
+   because the films draw their own props in it. */
+:root[data-reel='house'] .a2-launch .lights {
+  display: none;
+}
 .console-bar .lights i {
   width: 9px;
   height: 9px;
@@ -459,7 +471,7 @@ a {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 .a2-launch .a2-starters,
 .a2-launch .live-note {
@@ -702,7 +714,7 @@ a {
   font-size: 10.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   transition: color 0.12s;
 }
 .a2-peek > summary::-webkit-details-marker {
@@ -768,7 +780,7 @@ a {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 
 /* ── composer ── */
@@ -816,7 +828,7 @@ a {
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   padding-top: 6px;
 }
 .a2-starter-group .a2-starters {
@@ -837,7 +849,7 @@ a {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--muted-2);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 .a2-quota.is-spent {
@@ -1676,7 +1688,7 @@ a.hash:hover {
 .logitem .date {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 .logitem .tag {
   font-family: var(--font-mono);
@@ -1742,7 +1754,7 @@ a.hash:hover {
 .wrow .rt {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--muted-2);
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -1786,10 +1798,10 @@ a.hash:hover {
 }
 .toolcol .h {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   margin-bottom: 12px;
 }
 .toolcol ul {
@@ -1807,11 +1819,6 @@ a.hash:hover {
   display: flex;
   align-items: center;
   gap: 9px;
-}
-.toolcol li::before {
-  content: '$';
-  color: var(--amber-deep);
-  font-size: 11px;
 }
 
 /* ============================================================
@@ -2378,12 +2385,6 @@ a.hash:hover {
   .toolbox {
     grid-template-columns: 1fr;
     gap: 18px;
-  }
-  .toolcol {
-    text-align: center;
-  }
-  .toolcol li {
-    justify-content: center;
   }
 
   /* metrics: a tidy 2-up grid; an odd last card spans the full width so the
