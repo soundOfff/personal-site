@@ -4,9 +4,10 @@
  * config.stages; the engine hides it unless this reel is screening.
  *
  * The page is a house and scrolling goes down it: the living-room window
- * (the hero), the stairs in the rain, the semi-basement, the bunker. Every
- * piece here is scenery (aria-hidden) except the Morse key, which is a real
- * button, and the end credits, which carry the homage line.
+ * (the hero), the stairs in the rain, the semi-basement and its street-level
+ * window, the bunker. Every piece here is scenery (aria-hidden) except the
+ * Morse key, which is a real button, and the end credits, which carry the
+ * homage line.
  */
 import type { StagePoint } from '../types';
 import parasite from './config';
@@ -79,12 +80,7 @@ const drops = Array.from({ length: 56 }, () => {
         <span class="px-kr" lang="ko">
           기생충
         </span>
-        <span class="px-kr-sub">Parasite · 2019</span>
       </div>
-      <p class="px-ratio" aria-hidden="true">
-        <span>2.39 : 1 · the living-room window</span>
-        <span>EXT. garden, seen from inside</span>
-      </p>
     </>
   )
 }
@@ -97,19 +93,25 @@ const drops = Array.from({ length: 56 }, () => {
           <i class="px-drop" style={style} />
         ))}
       </div>
-      <div class="px-steps">
-        {Array.from({ length: 10 }, (_, i) => (
-          <i style={`margin-top:${i * 18}px`} />
-        ))}
-      </div>
       <div class="px-water" />
-      <p class="px-il-a">
-        S#04 → S#05 · <span lang="ko">비</span> · rain all night
-      </p>
-      <p class="px-il-b">
-        ↓ B1 · <span lang="ko">반지하</span> · semi-basement
-      </p>
+      <p class="px-il">It rains all night. The water runs down the stairs ahead of them.</p>
     </div>
+  )
+}
+
+{
+  at === 'in:writing' && (
+    <>
+      <div class="px-strip" data-px-strip aria-hidden="true">
+        <span class="px-fog" />
+        <span class="px-mull">
+          <i />
+          <i />
+          <i />
+        </span>
+      </div>
+      <div class="px-smoke" aria-hidden="true" />
+    </>
   )
 }
 

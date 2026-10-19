@@ -156,7 +156,7 @@ const parasite: ReelConfig = {
   ],
   layout: { nav: 'rail', hero: 'window', flow: 'descent', grid: 'left' },
   scroll: ['window-to-dusk', 'staircase-rail', 'flood-interlude'],
-  motifs: ['bar', 'descent', 'lamps', 'window', 'wifi', 'rain', 'morse'],
+  motifs: ['bar', 'descent', 'lamps', 'window', 'wifi', 'rain', 'fumigation', 'morse'],
   sound: {
     score: "after Jung Jae-il: harpsichord (8' + 4') and string trio, C minor",
     hover: 'harpsichord quill',

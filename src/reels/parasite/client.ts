@@ -13,6 +13,7 @@
  *     the rail's stair treads, the semi-basement's tube, the bunker's bulb,
  *   - the censor bar on the headline, timed to clear after the title card,
  *   - rain you hear only while the interlude is on screen,
+ *   - the fumigation smoke through the semi-basement window, once,
  *   - a harpsichord quill on hover and a key on click,
  *   - the playground scored: signal bars, a tirata as it opens and closes, a
  *     climbing figure per surface (a note per component), a trilled cadence when
@@ -237,6 +238,21 @@ const reel: ReelModule = {
     on(window, 'pointerdown', rainOn);
     on(window, 'keydown', rainOn);
 
+    /* ---- the fumigation truck goes by the semi-basement window, the first time you see it ---- */
+    const strip = document.querySelector<HTMLElement>('[data-px-strip]');
+    if (strip && !ctx.reducedMotion) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          strip.classList.add('is-fumigated');
+        },
+        { threshold: 1 },
+      );
+      io.observe(strip);
+      signal.addEventListener('abort', () => io.disconnect(), { once: true });
+    }
+
     /* ---- a quill on hover, a key on press; the glass rings, the log's steps thud ---- */
     const interactive = 'a[href], button, summary, .idx tr[data-href]';
     const own = '[data-reel-pick], [data-sound-toggle], [data-boxoffice-open], [data-px-key]';
@@ -304,6 +320,7 @@ const reel: ReelModule = {
       rainOff();
       offSound();
       rainEl?.classList.remove('is-raining');
+      strip?.classList.remove('is-fumigated');
       nav?.style.removeProperty('--px-mark');
       nav?.style.removeProperty('--px-deep');
       delete root.dataset.pxLit;
