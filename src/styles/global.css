@@ -361,9 +361,10 @@ a {
   text-transform: uppercase;
   color: var(--muted);
   margin-top: 5px;
-  /* labels cap at two lines; longer ones truncate rather than stretch the row */
+  /* three lines is what a film's narrow plaque needs for "South America finalist";
+     anything longer truncates rather than stretch the row */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
