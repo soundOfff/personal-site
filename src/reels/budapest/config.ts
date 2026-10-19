@@ -158,7 +158,8 @@ const budapest: ReelConfig = {
     signature: 'key ring, whip pan, date stamp, switchboard relay, service bell',
     title: 'timpani roll into an organ chord, a trembling balalaika over it, dead stop',
   },
-  credits: 'Inspired by The Grand Budapest Hotel (Wes Anderson, 2014). Not affiliated with the film.',
+  credits:
+    'Inspired by The Grand Budapest Hotel, a film by Wes Anderson. Not affiliated with the film or its makers.',
   announce: 'Now showing: The Grand Budapest Hotel, 2014',
 };
 
