@@ -48,15 +48,32 @@
   /* the column: 880px, and never under the 1932 matte's side bars */
   --gb-gutter: 22px;
   --gb-ar: 1.37;
+  --gb-era: 0;
   --radius-card: 0px;
   --radius-control: 0px;
   --radius-chip: 0px;
 
+  /* The frame follows the act until the client is running; from then on
+     the interludes cut it (data-gb-ar), as the film cuts on a new era. */
+  &[data-act='1'] {
+    --gb-ar: 2.35;
+    --gb-era: 1;
+  }
+  &[data-act='2'] {
+    --gb-ar: 1.85;
+    --gb-era: 2;
+  }
+  &[data-gb-ar='0'] {
+    --gb-ar: 1.37;
+    --gb-era: 0;
+  }
   &[data-gb-ar='1'] {
     --gb-ar: 2.35;
+    --gb-era: 1;
   }
   &[data-gb-ar='2'] {
     --gb-ar: 1.85;
+    --gb-era: 2;
   }
   &[data-sec='1'] {
     --gb-sec: 1;
@@ -323,11 +340,8 @@
     color: var(--gb-rose);
     letter-spacing: 0.22em;
   }
-  &[data-gb-ar='1'] .gb-era-roll > span {
-    transform: translateY(-14px);
-  }
-  &[data-gb-ar='2'] .gb-era-roll > span {
-    transform: translateY(-28px);
+  .gb-era-roll > span {
+    transform: translateY(calc(var(--gb-era) * -14px));
   }
 
   /* ---- the switcher, the sound, the contacts: on the front desk ---- */
