@@ -658,6 +658,17 @@
       .rail .contact-wrap:not(:hover, :focus-within) .rail-sec {
         display: block;
       }
+      /* the plates' ground: the column fades into the act's colour before it
+         reaches them, so a folded plate never sits on a line of text */
+      .rail::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto;
+        height: 120px;
+        /* --page, because the rail sets its own --paper for the plates */
+        background: var(--page);
+        mask-image: linear-gradient(#000 84px, transparent);
+      }
     }
   }
 
