@@ -89,11 +89,13 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
       id: 'next',
       type: 'Actions',
       props: {
+        // Not the QUICK_STARTERS row under the composer: two rows of the same
+        // four questions on one screen offer one choice twice.
         prompts: [
-          'What has he shipped?',
-          'How does the LLM routing work?',
-          'What is he writing about?',
-          'What does ICPC say about him?',
+          'What did he build at Dex?',
+          'How does he keep LLM costs down?',
+          'What does "evals are contracts" mean?',
+          'What is he working on now?',
         ],
       },
     },
