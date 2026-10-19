@@ -1,15 +1,27 @@
 import type { ReelConfig } from '../types';
 import { tokens } from '../tokens';
 
-/** Reel 04. Seeded from the design canvas board Budapest.dc.html; tune freely. */
+/**
+ * Reel 04 · The Grand Budapest Hotel. Three eras of one hotel, one per act,
+ * and the frame changes shape with each: 1932 in Academy ratio, 1968 widened
+ * to scope, 1985 settled at flat widescreen. Everything sits on one centred
+ * axis.
+ *
+ * Contrast (WCAG, against each act's `paper`):
+ *   1932  ink 12.5 · muted 5.5 · accentInk 6.7 · card-ink on card 7.8
+ *   1968  ink 11.2 · muted 5.5 · accentInk 5.6 · card-ink on card 8.6
+ *   1985  ink 13.5 · muted 6.0 · accentInk 7.1 · card-ink on card 6.6
+ * The hotel chrome (key rack, front desk) is plum throughout: rose ink 12.4,
+ * mauve 7.9, gold 6.9.
+ */
 const budapest: ReelConfig = {
   id: 'budapest',
   n: '04',
   title: 'The Grand Budapest Hotel',
   year: 2014,
   director: 'Wes Anderson',
-  ratio: '1.37 · 1.85 · 2.35',
-  meta: '2014 · Wes Anderson · 1.37 · 1.85 · 2.35',
+  ratio: '1.37 · 2.35 · 1.85',
+  meta: '2014 · Wes Anderson · 1.37 · 2.35 · 1.85',
   bands: [
     ['#F2C6D0', 3],
     ['#E8A6B8', 2],
@@ -38,8 +50,12 @@ const budapest: ReelConfig = {
         ink2: '#4A2347',
         muted: '#6E4B66',
         line: 'rgba(46,20,48,.18)',
+        line2: 'rgba(46,20,48,.32)',
         accent: '#B3262D',
         accentInk: '#8E1B26',
+        accentSoft: '#F4B6C2',
+        onAccent: '#FBEFE6',
+        vars: { card: '#5B2A6E', 'card-ink': '#F6D7DE', 'card-mute': '#E9C9D6' },
       }),
     },
     {
@@ -54,8 +70,12 @@ const budapest: ReelConfig = {
         ink2: '#4D3219',
         muted: '#6B4F2E',
         line: 'rgba(51,32,15,.2)',
+        line2: 'rgba(51,32,15,.34)',
         accent: '#B4541E',
         accentInk: '#8A3B12',
+        accentSoft: '#E8C48A',
+        onAccent: '#FBEFE6',
+        vars: { card: '#5A3A1E', 'card-ink': '#F7EAD0', 'card-mute': '#E3CFA6' },
       }),
     },
     {
@@ -70,8 +90,12 @@ const budapest: ReelConfig = {
         ink2: '#3B2A4C',
         muted: '#5A4F69',
         line: 'rgba(36,21,50,.18)',
+        line2: 'rgba(36,21,50,.32)',
         accent: '#A3212B',
         accentInk: '#8E1B26',
+        accentSoft: '#F2C6D0',
+        onAccent: '#FBEFE6',
+        vars: { card: '#A3212B', 'card-ink': '#FBEFE6', 'card-mute': '#F6D7DE' },
       }),
     },
   ],
@@ -81,7 +105,34 @@ const budapest: ReelConfig = {
     mono: "'Courier Prime', ui-monospace, monospace",
     title: "'Playfair Display Variable', Georgia, serif",
   },
-  stages: [],
+  sections: {
+    readme: { slug: 'in which a dispatcher is introduced' },
+    playground: { slug: 'in which the concierge takes a question' },
+    work: { slug: 'in which the guests are entered in the register' },
+    oss: { slug: 'in which two portraits are acquired' },
+    log: { slug: 'in which word arrives by wire' },
+    writing: { slug: 'in which four courses are served' },
+    principles: { slug: 'in which the house keeps its rules' },
+    stack: { slug: 'in which a tower is assembled' },
+    now: { slug: 'in which the author is at your service' },
+  },
+  stages: [
+    'backdrop',
+    'rail',
+    'title',
+    'in:readme',
+    'in:playground',
+    'in:work',
+    'in:oss',
+    'in:log',
+    'in:writing',
+    'in:principles',
+    'in:stack',
+    'in:now',
+    'after:work',
+    'after:writing',
+    'credits',
+  ],
   layout: { nav: 'keyrack', hero: 'diorama', flow: 'ratios', grid: 'centered' },
   scroll: [
     'frame matte changes aspect ratio by era (1.37 → 2.35 → 1.85)',
