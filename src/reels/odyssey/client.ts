@@ -122,13 +122,18 @@ function mount(ctx: ReelContext): () => void {
   };
   setAgent('idle');
   /* The lamps follow the quota the playground prints once the server has
-     counted ("4 of 5 left today"). Until then all five stay lit. */
+     counted ("4 of 5 left today"). Until then all five stay lit. The island
+     renders the count after its cue, and on the daily-cap path only after the
+     error, so watch its section rather than time a read off the cues. */
+  const pg = $('.block[data-sec="1"]');
   const readQuota = () => {
-    const text = $('.a2-launch-count, .a2-quota')?.textContent ?? '';
+    const text = pg?.querySelector('.a2-launch-count, .a2-quota')?.textContent ?? '';
     const m = /(\d+)\s*(?:of|\/)\s*(\d+)/.exec(text);
     if (m) root.dataset.odLeft = String(Math.min(LAMPS, Number(m[1])));
   };
   readQuota();
+  const quotaMO = new MutationObserver(readQuota);
+  if (pg) quotaMO.observe(pg, { childList: true, subtree: true, characterData: true });
   ctx.onCue((cue) => {
     switch (cue.name) {
       case 'open':
@@ -159,8 +164,6 @@ function mount(ctx: ReelContext): () => void {
         cadence(S, n * 0.15 + 0.12);
         later(() => setAgent('done'), n * 150 + 500);
         settleLater(n * 150 + 3200);
-        // the island renders the new count just after it cues
-        later(readQuota, 60);
         break;
       }
       case 'error':
@@ -168,7 +171,6 @@ function mount(ctx: ReelContext): () => void {
         fault(S);
         setAgent('error');
         settleLater(2600);
-        later(readQuota, 60);
         break;
     }
   });
@@ -499,6 +501,7 @@ function mount(ctx: ReelContext): () => void {
     if (praf) cancelAnimationFrame(praf);
     zoneIO.disconnect();
     sceneIO.disconnect();
+    quotaMO.disconnect();
     heroIO?.disconnect();
     offSound();
     [redHum, gate, entr, monolith, thinking, station].forEach((b) => b?.stop(0.3));
