@@ -247,7 +247,7 @@ export default function A2UIPlayground() {
     [ask],
   );
 
-  /* The hero's "Open the playground" asks for the panel with an event. A click
+  /* The hero button asks for the panel with an event. A click
      that landed before this island hydrated left a flag instead. */
   useEffect(() => {
     const root = document.documentElement;
