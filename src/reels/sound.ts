@@ -174,6 +174,7 @@ export class SoundKit {
     const dur = o.dur ?? 0.05;
     const osc = ac.createOscillator();
     const g = ac.createGain();
+    g.gain.value = 0;
     osc.type = o.type ?? 'sine';
     osc.frequency.setValueAtTime(o.f0, t);
     if (o.f1 && o.f1 !== o.f0)
@@ -197,6 +198,7 @@ export class SoundKit {
     f.frequency.value = o.f ?? 2000;
     f.Q.value = o.q ?? 0.9;
     const g = ac.createGain();
+    g.gain.value = 0;
     g.gain.setValueAtTime(o.vol ?? 0.3, t);
     g.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
     n.connect(f);
@@ -224,6 +226,7 @@ export class SoundKit {
     lp.frequency.setValueAtTime(7000, t);
     lp.frequency.exponentialRampToValueAtTime(900, t + 0.25);
     const g = ac.createGain();
+    g.gain.value = 0;
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + 0.003);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
@@ -328,6 +331,7 @@ export class SoundKit {
     lfo.connect(lg);
     lg.connect(amp.gain);
     const env = ac.createGain();
+    env.gain.value = 0;
     env.gain.setValueAtTime(0.0001, t);
     env.gain.exponentialRampToValueAtTime(0.09, t + 0.15);
     env.gain.setValueAtTime(0.09, t + dur - 0.35);
@@ -355,6 +359,7 @@ export class SoundKit {
       f.frequency.exponentialRampToValueAtTime(hz, t + (dur * (i + 1)) / freqs.length);
     });
     const g = ac.createGain();
+    g.gain.value = 0;
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + 0.03);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
