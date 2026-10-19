@@ -1690,6 +1690,10 @@
     letter-spacing: 0.14em;
     color: var(--muted);
   }
+  /* most rows have no commit: the tag takes the hash's place, over the message */
+  #log .logitem:not(:has(.hash)) .tag {
+    grid-column: 2 / -1;
+  }
   #log .logitem .msg {
     grid-column: 2 / -1;
     grid-row: 2;
@@ -2066,6 +2070,9 @@
     #log .logitem .tag {
       grid-column: 2;
       grid-row: 2;
+    }
+    #log .logitem:not(:has(.hash)) .tag {
+      grid-column: 1 / -1;
     }
     #log .logitem .msg {
       grid-column: 1 / -1;
