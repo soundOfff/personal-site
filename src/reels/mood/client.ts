@@ -19,7 +19,6 @@
  *
  * Loaded on demand while the reel screens; everything is torn down on abort.
  */
-import { mountFilmFind } from '../finds';
 import type { ReelContext, ReelModule } from '../types';
 import type { Bed } from '../sound';
 import {
@@ -90,7 +89,6 @@ const reel: ReelModule = {
   },
 
   mount(ctx: ReelContext) {
-    const stopFind = mountFilmFind(ctx);
     const { root, sound: s, signal } = ctx;
     const on = { signal } as const;
     const passive = { signal, passive: true } as const;
@@ -470,7 +468,6 @@ const reel: ReelModule = {
     }
 
     return () => {
-      stopFind();
       timers.forEach((id) => window.clearTimeout(id));
       observers.forEach((o) => o.disconnect());
       offSound();

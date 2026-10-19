@@ -15,7 +15,6 @@
  *     per composed surface and a minor-to-major chord as it settles, HUD
  *     ticks and clicks, the braam and sub hit on the title card.
  */
-import { mountFilmFind } from '../finds';
 import type { ReelContext, ReelModule } from '../types';
 import type { Bed } from '../sound';
 import { actOf } from '../registry';
@@ -111,7 +110,7 @@ const reel: ReelModule = {
       for (const el of list) el.addEventListener(type, fn as EventListener, { signal, passive });
     };
     const $$ = (sel: string) => document.querySelectorAll(sel);
-    const cleanups: (() => void)[] = [mountFilmFind(ctx)];
+    const cleanups: (() => void)[] = [];
 
     /* ---------- particles ---------- */
     cleanups.push(sprinkle(document.body, !ctx.reducedMotion));

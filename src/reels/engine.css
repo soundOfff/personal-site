@@ -89,7 +89,8 @@ html:root:not([data-reel='house']) section[data-sec] {
 /* ---- 2. one reel's things show only under that reel ---- */
 .reel-stage,
 .reel-slug,
-.pj-title {
+.pj-title,
+.cinema-opening {
   display: none;
 }
 .sr-only {

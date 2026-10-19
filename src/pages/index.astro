@@ -9,6 +9,7 @@ import { profile, proofs, tenets, toolbox, log, now } from '../data/site';
 import { repos } from '../data/repos';
 import ReelHead from '../reels/ReelHead.astro';
 import Stages from '../reels/Stages.astro';
+import Opening from '../reels/Opening.astro';
 import Projector from '../reels/Projector.astro';
 import BoxOffice from '../reels/boxoffice/BoxOffice.astro';
 import '../reels/reels.css';
@@ -43,7 +44,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
     <main class="content">
       {/* 00 · readme */}
       <section class="block" id="readme" data-sec="0">
-        <Stages at="in:readme" />
+        <Opening />
         <Keybar sec="readme" label="readme" />
         <p class="lede" set:html={profile.lede} />
         <p class="sub">{profile.sub}</p>
@@ -58,7 +59,6 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
           }
         </div>
       </section>
-      <Stages at="after:readme" />
 
       {/* 01 · playground (the one interactive island) */}
       <section class="block" id="playground" data-sec="1">

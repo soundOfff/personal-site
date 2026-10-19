@@ -21,7 +21,6 @@
  *
  * Everything audible goes through ctx.sound, so it is silent while muted.
  */
-import { mountFilmFind } from '../finds';
 import { SECTION_IDS, type ReelContext, type ReelModule } from '../types';
 import {
   blip,
@@ -81,7 +80,6 @@ function voice(ctx: ReelContext) {
 
 const reel: ReelModule = {
   mount(ctx) {
-    const stopFind = mountFilmFind(ctx);
     const { root, signal } = ctx;
     const v = voice(ctx);
     const timers = new Set<number>();
@@ -326,7 +324,6 @@ const reel: ReelModule = {
     });
 
     return () => {
-      stopFind();
       quiet();
       timers.forEach((id) => window.clearTimeout(id));
       root.style.scrollBehavior = '';

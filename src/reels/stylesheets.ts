@@ -4,6 +4,9 @@
  * before first paint, and the engine loads any other reel's while the
  * projector shows its title card. House lights loads none of them.
  */
+import cameraCss from './camera.css?url';
+export const CAMERA_CSS = cameraCss;
+
 const urls = import.meta.glob<string>('./*/reel.css', {
   query: '?url',
   import: 'default',

@@ -15,7 +15,7 @@
 
 import { REELS, REEL_KEY, DEFAULT_REEL, actOf, reelById } from './registry';
 import { sound } from './sound';
-import { REEL_CSS } from './stylesheets';
+import { REEL_CSS, CAMERA_CSS } from './stylesheets';
 import type { Cue, ReelConfig, ReelContext, ReelModule } from './types';
 
 const loaders = import.meta.glob<{ default: ReelModule }>('./*/client.ts');
@@ -114,7 +114,36 @@ function warmFonts(id: string): Promise<void> {
 
 /** Everything a switch needs before the reel can apply. */
 function prepare(id: string): Promise<ReelModule | null> {
-  return Promise.all([loadModule(id), loadCss(id).then(() => warmFonts(id))]).then(([mod]) => mod);
+  return Promise.all([
+    loadModule(id),
+    loadCss(id).then(() => warmFonts(id)),
+    loadCameraCss(id),
+  ]).then(([mod]) => mod);
+}
+
+let cameraCssLoad: Promise<void> | undefined;
+function loadCameraCss(id: string): Promise<void> {
+  if (id === 'house') return Promise.resolve();
+  if (cameraCssLoad) return cameraCssLoad;
+  if (document.querySelector('[data-camera-css]')) return Promise.resolve();
+  return (cameraCssLoad ??= new Promise<void>((resolve) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = CAMERA_CSS;
+    link.dataset.cameraCss = '';
+    link.addEventListener('load', () => resolve(), { once: true });
+    link.addEventListener(
+      'error',
+      () => {
+        cameraCssLoad = undefined;
+        link.remove();
+        resolve();
+      },
+      { once: true },
+    );
+    setTimeout(resolve, 5000);
+    document.head.appendChild(link);
+  }));
 }
 
 /** Fetch a reel's module, stylesheet and title face ahead of a likely switch (hover, focus). */
@@ -128,7 +157,18 @@ async function loadModule(id: string): Promise<ReelModule | null> {
   const load = loaderFor(id);
   if (!load) return null;
   try {
-    return (await load()).default;
+    const [module, camera] = await Promise.all([load(), import('./camera')]);
+    return {
+      ...module.default,
+      mount(ctx) {
+        const stopFilm = module.default.mount(ctx);
+        const stopCamera = camera.mountCamera(ctx);
+        return () => {
+          stopCamera();
+          stopFilm?.();
+        };
+      },
+    };
   } catch (err) {
     console.error(`[reels] failed to load ${id}`, err);
     return null;
