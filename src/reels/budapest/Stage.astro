@@ -22,15 +22,15 @@ interface Props {
 const { at } = Astro.props;
 
 const chapters: Record<SectionId, string> = {
-  readme: 'The Readme',
+  readme: 'The Lobby',
   playground: 'The Concierge Desk',
   work: 'The Guest Register',
   oss: 'The Gallery',
-  log: 'Telegrams',
+  log: 'The Telegraph Office',
   writing: 'The Dining Room',
   principles: 'House Rules',
   stack: 'The Pâtisserie',
-  now: 'At Your Service',
+  now: 'The Front Desk',
 };
 const sectionOf = at.startsWith('in:') ? (at.slice(3) as SectionId) : null;
 const part = sectionOf ? nav.findIndex((n) => n.id === sectionOf) + 1 : 0;

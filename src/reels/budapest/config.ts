@@ -105,17 +105,6 @@ const budapest: ReelConfig = {
     mono: "'Courier Prime', ui-monospace, monospace",
     title: "'Playfair Display Variable', Georgia, serif",
   },
-  sections: {
-    readme: { slug: 'in which a dispatcher is introduced' },
-    playground: { slug: 'in which the concierge takes a question' },
-    work: { slug: 'in which the guests are entered in the register' },
-    oss: { slug: 'in which two portraits are acquired' },
-    log: { slug: 'in which word arrives by wire' },
-    writing: { slug: 'in which four courses are served' },
-    principles: { slug: 'in which the house keeps its rules' },
-    stack: { slug: 'in which a tower is assembled' },
-    now: { slug: 'in which the author is at your service' },
-  },
   stages: [
     'backdrop',
     'rail',
@@ -137,7 +126,7 @@ const budapest: ReelConfig = {
   scroll: [
     "frame matte closes to each era's aspect ratio as its interlude crosses the screen (1.37 → 2.35 → 1.85)",
     'funicular car climbs with scroll',
-    'chapter cards and era years resolve on view',
+    'chapter cards open on view, card and foot as one piece; era years resolve',
     'telegrams stamp in as they arrive',
     'scroll progress rule on the front desk',
   ],
