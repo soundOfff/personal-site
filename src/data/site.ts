@@ -136,10 +136,7 @@ export const log: {
 // 08 · now: spec sheet.
 export const now = [
   { dt: 'Location', dd: 'Rosario, Argentina. Remote, UTC−3' },
-  {
-    dt: 'Status',
-    dd: 'Open to senior backend and AI infrastructure roles, and select contract work',
-  },
+  { dt: 'Status', dd: 'Open to senior full-stack and AI-product roles, and select contract work' },
   { dt: 'Email', dd: 'tomibrasca97@gmail.com' },
   {
     dt: 'Focus',
