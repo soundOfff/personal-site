@@ -1083,6 +1083,8 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, #d87536, #dd7a3c 40%, #bc5a22);
+    /* the haze thins toward the ground, so the city shows through before it lifts */
+    mask-image: linear-gradient(#000 35%, rgba(0, 0, 0, 0.6));
     opacity: 0;
   }
   .br-fl-rain {
@@ -2564,8 +2566,9 @@
   }
 }
 @keyframes br2049-flo {
+  /* opaque at the top edge, so the flight starts in the hero's own haze */
   0% {
-    opacity: 0.94;
+    opacity: 1;
   }
   24%,
   100% {
