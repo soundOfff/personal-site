@@ -266,6 +266,14 @@ html:root:not([data-reel='house']) [data-theme-toggle] {
   }
 }
 
+/* the switcher adds ~120px to the rail: on short laptop screens let it scroll */
+@media (min-width: 821px) and (max-height: 740px) {
+  .rail {
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
 @media (max-width: 820px) {
   .reelpick {
     order: 2;
