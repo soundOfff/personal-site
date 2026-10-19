@@ -9,10 +9,10 @@ export const profile = {
   name: 'Tomas Brasca',
   monogram: 'TB',
   // mono uppercase role under the name in the rail
-  role: 'Fullstack · AI systems',
+  role: 'Full-stack · AI systems',
   // hero lede: the phrase wrapped in <em></em> renders italic + amber
-  lede: "Most LLM calls don't need the biggest model. They need a dispatcher that knows which one will <em>clear the bar</em>.",
-  sub: "I'm a backend engineer who builds the systems that make AI products work in production: routing, scale, evals, the unglamorous middle. Backend is the foundation, LLM infrastructure is the edge, and competitive-programming results are the proof. Below, an agent answers questions about all of it by generating the interface it answers in.",
+  lede: "Most LLM calls don't need the biggest model. They need a router that knows which one will <em>clear the bar</em>.",
+  sub: "I'm a full-stack engineer, four-plus years in, and I ship AI products end to end: the web and mobile apps and the backend that keeps them running. At Dex I built the multi-LLM layer behind the CRM's AI features, plus web and mobile features in Vue 3 and React Native. At Mint Mobile I built and maintained e-commerce APIs for 2–3M subscribers. The agent below can answer questions about any of it.",
 } as const;
 
 export const contact = [
@@ -46,11 +46,11 @@ export const nav = [
  * `accent: true` renders the value in amber.
  */
 export const proofs: { value: string; key: string; accent?: boolean }[] = [
-  { value: '2-3M', accent: true, key: 'users at Mint' },
-  { value: 'ICPC', key: 'SA finalist' },
-  { value: '1st', key: 'GTS alg trading' },
-  { value: 'SE II', key: 'engineer at Dex' },
-  { value: '4+', key: 'yrs fullstack' },
+  { value: '2–3M', accent: true, key: 'subscribers at Mint Mobile' },
+  { value: 'ICPC', key: 'South America finalist' },
+  { value: '1st', key: 'GTS algorithmic trading' },
+  { value: 'SE II', key: 'at Dex' },
+  { value: '4+', key: 'years full-stack' },
 ];
 
 // 06 · principles: kept from the design; they map exactly to the router work.
