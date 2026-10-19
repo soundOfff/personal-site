@@ -19,7 +19,10 @@ const rnd = () => {
   return seed / 233280;
 };
 const windows = (n: number) =>
-  Array.from({ length: n }, () => ({ d: Math.round(rnd() * 650), on: rnd() < (aged ? 0.07 : 0.24) }));
+  Array.from({ length: n }, () => ({
+    d: Math.round(rnd() * 650),
+    on: rnd() < (aged ? 0.07 : 0.24),
+  }));
 const winsL = windows(12);
 const winsC = windows(15);
 const winsR = windows(12);
@@ -44,31 +47,35 @@ const flakes = aged
       </>
     )
   }
-  <span class="mtn ml2" />
-  <span class="mtn mr2" />
-  <span class="mtn mc" />
-  <span class="pines p1" />
-  <span class="pines p2" />
-  <span class="ledge" />
-  <span class="snowbank" />
+  <span class="mtn ml2"></span>
+  <span class="mtn mr2"></span>
+  <span class="mtn mc"></span>
+  <span class="pines p1"></span>
+  <span class="pines p2"></span>
+  <span class="ledge"></span>
+  <span class="snowbank"></span>
   <span class="track">
-    <span class="car" />
+    <span class="car"></span>
   </span>
   <span class="hotel">
     <span class="wing wl">
-      <span class="roof" />
+      <span class="roof"></span>
       <span class="wins">
-        {winsL.map((w) => (
-          <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
-        ))}
+        {
+          winsL.map((w) => (
+            <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+          ))
+        }
       </span>
     </span>
     <span class="wing wr">
-      <span class="roof" />
+      <span class="roof"></span>
       <span class="wins">
-        {winsR.map((w) => (
-          <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
-        ))}
+        {
+          winsR.map((w) => (
+            <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+          ))
+        }
       </span>
     </span>
     <span class="core">
@@ -82,15 +89,17 @@ const flakes = aged
           )
         }
       </span>
-      <span class="roof" />
+      <span class="roof"></span>
       <span class="sign">T · B</span>
       <span class="wins">
-        {winsC.map((w) => (
-          <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
-        ))}
+        {
+          winsC.map((w) => (
+            <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+          ))
+        }
       </span>
       {!aged && <span class="awn" />}
-      <span class="door" />
+      <span class="door"></span>
     </span>
   </span>
   {
