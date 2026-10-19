@@ -166,6 +166,11 @@ html:root:not([data-reel='house']) section[data-sec] {
     0 0 0 1px var(--ink),
     0 6px 14px -8px rgba(0, 0, 0, 0.45);
 }
+/* focus wins over the pressed shadow; the ink border still marks the current reel */
+.reel:focus-visible,
+.reel[aria-pressed='true']:focus-visible {
+  box-shadow: var(--focus-ring);
+}
 .reel-label {
   margin-top: 8px;
   min-height: 34px;

@@ -57,10 +57,25 @@ a {
   color: var(--ink);
 }
 
+/* The keyboard focus ring: a paper-coloured gap, then the amber, so it reads
+   on any ground. Built from tokens, so it follows dark mode and each film's
+   act palette. */
+:root {
+  --focus-ring: 0 0 0 2px var(--paper), 0 0 0 4px var(--amber-deep);
+}
+
 :focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
   border-radius: var(--radius-control);
+}
+
+/* Forced colours (Windows high contrast) drop box-shadows: keep a real outline. */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
 }
 
 /* ---- 3. reduced motion: kill the pulse + route spinner ---- */
