@@ -11,10 +11,11 @@
    exception: top level, prefixed 'br2049-'; the title card is scoped to
    the projector showing this reel).
 
-   No rail: the rail is restyled into a viewfinder HUD. Name, reel switcher
-   and contact are glass plates along the top edge; the section nav is a
-   scrubber dock along the bottom (acts bar, minor ticks, an indicator the
-   client moves with the scroll, a readout). Sections go full bleed; each
+   No rail: name, reel switcher and contact are glass plates along the top
+   edge (past the opening they fold down to a line until hovered or focused);
+   the section nav is a scrubber dock along the bottom (acts bar, minor ticks,
+   a playhead the client moves with the scroll, a timecode readout). Section
+   heads are scene headings, set like a script. Sections go full bleed; each
    act's scenery lives in one fixed backdrop the sections of the act in view
    turn transparent over (haze + ruins, Wallace's water-light, LA rain, snow).
    ============================================================ */
@@ -643,6 +644,28 @@
       bottom: 18px;
       width: var(--br-ro-w);
       height: 64px;
+    }
+
+    /* past the opening the plates fold to one line each, so the column reads clear
+       under them. Hover or focus opens them; the folded parts stay focusable. */
+    &:not([data-sec='0']) {
+      .rail .id:not(:hover) .rl,
+      .reelpick:not(:hover, :focus-within) :is(.reels, .reel-label span, .boxoffice-open),
+      .rail .contact-wrap:not(:hover, :focus-within) .contact {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      .reelpick:not(:hover, :focus-within) {
+        width: auto;
+        gap: 4px;
+      }
+      .rail .contact-wrap:not(:hover, :focus-within) .rail-sec {
+        display: block;
+      }
     }
   }
 
