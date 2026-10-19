@@ -2010,18 +2010,10 @@
     );
     animation: odyssey-orb 6s ease-in-out infinite;
   }
-  & .od-cr-k {
-    margin: 0 0 28px;
-    font: 400 10px var(--font-display);
-    letter-spacing: 0.5em;
-    padding-left: 0.5em;
-    text-transform: uppercase;
-    color: #8e918c;
-  }
   & .od-cr {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
     max-width: 700px;
     margin: 0 auto;
   }
@@ -2031,19 +2023,21 @@
     gap: 20px;
   }
   & .od-cr dt {
-    padding-top: 2px;
-    font: 10.5px var(--font-mono);
-    letter-spacing: 0.16em;
+    padding-top: 4px;
+    font: 400 11.5px var(--font-title);
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     text-align: right;
-    color: #8e918c;
+    color: #a3a6a1;
   }
   & .od-cr dd {
     margin: 0;
-    font: 400 11px/1.6 var(--font-display);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font: 400 16px/1.5 var(--font-title);
+    word-spacing: 0.06em;
     text-align: left;
+  }
+  & .od-cr dd span {
+    display: block;
   }
   & .content > .foot {
     margin: 0;
