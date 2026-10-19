@@ -390,19 +390,9 @@ html:root[data-reel='parasite'] {
   [data-sec='0']::before,
   [data-sec='3']::before,
   [data-sec='5']::before,
+  [data-sec='6']::before,
   [data-sec='7']::before {
     display: none;
-  }
-  /* except in the semi-basement, where the line between its two rooms is the
-     fluorescent tube: the width of the room, on once you get down to it */
-  .block[data-sec='6']::before {
-    left: 0;
-    right: 0;
-    height: 3px;
-  }
-  &[data-px-lit~='tube'] .block[data-sec='6']::before {
-    background: #d9e08a;
-    box-shadow: 0 0 18px 2px rgb(198 209 90 / 0.28);
   }
 
   /* the keybar is a screenplay slug: scene number, then the place and time */
@@ -1283,6 +1273,27 @@ html:root[data-reel='parasite'] {
   }
 
   /* ---------- S#7 · principles, under the tube ---------- */
+  /* one fluorescent fixture on the ceiling between the semi-basement's two
+     rooms, in place of the hairline: a batten, the tube, its end caps. Dark
+     until you first get down to it. */
+  [data-sec='6']::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 15%;
+    width: min(200px, 34%);
+    height: 6px;
+    border-top: 3px solid var(--frame);
+    border-inline: 5px solid #4b4e40;
+    background: #3a3e31;
+    pointer-events: none;
+  }
+  &[data-px-lit~='tube'] [data-sec='6']::after {
+    background: #e8ecd0;
+    box-shadow:
+      0 2px 10px 0 rgb(226 232 196 / 0.5),
+      0 30px 80px 24px rgb(198 209 90 / 0.06);
+  }
   .tenets {
     gap: 28px 40px;
   }
@@ -1745,7 +1756,7 @@ html:root[data-reel='parasite'] {
     &:is([data-act='2'], [data-act='3'], [data-sec='9']) .px-grain {
       animation-play-state: running;
     }
-    &[data-px-lit~='tube'] .block[data-sec='6']::before {
+    &[data-px-lit~='tube'] [data-sec='6']::after {
       animation: parasite-tube 0.9s linear both;
     }
     &[data-px-lit~='bulb'] .px-glow {
@@ -1977,25 +1988,22 @@ html:root[data-reel='parasite'] {
     clip-path: inset(calc(100% - 0.045em) 0 0 0);
   }
 }
+/* the tube strikes like a starter: only the tube flickers, the batten stays put */
 @keyframes parasite-tube {
-  0% {
-    opacity: 0.15;
-  }
-  8% {
-    opacity: 1;
-  }
-  12% {
-    opacity: 0.2;
-  }
-  22% {
-    opacity: 1;
-  }
+  0%,
+  12%,
   27% {
-    opacity: 0.35;
+    background: #3a3e31;
+    box-shadow: none;
   }
+  8%,
+  22%,
   40%,
   100% {
-    opacity: 1;
+    background: #e8ecd0;
+    box-shadow:
+      0 2px 10px 0 rgb(226 232 196 / 0.5),
+      0 30px 80px 24px rgb(198 209 90 / 0.06);
   }
 }
 @keyframes parasite-flick {
