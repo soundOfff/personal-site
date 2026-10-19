@@ -1,8 +1,2945 @@
+@import '@fontsource-variable/big-shoulders-display/wght';
+@import '@fontsource/barlow/latin-400.css';
+@import '@fontsource/barlow/latin-500.css';
+@import '@fontsource/barlow/latin-600.css';
+@import '@fontsource/share-tech-mono/latin-400.css';
+
 /* ============================================================
    Reel 03 · Blade Runner 2049.
-   Every rule lives inside :root[data-reel='br2049'] (keyframes and
-   @property are the exception: top level, prefixed 'br2049-').
+   Every rule lives inside :root[data-reel='br2049'] (keyframes are the
+   exception: top level, prefixed 'br2049-'; the title card is scoped to
+   the projector showing this reel).
+
+   No rail: the rail is restyled into a viewfinder HUD. Name, reel switcher
+   and contact are glass plates along the top edge; the section nav is a
+   scrubber dock along the bottom (acts bar, minor ticks, an indicator the
+   client moves with the scroll, a readout). Sections go full bleed; each
+   act's scenery lives in one fixed backdrop the sections of the act in view
+   turn transparent over (haze + ruins, Wallace's water-light, LA rain, snow).
    ============================================================ */
+
 :root[data-reel='br2049'] {
-  /* reel styles go here */
+  --br-mag: #e44d9b;
+  --br-cyan: #4fc3d9;
+  --br-cyan-ink: #7fd6e4;
+  --br-amber: #f2a25e;
+  --br-glass: rgba(8, 12, 14, 0.78);
+  --br-hud: #e3ecee;
+  --br-hud2: #a9b9bf;
+  --br-hair: rgba(227, 236, 238, 0.14);
+  --br-ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --br-gut: 72px;
+  --br-max: 1096px;
+  --br-pad: max(var(--br-gut), calc((100% - var(--br-max)) / 2));
+  --br-act: 'LV-0';
+  --br-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='20'%3E%3Cpolyline points='0,10 52,10 56,4 60,15 64,10 120,10' fill='none' stroke='%23E8C46F' stroke-width='1.4'/%3E%3C/svg%3E");
+  --br-bl: 'Baseline · stable';
+  --br-caustic-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='.012 .018' numOctaves='1' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .8 0 0 0 0 .4 -6 0 0 0 1.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+  --br-caustic-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='.016 .011' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .86 0 0 0 0 .56 -7 0 0 0 1.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+
+  &[data-act='1'] {
+    --br-act: 'WLC';
+  }
+  &[data-act='2'] {
+    --br-act: 'LV';
+  }
+  &[data-act='3'] {
+    --br-act: 'LA';
+  }
+  &:is([data-act='4'], [data-sec='9']) {
+    --br-act: 'SNW';
+  }
+
+  /* the agent's baseline readout, driven by playground cues (client.ts) */
+  &[data-br-wave='think'] {
+    --br-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='20'%3E%3Cpolyline points='0,9.9 4,10.9 8,4.2 12,6.2 16,9.1 20,10.1 24,3.7 28,15.7 32,11.3 36,8.7 40,6.8 44,14.2 48,12.4 52,3.6 56,10 60,6 64,12.6 68,4.9 72,10.9 76,9.8 80,5.1 84,3.3 88,16.6 92,17 96,4.3 100,9.2 104,16.8 108,5.3 112,8.8 116,10.8 120,9.9' fill='none' stroke='%23E8C46F' stroke-width='1.4'/%3E%3C/svg%3E");
+    --br-bl: 'Reading';
+  }
+  &[data-br-wave='speak'] {
+    --br-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='20'%3E%3Cpolyline points='0,10 8,10 12,2 16,18 20,10 68,10 72,2 76,18 80,10 120,10' fill='none' stroke='%23E8C46F' stroke-width='1.4'/%3E%3C/svg%3E");
+    --br-bl: 'Composing';
+  }
+  &[data-br-wave='done'] {
+    --br-bl: 'Within baseline';
+  }
+
+  /* ---------- base ---------- */
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+  }
+  ::selection {
+    background: var(--br-mag);
+    color: #0e171c;
+  }
+  :focus-visible {
+    outline: 2px solid var(--amber-deep);
+    outline-offset: 3px;
+    box-shadow: none;
+  }
+
+  /* ---------- the frame: full bleed, no sheet ---------- */
+  .shell {
+    display: block;
+    max-width: none;
+    min-height: 0;
+    background: none;
+    border: 0;
+  }
+  .content {
+    padding: 0;
+  }
+  .block[data-sec] {
+    position: relative;
+    padding: 116px var(--br-pad) 108px;
+    border-top: 0;
+    background-color: var(--paper);
+    transition:
+      background-color 0.8s ease,
+      color 0.8s ease;
+  }
+  /* the act in view shows its backdrop: its sections go see-through */
+  &[data-act='1'] #playground,
+  &[data-act='2'] :is(#work, #oss, #log),
+  &[data-act='3'] :is(#writing, #principles, #stack),
+  &:is([data-act='4'], [data-sec='9']) #now {
+    background-color: transparent;
+  }
+
+  /* ---------- the act backdrops (fixed, behind everything) ---------- */
+  .br-bd {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .br-bd-l {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+  }
+  &:is([data-act='0'], [data-act='2']):not([data-sec='9']) .br-bd-haze,
+  &[data-act='1'] .br-bd-water,
+  &[data-act='3'] .br-bd-rain,
+  &:is([data-act='4'], [data-sec='9']) .br-bd-snow {
+    opacity: 1;
+  }
+  .br-bd-haze {
+    background: linear-gradient(180deg, #eb9551 0%, #e3853f 45%, #dc7e3a 100%);
+  }
+  .br-ruins i {
+    position: absolute;
+    bottom: 0;
+    display: block;
+    background: #d97b3c;
+  }
+  .br-ruins .r1 {
+    right: 4%;
+    width: 7%;
+    height: 72%;
+  }
+  .br-ruins .r2 {
+    right: 14%;
+    width: 4%;
+    height: 52%;
+  }
+  .br-ruins .r3 {
+    right: 22%;
+    width: 10%;
+    height: 30%;
+    clip-path: polygon(0 30%, 100% 0, 100% 100%, 0 100%);
+  }
+  .br-ruins .r4 {
+    right: -3%;
+    width: 12%;
+    height: 46%;
+    background: #d4753a;
+    transform: rotate(7deg);
+    transform-origin: bottom right;
+  }
+  .br-dust {
+    position: absolute;
+    inset: 0;
+  }
+  .br-dust i {
+    position: absolute;
+    display: block;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: rgba(255, 238, 214, 0.9);
+    opacity: 0;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .br-bd-water {
+    background: #16120b;
+  }
+  .br-bd-water .cx {
+    position: absolute;
+    inset: -25%;
+    display: block;
+    mix-blend-mode: screen;
+  }
+  .br-bd-water .c1 {
+    background:
+      radial-gradient(
+        ellipse 12% 7% at 20% 30%,
+        rgba(232, 196, 110, 0.3),
+        rgba(232, 196, 110, 0) 70%
+      ),
+      radial-gradient(
+        ellipse 9% 6% at 55% 22%,
+        rgba(232, 196, 110, 0.22),
+        rgba(232, 196, 110, 0) 70%
+      ),
+      radial-gradient(
+        ellipse 14% 8% at 78% 64%,
+        rgba(232, 196, 110, 0.26),
+        rgba(232, 196, 110, 0) 70%
+      ),
+      radial-gradient(
+        ellipse 10% 6% at 35% 72%,
+        rgba(232, 196, 110, 0.2),
+        rgba(232, 196, 110, 0) 70%
+      );
+  }
+  .br-bd-water .c2 {
+    background:
+      radial-gradient(
+        ellipse 10% 6% at 64% 40%,
+        rgba(240, 210, 140, 0.26),
+        rgba(240, 210, 140, 0) 70%
+      ),
+      radial-gradient(
+        ellipse 13% 7% at 28% 52%,
+        rgba(240, 210, 140, 0.2),
+        rgba(240, 210, 140, 0) 70%
+      ),
+      radial-gradient(
+        ellipse 8% 5% at 86% 26%,
+        rgba(240, 210, 140, 0.24),
+        rgba(240, 210, 140, 0) 70%
+      );
+  }
+  /* the water-light itself: two caustic nets (ridged turbulence, drawn once
+     into a tile) drifting against each other */
+  .br-bd-water .l1 {
+    background: var(--br-caustic-a) 0 0 / 420px 420px;
+    opacity: 0.26;
+  }
+  .br-bd-water .l2 {
+    background: var(--br-caustic-b) 0 0 / 360px 360px;
+    opacity: 0.14;
+  }
+  /* the light falls from above, through the pool: strongest up top */
+  .br-bd-water :is(.l1, .l2) {
+    mask-image: radial-gradient(ellipse 80% 70% at 60% 18%, #000 30%, rgba(0, 0, 0, 0.35));
+  }
+  .br-bd-water .v {
+    inset: 0;
+    mix-blend-mode: normal;
+    background: radial-gradient(
+      ellipse 70% 60% at 50% 40%,
+      rgba(22, 18, 11, 0),
+      rgba(22, 18, 11, 0.85)
+    );
+  }
+  .br-bd-rain {
+    background:
+      radial-gradient(
+        ellipse 60% 30% at 50% 100%,
+        rgba(228, 77, 155, 0.16),
+        rgba(228, 77, 155, 0) 70%
+      ),
+      radial-gradient(
+        ellipse 40% 25% at 15% 100%,
+        rgba(79, 195, 217, 0.14),
+        rgba(79, 195, 217, 0) 70%
+      ),
+      linear-gradient(180deg, #0b1318, #0e171c 60%, #132430);
+  }
+  .br-rain {
+    position: absolute;
+    inset: -20% -10%;
+    transform: rotate(9deg);
+  }
+  .br-drop {
+    position: absolute;
+    top: -60px;
+    display: block;
+    width: 1px;
+    background: linear-gradient(rgba(220, 236, 240, 0), rgba(220, 236, 240, 0.75));
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .br-bd-snow {
+    background: linear-gradient(180deg, #d5dde0, #e6ecee 40%);
+  }
+  .br-snow i {
+    position: absolute;
+    top: -20px;
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px rgba(15, 26, 32, 0.14),
+      0 1px 3px rgba(15, 26, 32, 0.2);
+    transition: opacity 0.5s ease;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .br-snow i.is-melt {
+    opacity: 0;
+  }
+
+  /* the viewfinder: corner brackets + a faint centre cross, inverted over whatever is under */
+  .br-vf {
+    position: fixed;
+    inset: 16px;
+    z-index: 39;
+    pointer-events: none;
+    mix-blend-mode: difference;
+  }
+  .br-vf i {
+    position: absolute;
+    display: block;
+    width: 30px;
+    height: 30px;
+    border: 0 solid #fff;
+  }
+  .br-vf .c1 {
+    left: 0;
+    top: 0;
+    border-left-width: 1px;
+    border-top-width: 1px;
+  }
+  .br-vf .c2 {
+    right: 0;
+    top: 0;
+    border-right-width: 1px;
+    border-top-width: 1px;
+  }
+  .br-vf .c3 {
+    left: 0;
+    bottom: 0;
+    border-left-width: 1px;
+    border-bottom-width: 1px;
+  }
+  .br-vf .c4 {
+    right: 0;
+    bottom: 0;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+  }
+  .br-vf .x {
+    left: 50%;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    background:
+      linear-gradient(#fff, #fff) center / 1px 100% no-repeat,
+      linear-gradient(#fff, #fff) center / 100% 1px no-repeat;
+    opacity: 0.22;
+  }
+  .br-grain {
+    position: fixed;
+    left: -50%;
+    top: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='192' height='192' filter='url(%23n)'/%3E%3C/svg%3E")
+      0 0 / 192px 192px repeat;
+  }
+
+  /* ============================================================
+     THE HUD: the rail, restyled. Plates use the HUD's own colours in
+     every act, so the tokens are re-pointed inside it.
+     ============================================================ */
+  .rail {
+    --ink: var(--br-hud);
+    --ink-2: #c9d6da;
+    --muted: var(--br-hud2);
+    --muted-2: var(--br-hud2);
+    --rule: var(--br-hair);
+    --rule-2: rgba(227, 236, 238, 0.24);
+    --paper: #0b1216;
+    --paper-2: #0b1216;
+    --paper-3: rgba(227, 236, 238, 0.08);
+    --amber: var(--br-amber);
+    --amber-deep: var(--br-amber);
+    color: var(--br-hud);
+    font-family: var(--font-mono);
+  }
+  .rail :focus-visible {
+    outline-color: var(--br-cyan-ink);
+  }
+  .rail .id .tile {
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--br-hud2);
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--br-hud);
+    font: 700 12px/1 var(--font-display);
+    letter-spacing: 0.08em;
+  }
+  .rail .id .nm {
+    font: 700 17px/1.15 var(--font-display);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .rail .id .rl {
+    margin-top: 2px;
+    font: 10.5px/1.5 var(--font-mono);
+    letter-spacing: 0.12em;
+    color: var(--br-hud2);
+  }
+  .rail .id > div::after {
+    content: '24 fps · 2.39:1 · ' var(--br-act) / '';
+    display: block;
+    font: 10.5px/1.5 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--br-hud2);
+  }
+  .reelpick .rail-sec {
+    margin: 0;
+    font: 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.14em;
+    color: var(--br-hud2);
+  }
+  .reelpick .rail-sec > span:first-child::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: #e5532e;
+    vertical-align: 1px;
+  }
+  .reelpick .rail-sec [data-reel-no]::before {
+    content: 'reel ' / '';
+  }
+  .reels {
+    gap: 6px;
+  }
+  .reel {
+    height: 40px;
+    border-color: rgba(227, 236, 238, 0.2);
+    border-radius: 0;
+    background: #0b1216;
+    transition:
+      transform 0.25s var(--br-ease),
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .reel:hover {
+    transform: translateY(-3px);
+    border-color: rgba(227, 236, 238, 0.6);
+  }
+  .reel .bc {
+    border-radius: 0;
+  }
+  .reel[aria-pressed='true'] {
+    border-color: var(--br-amber);
+    box-shadow:
+      0 0 0 1px var(--br-amber),
+      0 0 14px -2px rgba(242, 162, 94, 0.7);
+  }
+  .reel-label {
+    margin: 0;
+    min-height: 0;
+  }
+  .reel-label b {
+    font: 700 14px/1.2 var(--font-display);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--br-hud);
+  }
+  .reel-label span {
+    font: 10px/1.5 var(--font-mono);
+    letter-spacing: 0.08em;
+    color: var(--br-hud2);
+  }
+  .boxoffice-open {
+    align-self: flex-start;
+    margin: 0 0 0 -3px;
+    padding: 1px 3px;
+    color: var(--br-cyan-ink);
+    font: 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration-color: currentColor;
+  }
+  .boxoffice-open:hover {
+    background: var(--br-cyan);
+    color: #0b1216;
+    text-decoration: none;
+  }
+  .rail .contact a {
+    border-radius: 0;
+    font: 11px/1.4 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--br-hud);
+  }
+  .rail .contact a svg {
+    color: var(--br-hud2);
+  }
+  .rail .contact a:hover {
+    background: none;
+    color: var(--br-cyan-ink);
+  }
+  .rail .rail-sec {
+    color: var(--br-hud2);
+  }
+  .snd {
+    height: 34px;
+    padding: 0 11px;
+    gap: 7px;
+    border-color: rgba(227, 236, 238, 0.24);
+    border-radius: 0;
+    background: none;
+    color: var(--br-hud);
+    font: 11px/1 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .snd:hover {
+    background: rgba(227, 236, 238, 0.08);
+  }
+  .snd .w i {
+    border-radius: 0;
+  }
+
+  /* the scrubber: one tick per section, the acts bar above, minor ticks */
+  .railnav {
+    --br-acts: linear-gradient(
+      90deg,
+      #dd7a3c 0 calc(100% / 9 - 1px),
+      transparent 0 calc(100% / 9 + 1px),
+      #e0b354 0 calc(200% / 9 - 1px),
+      transparent 0 calc(200% / 9 + 1px),
+      #cf6a2e 0 calc(500% / 9 - 1px),
+      transparent 0 calc(500% / 9 + 1px),
+      #4fc3d9 0 calc(800% / 9 - 1px),
+      transparent 0 calc(800% / 9 + 1px),
+      #e6ecee 0
+    );
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    gap: 0;
+    background:
+      repeating-linear-gradient(90deg, rgba(227, 236, 238, 0.3) 0 1px, transparent 1px 11px) 0
+        19px / 100% 5px no-repeat content-box,
+      var(--br-glass);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--br-hair);
+  }
+  .railnav::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: var(--br-ruler-l);
+    right: var(--br-ruler-r);
+    height: 2px;
+    background: var(--br-acts);
+    pointer-events: none;
+  }
+  /* the playhead: client.ts writes --br-ind (0…1) as the page scrolls */
+  .railnav::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: var(--br-ruler-l);
+    right: var(--br-ruler-r);
+    height: 7px;
+    background:
+      linear-gradient(to bottom left, var(--br-amber) 50%, transparent 50%) 0 0 / 5px 7px no-repeat,
+      linear-gradient(to bottom right, var(--br-amber) 50%, transparent 50%) 5px 0 / 5px 7px
+        no-repeat;
+    translate: calc(var(--br-ind, 0.0556) * 100% - 5px) 0;
+    pointer-events: none;
+  }
+  .railnav a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 0 0;
+    border-radius: 0;
+    background: none;
+    font-size: 0;
+    color: var(--br-hud2);
+  }
+  .railnav a::before {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 13px;
+    background: currentColor;
+    transition:
+      height 0.2s var(--br-ease),
+      background-color 0.2s;
+  }
+  .railnav a .nx {
+    width: auto;
+    font: 10px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    color: inherit;
+  }
+  .railnav a:hover,
+  .railnav a:focus-visible,
+  .railnav a[aria-current='true'] {
+    background: none;
+    color: var(--br-hud);
+  }
+  .railnav a:hover::before {
+    height: 16px;
+  }
+  .railnav a[aria-current='true']::before {
+    width: 2px;
+    height: 16px;
+    background: var(--br-amber);
+  }
+  .railnav a:focus-visible {
+    outline-offset: -2px;
+  }
+  .br-ro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1px;
+    font: 10.5px/1.35 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--br-hud2);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .br-ro b {
+    font: 700 15px/1.15 var(--font-display);
+    letter-spacing: 0.14em;
+    color: var(--br-hud);
+  }
+  .br-tc {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .br-rec {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e5532e;
+  }
+  .br-ff {
+    display: inline-block;
+    height: 1.35em;
+    overflow: hidden;
+  }
+  .br-ff-strip {
+    display: flex;
+    flex-direction: column;
+  }
+  .br-ff-strip span {
+    height: 1.35em;
+  }
+
+  /* ---- desktop: plates in the corners, the dock along the bottom ---- */
+  @media (min-width: 821px) {
+    .rail {
+      --dock-w: min(1120px, calc(100% - 36px));
+      --dock-x: calc((100% - var(--dock-w)) / 2);
+      --br-snd-w: 150px;
+      --br-ro-w: 196px;
+      --br-ruler-l: var(--br-snd-w);
+      --br-ruler-r: calc(var(--br-ro-w) + 36px);
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      /* the house rail is align-self: start, which would shrink a fixed box to nothing */
+      align-self: stretch;
+      height: auto;
+      padding: 0;
+      display: block;
+      background: none;
+      border: 0;
+      pointer-events: none;
+    }
+    .rail > *,
+    .br-ro {
+      pointer-events: auto;
+    }
+    .rail :is(.id, .reelpick, .contact-wrap) {
+      position: absolute;
+      top: 28px;
+      background: var(--br-glass);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--br-hair);
+    }
+    .rail .id {
+      left: 30px;
+      align-items: flex-start;
+      padding: 10px 16px 10px 10px;
+    }
+    .reelpick {
+      right: 30px;
+      width: 258px;
+      padding: 10px 12px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .rail .contact-wrap {
+      left: 50%;
+      translate: -50% 0;
+      width: max-content;
+      max-width: calc(100% - 640px);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 2px 14px;
+      padding: 8px 14px;
+    }
+    .rail .contact-wrap .rail-sec {
+      margin: 0;
+      font-size: 10.5px;
+    }
+    .rail .contact {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2px 16px;
+    }
+    .rail .contact a {
+      gap: 6px;
+      padding: 2px 0;
+    }
+    .railnav {
+      position: absolute;
+      left: var(--dock-x);
+      bottom: 18px;
+      width: var(--dock-w);
+      height: 64px;
+      padding: 0 var(--br-ruler-r) 0 var(--br-ruler-l);
+      display: grid;
+    }
+    .rail-foot {
+      position: absolute;
+      left: calc(var(--dock-x) + 14px);
+      bottom: 33px;
+      margin: 0;
+    }
+    .rail-foot .mono {
+      display: none;
+    }
+    .railnav a .nx::before {
+      content: 'LV-' / '';
+    }
+    .railnav a:nth-child(2) .nx::before {
+      content: 'WL-' / '';
+    }
+    .railnav a:nth-child(n + 6) .nx::before {
+      content: 'LA-' / '';
+    }
+    .railnav a:nth-child(9) .nx::before {
+      content: 'SN-' / '';
+    }
+    .br-ro {
+      position: absolute;
+      right: calc(var(--dock-x) + 18px);
+      bottom: 18px;
+      width: var(--br-ro-w);
+      height: 64px;
+    }
+  }
+
+  /* ---- phones and tablets: a HUD band on top, the dock fixed at the bottom ---- */
+  @media (max-width: 820px) {
+    --br-gut: 22px;
+
+    .rail {
+      --br-ruler-l: 6px;
+      --br-ruler-r: 6px;
+      background: #0b1216;
+      border-bottom: 1px solid var(--br-hair);
+      padding: 14px 16px 12px;
+      gap: 10px 12px;
+    }
+    .rail .id .nm {
+      font-size: 16px;
+      letter-spacing: 0.14em;
+    }
+    .rail .id > div::after {
+      display: none;
+    }
+    .rail .contact-wrap {
+      display: block;
+      order: 3;
+      flex: 1 0 100%;
+    }
+    .rail .contact-wrap .rail-sec {
+      display: none;
+    }
+    .rail .contact {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 14px;
+    }
+    .rail .contact a {
+      display: block;
+      padding: 5px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rail .contact a svg {
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: -2px;
+    }
+    .railnav {
+      position: fixed;
+      z-index: 45;
+      left: 10px;
+      right: 10px;
+      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      height: 54px;
+      padding: 0 6px;
+      display: grid;
+    }
+    .railnav a {
+      padding-top: 15px;
+    }
+    .br-ro {
+      display: none;
+    }
+  }
+
+  /* ============================================================
+     SECTION HEADERS: the keybar becomes a slate. Code line, the section
+     name in Big Shoulders, the descriptor and the scene slug.
+     ============================================================ */
+  #readme {
+    --br-k: 'LV—00';
+  }
+  #playground {
+    --br-k: 'WL—01 · Wallace Corporation';
+  }
+  #work {
+    --br-k: 'LV—02 · Las Vegas';
+  }
+  #oss {
+    --br-k: 'LV—03 · Las Vegas';
+  }
+  #log {
+    --br-k: 'LV—04 · Las Vegas';
+  }
+  #writing {
+    --br-k: 'LA—05 · Los Angeles';
+  }
+  #principles {
+    --br-k: 'LA—06 · Los Angeles';
+  }
+  #stack {
+    --br-k: 'LA—07 · Los Angeles';
+  }
+  #now {
+    --br-k: 'SN—08 · Snow on the steps';
+  }
+  .block .keybar {
+    display: flow-root;
+    margin: 0 0 52px;
+    font: 12px/1.7 var(--font-mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .block .keybar::before {
+    content: var(--br-k) / '';
+    margin-right: 14px;
+    color: var(--amber-deep);
+    letter-spacing: 0.24em;
+  }
+  .block .keybar b {
+    display: block;
+    margin: 12px 0 16px;
+    font: 800 clamp(56px, 7.4vw, 108px) / 0.84 var(--font-display);
+    letter-spacing: 0.01em;
+    color: var(--ink);
+  }
+  .block .keybar a {
+    text-decoration-style: solid;
+    text-decoration-color: currentColor;
+  }
+  .block .keybar a:hover {
+    color: var(--amber-deep);
+  }
+  .block .keybar .reel-slug[data-for='br2049'] {
+    float: right;
+    margin-left: 24px;
+    color: var(--muted);
+    letter-spacing: 0.16em;
+  }
+  :is(#work, #oss, #log) .keybar b {
+    mask-image: linear-gradient(180deg, #000 52%, rgba(0, 0, 0, 0.38));
+  }
+
+  /* ============================================================
+     00 · README: the cold open in the haze, then the flight
+     ============================================================ */
+  #readme {
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(var(--br-gut), 1fr)
+      [main-start] minmax(0, var(--br-max))
+      [main-end] minmax(var(--br-gut), 1fr)
+      [full-end];
+    grid-template-rows:
+      [hero-start] minmax(124px, 1fr) repeat(4, auto)
+      [hero-end flight-start] auto [flight-end];
+    padding: 0;
+    isolation: isolate;
+    overflow-x: clip;
+
+    > * {
+      grid-column: main;
+    }
+  }
+  .br-hero {
+    position: relative;
+    z-index: -1;
+    grid-column: full;
+    grid-row: hero-start / hero-end;
+    min-height: 100svh;
+    overflow: hidden;
+    background: #e0803f;
+  }
+  .br-haze {
+    position: absolute;
+    inset: 0;
+  }
+  .br-haze.h1 {
+    background: linear-gradient(
+      180deg,
+      #f0a15c 0%,
+      #e8904b 30%,
+      #e2833f 60%,
+      #dc7b3a 85%,
+      #d87536 100%
+    );
+  }
+  .br-haze.h2 {
+    background:
+      radial-gradient(
+        ellipse 55% 42% at 72% 26%,
+        rgba(255, 220, 170, 0.55),
+        rgba(255, 220, 170, 0) 70%
+      ),
+      radial-gradient(ellipse 48% 40% at 84% 92%, rgba(122, 46, 14, 0.3), rgba(122, 46, 14, 0) 70%);
+  }
+  .br-shafts {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .br-shafts i {
+    position: absolute;
+    top: -20%;
+    display: block;
+    width: 16%;
+    height: 140%;
+    background: linear-gradient(180deg, rgba(255, 232, 196, 0.34), rgba(255, 232, 196, 0) 78%);
+    transform: rotate(19deg);
+    filter: blur(5px);
+    opacity: 0.6;
+  }
+  .br-shafts i:nth-child(1) {
+    left: 52%;
+  }
+  .br-shafts i:nth-child(2) {
+    left: 66%;
+    width: 9%;
+  }
+  .br-shafts i:nth-child(3) {
+    left: 80%;
+    width: 12%;
+  }
+  .br-mono {
+    position: absolute;
+    inset: 0;
+  }
+  .br-mono i {
+    position: absolute;
+    bottom: 0;
+    display: block;
+    box-shadow: inset 0 2px 0 rgba(255, 226, 186, 0.18);
+  }
+  .m-far i {
+    background: #d8733a;
+  }
+  .m-mid i {
+    background: #cc652e;
+  }
+  .m-near i {
+    background: #ad4e1e;
+  }
+  .m-far .a {
+    right: 40%;
+    width: 4%;
+    height: 58%;
+  }
+  .m-far .b {
+    right: 31%;
+    width: 6%;
+    height: 44%;
+  }
+  .m-far .c {
+    right: 12%;
+    width: 3%;
+    height: 66%;
+  }
+  .m-far .d {
+    right: 3%;
+    width: 5%;
+    height: 50%;
+  }
+  .m-mid .e {
+    right: 22%;
+    width: 8%;
+    height: 62%;
+    clip-path: polygon(0 8%, 100% 0, 100% 100%, 0 100%);
+  }
+  .m-mid .f {
+    right: -2%;
+    width: 9%;
+    height: 74%;
+  }
+  .m-near .g {
+    right: 6%;
+    width: 13%;
+    height: 40%;
+    transform: rotate(-5deg);
+    transform-origin: bottom left;
+    clip-path: polygon(0 18%, 100% 0, 94% 100%, 0 100%);
+  }
+  .m-near .h {
+    right: 28%;
+    width: 5%;
+    height: 22%;
+  }
+  .br-fog {
+    position: absolute;
+    left: -30%;
+    right: -30%;
+    bottom: -12%;
+    height: 56%;
+    background:
+      radial-gradient(
+        ellipse 38% 58% at 28% 72%,
+        rgba(244, 176, 116, 0.6),
+        rgba(244, 176, 116, 0) 70%
+      ),
+      radial-gradient(
+        ellipse 34% 50% at 74% 82%,
+        rgba(244, 176, 116, 0.5),
+        rgba(244, 176, 116, 0) 70%
+      );
+    filter: blur(10px);
+  }
+
+  #readme .keybar {
+    grid-row: 2;
+    margin: 0 0 24px;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--ink-2);
+  }
+  #readme .keybar::before {
+    color: var(--ink);
+  }
+  #readme .keybar b {
+    display: inline;
+    margin: 0 0 0 4px;
+    font: inherit;
+    color: var(--ink);
+  }
+  #readme .keybar .reel-slug[data-for='br2049'] {
+    float: none;
+    margin-left: 18px;
+    color: var(--ink-2);
+  }
+  #readme .lede {
+    grid-row: 3;
+    max-width: 15em;
+    font: 850 clamp(44px, min(6.4vw, 10vh), 100px) / 0.86 var(--font-display);
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  #readme .lede em {
+    padding: 0 0.12em;
+    font-style: normal;
+    white-space: nowrap;
+    color: var(--br-amber);
+    /* the plate, trimmed to the cap height so it doesn't eat the line above */
+    background: linear-gradient(#1a0b04, #1a0b04) 0 64% / 100% 78% no-repeat;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  #readme .sub {
+    grid-row: 4;
+    max-width: 60ch;
+    margin: 28px 0 0;
+    font-size: 16.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  #readme .startrow {
+    grid-row: 5;
+    gap: 14px 22px;
+    margin: 30px 0 clamp(96px, 14vh, 140px);
+  }
+  #readme .btn-amber {
+    height: 48px;
+    padding: 0 20px;
+    gap: 10px;
+    border: 1px solid #1a0b04;
+    border-radius: 0;
+    background: #1a0b04;
+    box-shadow: none;
+    filter: none;
+    color: var(--br-amber);
+    font: 700 16px/1 var(--font-display);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      box-shadow 0.25s,
+      transform 0.12s;
+  }
+  #readme .btn-amber:hover {
+    background: #0e171c;
+    color: #ffe9d2;
+    box-shadow:
+      0 0 0 1px var(--br-mag),
+      0 0 26px -4px rgba(228, 77, 155, 0.8);
+  }
+  #readme .btn-amber:active {
+    transform: scale(0.97);
+  }
+  #readme .startrow .link {
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 6px;
+    border-bottom: 1px solid rgba(26, 11, 4, 0.4);
+    font: 13px/1 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    transition:
+      border-color 0.2s,
+      padding 0.3s var(--br-ease);
+  }
+  #readme .startrow .link:hover {
+    padding-left: 12px;
+    border-color: var(--ink);
+  }
+
+  /* ---- the flight: the proof strip becomes billboards over LA ---- */
+  .br-flight {
+    position: relative;
+    z-index: -1;
+    grid-column: full;
+    grid-row: flight-start;
+    background: #0e171c;
+  }
+  .br-pin {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .br-fl-sky {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        ellipse 70% 30% at 50% 100%,
+        rgba(224, 122, 58, 0.28),
+        rgba(224, 122, 58, 0) 70%
+      ),
+      linear-gradient(180deg, #0b1318 0%, #13212a 55%, #1f3340 100%);
+  }
+  .br-fl-city {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 42%;
+    mask-image: linear-gradient(to top, #000 45%, rgba(0, 0, 0, 0));
+  }
+  .br-fl-city i {
+    position: absolute;
+    display: block;
+    width: 3px;
+    height: 3px;
+  }
+  .br-hero::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 180px;
+    background: linear-gradient(rgba(216, 117, 54, 0), #d87536);
+  }
+  .br-fl-o {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #d87536, #dd7a3c 40%, #bc5a22);
+    opacity: 0;
+  }
+  .br-fl-rain {
+    position: absolute;
+    inset: 0;
+  }
+  .br-fm {
+    position: absolute;
+    bottom: 0;
+    display: block;
+    background: #0a1115;
+    box-shadow: inset 2px 0 0 rgba(79, 195, 217, 0.25);
+  }
+  .br-fm.l {
+    left: 2%;
+    width: 9%;
+    height: 78%;
+  }
+  .br-fm.r {
+    right: 2%;
+    width: 10%;
+    height: 86%;
+    box-shadow: inset -2px 0 0 rgba(228, 77, 155, 0.28);
+  }
+  .br-fm.c {
+    left: 46%;
+    width: 6%;
+    height: 38%;
+    opacity: 0.65;
+  }
+  .br-fl-hud {
+    position: absolute;
+    left: 50%;
+    top: 132px;
+    translate: -50% 0;
+    margin: 0;
+    display: flex;
+    gap: 18px;
+    font: 11px/1.4 var(--font-mono);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--br-hud2);
+    white-space: nowrap;
+  }
+  .br-fl-cap {
+    position: absolute;
+    right: var(--br-gut);
+    bottom: 112px;
+    margin: 0;
+    font: 12px/1.4 var(--font-mono);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--br-hud2);
+  }
+  /* without scroll-driven animation (or with reduced motion) the flight is a
+     still: the billboards stand in a row over the night city */
+  #readme .metrics {
+    position: relative;
+    grid-row: flight-start;
+    grid-column: full;
+    counter-reset: br-m;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    gap: 26px;
+    min-height: 92svh;
+    margin: 0;
+    padding: 190px var(--br-pad) 150px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    overflow: visible;
+  }
+  #readme .metrics .m {
+    --c: 228, 77, 155;
+    --t: #f7b6d6;
+    counter-increment: br-m;
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 170px;
+    padding: 16px 20px 18px;
+    border: 1px solid rgba(var(--c), 0.75);
+    background:
+      linear-gradient(180deg, rgba(var(--c), 0.16), rgba(var(--c), 0.05)), rgba(10, 17, 21, 0.55);
+    box-shadow:
+      0 0 34px -8px rgba(var(--c), 0.7),
+      inset 0 0 22px -10px rgba(var(--c), 0.8);
+    color: var(--t);
+    overflow: hidden;
+  }
+  #readme .metrics .m:nth-child(even) {
+    --c: 79, 195, 217;
+    --t: #bdeff7;
+  }
+  #readme .metrics .m:nth-child(5) {
+    --c: 242, 162, 94;
+    --t: #ffd9b4;
+  }
+  #readme .metrics .m::before {
+    content: 'Proof 0' counter(br-m) / '';
+    font: 11px/1.4 var(--font-mono);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  #readme .metrics .m::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      rgba(255, 255, 255, 0) 1px 3px
+    );
+    pointer-events: none;
+  }
+  #readme .metrics .m .v {
+    font: 800 64px/0.9 var(--font-display);
+    letter-spacing: 0.01em;
+    color: inherit;
+  }
+  #readme .metrics .m .v em {
+    font-style: normal;
+    color: inherit;
+  }
+  #readme .metrics .m .k {
+    margin: 0;
+    font: 13px/1.4 var(--font-mono);
+    letter-spacing: 0.14em;
+    color: inherit;
+  }
+
+  /* ============================================================
+     01 · PLAYGROUND: Wallace Corporation, water-light on concrete
+     ============================================================ */
+  /* act changes dissolve: each act's first section starts in the colour of the last */
+  :is(#playground, #work, #writing, #now)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: min(110px, 80%);
+    background: linear-gradient(var(--br-from), transparent);
+    pointer-events: none;
+  }
+  #playground {
+    --br-from: #1f3340;
+  }
+  #work {
+    --br-from: #16120b;
+  }
+  #writing {
+    --br-from: #dc7e3a;
+  }
+  #now {
+    --br-from: #132430;
+  }
+  #playground .console {
+    border: 1px solid rgba(232, 196, 110, 0.38);
+    border-radius: 0;
+    background: rgba(18, 14, 8, 0.84);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 40px 90px -50px rgba(0, 0, 0, 0.9);
+  }
+  .console-bar {
+    gap: 16px;
+    padding: 12px 16px;
+    background: none;
+    border-bottom: 1px solid rgba(232, 196, 110, 0.24);
+  }
+  .console-bar .who {
+    order: 1;
+    flex: 1;
+    min-width: 0;
+    font: 12px/1.3 var(--font-mono);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+  }
+  .console-bar .lights {
+    display: none;
+  }
+  /* the baseline readout: a scrolling trace, and the state it's in */
+  .console-bar::before {
+    content: '';
+    order: 2;
+    flex: none;
+    width: 120px;
+    height: 20px;
+    background: var(--br-wave) 0 0 / 120px 20px repeat-x;
+  }
+  .console-bar::after {
+    content: var(--br-bl) / '';
+    order: 3;
+    min-width: 128px;
+    font: 11px/1.3 var(--font-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: right;
+    color: var(--ink-2);
+  }
+  .console-bar > :not(.who) {
+    order: 4;
+  }
+  #playground .console-body {
+    padding: 22px 22px 20px;
+  }
+  #playground .a2-launch-lede {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  :is(#playground, .a2-panel) .btn-amber {
+    height: 46px;
+    padding: 0 20px;
+    gap: 10px;
+    border: 1px solid #e0b354;
+    border-radius: 0;
+    background: #e0b354;
+    box-shadow: none;
+    filter: none;
+    color: #16120b;
+    font: 700 16px/1 var(--font-display);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition:
+      background-color 0.15s,
+      transform 0.12s;
+  }
+  :is(#playground, .a2-panel) .btn-amber:hover {
+    background: #f0cb76;
+  }
+  :is(#playground, .a2-panel) .btn-amber:active {
+    transform: scale(0.97);
+  }
+  :is(.a2-launch-hint, .a2-launch-count, .a2-quota, .a2-composing) {
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .a2-starter-lbl {
+    color: var(--amber-deep);
+    letter-spacing: 0.14em;
+  }
+  .a2-action {
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid rgba(232, 196, 110, 0.34);
+    border-radius: 0;
+    background: transparent;
+    font: 12.5px/1.3 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+    transition:
+      background-color 0.15s,
+      color 0.15s,
+      border-color 0.15s,
+      transform 0.12s;
+  }
+  .a2-action:hover {
+    border-color: #e8c46f;
+    background: rgba(232, 196, 110, 0.08);
+    color: var(--ink);
+  }
+  .a2-action:active {
+    transform: scale(0.97);
+  }
+  :is(#playground, .a2-panel) .alert {
+    border-radius: 0;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+
+  /* the slideover: a Wallace terminal, gold water-light moving under it */
+  .a2-drawer::backdrop {
+    background: rgba(6, 5, 3, 0.62);
+  }
+  .a2-panel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #16120b;
+    border-left: 1px solid rgba(232, 196, 110, 0.3);
+  }
+  .a2-panel::before {
+    content: '';
+    position: absolute;
+    inset: -25%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 14% 8% at 22% 30%,
+        rgba(232, 196, 110, 0.3),
+        rgba(232, 196, 110, 0) 70%
+      ),
+      radial-gradient(
+        ellipse 16% 9% at 78% 70%,
+        rgba(232, 196, 110, 0.24),
+        rgba(232, 196, 110, 0) 70%
+      ),
+      var(--br-caustic-a) 0 0 / 420px 420px;
+    opacity: 0.12;
+    mask-image: linear-gradient(180deg, #000, rgba(0, 0, 0, 0.3) 70%);
+  }
+  .a2-panel-foot {
+    background: rgba(22, 18, 11, 0.92);
+    border-top-color: rgba(232, 196, 110, 0.24);
+  }
+  .a2-lamp {
+    border-radius: 1px;
+  }
+  .a2-turn + .a2-turn,
+  .a2-status {
+    border-top-color: rgba(232, 196, 110, 0.22);
+  }
+  .a2-ask {
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+  .a2-ask .car {
+    color: var(--amber-deep);
+  }
+  .a2-heading h3 {
+    font: 700 24px/1 var(--font-display);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .a2-eyebrow {
+    color: var(--amber-deep);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .a2-text {
+    font-size: 14.5px;
+  }
+  :is(.a2-card, .a2-code, .a2-metrics, .a2-flow-box, .a2-peek pre, .a2-text code) {
+    border-radius: 0;
+  }
+  .a2-card {
+    background: rgba(241, 230, 207, 0.04);
+    transition:
+      border-color 0.2s,
+      transform 0.25s var(--br-ease);
+  }
+  .a2-card.is-link:hover {
+    border-color: #e8c46f;
+    background: rgba(241, 230, 207, 0.06);
+    transform: translateY(-2px);
+  }
+  .a2-card-top b {
+    font: 700 20px/1 var(--font-display);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .a2-metric-v,
+  .a2-gauge-v {
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+  .a2-metric-v {
+    font-size: 28px;
+  }
+  .a2-metric-v em {
+    font-style: normal;
+  }
+  .a2-bar-track {
+    border-radius: 0;
+    height: 6px;
+  }
+  .a2-bar-fill {
+    border-radius: 0;
+  }
+  .a2-flow-step:last-child .a2-flow-box {
+    border-color: #e0b354;
+  }
+  .a2-sk-line,
+  .a2-sk-block {
+    border-radius: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(232, 196, 110, 0.05) 25%,
+      rgba(232, 196, 110, 0.16) 50%,
+      rgba(232, 196, 110, 0.05) 75%
+    );
+    background-size: 200% 100%;
+  }
+  .a2-composer .a2-input {
+    height: 46px;
+    padding: 0 14px;
+    border: 0;
+    border-bottom: 1px solid rgba(232, 196, 110, 0.5);
+    border-radius: 0;
+    background: rgba(241, 230, 207, 0.04);
+    box-shadow: none;
+    font: 14.5px var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+  .a2-composer .a2-input::placeholder {
+    color: var(--muted);
+  }
+  .a2-composer .a2-input:focus {
+    border-color: #e8c46f;
+    background: rgba(241, 230, 207, 0.08);
+  }
+
+  /* ============================================================
+     LAS VEGAS: the work index, two monuments, dates carved in wood
+     ============================================================ */
+  #work .idx {
+    display: block;
+    border-top: 2px solid var(--ink);
+  }
+  #work .idx tbody {
+    display: block;
+  }
+  #work .idx tr {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr) 230px;
+    column-gap: 32px;
+    padding: 28px 0 30px;
+    border-bottom: 1px solid var(--rule);
+    transition:
+      padding-left 0.45s var(--br-ease),
+      background-color 0.3s;
+  }
+  #work .idx tr:hover {
+    padding-left: 16px;
+    background: rgba(255, 236, 214, 0.14);
+  }
+  #work .idx td {
+    display: block;
+    width: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  #work .idx .n {
+    grid-row: 1 / span 2;
+    font: 900 100px/0.78 var(--font-display);
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--ink);
+  }
+  #work .idx .proj {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  #work .idx .proj b {
+    font: 800 48px/0.92 var(--font-display);
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  #work .idx .proj span {
+    max-width: 58ch;
+    margin-top: 12px;
+    font-size: 16.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  #work .idx .yr {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    font: 800 34px/1 var(--font-display);
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+  #work .idx .stk {
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: end;
+    text-align: right;
+    font: 12px/1.8 var(--font-mono);
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+
+  #oss .repos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+  #oss .repo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 270px;
+    padding: 28px 28px 26px;
+    border: 0;
+    background: #2a1408;
+    color: #f6e3cf;
+    overflow: hidden;
+    transition:
+      transform 0.5s var(--br-ease),
+      box-shadow 0.5s;
+  }
+  #oss .repo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(200deg, rgba(255, 214, 160, 0.2), rgba(255, 214, 160, 0) 45%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  #oss .repo:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 40px 60px -40px rgba(26, 11, 4, 0.85);
+  }
+  #oss .repo:hover::before {
+    opacity: 1;
+  }
+  #oss .repo:focus-visible {
+    outline-color: #2a1408;
+  }
+  #oss .repo .nm {
+    order: 1;
+    font: 800 50px/0.88 var(--font-display);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: #f6e3cf;
+  }
+  #oss .repo .nm .org {
+    display: block;
+    margin-bottom: 12px;
+    font: 12px/1.4 var(--font-mono);
+    letter-spacing: 0.16em;
+    text-transform: none;
+    color: #cdb49a;
+  }
+  #oss .repo .desc {
+    order: 2;
+    margin-top: auto;
+    max-width: 44ch;
+    font-size: 15.5px;
+    line-height: 1.5;
+    color: #e6cdb2;
+  }
+  #oss .repo .meta {
+    order: 3;
+    align-self: flex-start;
+    font: 12px/1.4 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #cdb49a;
+  }
+  #oss .repo .lang .sw {
+    width: 9px;
+    height: 9px;
+    border-radius: 0;
+  }
+
+  #log .logitem {
+    grid-template-columns: 170px auto minmax(0, 1fr);
+    column-gap: 14px;
+    row-gap: 4px;
+    align-items: start;
+    padding: 20px 0;
+    border-top: 1px solid var(--rule);
+  }
+  #log .logitem .gutter {
+    display: none;
+  }
+  #log .logitem :is(.lbody, .top) {
+    display: contents;
+  }
+  #log .logitem .date {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    justify-self: start;
+    margin-right: 12px;
+    padding: 8px 12px 7px;
+    font: 700 21px/1 var(--font-display);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2a1206;
+    background-color: #c4844f;
+    background-image: repeating-linear-gradient(
+      176deg,
+      rgba(90, 40, 12, 0.16) 0 2px,
+      rgba(90, 40, 12, 0) 2px 7px
+    );
+    text-shadow: 0 1px 0 rgba(255, 226, 190, 0.45);
+    box-shadow:
+      inset 0 0 0 1px rgba(42, 18, 6, 0.25),
+      inset 0 -3px 0 rgba(42, 18, 6, 0.12);
+    transition: transform 0.3s var(--br-ease);
+  }
+  #log .logitem:hover .date {
+    transform: rotate(-2deg) translateY(-2px);
+  }
+  #log .logitem.upcoming .date {
+    background: transparent;
+    border: 1px dashed var(--ink-2);
+    color: var(--ink-2);
+    text-shadow: none;
+    box-shadow: none;
+  }
+  #log .logitem .hash {
+    grid-column: 2;
+    grid-row: 1;
+    font: 12px/1.6 var(--font-mono);
+    letter-spacing: 0.14em;
+    color: var(--ink);
+  }
+  #log .logitem .tag {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: start;
+    padding: 0;
+    border: 0;
+    font: 12px/1.6 var(--font-mono);
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+  #log .logitem .msg {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    max-width: 66ch;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  #log .logitem.upcoming :is(.hash, .msg) {
+    color: var(--ink-2);
+  }
+  #log .logitem .msg a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ============================================================
+     LOS ANGELES: neon, holograms, the records archive
+     ============================================================ */
+  #writing .keybar a {
+    color: var(--br-cyan-ink);
+  }
+  #writing .wrow {
+    grid-template-columns: 150px minmax(0, 1fr) 80px;
+    gap: 24px;
+    padding: 22px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 0;
+  }
+  #writing .wrow:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+  #writing .wrow .d {
+    font: 13px/1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: var(--br-cyan-ink);
+  }
+  #writing .wrow .t {
+    font: 700 36px/0.98 var(--font-display);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--ink);
+    transition:
+      color 0.2s,
+      text-shadow 0.2s;
+  }
+  #writing .wrow:hover .t {
+    color: var(--amber-deep);
+    text-shadow: 0 0 22px rgba(228, 77, 155, 0.6);
+  }
+  #writing .wrow .rt {
+    font: 13px/1.4 var(--font-mono);
+    color: var(--muted);
+    text-align: right;
+  }
+
+  #principles .tenets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  #principles .tenet {
+    --c: 228, 77, 155;
+    --s: #f27db8;
+    position: relative;
+    padding: 26px 28px;
+    border: 1px solid rgba(var(--c), 0.55);
+    background: linear-gradient(180deg, rgba(var(--c), 0.1), rgba(var(--c), 0.03));
+    box-shadow:
+      0 0 34px -12px rgba(var(--c), 0.55),
+      inset 0 0 26px -14px rgba(var(--c), 0.7);
+    overflow: hidden;
+  }
+  #principles .tenet:is(:nth-child(2), :nth-child(3)) {
+    --c: 79, 195, 217;
+    --s: #7fd6e4;
+  }
+  #principles .tenet::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.04) 0 1px,
+      rgba(255, 255, 255, 0) 1px 3px
+    );
+    pointer-events: none;
+  }
+  #principles .tenet .nn {
+    font: 900 72px/0.8 var(--font-display);
+    color: transparent;
+    -webkit-text-stroke: 1px var(--s);
+  }
+  #principles .tenet h3 {
+    margin: 14px 0 8px;
+    font: 700 32px/1 var(--font-display);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  #principles .tenet p {
+    max-width: 46ch;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  #stack .toolbox {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  #stack .toolcol {
+    --br-cab: 'L';
+    counter-reset: br-dr;
+    padding: 16px;
+    border: 1px solid var(--rule);
+    background: #111c22;
+    text-align: left;
+  }
+  #stack .toolcol:nth-child(2) {
+    --br-cab: 'I';
+  }
+  #stack .toolcol:nth-child(3) {
+    --br-cab: 'M';
+  }
+  #stack .toolcol .h {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 12px;
+    font: 12px/1.4 var(--font-mono);
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  #stack .toolcol .h::after {
+    content: var(--br-cab) / '';
+  }
+  #stack .toolcol ul {
+    gap: 6px;
+  }
+  #stack .toolcol li {
+    counter-increment: br-dr;
+    justify-content: flex-start;
+    gap: 12px;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid rgba(227, 236, 238, 0.08);
+    background: #18262e;
+    font: 14px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    transition:
+      transform 0.35s var(--br-ease),
+      background-color 0.2s,
+      border-color 0.2s;
+  }
+  #stack .toolcol li::before {
+    content: '';
+    flex: none;
+    width: 18px;
+    height: 4px;
+    border-radius: 2px;
+    background: #62777f;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+  #stack .toolcol li::after {
+    content: var(--br-cab) '-0' counter(br-dr) / '';
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  #stack .toolcol li:hover {
+    transform: translateX(16px);
+    background: #1f313b;
+    border-color: rgba(79, 195, 217, 0.35);
+  }
+
+  /* ============================================================
+     08 · NOW: snow on the steps, then the end credits
+     ============================================================ */
+  #now .specs {
+    display: flex;
+    flex-direction: column;
+    max-width: 860px;
+  }
+  #now .spec {
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 20px;
+    padding: 15px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 0;
+  }
+  #now .spec:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+  #now .spec dt {
+    font: 12px/1.6 var(--font-mono);
+    letter-spacing: 0.18em;
+    color: var(--muted);
+  }
+  #now .spec dd {
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  /* the credits and the footer only ever follow the snow: they keep its palette */
+  :is(.br-credits, .content .foot) {
+    --ink: #0f1a20;
+    --ink-2: #2a3a42;
+    --muted: #4c5d65;
+    --rule: rgba(15, 26, 32, 0.16);
+    --amber-deep: #1f5f7a;
+  }
+  .br-credits {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 40px var(--br-pad) 64px;
+    text-align: center;
+    color: var(--ink);
+  }
+  .br-end {
+    margin: 0 -0.6em 22px 0;
+    font: 200 30px/1 var(--font-display);
+    letter-spacing: 0.6em;
+    text-transform: uppercase;
+  }
+  .br-credits dl {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    max-width: 720px;
+    margin: 0;
+  }
+  .br-credits dl > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px;
+    align-items: baseline;
+  }
+  .br-credits dt {
+    text-align: right;
+    font: 12px/1.5 var(--font-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .br-credits dd {
+    margin: 0;
+    text-align: left;
+    font: 700 17px/1.3 var(--font-display);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .content .foot {
+    margin: 0;
+    padding: 22px var(--br-pad) 120px;
+    border-top: 1px solid var(--rule);
+    font: 11px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .content .foot-links a {
+    color: var(--ink-2);
+  }
+  .content .foot-links a:hover {
+    color: var(--amber-deep);
+  }
+
+  /* ============================================================
+     PHONES
+     ============================================================ */
+  @media (max-width: 820px) {
+    .block[data-sec] {
+      padding: 92px var(--br-pad) 84px;
+    }
+    .block .keybar {
+      margin-bottom: 36px;
+    }
+    .block .keybar b {
+      font-size: clamp(50px, 15vw, 72px);
+    }
+    .block .keybar .reel-slug[data-for='br2049'] {
+      float: none;
+      display: block;
+      margin: 4px 0 0;
+    }
+    #readme .keybar .reel-slug[data-for='br2049'] {
+      display: inline;
+      margin-left: 12px;
+    }
+    .br-hero {
+      min-height: 86svh;
+    }
+    .br-fl-hud,
+    .br-fl-cap {
+      display: none;
+    }
+    #readme .metrics {
+      padding: 120px var(--br-pad) 110px;
+      gap: 16px;
+    }
+    #readme .metrics .m {
+      min-width: 0;
+      padding: 10px 12px 12px;
+    }
+    #readme .metrics .m .v {
+      font-size: 40px;
+    }
+    #readme .metrics .m .k {
+      font-size: 11px;
+    }
+    #work .idx tr {
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding: 24px 0;
+    }
+    #work .idx tr:hover {
+      padding-left: 8px;
+    }
+    #work .idx .n {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      margin-bottom: 10px;
+      font-size: 64px;
+    }
+    #work .idx .proj {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+    #work .idx .proj b {
+      font-size: 36px;
+    }
+    #work .idx .stk {
+      display: block;
+      grid-column: 1;
+      grid-row: 3;
+      justify-self: start;
+      text-align: left;
+      margin-top: 12px;
+    }
+    #work .idx .yr {
+      grid-column: 2;
+      grid-row: 3;
+      align-self: end;
+      font-size: 26px;
+    }
+    #oss .repos,
+    #principles .tenets,
+    #stack .toolbox {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    #oss .repo {
+      min-height: 220px;
+    }
+    #oss .repo .nm {
+      font-size: 40px;
+    }
+    #log .logitem {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+    #log .logitem .date {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      margin: 0 0 10px;
+    }
+    #log .logitem .hash {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    #log .logitem .tag {
+      grid-column: 2;
+      grid-row: 2;
+    }
+    #log .logitem .msg {
+      grid-column: 1 / -1;
+      grid-row: 3;
+    }
+    #writing .wrow {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px 14px;
+    }
+    #writing .wrow .d {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    #writing .wrow .rt {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    #writing .wrow .t {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      font-size: 28px;
+    }
+    #principles .tenet h3 {
+      font-size: 28px;
+    }
+    #now .spec {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+    }
+    .br-credits dl > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
+    .br-credits :is(dt, dd) {
+      text-align: center;
+    }
+    .content .foot {
+      padding-bottom: 96px;
+    }
+  }
+  @media (max-width: 600px) {
+    .console-bar {
+      gap: 10px;
+    }
+    .console-bar::before {
+      width: 72px;
+    }
+    .console-bar::after {
+      display: none;
+    }
+  }
+  @media (max-width: 400px) {
+    --br-gut: 16px;
+  }
+
+  /* narrow desktops: shorter contact labels, a tighter work index */
+  @media (min-width: 821px) and (max-width: 1180px) {
+    .rail .contact-wrap .rail-sec {
+      display: none;
+    }
+    .rail .contact a {
+      font-size: 0;
+    }
+    .rail .contact a::after {
+      font: 11px/1.4 var(--font-mono);
+      letter-spacing: 0.08em;
+    }
+    .rail .contact a[href^='mailto:']::after {
+      content: 'mail' / '';
+    }
+    .rail .contact a[href*='github.com']::after {
+      content: 'github' / '';
+    }
+    .rail .contact a[href*='linkedin.com']::after {
+      content: 'linkedin' / '';
+    }
+    .rail .contact a[href$='.pdf']::after {
+      content: 'resume' / '';
+    }
+    #work .idx tr {
+      grid-template-columns: 110px minmax(0, 1fr) 170px;
+      column-gap: 24px;
+    }
+    #work .idx .n {
+      font-size: 80px;
+    }
+    #work .idx .proj b {
+      font-size: 40px;
+    }
+  }
+}
+
+/* ============================================================
+   SCROLL SCENES: only where scroll-driven animation exists and motion
+   is welcome. Otherwise the hero is still and the flight is a still.
+   ============================================================ */
+@supports (animation-timeline: view()) and (timeline-scope: none) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-reel='br2049'] {
+      #readme {
+        timeline-scope: --br-hero, --br-flight;
+      }
+      .br-hero {
+        view-timeline: --br-hero block;
+      }
+      .br-hero :is(.m-far, .m-mid, .m-near) {
+        animation: br2049-pf linear both;
+        animation-timeline: --br-hero;
+        animation-range: exit 0% exit 100%;
+      }
+      .br-hero .m-mid {
+        animation-name: br2049-pm;
+      }
+      .br-hero .m-near {
+        animation-name: br2049-pn;
+      }
+      #readme :is(.keybar, .lede, .sub, .startrow) {
+        animation: br2049-pt linear both;
+        animation-timeline: --br-hero;
+        animation-range: exit 0% exit 90%;
+      }
+
+      /* the flight: pinned for 2.6 screens, scrubbed by the scroll */
+      .br-flight {
+        height: 260svh;
+        view-timeline: --br-flight block;
+      }
+      .br-pin {
+        position: sticky;
+        top: 0;
+        right: auto;
+        bottom: auto;
+        left: auto;
+        height: 100svh;
+      }
+      :is(.br-fl-o, .br-fl-rain, .br-fl-city, .br-fm) {
+        animation: br2049-flo linear both;
+        animation-timeline: --br-flight;
+        animation-range: contain 0% contain 100%;
+      }
+      .br-fl-rain {
+        animation-name: br2049-flr;
+      }
+      .br-fl-city {
+        animation-name: br2049-flc;
+      }
+      .br-fm.l {
+        animation-name: br2049-fml;
+      }
+      .br-fm.r {
+        animation-name: br2049-fmr;
+      }
+      .br-fm.c {
+        animation-name: br2049-fmc;
+      }
+      #readme .metrics {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        display: block;
+        height: 100svh;
+        min-height: 0;
+        padding: 0;
+      }
+      #readme .metrics .m {
+        position: absolute;
+        animation: br2049-bb linear both;
+        animation-timeline: --br-flight;
+      }
+      #readme .metrics .m:nth-child(1) {
+        left: 7%;
+        top: 17%;
+        animation-range: contain 10% contain 22%;
+      }
+      #readme .metrics .m:nth-child(2) {
+        right: 9%;
+        top: 22%;
+        animation-range: contain 22% contain 34%;
+      }
+      #readme .metrics .m:nth-child(3) {
+        left: 31%;
+        top: 46%;
+        animation-range: contain 34% contain 46%;
+      }
+      #readme .metrics .m:nth-child(4) {
+        right: 23%;
+        top: 54%;
+        animation-range: contain 46% contain 58%;
+      }
+      #readme .metrics .m:nth-child(5) {
+        left: 11%;
+        bottom: 17%;
+        animation-range: contain 58% contain 70%;
+      }
+      @media (max-width: 820px) {
+        #readme .metrics .m:nth-child(1) {
+          left: 5%;
+          top: 8%;
+        }
+        #readme .metrics .m:nth-child(2) {
+          right: 5%;
+          top: 25%;
+        }
+        #readme .metrics .m:nth-child(3) {
+          left: 5%;
+          top: 42%;
+        }
+        #readme .metrics .m:nth-child(4) {
+          right: 5%;
+          top: 58%;
+        }
+        #readme .metrics .m:nth-child(5) {
+          left: 5%;
+          bottom: 15%;
+        }
+      }
+    }
+  }
+}
+
+/* ============================================================
+   LOOPS: only while motion is welcome, and only for the act on screen
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-reel='br2049'] {
+    .br-grain {
+      animation: br2049-grain 1s steps(6) infinite;
+    }
+    .reelpick .rail-sec > span:first-child::before,
+    .br-rec {
+      animation: br2049-rec 1.6s steps(1) infinite;
+    }
+    .br-ff-strip {
+      animation: br2049-ff 1s steps(24) infinite;
+    }
+    .console-bar::before {
+      animation: br2049-wv 2.4s linear infinite;
+    }
+    &[data-br-wave='think'] .console-bar::before {
+      animation-duration: 0.6s;
+    }
+    &[data-br-wave='speak'] .console-bar::before {
+      animation-duration: 1s;
+    }
+    &[data-br-wave='done'] .console-bar::before {
+      animation-play-state: paused;
+    }
+    #readme .lede em {
+      animation: br2049-holo 4.2s steps(1) infinite;
+    }
+    #work .idx tr:hover .proj b,
+    #principles .tenet:hover h3 {
+      animation: br2049-glitch 0.38s steps(2) 2;
+    }
+    #principles .tenet:hover {
+      animation: br2049-flick 0.45s steps(3) 1;
+    }
+    .a2-surface {
+      position: relative;
+      animation: br2049-holo-in 0.85s linear backwards;
+    }
+    .a2-surface::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 34%;
+      background: linear-gradient(
+        180deg,
+        rgba(232, 196, 110, 0),
+        rgba(232, 196, 110, 0.32) 50%,
+        rgba(232, 196, 110, 0)
+      );
+      opacity: 0;
+      animation: br2049-scan 0.85s ease-out;
+      pointer-events: none;
+    }
+    .a2-panel::before {
+      animation: br2049-cx1 13s ease-in-out infinite alternate;
+    }
+
+    /* the cold open breathes while it's on screen */
+    &[data-sec='0'] {
+      .br-hero .h2 {
+        animation: br2049-breathe 12s ease-in-out infinite alternate;
+      }
+      .br-shafts i {
+        animation: br2049-shaft 9s ease-in-out infinite alternate;
+      }
+      .br-shafts i:nth-child(2) {
+        animation-delay: -3s;
+      }
+      .br-shafts i:nth-child(3) {
+        animation-delay: -6s;
+      }
+      .br-fog {
+        animation: br2049-fog 26s ease-in-out infinite alternate;
+      }
+      :is(.br-hero, .br-fl-o) .br-dust i {
+        animation-name: br2049-dust;
+      }
+      .br-flight .br-drop {
+        animation-name: br2049-fall;
+      }
+      .br-fl-city i {
+        animation: br2049-twinkle 3.4s ease-in-out infinite;
+      }
+    }
+    &:is([data-act='0'], [data-act='2']) .br-bd-haze .br-dust i {
+      animation-name: br2049-dust;
+    }
+    &[data-act='1'] .br-bd-water {
+      .c1 {
+        animation: br2049-cx1 11s ease-in-out infinite alternate;
+      }
+      .c2 {
+        animation: br2049-cx2 13s ease-in-out infinite alternate;
+      }
+      .l1 {
+        animation: br2049-cxl1 9s ease-in-out infinite alternate;
+      }
+      .l2 {
+        animation: br2049-cxl2 11s ease-in-out infinite alternate;
+      }
+    }
+    &[data-act='3'] .br-bd-rain .br-drop {
+      animation-name: br2049-fall;
+    }
+    &:is([data-act='4'], [data-sec='9']) .br-snow i {
+      animation-name: br2049-snow;
+    }
+  }
+}
+
+/* ============================================================
+   THE TITLE CARD: inside the projector, while it shows this reel
+   ============================================================ */
+.projector[data-title='br2049'] {
+  .br-title {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    color: #f2e2cc;
+  }
+  .br-title-haze {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: 100vw;
+    height: min(100vh, calc(100vw / 2.39));
+    translate: -50% -50%;
+    background: radial-gradient(
+      ellipse 62% 70% at 50% 72%,
+      rgba(221, 122, 60, 0.82),
+      rgba(221, 122, 60, 0) 70%
+    );
+    opacity: 0;
+  }
+  .br-title-t {
+    font:
+      200 clamp(30px, 4.6vw, 64px) / 1 'Big Shoulders Display Variable',
+      sans-serif;
+    letter-spacing: 0.5em;
+    margin-right: -0.5em;
+    text-transform: uppercase;
+    opacity: 0;
+  }
+  .br-title-n {
+    margin-top: -4px;
+    font-size: clamp(22px, 2.8vw, 38px);
+    letter-spacing: 0.9em;
+    margin-right: -0.9em;
+  }
+  .br-title-line {
+    display: block;
+    width: 0;
+    height: 1px;
+    margin-top: 6px;
+    background: #f2e2cc;
+  }
+  .br-title-s {
+    font:
+      11px/1.5 'Share Tech Mono',
+      ui-monospace,
+      monospace;
+    letter-spacing: 0.32em;
+    margin-right: -0.32em;
+    text-transform: uppercase;
+    color: rgba(242, 226, 204, 0.72);
+    opacity: 0;
+  }
+  &:is([data-state='card'], [data-state='open']) {
+    .br-title-haze {
+      animation: br2049-o-in 1.1s ease forwards;
+    }
+    .br-title-t {
+      animation: br2049-track 1.2s cubic-bezier(0.2, 0.7, 0.1, 1) 0.12s forwards;
+    }
+    .br-title-n {
+      animation-delay: 0.3s;
+    }
+    .br-title-line {
+      animation: br2049-line 0.9s cubic-bezier(0.2, 0.7, 0.1, 1) 0.3s forwards;
+    }
+    .br-title-s {
+      animation: br2049-o-in 0.6s ease 0.5s forwards;
+    }
+  }
+}
+
+/* ---------- keyframes ---------- */
+@keyframes br2049-grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  17% {
+    transform: translate(-3%, 2%);
+  }
+  33% {
+    transform: translate(2%, -4%);
+  }
+  50% {
+    transform: translate(-4%, -1%);
+  }
+  67% {
+    transform: translate(3%, 3%);
+  }
+  83% {
+    transform: translate(-1%, 4%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes br2049-rec {
+  50% {
+    opacity: 0.25;
+  }
+}
+@keyframes br2049-ff {
+  to {
+    transform: translateY(-32.4em);
+  }
+}
+@keyframes br2049-wv {
+  to {
+    background-position-x: -120px;
+  }
+}
+@keyframes br2049-breathe {
+  to {
+    transform: scale(1.06) translateX(-2%);
+    opacity: 0.8;
+  }
+}
+@keyframes br2049-shaft {
+  0% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
+@keyframes br2049-dust {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: var(--o, 1);
+  }
+  100% {
+    transform: translate(140px, -70px);
+    opacity: 0;
+  }
+}
+@keyframes br2049-twinkle {
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes br2049-fog {
+  to {
+    transform: translateX(12%);
+  }
+}
+@keyframes br2049-fall {
+  to {
+    transform: translateY(150vh);
+  }
+}
+@keyframes br2049-snow {
+  to {
+    transform: translate(46px, 112vh);
+  }
+}
+@keyframes br2049-cx1 {
+  to {
+    transform: translate(4%, 3%) scale(1.08);
+  }
+}
+@keyframes br2049-cx2 {
+  to {
+    transform: translate(-5%, 2%) scale(1.1) rotate(2deg);
+  }
+}
+@keyframes br2049-cxl1 {
+  to {
+    transform: translate(-64px, 36px);
+  }
+}
+@keyframes br2049-cxl2 {
+  to {
+    transform: translate(52px, -30px) scale(1.04);
+  }
+}
+@keyframes br2049-pf {
+  to {
+    transform: translateY(60px);
+  }
+}
+@keyframes br2049-pm {
+  to {
+    transform: translateY(150px);
+  }
+}
+@keyframes br2049-pn {
+  to {
+    transform: translateY(280px) scale(1.08);
+  }
+}
+@keyframes br2049-pt {
+  to {
+    transform: translateY(-90px);
+    opacity: 0.2;
+  }
+}
+@keyframes br2049-flo {
+  0% {
+    opacity: 0.94;
+  }
+  55%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes br2049-flr {
+  0%,
+  40% {
+    opacity: 0;
+  }
+  80%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes br2049-flc {
+  0% {
+    opacity: 0.15;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+@keyframes br2049-fml {
+  0% {
+    transform: translateX(30vw) scale(0.35);
+  }
+  100% {
+    transform: translateX(-58vw) scale(3.2);
+  }
+}
+@keyframes br2049-fmr {
+  0% {
+    transform: translateX(-30vw) scale(0.35);
+  }
+  100% {
+    transform: translateX(56vw) scale(3.4);
+  }
+}
+@keyframes br2049-fmc {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(2.4);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(4.2);
+    opacity: 0;
+  }
+}
+@keyframes br2049-bb {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) translateY(40px);
+  }
+  40% {
+    opacity: 0.7;
+  }
+  55% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes br2049-holo {
+  0%,
+  86%,
+  92%,
+  96%,
+  100% {
+    text-shadow: none;
+  }
+  88% {
+    text-shadow:
+      -3px 0 rgba(228, 77, 155, 0.85),
+      3px 0 rgba(79, 195, 217, 0.85);
+  }
+  90% {
+    text-shadow:
+      2px 1px rgba(228, 77, 155, 0.85),
+      -2px -1px rgba(79, 195, 217, 0.85);
+  }
+  94% {
+    text-shadow:
+      -1px 0 rgba(228, 77, 155, 0.85),
+      2px 0 rgba(79, 195, 217, 0.85);
+  }
+}
+@keyframes br2049-glitch {
+  0% {
+    text-shadow:
+      -3px 0 rgba(228, 77, 155, 0.8),
+      3px 0 rgba(79, 195, 217, 0.8);
+    transform: translateX(1px);
+  }
+  50% {
+    text-shadow:
+      2px 1px rgba(228, 77, 155, 0.8),
+      -2px -1px rgba(79, 195, 217, 0.8);
+    transform: translateX(-1px) skewX(-3deg);
+  }
+  100% {
+    text-shadow: none;
+    transform: none;
+  }
+}
+@keyframes br2049-flick {
+  0% {
+    opacity: 1;
+  }
+  33% {
+    opacity: 0.5;
+  }
+  66% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes br2049-holo-in {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  20% {
+    opacity: 0.8;
+    clip-path: inset(0 0 60% 0);
+  }
+  26% {
+    opacity: 0.25;
+  }
+  34% {
+    opacity: 0.9;
+    clip-path: inset(0 0 22% 0);
+  }
+  40% {
+    opacity: 0.45;
+  }
+  55%,
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes br2049-scan {
+  from {
+    opacity: 1;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(300%);
+  }
+}
+@keyframes br2049-o-in {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes br2049-track {
+  from {
+    opacity: 0;
+    letter-spacing: 0.8em;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes br2049-line {
+  to {
+    width: min(520px, 64vw);
+  }
 }

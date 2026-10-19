@@ -2,8 +2,20 @@
 /**
  * Reel 03 · Blade Runner 2049: reel-only markup. Rendered once per point listed in
  * config.stages; the engine hides it unless this reel is screening.
+ *
+ *   backdrop   the act backdrops (haze + ruins, Wallace's water-light, LA rain,
+ *              snow), the viewfinder corners and the grain
+ *   rail       the readout at the right end of the scrubber dock
+ *   in:readme  the cold open (haze, light shafts, parallax monoliths, fog) and
+ *              the flight into Los Angeles that the proof billboards ride on
+ *   credits    end credits, in the snow
+ *   title      the title card inside the projector
+ *
+ * Particles (dust, rain, snow) are sprinkled in by client.ts, so visitors who
+ * never screen this reel don't download a few hundred empty elements.
  */
 import type { StagePoint } from '../types';
+import reel from './config';
 
 interface Props {
   at: StagePoint;
@@ -11,4 +23,160 @@ interface Props {
 const { at } = Astro.props;
 ---
 
-{at === 'backdrop' && null}
+{
+  at === 'backdrop' && (
+    <>
+      <div class="br-bd" aria-hidden="true">
+        <div class="br-bd-l br-bd-haze">
+          <div class="br-ruins">
+            <i class="r1" />
+            <i class="r2" />
+            <i class="r3" />
+            <i class="r4" />
+          </div>
+          <div class="br-dust" data-br-dust="28" />
+        </div>
+        <div class="br-bd-l br-bd-water">
+          <i class="cx c1" />
+          <i class="cx c2" />
+          <i class="cx l1" />
+          <i class="cx l2" />
+          <i class="cx v" />
+        </div>
+        <div class="br-bd-l br-bd-rain">
+          <div class="br-rain" data-br-rain="48" />
+        </div>
+        <div class="br-bd-l br-bd-snow">
+          <div class="br-snow" data-br-snow="46" />
+        </div>
+      </div>
+      <div class="br-vf" aria-hidden="true">
+        <i class="c1" />
+        <i class="c2" />
+        <i class="c3" />
+        <i class="c4" />
+        <i class="x" />
+      </div>
+      <div class="br-grain" aria-hidden="true" />
+    </>
+  )
+}
+
+{
+  at === 'rail' && (
+    <div class="br-ro" aria-hidden="true">
+      <b data-br-ro="name">LV-00 · readme</b>
+      <span>
+        alt <span data-br-ro="alt">1200</span> m · dst <span data-br-ro="dst">00.0</span> km
+      </span>
+      <span class="br-tc">
+        <i class="br-rec" />
+        rec <span data-br-ro="tc">00:00:00</span>:
+        <span class="br-ff">
+          <span class="br-ff-strip">
+            {Array.from({ length: 24 }, (_, i) => (
+              <span>{String(i).padStart(2, '0')}</span>
+            ))}
+          </span>
+        </span>
+      </span>
+    </div>
+  )
+}
+
+{
+  at === 'in:readme' && (
+    <>
+      <div class="br-hero" aria-hidden="true">
+        <div class="br-haze h1" />
+        <div class="br-haze h2" />
+        <div class="br-shafts">
+          <i />
+          <i />
+          <i />
+        </div>
+        <div class="br-mono m-far">
+          <i class="a" />
+          <i class="b" />
+          <i class="c" />
+          <i class="d" />
+        </div>
+        <div class="br-mono m-mid">
+          <i class="e" />
+          <i class="f" />
+        </div>
+        <div class="br-mono m-near">
+          <i class="g" />
+          <i class="h" />
+        </div>
+        <div class="br-dust" data-br-dust="34" />
+        <div class="br-fog" />
+      </div>
+      <div class="br-flight" aria-hidden="true">
+        <div class="br-pin">
+          <div class="br-fl-sky" />
+          <div class="br-fl-city" data-br-city="90" />
+          <div class="br-fl-rain">
+            <div class="br-rain" data-br-rain="40" />
+          </div>
+          <i class="br-fm c" />
+          <i class="br-fm l" />
+          <i class="br-fm r" />
+          <div class="br-fl-o">
+            <div class="br-dust" data-br-dust="26" />
+          </div>
+          <p class="br-fl-hud">
+            <span>approach · Los Angeles</span>
+            <span>alt ▾ 1200 → 0300 m</span>
+            <span>rain · heavy</span>
+          </p>
+          <p class="br-fl-cap">the proof, on the billboards</p>
+        </div>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'credits' && (
+    <div class="br-credits">
+      <p class="br-end" aria-hidden="true">
+        End
+      </p>
+      <dl>
+        <div>
+          <dt>A portfolio by</dt>
+          <dd>Tomas Brasca</dd>
+        </div>
+        <div>
+          <dt>Screened through</dt>
+          <dd>
+            {reel.title} · {reel.year}
+          </dd>
+        </div>
+        <div>
+          <dt>Directed by</dt>
+          <dd>{reel.director}</dd>
+        </div>
+        <div>
+          <dt>Palette &amp; motifs</dt>
+          <dd>{reel.credits}</dd>
+        </div>
+      </dl>
+    </div>
+  )
+}
+
+{
+  at === 'title' && (
+    <div class="br-title">
+      <span class="br-title-haze" />
+      <span class="br-title-t">Blade Runner</span>
+      <span class="br-title-t br-title-n">2049</span>
+      <span class="br-title-line" />
+      <span class="br-title-s">
+        {reel.year} · {reel.director} · the portfolio of Tomas Brasca
+      </span>
+    </div>
+  )
+}
