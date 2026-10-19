@@ -1,23 +1,47 @@
 /**
  * Reel 04 · The Grand Budapest Hotel: the reel's behaviour (scroll scenes, motifs, sound).
  * Loaded on demand when the reel starts screening; everything registered
- * against ctx.signal is torn down when it stops.
+ * against ctx.signal is torn down when it stops. The sounds themselves are the
+ * score (./score): a balalaika, cimbalom, zither, organ and timpani band in
+ * E harmonic minor, after Desplat, plus the hotel's own noises.
  *
- *   - the key rack: a brass tink per key, a key-ring jingle and a whip pan
+ *   - the key rack: a brass key tink per key, a key-ring jingle and a whip pan
  *     (pastel smear, stereo whoosh) on every in-page jump
- *   - each era change: a projector clunk and a cimbalom triad
+ *   - other hovers: the cimbalom's cotton beater, wandering the scale
+ *   - each era change: a projector clunk, then the era's chord (i, iv, V) on
+ *     a trembling balalaika over a timpani note
  *   - the diorama: windows that light on hover (CSS) and twinkle while in view
  *   - telegrams stamp in as they scroll into view, with a postmark thump
- *   - the playground: a switchboard relay (html[data-gb-relay]) and the
- *     desk bell, box thud, paper rustle, cimbalom pluck and music box
+ *   - the playground: a switchboard relay (html[data-gb-relay]) and the desk
+ *     bell; a pastry box, tissue paper and a zither run when it composes, a
+ *     balalaika accelerando to a dead stop when it is done, and the organ
+ *     losing its wind on an error
  *   - the registration card's clock, and the service bell
  *
  * Everything audible goes through ctx.sound, so it is silent while muted.
  */
 import type { ReelContext, ReelModule } from '../types';
-
-/** D major, for the cimbalom. */
-const DMAJ = [293.66, 329.63, 369.99, 392, 440, 493.88, 554.37, 587.33, 659.25, 739.99];
+import {
+  blip,
+  clack,
+  creak,
+  deskBell,
+  flourish,
+  glow,
+  hover,
+  jingle,
+  paper,
+  pen,
+  run,
+  sag,
+  section,
+  squish,
+  stamp,
+  thud,
+  tink,
+  title,
+  whoosh,
+} from './score';
 
 function voice(ctx: ReelContext) {
   const s = ctx.sound;
@@ -30,208 +54,26 @@ function voice(ctx: ReelContext) {
     return true;
   };
 
-  /** a hammered string: four inharmonic partials and the felt's click */
-  const ham = (f: number, at = 0, vol = 0.07) => {
-    (
-      [
-        [1, 1, 1.5],
-        [2.01, 0.5, 0.9],
-        [3.02, 0.28, 0.55],
-        [4.13, 0.14, 0.3],
-      ] as const
-    ).forEach(([m, g, d]) => s.tone({ f0: f * m, dur: d, vol: vol * g, at }));
-    s.burst({ dur: 0.006, f: 3200, q: 1.2, vol: vol * 1.4, at });
-  };
-
-  const tink = (at = 0) => {
-    const f = 3600 + Math.random() * 1400;
-    s.tone({ f0: f, dur: 0.08, vol: 0.035, at });
-    s.tone({ f0: f * 1.48, dur: 0.05, vol: 0.02, at });
-  };
-
-  const deskBell = (vol = 0.1) => {
-    if (!gate('bell', 220)) return;
-    (
-      [
-        [2093, 1, 1.9],
-        [2093 * 2.76, 0.35, 1.0],
-        [2093 * 5.4, 0.12, 0.45],
-        [1046.5, 0.15, 0.8],
-      ] as const
-    ).forEach(([f, g, d]) => s.tone({ f0: f, dur: d, vol: vol * g }));
-    s.burst({ dur: 0.008, kind: 'highpass', f: 4000, vol: 0.2 });
-  };
-
-  /** a whip pan: band-passed air swept up and back, panned left to right */
-  const whoosh = () => {
-    const ac = s.ctx();
-    if (!ac) return;
-    const t = ac.currentTime;
-    const n = s.noise(0.42);
-    const bp = ac.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.Q.value = 0.8;
-    bp.frequency.setValueAtTime(500, t);
-    bp.frequency.exponentialRampToValueAtTime(3200, t + 0.18);
-    bp.frequency.exponentialRampToValueAtTime(700, t + 0.42);
-    const g = ac.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.16, t + 0.12);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.42);
-    n.connect(bp);
-    bp.connect(g);
-    let tail: AudioNode = g;
-    if (typeof ac.createStereoPanner === 'function') {
-      const p = ac.createStereoPanner();
-      p.pan.setValueAtTime(-0.9, t);
-      p.pan.linearRampToValueAtTime(0.9, t + 0.4);
-      g.connect(p);
-      tail = p;
-    }
-    tail.connect(s.out());
-    n.start(t);
-  };
-
-  /** paper: a handful of bright noise grains */
-  const paper = (at = 0) => {
-    const ac = s.ctx();
-    if (!ac) return;
-    const t = ac.currentTime + at;
-    const n = s.noise(0.16);
-    const bp = ac.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 4200;
-    bp.Q.value = 0.7;
-    const g = ac.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    for (let k = 0; k < 6; k++)
-      g.gain.setValueAtTime(0.02 + Math.random() * 0.05, t + 0.005 + k * 0.022);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-    n.connect(bp);
-    bp.connect(g);
-    g.connect(s.out());
-    n.start(t);
-  };
-
-  /** a picture frame swinging on its wire */
-  const creak = () => {
-    const ac = s.ctx();
-    if (!ac) return;
-    const t = ac.currentTime;
-    const n = s.noise(0.34);
-    const bp = ac.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.Q.value = 6;
-    bp.frequency.setValueAtTime(380, t);
-    bp.frequency.linearRampToValueAtTime(540, t + 0.3);
-    const am = ac.createGain();
-    am.gain.value = 0.5;
-    const lfo = ac.createOscillator();
-    lfo.frequency.value = 34;
-    const lg = ac.createGain();
-    lg.gain.value = 0.5;
-    lfo.connect(lg);
-    lg.connect(am.gain);
-    const g = ac.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.09, t + 0.05);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
-    n.connect(bp);
-    bp.connect(am);
-    am.connect(g);
-    g.connect(s.out());
-    n.start(t);
-    lfo.start(t);
-    lfo.stop(t + 0.36);
-  };
-
   return {
-    gate,
-    ham,
-    tink: () => gate('tink', 45) && tink(),
-    jingle: () => {
-      tink(0);
-      tink(0.05);
-      tink(0.11);
-    },
-    deskBell,
-    whoosh,
-    paper,
-    creak: () => gate('creak', 260) && creak(),
-    tick: () => gate('tick', 40) && s.tick(),
-    pen: () => gate('pen', 60) && s.burst({ dur: 0.07, f: 5200, q: 2.2, vol: 0.04 }),
-    clack: () => {
-      if (!gate('clack', 50)) return;
-      s.burst({ dur: 0.014, f: 2400 + Math.random() * 1200, q: 1.3, vol: 0.12 });
-      s.tone({ f0: 210, f1: 120, dur: 0.03, vol: 0.05 });
-    },
-    squish: () => {
-      if (!gate('squish', 160)) return;
-      s.tone({ f0: 260, f1: 120, dur: 0.18, vol: 0.11 });
-      s.burst({ dur: 0.12, kind: 'lowpass', f: 900, vol: 0.07 });
-    },
-    /** the postmark coming down on a telegram */
-    stamp: () => {
-      if (!gate('stamp', 90)) return;
-      s.tone({ f0: 150, f1: 60, dur: 0.09, vol: 0.2 });
-      s.burst({ dur: 0.05, kind: 'lowpass', f: 700, vol: 0.24 });
-      s.burst({ dur: 0.02, f: 2200, vol: 0.1, at: 0.01 });
-    },
-    /** projector clunk and a cimbalom triad, rooted per era */
-    era: (e: number) => {
-      if (!gate('era', 500)) return;
-      s.tone({ f0: 95, f1: 45, dur: 0.16, vol: 0.22 });
-      s.burst({ dur: 0.012, kind: 'highpass', f: 2200, vol: 0.25 });
-      const r = [587.33, 523.25, 659.25][e] ?? 587.33;
-      ham(r, 0.1, 0.05);
-      ham(r * 1.26, 0.18, 0.045);
-      ham(r * 1.5, 0.26, 0.04);
-    },
-    /** the windows coming on, one after another */
-    glow: () => {
-      if (!gate('glow', 900)) return;
-      [2093, 2349.32, 2637.02, 3135.96, 3520].forEach((f, i) =>
-        s.tone({ type: 'triangle', f0: f, dur: 0.3, vol: 0.02, at: i * 0.07 }),
-      );
-    },
-    thud: () => s.tone({ f0: 120, f1: 70, dur: 0.09, vol: 0.15 }),
-    relayBlip: () => {
-      s.tone({ f0: 1320, dur: 0.035, vol: 0.028 });
-      s.tone({ f0: 1760, dur: 0.03, vol: 0.018, at: 0.045 });
-    },
-    musicBox: () =>
-      (
-        [
-          [1567.98, 0],
-          [2093, 0.11],
-          [2637.02, 0.22],
-          [3135.96, 0.33],
-          [2637.02, 0.5],
-          [3135.96, 0.62],
-        ] as const
-      ).forEach(([f, at]) => {
-        s.tone({ f0: f, dur: 0.9, vol: 0.05, at });
-        s.tone({ type: 'triangle', f0: f * 2, dur: 0.22, vol: 0.012, at });
-      }),
-    /** a wrong number: two dull buzzes */
-    engaged: () => {
-      s.tone({ type: 'square', f0: 220, dur: 0.16, vol: 0.035 });
-      s.tone({ type: 'square', f0: 220, dur: 0.16, vol: 0.035, at: 0.26 });
-    },
-    /** the title sting: a cimbalom run up D major, then the open fifth */
-    flourish: () => {
-      (
-        [
-          [587.33, 0],
-          [739.99, 0.06],
-          [880, 0.12],
-          [1174.66, 0.18],
-          [1479.98, 0.26],
-        ] as const
-      ).forEach(([f, at]) => ham(f, at, 0.055));
-      ham(587.33, 0.44, 0.05);
-      ham(880, 0.44, 0.04);
-    },
+    hover: () => gate('tick', 40) && hover(s),
+    tink: () => gate('tink', 45) && tink(s),
+    jingle: () => jingle(s),
+    deskBell: (vol: number) => gate('bell', 220) && deskBell(s, vol),
+    whoosh: () => whoosh(s),
+    paper: (at = 0) => paper(s, at),
+    creak: () => gate('creak', 260) && creak(s),
+    pen: () => gate('pen', 60) && pen(s),
+    clack: () => gate('clack', 50) && clack(s),
+    squish: () => gate('squish', 160) && squish(s),
+    stamp: () => gate('stamp', 90) && stamp(s),
+    /** projector clunk and the era's chord; `i` is the section that moved it */
+    era: (i: number) => gate('era', 500) && section(s, i),
+    glow: () => gate('glow', 900) && glow(s),
+    thud: () => thud(s),
+    relayBlip: () => blip(s),
+    run: (n?: number) => run(s, n),
+    done: () => flourish(s),
+    error: () => sag(s),
   };
 }
 
@@ -297,15 +139,15 @@ const reel: ReelModule = {
     const hovers: [string, () => void][] = [
       ['.railnav a', v.tink],
       ['.gb-dio', v.glow],
-      ['.metrics .m', v.tick],
-      ['.startrow a, .a2-launch .btn, .a2-action', v.tick],
+      ['.metrics .m', v.hover],
+      ['.startrow a, .a2-launch .btn, .a2-action', v.hover],
       ['.idx tbody tr', v.pen],
       ['.repo', v.creak],
       ['.logitem', v.clack],
-      ['.wrow', v.tink],
-      ['.tenet', v.tick],
+      ['.wrow', v.hover],
+      ['.tenet', v.hover],
       ['.toolcol', v.squish],
-      ['.gb-bell, .contact a, .foot-links a', v.tick],
+      ['.gb-bell, .contact a, .foot-links a', v.hover],
     ];
     let hovered: Element | null = null;
     on(
@@ -328,13 +170,13 @@ const reel: ReelModule = {
       { passive: true },
     );
 
-    /* ---------- each era change: clunk + triad ---------- */
+    /* ---------- each era change: clunk + the era's chord ---------- */
     let era = Number(root.dataset.act ?? 0);
     ctx.onSection((i) => {
       // only the nine real sections move the era (see the engine note in the report)
       if (i < 0 || i >= ctx.reel.acts.flatMap((a) => a.sections).length) return;
       const next = Number(root.dataset.act ?? 0);
-      if (next !== era) v.era(next);
+      if (next !== era) v.era(i);
       era = next;
     });
 
@@ -417,10 +259,10 @@ const reel: ReelModule = {
           relay('boxing');
           v.thud();
           cueLater(() => v.paper(), 300);
-          cueLater(() => v.ham(DMAJ[(cue.count ?? 0) % DMAJ.length], 0, 0.06), 720);
+          cueLater(() => v.run(cue.count), 720);
           cueLater(() => {
             relay('done');
-            v.musicBox();
+            v.done();
           }, 1250);
           cueLater(() => relay(''), 4200);
           break;
@@ -428,7 +270,7 @@ const reel: ReelModule = {
         case 'error':
           quiet();
           relay('error');
-          v.engaged();
+          v.error();
           cueLater(() => relay(''), 3200);
           break;
       }
@@ -478,7 +320,7 @@ const reel: ReelModule = {
   },
 
   titleSound(ctx) {
-    voice(ctx).flourish();
+    title(ctx.sound);
   },
 };
 
