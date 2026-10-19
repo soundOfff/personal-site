@@ -1,7 +1,19 @@
 import type { ReelConfig } from '../types';
 import { tokens } from '../tokens';
 
-/** Reel 05. Seeded from the design canvas board Odyssey.dc.html; tune freely. */
+/**
+ * Reel 05 · 2001: A Space Odyssey. Seeded from the design canvas board
+ * Odyssey.dc.html.
+ *
+ * Contrast, checked against each act's `bg` (WCAG):
+ *   I     ink 17.3 · muted 6.4 · accentInk 6.6 · muted2 4.9
+ *   II    ink 16.7 · muted 5.6 · accentInk 5.8 · muted2 4.5
+ *   III   ink 15.4 · muted 5.6 · accentInk 5.6 · muted2 4.6
+ *   III·M ink 13.7 · muted 6.6 · accentInk 10.9 · muted2 4.8  (the red act:
+ *         text sits on #4A0B08 or on the modules' faint white wash, ~5.7 at worst)
+ *   IV    ink 16.6 · muted 6.1 · accentInk 5.6 · muted2 4.7
+ * The ship console (the rail) is one fixed palette in reel.css: ink 15.3, muted 5.6.
+ */
 const odyssey: ReelConfig = {
   id: 'odyssey',
   n: '05',
@@ -39,9 +51,12 @@ const odyssey: ReelConfig = {
         ink: '#EDEDEA',
         ink2: '#C4C6C2',
         muted: '#8E918C',
+        muted2: '#7A7D78',
         line: 'rgba(237,237,234,.14)',
+        line2: 'rgba(237,237,234,.3)',
         accent: '#E1261C',
         accentInk: '#FF5A4E',
+        onAccent: '#FFFFFF',
       }),
     },
     {
@@ -56,9 +71,12 @@ const odyssey: ReelConfig = {
         ink: '#111214',
         ink2: '#34363A',
         muted: '#5E6166',
+        muted2: '#6C6F74',
         line: 'rgba(17,18,20,.14)',
+        line2: 'rgba(17,18,20,.3)',
         accent: '#D63C2F',
         accentInk: '#B3261C',
+        onAccent: '#FFFFFF',
       }),
     },
     {
@@ -73,9 +91,12 @@ const odyssey: ReelConfig = {
         ink: '#0F1012',
         ink2: '#2F3237',
         muted: '#565A60',
+        muted2: '#62666C',
         line: 'rgba(15,16,18,.15)',
+        line2: 'rgba(15,16,18,.32)',
         accent: '#2D6CDF',
         accentInk: '#1F55B8',
+        onAccent: '#FFFFFF',
       }),
     },
     {
@@ -90,9 +111,12 @@ const odyssey: ReelConfig = {
         ink: '#FBEDEA',
         ink2: '#F0CFC9',
         muted: '#D49A92',
+        muted2: '#B98078',
         line: 'rgba(255,200,190,.22)',
+        line2: 'rgba(255,200,190,.36)',
         accent: '#FF3B2F',
         accentInk: '#FFD24A',
+        onAccent: '#1A0302',
       }),
     },
     {
@@ -107,19 +131,46 @@ const odyssey: ReelConfig = {
         ink: '#10140F',
         ink2: '#2E352C',
         muted: '#555D4E',
+        muted2: '#666E5F',
         line: 'rgba(16,20,15,.14)',
+        line2: 'rgba(16,20,15,.3)',
         accent: '#0B0B0B',
         accentInk: '#3F6B2A',
+        onAccent: '#FFFFFF',
       }),
     },
   ],
   type: {
-    display: "'Michroma', system-ui, sans-serif",
+    display: "'Michroma', 'Hanken Grotesk Variable', system-ui, sans-serif",
     body: "'Hanken Grotesk Variable', system-ui, sans-serif",
-    mono: "'DM Mono', ui-monospace, monospace",
-    title: "'Michroma', sans-serif",
+    mono: "'DM Mono', ui-monospace, Menlo, monospace",
+    title: "'Michroma', system-ui, sans-serif",
   },
-  stages: [],
+  sections: {
+    readme: { slug: 'Act I · The dawn of man' },
+    playground: { slug: 'Act II · Space station · 01' },
+    work: { slug: 'Act II · Lunar surface · 02' },
+    oss: { slug: 'Act III · Pod bay · 03' },
+    log: { slug: 'Act III · Centrifuge · 04' },
+    writing: { slug: 'Act III · Logic memory center · 05' },
+    principles: { slug: 'Act III · Logic memory center · 06' },
+    stack: { slug: 'Act IV · The room · 07' },
+    now: { slug: 'Act IV · The room · 08' },
+  },
+  stages: [
+    'backdrop',
+    'rail',
+    'title',
+    'in:readme',
+    'after:readme',
+    'in:playground',
+    'after:work',
+    'in:log',
+    'after:log',
+    'after:principles',
+    'in:now',
+    'credits',
+  ],
   layout: { nav: 'console', hero: 'alignment', flow: 'odyssey', grid: 'axial' },
   scroll: [
     'alignment parallax',
