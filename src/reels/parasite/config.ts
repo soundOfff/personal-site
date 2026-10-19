@@ -162,7 +162,7 @@ const parasite: ReelConfig = {
     hover: 'harpsichord quill',
     click: 'one harpsichord key, walking a C-minor phrase',
     section: 'footstep + reverb by floor; a lament-bass step per floor, C · B♭ · A♭ · G',
-    lamp: 'relay · tube · bulb, tuned to the floor’s chord',
+    lamp: "relay · tube · bulb, tuned to the floor's chord",
     rain: 'rain loop while the interlude is on screen',
     morse: 'E♭ key tone',
     open: 'tirata up / down',
@@ -171,7 +171,7 @@ const parasite: ReelConfig = {
     error: 'deceptive cadence, the cello sagging',
     signature: 'projector + moto perpetuo',
   },
-  credits: 'A fan homage, not affiliated with the film.',
+  credits: 'A fan homage. Not affiliated with Bong Joon-ho, Barunson E&A or CJ ENM.',
   announce: 'Now showing: Parasite, 2019',
 };
 

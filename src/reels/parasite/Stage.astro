@@ -24,6 +24,7 @@ const builtWith = now.find((s) => s.dt === 'Built with')?.dd;
 const mail = contact.find((c) => c.href.startsWith('mailto:'));
 
 const floors = parasite.acts.map((a) => ({ code: a.code, native: a.native, name: a.name }));
+const tools = builtWith?.split(' · ') ?? [];
 
 // The rain: one seeded scatter, so every build draws the same storm.
 let seed = 11;
@@ -133,30 +134,29 @@ const drops = Array.from({ length: 56 }, () => {
           class="px-key"
           type="button"
           data-px-key
-          aria-label="Morse key: tap for a dot, hold for a dash"
+          aria-label="Morse key"
           aria-describedby="px-morse-hint"
         >
           <span class="px-plate" />
         </button>
         <div class="px-mread">
-          <p class="px-mk">Signal upstairs · the switch keys Morse</p>
-          <p class="px-msym" data-px-msym aria-hidden="true">
-            · · · ·
-          </p>
-          <p class="px-mtxt" data-px-mtxt aria-live="polite">
-            —
-          </p>
-          <p class="px-mhint" id="px-morse-hint">
-            <span>tap = dot</span>
-            <span>hold = dash</span>
-            <button class="px-lnk" type="button" data-px-hi>
-              play “HI”
+          <p class="px-mk">Signal upstairs.</p>
+          <p class="px-mhint">
+            <span id="px-morse-hint">Tap for a dot, hold for a dash.</span>
+            <button class="px-lnk" type="button" data-px-send>
+              send "RESPECT"
             </button>
           </p>
+          <p class="px-msym" data-px-msym aria-hidden="true" />
+          <p class="px-mtxt" data-px-mtxt aria-live="polite" />
         </div>
         <p class="px-mdone" data-px-mdone hidden>
-          Message received upstairs. Now say it in words:{' '}
-          {mail && <a href={mail.href}>{mail.label}</a>}
+          Seen upstairs.{' '}
+          {mail && (
+            <>
+              To say it in words, write to <a href={mail.href}>{mail.label}</a>.
+            </>
+          )}
         </p>
       </div>
     </div>
@@ -172,25 +172,36 @@ const drops = Array.from({ length: 56 }, () => {
       <dl class="px-cr">
         <div>
           <dt>A portfolio by</dt>
-          <dd>{profile.name}</dd>
-        </div>
-        <div>
-          <dt>Screened through</dt>
           <dd>
-            Parasite (<span lang="ko">기생충</span>) · 2019 · dir. Bong Joon-ho
+            <span class="px-nw">{profile.name}</span>
           </dd>
         </div>
         <div>
-          <dt>Palette &amp; motifs</dt>
-          <dd>A fan homage, not affiliated with the film</dd>
+          <dt>After</dt>
+          <dd>
+            <span class="px-nw">
+              Parasite (<span lang="ko">기생충</span>),
+            </span>{' '}
+            <span class="px-nw">Bong Joon-ho,</span> 2019
+          </dd>
         </div>
-        {builtWith && (
+        {tools.length > 0 && (
           <div>
             <dt>Built with</dt>
-            <dd>{builtWith}</dd>
+            <dd>
+              {tools.map((t, i) => (
+                <>
+                  <span class="px-nw">{i < tools.length - 1 ? `${t},` : t}</span>{' '}
+                </>
+              ))}
+            </dd>
           </div>
         )}
       </dl>
+      <p class="px-legal">
+        A fan homage. Not affiliated with <span class="px-nw">Bong Joon-ho</span>,{' '}
+        <span class="px-nw">Barunson E&amp;A</span> or <span class="px-nw">CJ ENM</span>.
+      </p>
     </aside>
   )
 }

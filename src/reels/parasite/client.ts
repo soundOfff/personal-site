@@ -54,6 +54,16 @@ const LIGHTS: [sec: number, name: string][] = [
   [6, 'tube'],
   [8, 'bulb'],
 ];
+/** Geun-sae's word, for the key to send by itself. */
+const RESPECT: [string, string][] = [
+  ['R', '.-.'],
+  ['E', '.'],
+  ['S', '...'],
+  ['P', '.--.'],
+  ['E', '.'],
+  ['C', '-.-.'],
+  ['T', '-'],
+];
 const MORSE: Record<string, string> = {
   '.-': 'A',
   '-...': 'B',
@@ -350,8 +360,8 @@ function morse(
   const symEl = panel?.querySelector<HTMLElement>('[data-px-msym]');
   const txtEl = panel?.querySelector<HTMLElement>('[data-px-mtxt]');
   const doneEl = panel?.querySelector<HTMLElement>('[data-px-mdone]');
-  const hiBtn = panel?.querySelector<HTMLButtonElement>('[data-px-hi]');
-  if (!panel || !key || !symEl || !txtEl || !doneEl || !hiBtn) return () => {};
+  const sendBtn = panel?.querySelector<HTMLButtonElement>('[data-px-send]');
+  if (!panel || !key || !symEl || !txtEl || !doneEl || !sendBtn) return () => {};
 
   const { root, signal } = ctx;
   const s = ctx.sound;
@@ -367,8 +377,8 @@ function morse(
 
   const render = () => {
     const sym = [...codes, cur].filter(Boolean).join(' ').replace(/\./g, '·').replace(/-/g, '—');
-    symEl.textContent = sym || '· · · ·';
-    txtEl.textContent = txt || '—';
+    symEl.textContent = sym;
+    txtEl.textContent = txt;
   };
   const lit = (onOff: boolean) => {
     key.classList.toggle('is-down', onOff);
@@ -452,17 +462,14 @@ function morse(
     opts,
   );
 
-  // “play HI”: the key sends it by itself, at 95 ms a unit.
-  hiBtn.addEventListener(
+  // "send RESPECT": the key sends it by itself, at 95 ms a unit.
+  sendBtn.addEventListener(
     'click',
     () => {
       reset();
       const u = 95;
       let t = 150;
-      for (const [ch, code] of [
-        ['H', '....'],
-        ['I', '..'],
-      ] as const) {
+      for (const [ch, code] of RESPECT) {
         for (const sym of code) {
           const dur = sym === '.' ? u : u * 3;
           seq.push(
