@@ -476,9 +476,12 @@
     text-wrap: balance;
     color: var(--muted);
   }
-  /* sections whose keybar is only "// <name>": the slashes alone read as a stray glyph */
-  & :is([data-sec='3'], [data-sec='8']) .keybar {
-    font-size: 0;
+  /* the slugline, the name and the descriptor; no code-comment slashes or dot */
+  & .keybar .kb-sl {
+    display: none;
+  }
+  & .keybar .kb-d::before {
+    content: none;
   }
   & .keybar a {
     text-decoration-color: var(--rule-2);

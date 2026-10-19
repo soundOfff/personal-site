@@ -276,6 +276,9 @@ a {
   color: var(--amber-deep);
   font-weight: 600;
 }
+.keybar .kb-d::before {
+  content: ' · ' / '';
+}
 .keybar a {
   text-decoration: underline;
   text-decoration-style: dotted;

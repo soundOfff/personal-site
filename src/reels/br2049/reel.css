@@ -732,12 +732,25 @@
     flex-wrap: wrap;
     align-items: baseline;
     margin: 0 0 52px;
-    /* the house line is "// name · descriptor". The slate keeps the name and the
-       scene heading; the slashes and the descriptor shrink to nothing on screen and
-       stay in the text for screen readers. */
-    font-size: 0;
+    letter-spacing: 0;
     text-transform: uppercase;
     color: var(--muted);
+  }
+  /* the slate keeps the name and the scene heading. The descriptor stays in the
+     text for screen readers, and on screen only when it is a link. */
+  .block .keybar .kb-sl {
+    display: none;
+  }
+  .block .keybar .kb-d::before {
+    content: none;
+  }
+  .block .keybar .kb-d:not(:has(a)) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   /* the scene heading opens the scene, set the way a script sets it */
   .block .keybar .reel-slug[data-for='br2049'] {

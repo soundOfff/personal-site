@@ -755,8 +755,8 @@
     text-transform: uppercase;
     text-wrap: balance;
   }
-  /* The shared keybar's "//" and descriptor are bare text nodes: a zero font
-     size drops them and keeps the section's own name (and the blog link). */
+  /* the foot keeps the section's own name and the blog link; the descriptor
+     text stays for screen readers only */
   .block > .keybar {
     max-width: 520px;
     /* the -1px overlap hides the anti-aliased seam on the card's fractional edge */
@@ -764,13 +764,23 @@
     padding: 7px 28px 20px;
     background: var(--card);
     color: var(--card-mute);
-    font-size: 0;
-    line-height: 1.6;
+    font: 600 10.5px/1.6 var(--font-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 
-    :is(b, a) {
-      font: 600 10.5px/1.6 var(--font-sans);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+    .kb-sl {
+      display: none;
+    }
+    .kb-d::before {
+      content: none;
+    }
+    .kb-d:not(:has(a)) {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
     b {
       color: var(--card-mute);
