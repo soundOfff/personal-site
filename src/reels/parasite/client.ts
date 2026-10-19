@@ -4,30 +4,48 @@
  * against ctx.signal is torn down when it stops.
  *
  * The page is a house and scrolling goes down it. What this module adds on
- * top of reel.css:
+ * top of reel.css (every sound is in score.ts: harpsichord and string trio in
+ * C minor, after Jung Jae-il):
  *   - the walker: a square on the rail's staircase that follows the section in
  *     view one step at a time, a footstep per step, echo deepening per floor,
+ *     and a step of the lament bass (C · B♭ · A♭ · G) once it reaches a new floor,
  *   - lamps that click on as you first arrive in each room below ground,
  *   - the censor bar on the headline, timed to clear after the title card,
  *   - rain you hear only while the interlude is on screen,
- *   - the playground scored: signal bars, a slate and a pluck per surface, a
- *     cadence when it's done,
+ *   - a harpsichord quill on hover and a key on click,
+ *   - the playground scored: signal bars, a tirata as it opens and closes, a
+ *     climbing figure per surface (a note per component), a trilled cadence when
+ *     it's done, a deceptive cadence on error,
  *   - the bunker's Morse key: tap for a dot, hold for a dash, decoded live.
  */
 import type { Cue, ReelContext, ReelModule } from '../types';
 import { SECTION_IDS } from '../types';
-import type { Bed, SoundKit } from '../sound';
+import type { Bed } from '../sound';
+import {
+  bar,
+  beep,
+  cadence,
+  cadenceAfter,
+  CADENCE_LANDS,
+  deceptive,
+  figure,
+  floorOf,
+  footstep,
+  glass as glassy,
+  keyTone,
+  lament,
+  lamp,
+  note,
+  overture,
+  quill,
+  rain as rainBed,
+  tirataDown,
+  tirataUp,
+} from './score';
 
-/** Reverb per floor: [seconds, send]. The deeper the floor, the longer the echo. */
-const VERB: readonly (readonly [number, number])[] = [
-  [0.9, 0.05],
-  [1.4, 0.18],
-  [2.0, 0.34],
-  [2.8, 0.55],
-];
 const STEP_MS = 115;
-/** The surfaces' pitches: D minor, rising. */
-const D_MINOR = [293.66, 349.23, 392, 440, 523.25, 587.33];
+/** Let the walker settle before the lament takes its step, so a fast scroll is one phrase. */
+const ACT_MS = 160;
 const MORSE: Record<string, string> = {
   '.-': 'A',
   '-...': 'B',
@@ -57,164 +75,6 @@ const MORSE: Record<string, string> = {
   '--..': 'Z',
 };
 
-/* ---------- the reel's own sounds, built on the shared kit ---------- */
-
-/** One step on a floor: a dull thud through that floor's room. */
-function footstep(s: SoundKit, floor: number, up: boolean, vol = 1): void {
-  const ac = s.ctx();
-  if (!ac) return;
-  const [seconds, wet] = VERB[floor] ?? VERB[0];
-  const dry = ac.createGain();
-  dry.gain.value = vol;
-  dry.connect(s.out());
-  const send = ac.createGain();
-  send.gain.value = wet;
-  dry.connect(send);
-  send.connect(s.reverb(seconds));
-  s.burst({ dur: 0.07, kind: 'lowpass', f: 560 - floor * 70, q: 0.8, vol: 0.5, dest: dry });
-  s.tone({ f0: (up ? 140 : 120) - floor * 14, f1: 55, dur: 0.08, vol: 0.22, dest: dry });
-  window.setTimeout(() => dry.disconnect(), 400);
-}
-
-function relay(s: SoundKit, at = 0): void {
-  s.burst({ dur: 0.006, kind: 'highpass', f: 2500, vol: 0.4, at });
-}
-
-/** The fluorescent tube's mains hum. */
-function hum(s: SoundKit, at: number, dur: number): void {
-  const ac = s.ctx();
-  if (!ac) return;
-  const t = ac.currentTime + at;
-  const o = ac.createOscillator();
-  o.type = 'sawtooth';
-  o.frequency.value = 100;
-  const lp = ac.createBiquadFilter();
-  lp.type = 'lowpass';
-  lp.frequency.value = 420;
-  const g = ac.createGain();
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.03, t + 0.05);
-  g.gain.setValueAtTime(0.03, t + dur - 0.2);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(lp);
-  lp.connect(g);
-  g.connect(s.out());
-  o.start(t);
-  o.stop(t + dur + 0.05);
-}
-
-/** A lamp clicking on: stair relays, a tube that tinks and hums, a bulb's ping. */
-function lampOn(s: SoundKit, floor: number): void {
-  relay(s);
-  if (floor === 1) {
-    relay(s, 0.035);
-    s.tone({ f0: 2200, dur: 0.05, vol: 0.02, at: 0.04 });
-  } else if (floor === 2) {
-    s.tone({ f0: 3400, dur: 0.02, vol: 0.05, at: 0.07 });
-    s.tone({ f0: 3100, dur: 0.02, vol: 0.05, at: 0.19 });
-    hum(s, 0.22, 0.7);
-  } else {
-    s.tone({ type: 'triangle', f0: 2400, f1: 2300, dur: 0.2, vol: 0.04, at: 0.02 });
-  }
-}
-
-/** Light sliding across the living-room glass. */
-function glassy(s: SoundKit): void {
-  s.tone({ type: 'triangle', f0: 2637, dur: 0.5, vol: 0.025 });
-  s.tone({ type: 'triangle', f0: 3520, dur: 0.6, vol: 0.018, at: 0.06 });
-}
-
-/** The clapper: a surface landed. */
-function slate(s: SoundKit, at = 0): void {
-  s.burst({ dur: 0.03, f: 1800, q: 0.7, vol: 0.3, at });
-  s.tone({ f0: 220, f1: 120, dur: 0.04, vol: 0.12, at });
-}
-
-/** The plucked cadence: the agent is done, and the film's sting. */
-function cadence(s: SoundKit, at = 0): void {
-  (
-    [
-      [293.66, 0],
-      [349.23, 0.07],
-      [440, 0.14],
-      [587.33, 0.21],
-      [523.25, 0.38],
-      [587.33, 0.52],
-    ] as const
-  ).forEach(([f, t]) => s.pluck(f, at + t, 0.06));
-}
-
-/** A held 620 Hz key tone (the bunker's telegraph). */
-function keyTone(s: SoundKit): (() => void) | null {
-  const ac = s.ctx();
-  if (!ac) return null;
-  const o = ac.createOscillator();
-  o.frequency.value = 620;
-  const g = ac.createGain();
-  const t = ac.currentTime;
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.12, t + 0.006);
-  o.connect(g);
-  g.connect(s.out());
-  o.start(t);
-  return () => {
-    const now = ac.currentTime;
-    g.gain.cancelScheduledValues(now);
-    g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), now);
-    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
-    o.stop(now + 0.03);
-  };
-}
-
-function beep(s: SoundKit, dur: number): void {
-  const ac = s.ctx();
-  if (!ac) return;
-  const t = ac.currentTime;
-  const o = ac.createOscillator();
-  o.frequency.value = 620;
-  const g = ac.createGain();
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.12, t + 0.006);
-  g.gain.setValueAtTime(0.12, t + Math.max(0.01, dur - 0.012));
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g);
-  g.connect(s.out());
-  o.start(t);
-  o.stop(t + dur + 0.02);
-}
-
-/** Rain on the stairs: band-limited noise, faded in, looped. */
-function rainBed(s: SoundKit, signal: AbortSignal): Bed | null {
-  return s.bed((ac, out) => {
-    const src = s.noise(2.5);
-    src.loop = true;
-    const hp = ac.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 500;
-    const lp = ac.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 5200;
-    const g = ac.createGain();
-    const t = ac.currentTime;
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.05, t + 0.9);
-    src.connect(hp);
-    hp.connect(lp);
-    lp.connect(g);
-    g.connect(out);
-    src.start(t);
-    return {
-      stop(fade = 0.6) {
-        const now = ac.currentTime;
-        g.gain.cancelScheduledValues(now);
-        g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), now);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + fade);
-        src.stop(now + fade + 0.05);
-      },
-    };
-  }, signal);
-}
-
 /* ---------- the reel ---------- */
 
 /**
@@ -223,12 +83,6 @@ function rainBed(s: SoundKit, signal: AbortSignal): Bed | null {
  */
 const LAST = SECTION_IDS.length - 1;
 const clampSec = (i: number) => Math.max(0, Math.min(LAST, i));
-
-function floorOf(ctx: ReelContext, sec: number): number {
-  const id = SECTION_IDS[sec];
-  const i = ctx.reel.acts.findIndex((a) => a.sections.includes(id));
-  return i < 0 ? 0 : i;
-}
 
 const reel: ReelModule = {
   mount(ctx) {
@@ -259,7 +113,7 @@ const reel: ReelModule = {
     const clearBar = (withSound: boolean) => {
       root.dataset.pxBar = 'clear';
       const r = lede?.getBoundingClientRect();
-      if (withSound && r && r.bottom > 0 && r.top < innerHeight) s.swipe();
+      if (withSound && r && r.bottom > 0 && r.top < innerHeight) bar(s);
     };
     const projector = document.querySelector<HTMLElement>('[data-projector]');
     if (ctx.reducedMotion) {
@@ -286,13 +140,26 @@ const reel: ReelModule = {
     const nav = document.querySelector<HTMLElement>('.railnav');
     const place = (i: number) => nav?.style.setProperty('--px-mark', String(i));
     place(mark);
+    // The lament moves once the walker stops on a new floor: one note per arrival.
+    let heard = floorOf(mark);
+    let arriving = 0;
+    const arrive = () => {
+      cancel(arriving);
+      arriving = later(() => {
+        const floor = floorOf(mark);
+        if (floor === heard) return;
+        heard = floor;
+        lament(s, floor);
+      }, ACT_MS);
+    };
     const step = () => {
       walking = 0;
       if (mark === target) return;
       const up = target < mark;
       mark += up ? -1 : 1;
       place(mark);
-      footstep(s, floorOf(ctx, mark), up);
+      footstep(s, floorOf(mark), up);
+      arrive();
       if (mark !== target) walking = later(step, STEP_MS);
     };
 
@@ -305,8 +172,8 @@ const reel: ReelModule = {
       lamps.forEach((el) => {
         if (Number(el.dataset.pxLamp) <= deepest) el.classList.add('is-on');
       });
-      const floor = floorOf(ctx, sec);
-      if (withSound && floor >= 1) lampOn(s, floor);
+      const floor = floorOf(sec);
+      if (withSound && floor >= 1) lamp(s, floor);
     };
     light(mark, false);
 
@@ -314,9 +181,10 @@ const reel: ReelModule = {
       const i = clampSec(index);
       target = i;
       if (ctx.reducedMotion) {
-        if (i !== mark) footstep(s, floorOf(ctx, i), i < mark);
+        if (i !== mark) footstep(s, floorOf(i), i < mark);
         mark = i;
         place(mark);
+        arrive();
       } else if (!walking) {
         step();
       }
@@ -358,7 +226,7 @@ const reel: ReelModule = {
     on(window, 'pointerdown', rainOn);
     on(window, 'keydown', rainOn);
 
-    /* ---- tick on hover, click on press; the glass rings, the log's steps thud ---- */
+    /* ---- a quill on hover, a key on press; the glass rings, the log's steps thud ---- */
     const interactive = 'a[href], button, summary, .idx tr[data-href]';
     const own = '[data-reel-pick], [data-sound-toggle], [data-boxoffice-open], [data-px-key]';
     let hovered: Element | null = null;
@@ -371,24 +239,24 @@ const reel: ReelModule = {
       const glass = !!t.closest('.px-window, [data-sec="0"] > .lede');
       if (glass && !inGlass) glassy(s);
       inGlass = glass;
-      const bar = !!t.closest('[data-sec="0"] > .lede em');
-      if (bar && !onBar && root.dataset.pxBar === 'clear') s.swipe();
-      onBar = bar;
+      const overBar = !!t.closest('[data-sec="0"] > .lede em');
+      if (overBar && !onBar && root.dataset.pxBar === 'clear') bar(s);
+      onBar = overBar;
       const stair = t.closest('.logitem');
       if (stair && stair !== onStep) footstep(s, 1, false, 0.5);
       onStep = stair;
       const hit = t.closest(interactive);
       if (hit === hovered) return;
       hovered = hit;
-      if (hit && !stair && !hit.closest(own)) s.tick();
+      if (hit && !stair && !hit.closest(own)) quill(s);
     });
     on(document, 'pointerdown', (e) => {
       if (e.button !== 0 || !(e.target instanceof Element)) return;
       const hit = e.target.closest(interactive);
-      if (hit && !hit.closest(own)) s.click();
+      if (hit && !hit.closest(own)) note(s);
     });
 
-    /* ---- the playground: a phone hunting for wifi, a slate per surface ---- */
+    /* ---- the playground: a phone hunting for wifi, the harpsichord climbing per surface ---- */
     const signalBars = (v?: 'search' | 'full' | 'done' | 'lost') => {
       if (v) root.dataset.pxSignal = v;
       else delete root.dataset.pxSignal;
@@ -400,20 +268,18 @@ const reel: ReelModule = {
         signalBars('search');
       } else if (cue.name === 'surface') {
         signalBars('full');
-        const n = Math.max(1, Math.min(cue.count ?? 1, D_MINOR.length));
-        slate(s);
-        for (let k = 0; k < n; k++) s.pluck(D_MINOR[k], 0.08 + k * 0.11, 0.06);
-        const end = 0.08 + n * 0.11 + 0.22;
+        const n = cue.count ?? 1;
+        figure(s, n);
+        const end = cadenceAfter(n);
         cadence(s, end);
-        settle = later(() => signalBars('done'), (end + 0.7) * 1000);
+        settle = later(() => signalBars('done'), (end + CADENCE_LANDS + 0.15) * 1000);
       } else if (cue.name === 'error') {
         signalBars('lost');
-        s.pluck(293.66, 0, 0.05);
-        s.pluck(220, 0.16, 0.05);
+        deceptive(s);
       } else if (cue.name === 'open') {
-        s.whoosh();
+        tirataUp(s);
       } else if (cue.name === 'close') {
-        s.swipe();
+        tirataDown(s);
       }
     });
 
@@ -436,9 +302,7 @@ const reel: ReelModule = {
   },
 
   titleSound(ctx) {
-    // a low pedal under the plucked cadence
-    ctx.sound.tone({ f0: 73.42, dur: 1.6, vol: 0.09 });
-    cadence(ctx.sound, 0.05);
+    overture(ctx.sound);
   },
 };
 
