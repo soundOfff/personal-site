@@ -360,8 +360,11 @@ function mount(ctx: ReelContext): () => void {
     },
     { threshold: 0.2 },
   );
+  // `.block`, because the engine also sets data-sec on <html> for the current section
   document
-    .querySelectorAll('[data-sec="4"], [data-sec="5"], [data-sec="6"], .od-sg, [data-od-zone]')
+    .querySelectorAll(
+      '.block:is([data-sec="4"], [data-sec="5"], [data-sec="6"]), .od-sg, [data-od-zone]',
+    )
     .forEach((el) => zoneIO.observe(el));
   // muting stops every bed; unmuting brings back the ones still on screen
   const offSound = S.onChange((muted) => {
@@ -440,7 +443,7 @@ function mount(ctx: ReelContext): () => void {
   let mx = 0;
   let my = 0;
   const sky = $('.od-sky');
-  const hero = $('[data-sec="0"]');
+  const hero = $('.block[data-sec="0"]');
   let heroOn = true;
   const lenses = [...document.querySelectorAll<HTMLElement>('.od-lens')];
   const moved = () => {
