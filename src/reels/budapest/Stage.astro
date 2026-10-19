@@ -2,13 +2,279 @@
 /**
  * Reel 04 · The Grand Budapest Hotel: reel-only markup. Rendered once per point listed in
  * config.stages; the engine hides it unless this reel is screening.
+ *
+ *   backdrop      the frame matte (aspect ratio by era), the whip pan, grain,
+ *                 and the front desk's progress rule with its funicular car
+ *   rail          the right-hand brass plate: room number + era, both rolling
+ *   in:readme     the opening: name plate, the pastel diorama, chapter card
+ *   in:<section>  a PART chapter card (the section's keybar finishes the card)
+ *   after:work    1968 interlude · after:writing 1985 interlude
+ *   credits       the service bell and the end credits
+ *   title         the projector's title card
  */
-import type { StagePoint } from '../types';
+import type { StagePoint, SectionId } from '../types';
+import { nav, contact } from '../../data/site';
 
 interface Props {
   at: StagePoint;
 }
 const { at } = Astro.props;
+
+const chapters: Record<SectionId, string> = {
+  readme: 'The Readme',
+  playground: 'The Concierge Desk',
+  work: 'The Guest Register',
+  oss: 'The Gallery',
+  log: 'Telegrams',
+  writing: 'The Dining Room',
+  principles: 'House Rules',
+  stack: 'The Pâtisserie',
+  now: 'At Your Service',
+};
+const sectionOf = at.startsWith('in:') ? (at.slice(3) as SectionId) : null;
+const part = sectionOf ? nav.findIndex((n) => n.id === sectionOf) + 1 : 0;
+
+// A seeded scatter so the diorama renders the same on every build.
+let seed = 23;
+const rnd = () => {
+  seed = (seed * 9301 + 49297) % 233280;
+  return seed / 233280;
+};
+const windows = (n: number) =>
+  Array.from({ length: n }, () => ({ d: Math.round(rnd() * 650), on: rnd() < 0.24 }));
+const winsL = windows(12);
+const winsC = windows(15);
+const winsR = windows(12);
+const flakes = Array.from({ length: 30 }, () => ({
+  l: (rnd() * 100).toFixed(1),
+  s: (2 + rnd() * 3.5).toFixed(1),
+  o: (0.5 + rnd() * 0.5).toFixed(2),
+  du: (6 + rnd() * 7).toFixed(1),
+  de: (rnd() * 12).toFixed(1),
+}));
+
+const eras = ['1932 · 1.37 : 1', '1968 · 2.35 : 1', '1985 · 1.85 : 1'];
+const mail = contact.find((c) => c.href.startsWith('mailto:'));
 ---
 
-{at === 'backdrop' && null}
+{
+  at === 'backdrop' && (
+    <>
+      <div class="gb-matte" aria-hidden="true">
+        <i class="mt" />
+        <i class="mb" />
+        <i class="ml" />
+        <i class="mr" />
+        <span class="fl" />
+      </div>
+      <div class="gb-whip" aria-hidden="true" data-gb-whip>
+        <i />
+        <i />
+        <i />
+        <i />
+        <i />
+      </div>
+      <div class="gb-grain" aria-hidden="true" />
+      <div class="gb-prog" aria-hidden="true">
+        <span class="gb-prog-fill" />
+        <span class="gb-ride">
+          <span class="gb-car" />
+        </span>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'rail' && (
+    <div class="gb-room" aria-hidden="true">
+      <span class="gb-roll gb-room-roll">
+        {nav.map((n, i) => (
+          <span>
+            <b>Room {String(i).padStart(2, '0')}</b> · {n.label}
+          </span>
+        ))}
+      </span>
+      <span class="gb-roll gb-era-roll">
+        {eras.map((e) => (
+          <span>Era {e}</span>
+        ))}
+      </span>
+    </div>
+  )
+}
+
+{
+  at === 'in:readme' && (
+    <div class="gb-hero" aria-hidden="true">
+      <p class="gb-kicker">The portfolio of</p>
+      <p class="gb-name">Tomas Brasca</p>
+      <p class="gb-kicker2">Fullstack · AI systems · Rosario</p>
+      <figure class="gb-dio-wrap">
+        <div class="gb-dio" data-gb-dio>
+          <span class="cloud c1" />
+          <span class="cloud c2" />
+          <span class="cloud c3" />
+          <span class="mtn ml2" />
+          <span class="mtn mr2" />
+          <span class="mtn mc" />
+          <span class="pines p1" />
+          <span class="pines p2" />
+          <span class="ledge" />
+          <span class="snowbank" />
+          <span class="track">
+            <span class="car" />
+          </span>
+          <span class="hotel">
+            <span class="wing wl">
+              <span class="roof" />
+              <span class="wins">
+                {winsL.map((w) => (
+                  <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+                ))}
+              </span>
+            </span>
+            <span class="wing wr">
+              <span class="roof" />
+              <span class="wins">
+                {winsR.map((w) => (
+                  <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+                ))}
+              </span>
+            </span>
+            <span class="core">
+              <span class="tower">
+                <span class="dome" />
+                <span class="spire" />
+              </span>
+              <span class="roof" />
+              <span class="sign">T · B</span>
+              <span class="wins">
+                {winsC.map((w) => (
+                  <i class:list={['w', w.on && 'on']} style={`transition-delay:${w.d}ms`} />
+                ))}
+              </span>
+              <span class="awn" />
+              <span class="door" />
+            </span>
+          </span>
+          <span class="flakes">
+            {flakes.map((f) => (
+              <i
+                class="flake"
+                style={`left:${f.l}%;width:${f.s}px;height:${f.s}px;opacity:${f.o};animation-duration:${f.du}s;animation-delay:-${f.de}s`}
+              />
+            ))}
+          </span>
+        </div>
+        <figcaption class="gb-ratio">
+          <span>1.37 : 1</span>
+          <span>Exterior · the hotel · winter</span>
+        </figcaption>
+      </figure>
+    </div>
+  )
+}
+
+{
+  sectionOf && (
+    <div class="gb-chapter" aria-hidden="true">
+      <span class="pt">Part {part}</span>
+      <span class="ct">{chapters[sectionOf]}</span>
+    </div>
+  )
+}
+
+{
+  at === 'after:work' && (
+    <div class="gb-interlude" data-era="1" aria-hidden="true">
+      <p class="il-k">Thirty-six years later</p>
+      <p class="il-year">1968</p>
+      <p class="il-r">The frame widens · 2.35 : 1</p>
+    </div>
+  )
+}
+
+{
+  at === 'after:writing' && (
+    <div class="gb-interlude" data-era="2" aria-hidden="true">
+      <p class="il-k">Seventeen years after that</p>
+      <p class="il-year">1985</p>
+      <p class="il-r">The frame settles · 1.85 : 1</p>
+    </div>
+  )
+}
+
+{
+  at === 'credits' && (
+    <div class="gb-credits">
+      {mail && (
+        <a class="gb-bell" href={mail.href} data-gb-bell>
+          <span class="bb" aria-hidden="true">
+            <span class="bb-knob" />
+            <span class="bb-dome" />
+            <span class="bb-base" />
+          </span>
+          <span class="bbl">Ring for service</span>
+          <span class="bbm">{mail.label}</span>
+        </a>
+      )}
+      <svg class="gb-keys" viewBox="0 0 64 64" aria-hidden="true">
+        <g transform="rotate(45 32 32)">
+          <circle cx="32" cy="12" r="6" />
+          <path d="M32 18 V54 M32 46 H38 M32 51 H36" />
+        </g>
+        <g transform="rotate(-45 32 32)">
+          <circle cx="32" cy="12" r="6" />
+          <path d="M32 18 V54 M32 46 H26 M32 51 H28" />
+        </g>
+      </svg>
+      <dl class="gb-cr">
+        <div>
+          <dt>A portfolio by</dt>
+          <dd>Tomas Brasca</dd>
+        </div>
+        <div>
+          <dt>Screened through</dt>
+          <dd>The Grand Budapest Hotel · 2014</dd>
+        </div>
+        <div>
+          <dt>Directed by</dt>
+          <dd>Wes Anderson</dd>
+        </div>
+        <div>
+          <dt>Palette &amp; motifs</dt>
+          <dd>A fan homage, not affiliated with the film</dd>
+        </div>
+      </dl>
+    </div>
+  )
+}
+
+{
+  at === 'title' && (
+    <div class="gb-title">
+      <div class="gb-title-in">
+        <svg class="gb-keys" viewBox="0 0 64 64" aria-hidden="true">
+          <g transform="rotate(45 32 32)">
+            <circle cx="32" cy="12" r="6" />
+            <path d="M32 18 V54 M32 46 H38 M32 51 H36" />
+          </g>
+          <g transform="rotate(-45 32 32)">
+            <circle cx="32" cy="12" r="6" />
+            <path d="M32 18 V54 M32 46 H26 M32 51 H28" />
+          </g>
+        </svg>
+        <span class="t-k">The portfolio of Tomas Brasca</span>
+        <span class="t-n">
+          <span class="t-the">The</span>
+          Grand Budapest
+          <span class="t-h">Hotel</span>
+        </span>
+        <span class="t-r" />
+        <span class="t-s">a presentation in nine parts</span>
+        <span class="t-m">2014 · Wes Anderson · a fan homage</span>
+      </div>
+    </div>
+  )
+}
