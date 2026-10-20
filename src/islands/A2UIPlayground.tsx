@@ -188,7 +188,7 @@ export default function A2UIPlayground() {
           if (isDailyCap(retryAfter)) {
             setQuota({ remaining: 0, limit: DAILY_LIMIT });
             setError(
-              `That was your ${DAILY_LIMIT} questions for today. The cap resets at 00:00 UTC, about ${formatRetry(retryAfter)} from now. Everything the agent knows is also on the page below.`,
+              `You've reached today's limit of ${DAILY_LIMIT} questions. It resets at 00:00 UTC, about ${formatRetry(retryAfter)} from now. You can still browse the work and blog below.`,
             );
             return;
           }
@@ -199,13 +199,13 @@ export default function A2UIPlayground() {
         if (res.status === 503) {
           setError(
             body.error === 'daily-budget-exhausted'
-              ? 'The shared daily budget for live turns is spent, and it resets at 00:00 UTC. That cap is what keeps this endpoint open to everyone without a login.'
-              : "The agent isn't configured on this deploy. No API key is set on the server, so there is nothing to ask.",
+              ? 'The agent has reached its daily limit. Try again after 00:00 UTC, or browse the work and blog below.'
+              : 'The agent is unavailable right now. You can still browse the work and blog below.',
           );
           return;
         }
 
-        setError('The agent failed to compose a surface. Try rephrasing the question.');
+        setError("The agent couldn't put a reply together. Try rephrasing the question.");
       } catch {
         setPending(null);
         cue('error');
@@ -329,29 +329,28 @@ export default function A2UIPlayground() {
 
         <div className="console-body a2-launch-body">
           <p className="a2-launch-lede">
-            Ask about the work and the agent answers with an interface built for the question:
-            project cards, a chart, a timeline or a diagram.
+            Ask about my projects or experience. The agent uses the content on this site and can
+            show cards, tables or diagrams in its reply.
           </p>
 
           <div className="a2-launch-row">
             <Button variant="amber" onClick={() => launch()}>
               <GlyphIcon id={started ? 'i-arrow-r' : 'i-play'} />
-              <span>{started ? 'Reopen the playground' : 'Open the playground'}</span>
+              <span>{started ? 'Continue the conversation' : 'Ask about my work'}</span>
             </Button>
             {started ? (
               <button type="button" className="a2-reset" onClick={reset}>
                 clear thread
               </button>
             ) : (
-              <span className="a2-launch-hint">or start with a question:</span>
+              <span className="a2-launch-hint">or choose a question below</span>
             )}
           </div>
 
           {!started && <StarterMenu onPick={launch} />}
 
           <Alert variant="info" compact className="live-note">
-            Each visitor gets {DAILY_LIMIT} questions a day, and each one is a live call to the
-            model.
+            Up to {DAILY_LIMIT} live questions a day per IP address.
           </Alert>
         </div>
       </div>
@@ -485,12 +484,12 @@ export default function A2UIPlayground() {
                       </span>
                       <span>{pending}</span>
                     </p>
-                    <div className="a2-skeleton" aria-label="Composing the surface">
+                    <div className="a2-skeleton" aria-label="Preparing a reply">
                       <span className="a2-sk-line is-w70"></span>
                       <span className="a2-sk-line is-w90"></span>
                       <span className="a2-sk-block"></span>
                     </div>
-                    <p className="a2-composing">composing surface…</p>
+                    <p className="a2-composing">Preparing a reply…</p>
                   </article>
                 )}
               </div>

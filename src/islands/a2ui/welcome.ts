@@ -58,7 +58,7 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
       id: 'intro',
       type: 'Text',
       props: {
-        text: 'Ask about the work, the blog or the background.',
+        text: "Ask about Tomas's work, background or blog. You can start with a question below.",
       },
     },
     {
@@ -67,14 +67,14 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
       data: {
         steps: [
           { label: 'question' },
-          { label: 'retrieve', note: 'ranked context' },
+          { label: 'retrieve', note: 'site content' },
           { label: 'agent', note: 'one tool call' },
           { label: 'A2UI', note: 'components' },
           { label: 'this panel' },
         ],
       },
       props: {
-        caption: 'What each turn does. Tomas wrote this first surface by hand, in the same format.',
+        caption: 'The agent reads the site content and returns the components shown in this panel.',
       },
     },
     {
@@ -82,7 +82,7 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
       type: 'Callout',
       props: {
         tone: 'info',
-        text: 'Under every answer, one line reports what that turn cost: the model, latency, tokens and dollars.',
+        text: 'Each live reply shows the model, response time, token use and estimated cost.',
       },
     },
     {
@@ -110,7 +110,11 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
 export const STARTER_GROUPS: { label: string; prompts: string[] }[] = [
   {
     label: 'work',
-    prompts: ['What has he shipped?', 'What did he build at Dex?', 'What happened at Mint?'],
+    prompts: [
+      'What has he built?',
+      'What did he build at Dex?',
+      'What did he work on at Mint Mobile?',
+    ],
   },
   {
     label: 'ai systems',
@@ -126,7 +130,11 @@ export const STARTER_GROUPS: { label: string; prompts: string[] }[] = [
   },
   {
     label: 'background',
-    prompts: ['What does ICPC say about him?', 'What is his stack?', 'What is he working on now?'],
+    prompts: [
+      'What is his competitive programming background?',
+      'Which tools does he use?',
+      'What is he working on now?',
+    ],
   },
 ];
 
