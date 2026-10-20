@@ -19,6 +19,7 @@
  *
  * Loaded on demand while the reel screens; everything is torn down on abort.
  */
+import { mountOpeningDisclosure } from '../openings/disclosure';
 import type { ReelContext, ReelModule } from '../types';
 import type { Bed } from '../sound';
 import {
@@ -90,6 +91,10 @@ const reel: ReelModule = {
 
   mount(ctx: ReelContext) {
     const { root, sound: s, signal } = ctx;
+    const stopOpening = mountOpeningDisclosure(
+      document.querySelector('[data-opening="mood"]'),
+      signal,
+    );
     const on = { signal } as const;
     const passive = { signal, passive: true } as const;
     const timers = new Set<number>();
@@ -468,6 +473,7 @@ const reel: ReelModule = {
     }
 
     return () => {
+      stopOpening();
       timers.forEach((id) => window.clearTimeout(id));
       observers.forEach((o) => o.disconnect());
       offSound();

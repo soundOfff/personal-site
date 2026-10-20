@@ -3590,3 +3590,210 @@
     opacity: 0;
   }
 }
+
+html:root[data-reel='mood'][data-sec='0'] .mood-clock {
+  visibility: hidden;
+}
+
+html:root[data-reel='mood'] .content {
+  .cinema-opening[data-camera] {
+    height: auto;
+    background: #160f10;
+  }
+  .camera-pin,
+  .camera-frame {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .camera-scroll,
+  .camera-progress {
+    display: none;
+  }
+  .opening-mood[data-opening-mode='flow'] {
+    position: relative;
+    inset: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    min-height: 620px;
+    margin: 26px 4% 0;
+    overflow: visible;
+    isolation: isolate;
+    color: #eee0bf;
+    background: #160f10;
+  }
+  .mk-photo {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    background: url('../../assets/openings/mood.avif') 65% center / cover;
+  }
+  .opening-mood::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, #160f10ef 0%, #160f1090 35%, transparent 68%);
+  }
+  .mk-title {
+    grid-area: 1 / 1;
+    padding: 60px 10% 70px;
+  }
+  .mk-title .shot-kicker {
+    margin-bottom: 24px;
+    color: #d6ae7e;
+  }
+  .mk-title h1 {
+    font: 400 clamp(44px, 5vw, 80px)/1.1 var(--font-display);
+    letter-spacing: -0.04em;
+  }
+  .mk-title h1 em {
+    color: #dca35f;
+  }
+  .mk-title > p:not(.shot-kicker) {
+    margin-top: 30px;
+    font: 400 14px/1.8 var(--font-sans);
+  }
+  .opening-mood nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    margin-top: 18px;
+  }
+  .opening-mood a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: inherit;
+    font: 400 13px/1.5 var(--font-sans);
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+  .opening-mood :is(a, summary):focus-visible {
+    outline: 3px solid #d6a054;
+    outline-offset: 5px;
+  }
+  .mk-native {
+    position: absolute;
+    z-index: -1;
+    right: 4%;
+    top: 8%;
+    writing-mode: vertical-rl;
+    font: 600 36px/1 var(--mood-cjk);
+    letter-spacing: 0.3em;
+    color: #cca275;
+  }
+  .opening-mood details {
+    grid-area: 1 / 2;
+    align-self: start;
+    justify-self: end;
+    max-width: calc(100% - 40px);
+    margin: 55px 12% 55px 0;
+  }
+  .opening-mood summary {
+    min-height: 44px;
+    padding: 13px 20px;
+    cursor: pointer;
+    list-style: none;
+    font: 400 12px/1.5 var(--font-sans);
+    color: #5c3225;
+    background: #eeddbb;
+    box-shadow: 0 3px 18px #0009;
+  }
+  .opening-mood summary::-webkit-details-marker {
+    display: none;
+  }
+  .mk-open-label,
+  details[open] .mk-closed-label {
+    display: none;
+  }
+  details[open] .mk-open-label {
+    display: inline;
+  }
+  .opening-mood details[open] {
+    align-self: start;
+    justify-self: stretch;
+    margin: 55px 12% 55px 0;
+    max-width: none;
+    color: #4a3025;
+    background: #e9d7b2;
+    box-shadow: 0 15px 60px #0008;
+  }
+  .opening-mood details[open] summary {
+    text-align: right;
+    background: transparent;
+    box-shadow: none;
+  }
+  .mk-letter {
+    padding: 12px 38px 30px;
+  }
+  .mk-letter .shot-kicker {
+    margin-bottom: 20px;
+    font-size: 9px;
+  }
+  .mk-letter h2 {
+    margin: 0 0 20px;
+    font: 400 clamp(32px, 3.3vw, 44px)/1.15 var(--font-display);
+    color: inherit;
+  }
+  .mk-letter p:not(.shot-kicker) {
+    font: 400 14px/1.8 var(--font-sans);
+  }
+  .mk-letter .mk-signature {
+    margin: 15px 0;
+    font: italic 400 30px/1.5 var(--font-display);
+    rotate: -7deg;
+  }
+  @media (max-width: 1000px) {
+    .opening-mood[data-opening-mode='flow'] {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 620px;
+    }
+    .mk-title {
+      padding: 42px 7% 24px;
+    }
+    .mk-title h1 {
+      font-size: clamp(46px, 7vw, 64px);
+    }
+    .opening-mood details {
+      grid-area: 2 / 1;
+      justify-self: end;
+      margin: 24px 7% 36px;
+    }
+    .opening-mood details[open] {
+      margin: 24px 7% 36px;
+    }
+    .mk-letter {
+      padding-inline: 28px;
+    }
+    .mk-photo {
+      background-position: 62% center;
+    }
+    .opening-mood::after {
+      background: linear-gradient(90deg, #160f10df 0%, #160f1060 75%);
+    }
+    .mk-native {
+      top: 35%;
+      font-size: 28px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .opening-mood details[open] .mk-letter {
+      animation: mood-opening-letter 0.5s ease both;
+    }
+  }
+}
+@keyframes mood-opening-letter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
