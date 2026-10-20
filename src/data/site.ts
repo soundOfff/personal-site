@@ -9,10 +9,10 @@ export const profile = {
   name: 'Tomas Brasca',
   monogram: 'TB',
   // mono uppercase role under the name in the rail
-  role: 'Full-stack · AI systems',
+  role: 'Full-stack engineer',
   // hero lede: the phrase wrapped in <em></em> renders italic + amber
-  lede: "Most LLM calls don't need the biggest model. They need a router that knows which one will <em>clear the bar</em>.",
-  sub: 'I build AI products end to end, from web and mobile to the systems behind them. At Dex, I shipped multi-LLM routing and CRM features. At Mint Mobile, I built e-commerce APIs serving 2–3M subscribers.',
+  lede: 'I build web and mobile apps, <em>and their APIs.</em>',
+  sub: "I'm Tomas, a software engineer based in Rosario, Argentina. I've worked on CRM features and LLM routing at Dex, and e-commerce APIs for Mint Mobile.",
 } as const;
 
 export const contact = [
@@ -30,14 +30,14 @@ export const contact = [
 
 // In-page rail nav. Indices render as 00–08.
 export const nav = [
-  { id: 'readme', label: 'readme' },
+  { id: 'readme', label: 'about' },
   { id: 'playground', label: 'playground' },
-  { id: 'work', label: 'work index' },
+  { id: 'work', label: 'work' },
   { id: 'oss', label: 'projects' },
   { id: 'log', label: 'log' },
   { id: 'writing', label: 'blog' },
-  { id: 'principles', label: 'principles' },
-  { id: 'stack', label: 'stack' },
+  { id: 'principles', label: 'how I work' },
+  { id: 'stack', label: 'tools' },
   { id: 'now', label: 'now' },
 ] as const;
 
@@ -53,23 +53,23 @@ export const proofs: { value: string; key: string; accent?: boolean }[] = [
   { value: '5+', key: 'years full-stack' },
 ];
 
-// 06 · principles: kept from the design; they map exactly to the router work.
+// 06 · how I work
 export const tenets = [
   {
-    title: 'Smallest model that passes',
-    body: 'Start with the cheapest model and move up only when an eval fails on it.',
+    title: 'Test before changing models',
+    body: 'I use evals to check whether a cheaper model can handle a task before routing traffic to it.',
   },
   {
-    title: 'Cache before you call',
-    body: 'Check the cache before calling a model, and treat the call as the slow path.',
+    title: 'Cache repeated work',
+    body: 'A cached result can save an API call. The decision is what can be reused and how long it can stay valid.',
   },
   {
-    title: 'Cap the blast radius',
-    body: 'Every public endpoint gets a rate limit and a kill switch before launch. The agent on this page has both: five questions a day per visitor, and a shared daily ceiling that turns it off.',
+    title: 'Set limits before launch',
+    body: 'Public demos need request limits. This agent allows five questions per IP each day and checks a shared daily quota.',
   },
   {
-    title: 'Evals are contracts',
-    body: "Write down what a behaviour must do as an eval you can run. If there is no eval, it doesn't ship.",
+    title: 'Turn failures into test cases',
+    body: 'A missed extraction or a bad routing decision belongs in the eval set, so it can be checked when the prompt or model changes.',
   },
 ] as const;
 
@@ -99,51 +99,51 @@ export const log: {
   {
     date: '15 oct 2026',
     tag: 'build',
-    msg: 'Build Sift: a YouTube companion that saves concept notes, source frames and diagrams to a local notebook. The Chrome extension MVP is implemented',
+    msg: 'Built the first version of Sift, a Chrome extension for saving notes, frames and diagrams from YouTube videos to a local notebook',
   },
   {
     date: '11 oct 2026',
     tag: 'build',
-    msg: 'Keep developing Second Brain, an agent-maintained wiki with a reading queue, feed triage and linked, cited pages',
+    msg: 'Working on Second Brain, a wiki and reading queue with agent-assisted notes, feed triage and source citations',
     link: { label: 'source', href: 'https://github.com/soundOfff/second-brain' },
   },
   {
     date: '21 sep 2026',
     tag: 'build',
-    msg: 'Build On-Call: monitoring events become incidents with timelines, escalation policies and responder rotations',
+    msg: 'Built On-Call to group monitoring events into incidents, with timelines, escalation policies and on-call rotations',
   },
   {
     date: '01 sep 2026',
     tag: 'build',
-    msg: 'Develop Curation Archive, a visual archive scored by a personal taste model with image deduplication and source provenance',
+    msg: 'Working on Curation Archive, an image collection ranked by a model trained on my own labels, with duplicate detection and source tracking',
   },
   {
     hash: '0ade814',
     date: 'jul 2026',
     tag: 'site',
-    msg: 'Replace the router demo with a conversational portfolio, where a Claude agent answers in A2UI and a custom renderer draws the answer',
+    msg: "Replaced this site's router demo with an agent that answers questions about my work using cards, tables and diagrams",
   },
   {
     date: 'jun 2026',
     tag: 'blog',
-    msg: 'Publish "The unglamorous middle", about joining my first startup three and a half years into my career and finding out the real job was the part nobody demos',
+    msg: 'Wrote "The unglamorous middle" about joining my first startup three and a half years into my career',
     link: { label: 'read it', href: '/blog/the-unglamorous-middle' },
   },
   {
     date: 'jun 2026',
     tag: 'oss',
-    msg: 'Publish editorial-ui v0.1.0, the design system this site is built on',
+    msg: 'Published editorial-ui v0.1.0, the component library used on this site',
   },
   {
     hash: 'ead2d68',
     date: 'jun 2026',
     tag: 'site',
-    msg: 'Ship this site: an Astro shell on editorial-ui, the router demo as an island, deployed as a Cloudflare Worker',
+    msg: 'Built this site with Astro and editorial-ui, added a router demo, and deployed it on Cloudflare Workers',
   },
   {
     date: 'may 2026',
     tag: 'launch',
-    msg: 'Launch Dana, AI meeting prep that pulls context from your calendar, email and Slack so you walk into the meeting already briefed',
+    msg: 'Launched Dana, a meeting-prep tool that gathers context from calendar events, email and Slack',
     link: { label: 'danahq.com', href: 'https://danahq.com/' },
   },
 ];
@@ -151,11 +151,11 @@ export const log: {
 // 08 · now: spec sheet.
 export const now = [
   { dt: 'Location', dd: 'Rosario, Argentina. Remote, UTC−3' },
-  { dt: 'Status', dd: 'Open to senior full-stack and AI-product roles, and select contract work' },
+  { dt: 'Status', dd: 'Open to senior full-stack and AI roles, plus contract work' },
   { dt: 'Email', dd: 'tomibrasca97@gmail.com' },
   {
     dt: 'Focus',
-    dd: 'AI features end to end: LLM routing, evals, cost control and high-traffic backends',
+    dd: 'Web and mobile apps, LLM routing, evals and backend APIs',
   },
   { dt: 'Reading', dd: 'AI Engineer' },
   { dt: 'Built with', dd: 'Astro · React island · A2UI · editorial-ui · Cloudflare' },

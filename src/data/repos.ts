@@ -15,7 +15,7 @@ export const repos: Repo[] = [
     name: 'Sift',
     href: 'https://github.com/soundOfff/sift',
     description:
-      'A Chrome companion that turns the YouTube video you watch into a local notebook, with concept notes, timestamped frames and diagrams.',
+      "A Chrome extension I'm building for taking notes from YouTube videos. It saves concepts, timestamped frames and diagrams to a local notebook.",
     language: 'TypeScript',
     color: '#3178c6',
     private: true,
@@ -25,7 +25,7 @@ export const repos: Repo[] = [
     name: 'Second Brain',
     href: 'https://github.com/soundOfff/second-brain',
     description:
-      'An agent-maintained wiki with linked concepts, source citations and contradiction checks. A keyboard-driven web app handles reading and triage.',
+      'Agents organise a wiki of reading notes, with linked ideas, citations and checks for conflicting claims. A keyboard-driven web app handles the reading queue.',
     language: 'Python',
     color: '#658367',
   },
@@ -34,7 +34,7 @@ export const repos: Repo[] = [
     name: 'On-Call',
     href: 'https://github.com/soundOfff/pagerduty-app',
     description:
-      'An incident response workspace: monitoring events, incident timelines, escalation policies and on-call rotations. React, Django and MongoDB.',
+      'An app for tracking monitoring events and incidents, with timelines, escalation policies and on-call rotations. Built with React, Django and MongoDB.',
     language: 'JavaScript · Python',
     color: '#b49845',
     private: true,
@@ -44,7 +44,7 @@ export const repos: Repo[] = [
     name: 'Curation Archive',
     href: 'https://github.com/soundOfff/not-archillect',
     description:
-      'A visual archive curated by a taste model trained on my own labels, with source adapters, image deduplication and a rotating single-image homepage.',
+      'An image archive ranked by a model trained on my own labels. It tracks sources, removes duplicates and shows one image at a time on the homepage.',
     language: 'TypeScript · Python',
     color: '#927088',
     private: true,

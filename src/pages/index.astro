@@ -35,7 +35,9 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
 ---
 
-<BaseLayout>
+<BaseLayout
+  description="Tomas Brasca, a software engineer in Rosario, Argentina. Web and mobile apps, LLM routing at Dex, and e-commerce APIs for Mint Mobile."
+>
   <ReelHead slot="head" />
   <Stages at="backdrop" />
   <div class="shell">
@@ -45,7 +47,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
       {/* 00 · readme */}
       <section class="block" id="readme" data-sec="0">
         <Opening />
-        <Keybar sec="readme" label="readme" />
+        <Keybar sec="readme" label="about" />
         <p class="lede" set:html={profile.lede} />
         <p class="sub">{profile.sub}</p>
         <div class="metrics">
@@ -63,7 +65,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
       {/* 01 · playground (the one interactive island) */}
       <section class="block" id="playground" data-sec="1">
         <Stages at="in:playground" />
-        <Keybar sec="playground" label="playground">a2ui portfolio agent</Keybar>
+        <Keybar sec="playground" label="playground">ask about my work</Keybar>
         <A2UIPlayground client:visible />
       </section>
       <Stages at="after:playground" />
@@ -200,7 +202,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
       {/* 06 · principles · how I build */}
       <section class="block" id="principles" data-sec="6">
         <Stages at="in:principles" />
-        <Keybar sec="principles" label="principles" />
+        <Keybar sec="principles" label="how I work" />
         <div class="tenets">
           {
             tenets.map((t, i) => (
@@ -218,7 +220,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
       {/* 07 · stack · toolbox */}
       <section class="block" id="stack" data-sec="7">
         <Stages at="in:stack" />
-        <Keybar sec="stack" label="stack" />
+        <Keybar sec="stack" label="tools" />
         <div class="toolbox">
           {
             toolbox.map((col) => (
