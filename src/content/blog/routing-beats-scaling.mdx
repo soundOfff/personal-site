@@ -1,6 +1,6 @@
 ---
-title: 'Routing beats scaling: a cost study'
-description: 'Most LLM calls do not need the biggest model: the arithmetic of classify-then-dispatch routing, and what it changed on a production traffic mix.'
+title: 'Routing before scaling: the cost arithmetic'
+description: 'A worked example of inference routing, its classification overhead, and the eval bar that makes a cheaper model a defensible choice.'
 date: 2026-05-12
 pillar: 'Backend & AI systems'
 tags: ['routing', 'llm', 'cost', 'evals']
@@ -15,10 +15,7 @@ they compound into a respectable saving, call it tens of percent.
 
 None of them touches the dominant term: **which model you call**.
 
-The unit economics of inference are lopsided in one specific way: the price
-spread between the smallest usable model and a frontier tier is roughly two
-orders of magnitude per token. No cache hit-rate improvement competes with a
-50x price difference on the call itself.
+Model prices can differ substantially. Whether routing saves money depends on that spread, the traffic mix, classification overhead, retries, and the quality each model can maintain. A large price difference creates an opportunity, not a guarantee.
 
 At [Dex](/work/dex) I got to test this on production traffic. This post is the
 argument and the arithmetic, with the parts I'm allowed to share.
@@ -49,8 +46,7 @@ the field; a structured one fails by emitting malformed output; a reasoning one
 fails by being wrong in the middle of a chain; a creative one fails by being
 dull. Different failure modes need different amounts of model.
 
-The [playground](/#playground) version uses a heuristic
-classifier, instant, free, and good enough to demonstrate the contract:
+An earlier version of this portfolio demonstrated the idea with a heuristic classifier. This example is historical; the current playground is an A2UI portfolio agent:
 
 ```ts
 /** Heuristic classifier: cheap and instant; swap for a model call if needed. */
@@ -93,12 +89,12 @@ function pickModel(cls: PromptClass, env: Record<string, string | undefined>): C
 ```
 
 That is the entire decision. The first model that both clears the class and has
-a configured key wins. In the playground catalog, `llama-3.1-8b-instant` on
+a configured key wins. In that historical demo catalog, `llama-3.1-8b-instant` on
 Groq ($0.05/M input tokens) clears `extractive` and `creative`; `gpt-4o-mini`
 ($0.15/M) adds `structured`; `qwen-2.5-72b` ($0.35/M) is the only entry that
 clears `reasoning`. Even within this deliberately cheap public catalog the
 spread is 7x. Add a frontier tier at the top, as a production catalog does, and
-the spread is closer to 50–100x.
+the spread depends on the models and prices at the time. These figures describe the old demo, not current provider pricing.
 
 Cost is computed from real token usage, not estimated:
 
@@ -107,14 +103,15 @@ const usd =
   (reply.promptTokens * entry.inPrice + reply.completionTokens * entry.outPrice) / 1_000_000;
 ```
 
-## What it saved
+## An illustrative request
+
+The following rates are assumptions for the arithmetic, not a current price quote or a measured production benchmark. Production outcomes below are qualitative accounts of employer work.
 
 Run the arithmetic on a typical extractive request, say 300 prompt tokens and
 a 150-token completion. On `llama-3.1-8b-instant` at $0.05/$0.08 per million
-tokens, that call costs **$0.000027**. The same call on a frontier model priced
+tokens, that call costs **$0.000027**. The same call on a hypothetical frontier model priced
 at $2.50/$10 per million costs about $0.00225. That is an 80x difference for a
-request whose correct answer is one sentence long, and which the small model
-gets right.
+request, provided the smaller model passes the same acceptance criteria. Include the classifier call, fallbacks, and repeated attempts before treating this as end-to-end savings.
 
 On the Dex traffic mix, the large majority of requests classified as extractive
 or short-form structured. Once those classes moved to small models, cost per
@@ -151,18 +148,8 @@ fall back. The engineering time went into writing honest per-class evals and
 keeping them green as models and prompts changed underneath. The routing
 decision is exactly as trustworthy as the test that gates it, and no more.
 
-## Try the contract
+## Where to inspect the design
 
-The [playground on this site](/#playground) runs the same classify-then-dispatch
-contract end to end: your prompt is classified, the catalog is walked, and the
-result shows which model won, why, the measured latency, and the real token
-cost down to fractions of a cent. Demo mode replays recorded fixtures for free;
-live mode does real inference against a cheap-models-only catalog behind a
-[rate limit](/blog/rate-limiting-inference), so the worst case is bounded by
-construction.
+The [Dex case study](/work/dex) describes the routing architecture and its tradeoffs. [Evals are contracts](/blog/evals-are-contracts) explains what must justify the catalog's quality claims.
 
-Type something extractive, then something that needs reasoning, and watch the
-dispatch change. The biggest model loses most rounds.
-
-That is the study in one line: scaling pays per token, routing decides whether
-you owe the token at all.
+The [current playground](/#playground) demonstrates a different system. It answers questions about this portfolio with interfaces built through A2UI. It does not let you compare model routes. The [Flagship case study](/work/flagship) documents that implementation.

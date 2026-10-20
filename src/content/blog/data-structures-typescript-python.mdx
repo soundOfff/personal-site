@@ -1,6 +1,6 @@
 ---
-title: 'Data structures in TypeScript and Python: what you get, what you build'
-description: 'A data structure is a bet about which operation must be fast. Your standard library has already placed some of those bets for you: a field guide to the ones it placed, the ones it didn’t, and the pattern to know for each.'
+title: 'Data structures in TypeScript and Python'
+description: 'A practical map of arrays, queues, heaps, maps, and union-find, with the library differences and complexity traps to watch for in TypeScript and Python.'
 date: 2026-06-12
 pillar: 'Algorithms & competitive programming'
 tags: ['data-structures', 'typescript', 'python', 'algorithms', 'interviews']
@@ -14,22 +14,22 @@ What changes between languages is not the bets; it is which ones the standard li
 
 ## The map
 
-| Structure    | Core bet                                   | Where you've already met it          |
-| ------------ | ------------------------------------------ | ------------------------------------ |
-| Array        | O(1) access by index                       | Everywhere                           |
-| Stack        | O(1) at one end (LIFO)                     | Undo/redo, the call stack            |
-| Queue        | O(1) at both ends (FIFO)                   | BFS, task scheduling                 |
-| Linked list  | O(1) insert/delete at a known node         | LRU cache internals                  |
-| Hash table   | O(1) average key lookup                    | Every cache, every index             |
-| Heap         | O(1) peek at min/max                       | OS schedulers, Dijkstra              |
-| Graph        | model relationships, traverse in O(V+E)    | Shortest-path anything               |
-| Union-Find   | "are these connected?" in ~O(1)            | Clustering, Kruskal's MST            |
-| BST / AVL    | sorted map, O(log n) everything            | Java's TreeMap, C++ std::map         |
-| B+ Tree      | sorted map _on disk_, minimal page reads   | Every `CREATE INDEX` in Postgres     |
-| Trie         | O(L) prefix lookup                         | Every autocomplete box               |
-| Suffix array | O(m log n) substring search                | Bioinformatics, plagiarism detection |
-| Segment tree | O(log n) range query _with updates_        | Time-series rollups                  |
-| Bloom filter | "definitely not here" in O(1), tiny memory | RocksDB, Chrome safe-browsing        |
+| Structure     | Core bet                                    | Where you've already met it          |
+| ------------- | ------------------------------------------- | ------------------------------------ |
+| Array         | O(1) access by index                        | Everywhere                           |
+| Stack         | O(1) at one end (LIFO)                      | Undo/redo, the call stack            |
+| Queue         | O(1) at both ends (FIFO)                    | BFS, task scheduling                 |
+| Linked list   | O(1) insert/delete at a known node          | LRU cache internals                  |
+| Hash table    | O(1) average key lookup                     | Every cache, every index             |
+| Heap          | O(1) peek at min/max                        | OS schedulers, Dijkstra              |
+| Graph         | model relationships, traverse in O(V+E)     | Shortest-path anything               |
+| Union-Find    | "are these connected?" in ~O(1)             | Clustering, Kruskal's MST            |
+| Balanced BST  | sorted map, O(log n) everything             | Java's TreeMap, C++ std::map         |
+| B-tree family | sorted keys with high fan-out               | Many database indexes                |
+| Trie          | O(L) prefix lookup                          | Every autocomplete box               |
+| Suffix array  | O(m log n) substring search                 | Bioinformatics, plagiarism detection |
+| Segment tree  | O(log n) range query _with updates_         | Time-series rollups                  |
+| Bloom filter  | membership test using a fixed set of hashes | Avoiding unnecessary storage reads   |
 
 The last four rows you will rarely implement outside a contest. The value of having them in the table is recognition: when someone asks "what was the average CPU between 2pm and 4pm?", you should hear _range query over an array_ and know the answer space before opening an editor.
 
@@ -37,7 +37,7 @@ One row gets no section below: graphs. Not because they matter less, but because
 
 ## What the languages actually hand you
 
-Here is the asymmetry that shapes everything below. **Python gives you `list`, `dict`, `set`, `heapq`, and `collections.deque`. TypeScript gives you `Array`, `Map`, and `Set`, and that's it.** TypeScript has no heap, no deque, no sorted map; neither language has a linked list, trie, union-find, or segment tree. Both languages also hide static arrays from you entirely: every `list` and every `Array` is dynamic, resizing when capacity is hit, which costs you nothing you'll notice and buys you never thinking about capacity again.
+Here is the asymmetry that shapes everything below. **Python gives you `list`, `dict`, `set`, `heapq`, and `collections.deque`. TypeScript gives you `Array`, `Map`, and `Set`, and that's it.** TypeScript has no heap, no deque, no sorted map; neither language has a linked list, trie, union-find, or segment tree. Their general-purpose lists and arrays are dynamic. JavaScript typed arrays and Python's `array` module also provide typed numeric storage, while `memoryview` exposes a buffer without copying it. Capacity, copying, and element representation still matter for large workloads.
 
 Two practical consequences:
 
@@ -52,10 +52,10 @@ node = queue.popleft()   # O(1)
 
 TypeScript does not. For interview-sized inputs, `shift()` is fine and everyone knows it; for production, you either keep a read-index into a plain array or bring a dependency. The point is to know you are making that trade, not to discover it in a profiler.
 
-**The heap gap.** Python's `heapq` is right there: min-heap only, so a max-heap is "negate on the way in, negate on the way out", which is ugly and universal. TypeScript has nothing, and this is the single most common "wait, really?" for people arriving from Python or Java. In an interview you say so out loud and write the simplest thing that preserves the interface:
+**The heap gap.** Python's `heapq` supplies min-heaps. Python 3.14 also adds public max-heap functions such as `heappush_max` and `heappop_max`. Negating numeric priorities remains a useful compatibility technique for older versions. See the [Python heapq documentation](https://docs.python.org/3/library/heapq.html). TypeScript has nothing, and this is the single most common "wait, really?" for people arriving from Python or Java. In an interview you say so out loud and write the simplest thing that preserves the interface:
 
 ```ts
-class MinHeap {
+class SortedPriorityQueue {
   private heap: number[] = [];
   push(val: number): void {
     this.heap.push(val);
@@ -125,7 +125,7 @@ The invariant (the stack always holds indices of a non-increasing run) is what m
 
 ## Hash maps: store the complement, not the search
 
-Both languages make the hash map their best structure: Python's `dict` and TypeScript's `Map` are O(1) average for get/set/delete, and most "make it faster" interview answers are some form of "put a hash map in front of it." The canonical pattern is two-sum: instead of scanning for a partner for each element (O(n²)), record what you've _seen_ and ask whether the current element completes a pair:
+Hash maps are useful when the dominant operation is lookup by key. Python dictionaries typically provide average O(1) access. JavaScript Map guarantees average sublinear access, not a particular hash-table implementation or an O(1) bound, and most "make it faster" interview answers are some form of "put a hash map in front of it." The canonical pattern is two-sum: instead of scanning for a partner for each element (O(n²)), record what you've _seen_ and ask whether the current element completes a pair:
 
 ```python
 def two_sum(nums: list[int], target: int) -> list[int]:
@@ -166,16 +166,20 @@ class UnionFind:
         return True
 ```
 
-Both optimizations matter and neither is optional: path compression flattens the tree as you query it, union by rank keeps it from growing tall in the first place. Connected components, cycle detection in undirected graphs, Kruskal's MST, "do these accounts belong to the same person": all union-find, all the same twenty lines.
+Using both optimizations gives the usual inverse-Ackermann amortized bound: path compression flattens the tree as you query it, union by rank keeps it from growing tall in the first place. Connected components, cycle detection in undirected graphs, Kruskal's MST, "do these accounts belong to the same person": all union-find, all the same twenty lines.
 
 Linked lists earn their twenty lines differently: not as a container you'd reach for (O(n) to _find_ anything), but as the only structure with O(1) delete at a known node, which is why the textbook LRU cache is a hash map pointing into a doubly linked list, and why the fast-and-slow-pointer trick (cycle detection, find-the-middle in one pass) keeps showing up.
 
-The LRU cache is worth thirty extra seconds, because it is the one interview classic that _composes_ two structures: the hash map answers "do we have this key?" in O(1), the linked list answers "which entry is oldest?" in O(1), and every node is reachable from both. And here is where knowing your standard library's bets pays off twice: JavaScript's `Map` iterates in insertion order, which is a linked list already threaded through the buckets for you. A full LRU in TypeScript is a dozen lines and no node class:
+The LRU cache is worth thirty extra seconds, because it is the one interview classic that _composes_ two structures: the hash map answers "do we have this key?" in O(1), the linked list answers "which entry is oldest?" in O(1), and every node is reachable from both. And here is where knowing your standard library's bets pays off twice: JavaScript's `Map` preserves insertion order. Its internal representation is engine-specific; that order guarantee is enough for the cache below. A full LRU in TypeScript is a dozen lines and no node class:
 
 ```ts
 class LRUCache<K, V> {
   private map = new Map<K, V>();
-  constructor(private capacity: number) {}
+  constructor(private capacity: number) {
+    if (!Number.isInteger(capacity) || capacity < 0) {
+      throw new RangeError('capacity must be a nonnegative integer');
+    }
+  }
 
   get(key: K): V | undefined {
     if (!this.map.has(key)) return undefined;
@@ -195,10 +199,10 @@ class LRUCache<K, V> {
 }
 ```
 
-Python plays the same trick with `collections.OrderedDict` (`move_to_end` on access, `popitem(last=False)` to evict), and if the cache fronts a pure function, `functools.lru_cache` is one decorator. The hand-rolled doubly-linked-list version is still worth understanding, because it is exactly what these implementations do underneath. But reaching for it first is solving a problem your standard library already solved.
+Python plays the same trick with `collections.OrderedDict` (`move_to_end` on access, `popitem(last=False)` to evict), and if the cache fronts a pure function, `functools.lru_cache` is one decorator. The hand-rolled doubly-linked-list version is still worth understanding, because it explains the operations the cache needs, regardless of how a runtime implements them. But reaching for it first is solving a problem your standard library already solved.
 
 ## The ones you only reason about
 
-B-Trees and Bloom filters close the table, and the honest advice is: understand them, never implement them. A B+ Tree node is sized to one disk page, so hundreds of keys per node means a million-row index is three or four levels deep: three or four disk reads for any lookup. That sentence is the entire reason `CREATE INDEX` makes your query fast, and it is worth more in a system-design conversation than any implementation would be. A Bloom filter is the inverse trade: a few kilobits buy you "this key _definitely_ doesn't exist", which is how RocksDB and Cassandra skip disk reads for absent keys: false positives possible, false negatives never.
+B-Trees and Bloom filters close the table, and the honest advice is: understand them, never implement them. A B+ Tree node is sized to one disk page, so hundreds of keys per node means a million-row index is three or four levels deep: three or four disk reads for any lookup. That explains one reason an appropriate B-tree index can reduce lookup work, and it is worth more in a system-design conversation than any implementation would be. A Bloom filter is the inverse trade: a few kilobits buy you "this key _definitely_ doesn't exist", which is how RocksDB and Cassandra skip disk reads for absent keys: false positives possible, false negatives never.
 
-The pattern across this whole post is the same one: the structure is rarely the hard part. The hard part is hearing the question your code keeps asking (_next greater? same group? range with updates? definitely absent?_) and recognizing which bet, already placed and paid for, answers it. That recognition reflex is the part of contest training that actually transfers, which is [its own post](/blog/what-icpc-trains-you-to-see). The table is the artifact. The rest is recognition.
+The pattern across this whole post is the same one: the structure is rarely the hard part. The hard part is hearing the question your code keeps asking (_next greater? same group? range with updates? definitely absent?_) and recognizing which bet, already placed and paid for, answers it. That recognition reflex is the part of contest training that actually transfers, which is [its own post](/blog/what-icpc-trains-you-to-see). For the JavaScript guarantees behind the cache, see the [Map reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map).
