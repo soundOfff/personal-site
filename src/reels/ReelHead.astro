@@ -33,13 +33,6 @@ const css = reelCss(REELS);
     root.dataset.reel = ids.indexOf(picked) >= 0 ? picked : fallback;
     // The saved reel's stylesheet, parser-blocking so its first frame is already the film.
     if (sheets[root.dataset.reel]) {
-      const crop = window.matchMedia('(max-width: 700px)').matches ? '-mobile' : '';
-      document.write(
-        '<link rel="preload" as="image" type="image/avif" fetchpriority="high" href="/images/cinema/' +
-          root.dataset.reel +
-          crop +
-          '.avif">',
-      );
       document.write(
         '<link rel="stylesheet" href="' +
           sheets[root.dataset.reel] +

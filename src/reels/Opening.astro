@@ -1,42 +1,16 @@
 ---
-/** One photographed set per film. The camera and mattes move; document scroll stays native. */
-const films = ['parasite', 'mood', 'br2049', 'budapest', 'odyssey'];
+import Parasite from './openings/Parasite.astro';
+import Mood from './openings/Mood.astro';
+import BladeRunner from './openings/BladeRunner.astro';
+import Budapest from './openings/Budapest.astro';
+import Odyssey from './openings/Odyssey.astro';
 ---
 
 <div class="cinema-opening" data-camera>
   <div class="camera-pin">
     <div class="camera-frame">
-      <div class="camera-world" aria-hidden="true">
-        <div class="camera-image"></div>
-        <div class="camera-atmosphere"></div>
-      </div>
-      <div class="camera-foreground" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div class="camera-shade" aria-hidden="true"></div>
-      <div class="camera-copy">
-        <p class="camera-eyebrow">Five films. One portfolio.</p>
-        <h1 class="camera-title">
-          <span>A different</span>
-          <span>point of <em>view.</em></span>
-        </h1>
-      </div>
-      <div class="camera-matte camera-matte-t" aria-hidden="true"></div>
-      <div class="camera-matte camera-matte-b" aria-hidden="true"></div>
-      <div class="camera-matte camera-matte-l" aria-hidden="true"></div>
-      <div class="camera-matte camera-matte-r" aria-hidden="true"></div>
-      <div class="camera-caption" aria-hidden="true">
-        <span class="camera-film">
-          <span data-camera-film="parasite">01 <i></i> Parasite</span>
-          <span data-camera-film="mood">02 <i></i> In the Mood for Love</span>
-          <span data-camera-film="br2049">03 <i></i> Blade Runner 2049</span>
-          <span data-camera-film="budapest">04 <i></i> The Grand Budapest Hotel</span>
-          <span data-camera-film="odyssey">05 <i></i> 2001: A Space Odyssey</span>
-        </span>
-        <span class="camera-ratio">
-          {films.map((film) => <span data-camera-film={film} data-camera-ratio />)}
-        </span>
-      </div>
-      <p class="camera-scroll" aria-hidden="true"><span></span> Scroll to move the camera</p>
-      <div class="camera-closer" aria-hidden="true"><span></span> A closer look.</div>
+      <Parasite /><Mood /><BladeRunner /><Budapest /><Odyssey />
+      <p class="camera-scroll" aria-hidden="true"><span></span> Scroll</p>
       <div class="camera-progress" aria-hidden="true"><span></span></div>
     </div>
   </div>

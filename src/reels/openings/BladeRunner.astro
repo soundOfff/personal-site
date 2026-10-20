@@ -1,0 +1,69 @@
+---
+const fibers = Array.from({ length: 192 }, (_, i) => {
+  const angle = (i * Math.PI * 2) / 192;
+  const start = 112 + Math.sin(i * 7) * 14;
+  const end = 306 + Math.cos(i * 11) * 18;
+  const bend = angle + Math.sin(i * 4) * 0.018;
+  const point = (a: number, r: number) =>
+    `${(400 + Math.cos(a) * r).toFixed(1)} ${(400 + Math.sin(a) * r).toFixed(1)}`;
+  return `M${point(angle, start)}Q${point(bend, 220)} ${point(angle, end)}`;
+});
+---
+
+<div class="opening-scene opening-blade" data-opening="br2049">
+  <div class="bk-macro">
+    <div class="bk-copy">
+      <p class="shot-kicker">03 / Blade Runner 2049</p>
+      <h1><span>Less model.</span><em>More signal.</em></h1>
+      <p class="bk-note">Classify. Dispatch. Evaluate.</p>
+    </div>
+    <div class="bk-eye" aria-hidden="true">
+      <svg viewBox="0 0 800 800" fill="none">
+        <defs>
+          <radialGradient id="bk-iris"
+            ><stop offset=".28" stop-color="#050e12"></stop><stop offset=".4" stop-color="#2b5a5a"
+            ></stop><stop offset=".7" stop-color="#44615b"></stop><stop
+              offset=".94"
+              stop-color="#163c43"></stop><stop offset="1" stop-color="#091b21"
+            ></stop></radialGradient
+          >
+          <radialGradient id="bk-pupil"
+            ><stop offset=".65" stop-color="#060d10"></stop><stop
+              offset="1"
+              stop-color="#060d10"
+              stop-opacity="0"></stop></radialGradient
+          >
+        </defs>
+        <circle cx="400" cy="400" r="330" fill="url(#bk-iris)"></circle>
+        <g stroke="#b2bfa5" stroke-width=".8" opacity=".38">{fibers.map((d) => <path d={d} />)}</g>
+        <circle cx="400" cy="400" r="326" stroke="#7a9a8e" stroke-width="1"></circle>
+        <circle cx="400" cy="400" r="313" stroke="#7a9a8e" stroke-width=".4"></circle>
+        <circle cx="400" cy="400" r="115" fill="url(#bk-pupil)"></circle>
+        <circle cx="400" cy="400" r="91" fill="#050c10"></circle>
+        <path
+          d="M238 243a220 220 0 0 1 190-57"
+          stroke="#dbede0"
+          stroke-width="16"
+          stroke-linecap="round"
+          opacity=".1"></path>
+        <path
+          d="M238 243a220 220 0 0 1 190-57"
+          stroke="#dbede0"
+          stroke-width="2"
+          stroke-linecap="round"
+          opacity=".65"></path>
+        <path
+          d="M30 400h74m592 0h74M400 30v74m0 592v74"
+          stroke="#c0d4bf"
+          stroke-width="1"
+          opacity=".45"></path>
+      </svg>
+      <span class="bk-scan"></span>
+    </div>
+  </div>
+  <div class="bk-cut" aria-hidden="true">
+    <span class="bk-solar"></span>
+    <p>The smallest<br />that <em>passes.</em></p>
+    <span class="bk-providers">OpenAI / Groq / OpenRouter</span>
+  </div>
+</div>

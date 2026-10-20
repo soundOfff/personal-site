@@ -1,0 +1,71 @@
+---
+const windows = Array.from({ length: 28 }, (_, i) => ({
+  x: 74 + (i % 7) * 26,
+  y: 100 + Math.floor(i / 7) * 32,
+}));
+---
+
+<div class="opening-scene opening-budapest" data-opening="budapest">
+  <div class="gk-heading">
+    <p class="shot-kicker">04 / The Grand Budapest Hotel</p>
+    <h1>Order, with<br /><em>character.</em></h1>
+  </div>
+  <div class="gk-desk">
+    <div class="gk-envelope" aria-hidden="true">
+      <span class="gk-envelope-seam"></span><span class="gk-seal">TB</span>
+      <p>PERSONAL<br />CORRESPONDENCE</p>
+    </div>
+    <div class="gk-register">
+      <p class="gk-register-top">The guest register <span>№ 2026</span></p>
+      <div class="gk-register-body">
+        <div class="gk-index">
+          <span class="gk-index-kicker">Selected work</span>
+          <p><span>01</span> Dex</p><p><span>02</span> Mint Mobile</p><p>
+            <span>03</span> Flagship
+          </p>
+          <i></i><small>Every detail<br />has its place.</small>
+        </div>
+        <svg class="gk-hotel" viewBox="0 0 320 310" fill="none" aria-hidden="true">
+          <g stroke="currentColor" stroke-width=".8">
+            <path
+              d="M43 80h234v175H43Zm22 0V58h190v22M55 58l17-24h176l17 24M124 80V41h72v39M138 41V26h44v15M143 26c0-28 34-28 34 0M160 5V0M36 255h248m-256 8h264M43 224h234M59 80v144m202-144v144M122 80v144m76-144v144M43 127h234m-234 32h234m-234 32h234"
+            ></path>
+            {windows.map(({ x, y }) => <path d={`M${x} ${y}h10v17H${x}Z`} />)}
+            <path
+              d="M143 255v-32c0-23 34-23 34 0v32m-25-29v29m17-29v29M31 279h258m-222 0v-16m187 16v-16M14 290h292"
+            ></path>
+            <path d="M9 255V112l-8 28h16L8 120m304 135V112l-8 28h16l-8-20"></path>
+          </g>
+          <text
+            x="160"
+            y="305"
+            text-anchor="middle"
+            font-size="7"
+            fill="currentColor"
+            letter-spacing="3">GRAND BUDAPEST</text
+          >
+        </svg>
+      </div>
+      <p class="gk-register-foot">Tomas Brasca <span>Rosario, Argentina</span></p>
+    </div>
+    <svg class="gk-key" viewBox="0 0 120 300" aria-hidden="true" fill="none">
+      <defs
+        ><linearGradient id="gk-brass" x2="1" y2=".6"
+          ><stop stop-color="#b38a42"></stop><stop offset=".4" stop-color="#e8cd89"></stop><stop
+            offset=".6"
+            stop-color="#c79d50"></stop><stop offset="1" stop-color="#8d6739"
+          ></stop></linearGradient
+        ></defs
+      >
+      <path
+        d="M60 27a35 35 0 1 0 0 70 35 35 0 0 0 0-70Zm0 13a22 22 0 1 1 0 44 22 22 0 0 1 0-44Z"
+        fill="url(#gk-brass)"
+        fill-rule="evenodd"></path>
+      <path d="M53 92h14v153h25v15H67v16H53Zm14 125h18v14H67Z" fill="url(#gk-brass)"></path>
+      <path d="M60 28V0" stroke="#bca176" stroke-width="1"></path>
+      <path d="m8 106 104 0v74l-52 23-52-23Z" fill="#79394b" stroke="#c5a26a"></path>
+      <text x="60" y="142" fill="#ead5a4" font-size="27" text-anchor="middle">04</text>
+      <path d="M29 157h62m-52 8h42" stroke="#c5a26a" stroke-width=".6"></path>
+    </svg>
+  </div>
+</div>
