@@ -36,6 +36,11 @@ export function mountCamera(ctx: ReelContext): () => void {
         : ctx.reel.id === 'odyssey'
           ? smooth((p - 0.38) / 0.3)
           : 0;
+    if (ctx.reel.id === 'odyssey') {
+      const rect = frame.getBoundingClientRect();
+      const overlap = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+      scene.toggleAttribute('data-opening-interactive', cut < 0.15 && overlap >= rect.height / 2);
+    }
     scene.style.setProperty('--shot-p', p.toFixed(4));
     scene.style.setProperty('--shot-a', smooth((p - 0.05) / 0.62).toFixed(4));
     scene.style.setProperty('--shot-b', smooth((p - 0.38) / 0.62).toFixed(4));
@@ -56,6 +61,7 @@ export function mountCamera(ctx: ReelContext): () => void {
     visible = entry.isIntersecting;
     scene.classList.toggle('is-camera-live', visible && !ctx.reducedMotion && !document.hidden);
     if (visible) invalidate();
+    else scene.removeAttribute('data-opening-interactive');
   });
   const ro = new ResizeObserver(invalidate);
   io.observe(track);
@@ -68,6 +74,7 @@ export function mountCamera(ctx: ReelContext): () => void {
     'visibilitychange',
     () => {
       scene.classList.toggle('is-camera-live', visible && !ctx.reducedMotion && !document.hidden);
+      if (document.hidden) scene.removeAttribute('data-opening-interactive');
       invalidate();
     },
     { signal: ctx.signal },
@@ -80,6 +87,7 @@ export function mountCamera(ctx: ReelContext): () => void {
     cancelAnimationFrame(queued);
     io.disconnect();
     ro.disconnect();
+    scene.removeAttribute('data-opening-interactive');
     scene.removeAttribute('style');
     scene.classList.remove('is-camera-live');
     frame.style.removeProperty('--scroll-hint');

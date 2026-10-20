@@ -407,6 +407,7 @@ html[data-reel='odyssey'] .cinema-opening {
   position: absolute;
   inset: 0;
   z-index: 2;
+  pointer-events: none;
 }
 .ok-copy .shot-kicker {
   position: absolute;
@@ -458,7 +459,7 @@ html[data-reel='odyssey'] .cinema-opening {
   letter-spacing: 0.12em;
   padding-top: 5px;
 }
-.ok-hal > svg {
+.ok-hal-eye > svg {
   position: absolute;
   top: 16%;
   width: 100%;
@@ -477,6 +478,7 @@ html[data-reel='odyssey'] .cinema-opening {
     #283033;
 }
 .ok-orbit {
+  pointer-events: none;
   position: absolute;
   inset: 0;
   background: #090d10;
@@ -860,7 +862,7 @@ html:root[data-reel]:not([data-reel='house']) #readme .metrics .k {
   .ok-hal-label {
     font-size: 17px;
   }
-  .ok-hal > svg {
+  .ok-hal-eye > svg {
     top: 10%;
   }
   .ok-hal-label {

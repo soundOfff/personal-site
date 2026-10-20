@@ -8,3 +8,7 @@ OPENROUTER_API_KEY=
 # OpenRouter slugs, not first-party ids. Override for a quality/cost trade,
 # e.g. A2UI_MODEL=anthropic/claude-sonnet-5
 A2UI_MODEL=
+
+# Optional. Opening HAL uses short plain-text replies from this inexpensive model.
+# Server-only, using the same OPENROUTER_API_KEY and rate-limit buckets as Playground.
+HAL_MODEL=google/gemini-2.5-flash-lite
