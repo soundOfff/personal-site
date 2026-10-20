@@ -1,0 +1,231 @@
+---
+/**
+ * Reel 04 · The Grand Budapest Hotel: reel-only markup. Rendered once per point listed in
+ * config.stages; the engine hides it unless this reel is screening.
+ *
+ *   backdrop      the frame matte (aspect ratio by era), the whip pan's blur,
+ *                 grain, and the front desk's progress rule
+ *   rail          the right-hand brass plate: room number + era, both rolling
+ *   in:readme     the opening: name plate, the pastel diorama, chapter card
+ *   in:<section>  a Part chapter card (the section's keybar finishes the card)
+ *   after:work    1968 interlude, the hotel aged · after:writing 1985 interlude
+ *   credits       the service bell and the end credits
+ *   title         the projector's title card
+ */
+import type { StagePoint, SectionId } from '../types';
+import { nav, contact } from '../../data/site';
+import Diorama from './Diorama.astro';
+
+interface Props {
+  at: StagePoint;
+}
+const { at } = Astro.props;
+
+const chapters: Record<SectionId, string> = {
+  readme: 'The Lobby',
+  playground: 'The Concierge Desk',
+  work: 'The Guest Register',
+  oss: 'The Gallery',
+  log: 'The Telegraph Office',
+  writing: 'The Dining Room',
+  principles: 'House Rules',
+  stack: 'The Pâtisserie',
+  now: 'The Front Desk',
+};
+const sectionOf = at.startsWith('in:') ? (at.slice(3) as SectionId) : null;
+const part = sectionOf ? nav.findIndex((n) => n.id === sectionOf) + 1 : 0;
+
+const eras = ['1932', '1968', '1985'];
+const mail = contact.find((c) => c.href.startsWith('mailto:'));
+---
+
+{
+  at === 'backdrop' && (
+    <>
+      <div class="gb-matte" aria-hidden="true">
+        <i class="mt" />
+        <i class="mb" />
+        <i class="ml" />
+        <i class="mr" />
+        <span class="fl" />
+      </div>
+      <svg class="gb-fx" width="0" height="0" aria-hidden="true">
+        <filter id="gb-hblur" x="-10%" width="120%">
+          <feGaussianBlur stdDeviation="36 0" />
+        </filter>
+      </svg>
+      <div class="gb-grain" aria-hidden="true" />
+      <div class="gb-prog" aria-hidden="true">
+        <span class="gb-prog-fill" />
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'rail' && (
+    <div class="gb-room" aria-hidden="true">
+      <span class="gb-roll gb-room-roll">
+        {nav.map((n, i) => (
+          <span>
+            <b>Room {String(i).padStart(2, '0')}</b> · {n.label}
+          </span>
+        ))}
+      </span>
+      <span class="gb-roll gb-era-roll">
+        {eras.map((e) => (
+          <span>Era {e}</span>
+        ))}
+      </span>
+    </div>
+  )
+}
+
+{
+  at === 'in:readme' && (
+    <div class="gb-hero">
+      <p class="gb-kicker">The portfolio of</p>
+      <p class="gb-name">Tomas Brasca</p>
+      <p class="gb-kicker2">Rosario, Argentina</p>
+      <figure class="gb-dio-wrap" aria-hidden="true">
+        <Diorama era="1932" />
+        <figcaption class="gb-slugline">EXT. GRAND BUDAPEST HOTEL - DAY</figcaption>
+      </figure>
+      <button
+        class="gb-luggage"
+        type="button"
+        data-film-find="budapest"
+        data-find-zone=".gb-dio-wrap"
+        data-find-action="flip"
+        aria-label="Turn over the Grand Budapest luggage tag"
+        aria-pressed="false"
+      >
+        <span class="gb-luggage-string" aria-hidden="true" />
+        <span class="gb-luggage-turn" aria-hidden="true">
+          <span class="gb-luggage-face gb-luggage-front">
+            <span class="gb-luggage-crest">GB</span>
+            <span class="gb-luggage-hotel">
+              The Grand
+              <br />
+              Budapest Hotel
+            </span>
+            <span class="gb-luggage-rule" />
+            <span class="gb-luggage-room">1932</span>
+            <span class="gb-luggage-small">Zubrowka · First class</span>
+          </span>
+          <span class="gb-luggage-face gb-luggage-back">
+            <span class="gb-luggage-small">A most distinguished guest</span>
+            <span class="gb-luggage-guest">
+              Tomas
+              <br />
+              Brasca
+            </span>
+            <span class="gb-luggage-rule" />
+            <span class="gb-luggage-small">Rosario → Zubrowka</span>
+            <span class="gb-luggage-stamp">ADMITTED</span>
+          </span>
+        </span>
+      </button>
+    </div>
+  )
+}
+
+{
+  sectionOf && (
+    <div class="gb-chapter" aria-hidden="true">
+      <span class="pt">Part {part}</span>
+      <span class="ct">{chapters[sectionOf]}</span>
+    </div>
+  )
+}
+
+{
+  at === 'after:work' && (
+    <div class="gb-interlude" data-era="1" aria-hidden="true">
+      <p class="il-k">Thirty-six years later</p>
+      <p class="il-year">1968</p>
+      <div class="il-shot">
+        <Diorama era="1968" />
+      </div>
+    </div>
+  )
+}
+
+{
+  at === 'after:writing' && (
+    <div class="gb-interlude" data-era="2" aria-hidden="true">
+      <div class="il-frame">
+        <p class="il-k">Seventeen years after that</p>
+        <p class="il-year">1985</p>
+      </div>
+    </div>
+  )
+}
+
+{
+  at === 'credits' && (
+    <div class="gb-credits">
+      {mail && (
+        <a class="gb-bell" href={mail.href} data-gb-bell>
+          <span class="bb" aria-hidden="true">
+            <span class="bb-knob" />
+            <span class="bb-dome" />
+            <span class="bb-base" />
+          </span>
+          <span class="bbl">Ring for service</span>
+          <span class="bbm">{mail.label}</span>
+        </a>
+      )}
+      <svg class="gb-keys" viewBox="0 0 64 64" aria-hidden="true">
+        <g transform="rotate(45 32 32)">
+          <circle cx="32" cy="12" r="6" />
+          <path d="M32 18 V54 M32 46 H38 M32 51 H36" />
+        </g>
+        <g transform="rotate(-45 32 32)">
+          <circle cx="32" cy="12" r="6" />
+          <path d="M32 18 V54 M32 46 H26 M32 51 H28" />
+        </g>
+      </svg>
+      <dl class="gb-cr">
+        <div>
+          <dt>A portfolio by</dt>
+          <dd>Tomas Brasca</dd>
+        </div>
+        <div>
+          <dt>Inspired by</dt>
+          <dd>
+            <cite>The Grand Budapest Hotel</cite>, a film by Wes Anderson
+          </dd>
+        </div>
+      </dl>
+      <p class="gb-disc">Not affiliated with the film or its makers.</p>
+    </div>
+  )
+}
+
+{
+  at === 'title' && (
+    <div class="gb-title">
+      <div class="gb-title-in">
+        <svg class="gb-keys" viewBox="0 0 64 64" aria-hidden="true">
+          <g transform="rotate(45 32 32)">
+            <circle cx="32" cy="12" r="6" />
+            <path d="M32 18 V54 M32 46 H38 M32 51 H36" />
+          </g>
+          <g transform="rotate(-45 32 32)">
+            <circle cx="32" cy="12" r="6" />
+            <path d="M32 18 V54 M32 46 H26 M32 51 H28" />
+          </g>
+        </svg>
+        <span class="t-n">
+          <span class="t-the">The</span>
+          Grand Budapest
+          <span class="t-h">Hotel</span>
+        </span>
+        <span class="t-r" />
+        <span class="t-s">a portfolio in nine parts</span>
+        <span class="t-m">Tomas Brasca, after Wes Anderson</span>
+      </div>
+    </div>
+  )
+}

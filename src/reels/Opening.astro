@@ -1,0 +1,17 @@
+---
+import Parasite from './openings/Parasite.astro';
+import Mood from './openings/Mood.astro';
+import BladeRunner from './openings/BladeRunner.astro';
+import Budapest from './openings/Budapest.astro';
+import Odyssey from './openings/Odyssey.astro';
+---
+
+<div class="cinema-opening" data-camera>
+  <div class="camera-pin">
+    <div class="camera-frame">
+      <Parasite /><Mood /><BladeRunner /><Budapest /><Odyssey />
+      <p class="camera-scroll" aria-hidden="true"><span></span> Scroll</p>
+      <div class="camera-progress" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+</div>

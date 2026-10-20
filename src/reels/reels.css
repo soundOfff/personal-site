@@ -1,0 +1,5 @@
+/* What the homepage always needs: the engine (projector, switcher, sound
+   toggle) and the box office. Each reel's own stylesheet loads on demand
+   (see stylesheets.ts), so House lights never downloads a film's CSS. */
+@import './engine.css';
+@import './boxoffice/boxoffice.css';

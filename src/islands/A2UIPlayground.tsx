@@ -119,6 +119,14 @@ const WELCOME_TURN: Turn = {
   state: stateFrom(WELCOME.messages),
 };
 
+/**
+ * Tell the page what the agent is doing, so a film reel can score it
+ * (src/reels: the engine relays these to whichever reel is screening).
+ */
+function cue(name: 'ask' | 'surface' | 'error' | 'open' | 'close', count?: number) {
+  document.dispatchEvent(new CustomEvent('reel:cue', { detail: { name, count } }));
+}
+
 export default function A2UIPlayground() {
   const [turns, setTurns] = useState<Turn[]>([WELCOME_TURN]);
   const [draft, setDraft] = useState('');
@@ -160,6 +168,7 @@ export default function A2UIPlayground() {
         if (res.ok) {
           const body = (await res.json()) as A2uiResponse;
           if (body.quota) setQuota(body.quota);
+          cue('surface', body.messages.length);
           append({
             question,
             summary: body.summary,
@@ -172,25 +181,26 @@ export default function A2UIPlayground() {
 
         const body = (await res.json().catch(() => ({}))) as A2uiError;
         setPending(null);
+        cue('error');
 
         if (res.status === 429) {
           const retryAfter = body.retryAfter ?? 60;
           if (isDailyCap(retryAfter)) {
             setQuota({ remaining: 0, limit: DAILY_LIMIT });
             setError(
-              `That was your ${DAILY_LIMIT} questions for today. The cap resets at 00:00 UTC — about ${formatRetry(retryAfter)} from now. Everything the agent knows is also on the page below.`,
+              `That was your ${DAILY_LIMIT} questions for today. The cap resets at 00:00 UTC, about ${formatRetry(retryAfter)} from now. Everything the agent knows is also on the page below.`,
             );
             return;
           }
-          setError(`Slow down a moment — try again in ${formatRetry(retryAfter)}.`);
+          setError(`That's the per-minute limit. Try again in ${formatRetry(retryAfter)}.`);
           return;
         }
 
         if (res.status === 503) {
           setError(
             body.error === 'daily-budget-exhausted'
-              ? 'The shared daily budget for live turns is spent. It resets at 00:00 UTC — that cap is what keeps this endpoint open to everyone without a login.'
-              : "The agent isn't configured on this deploy: no API key is set server-side, so there is nothing to ask.",
+              ? 'The shared daily budget for live turns is spent, and it resets at 00:00 UTC. That cap is what keeps this endpoint open to everyone without a login.'
+              : "The agent isn't configured on this deploy. No API key is set on the server, so there is nothing to ask.",
           );
           return;
         }
@@ -198,6 +208,7 @@ export default function A2UIPlayground() {
         setError('The agent failed to compose a surface. Try rephrasing the question.');
       } catch {
         setPending(null);
+        cue('error');
         setError('Network error reaching the agent. Check the connection and ask again.');
       }
     },
@@ -214,6 +225,7 @@ export default function A2UIPlayground() {
       setDraft('');
       setError(null);
       setPending(question);
+      cue('ask');
       void askAgent(question, turns);
     },
     [askAgent, pending, spent, turns],
@@ -235,6 +247,23 @@ export default function A2UIPlayground() {
     [ask],
   );
 
+  /* The hero button asks for the panel with an event. A click
+     that landed before this island hydrated left a flag instead. */
+  useEffect(() => {
+    const root = document.documentElement;
+    const take = () => {
+      root.removeAttribute('data-playground-want');
+      setOpen(true);
+    };
+    if (root.hasAttribute('data-playground-want')) take();
+    root.setAttribute('data-playground-ready', '');
+    document.addEventListener('playground:open', take);
+    return () => {
+      document.removeEventListener('playground:open', take);
+      root.removeAttribute('data-playground-ready');
+    };
+  }, []);
+
   /* The dialog is native, so Esc, the backdrop and focus containment are the
      platform's job; React only keeps `open` in step with the element. */
   useEffect(() => {
@@ -243,6 +272,7 @@ export default function A2UIPlayground() {
 
     if (open && !dialog.open) {
       dialog.showModal();
+      cue('open');
       // The composer is the point of the panel — but not at the cost of
       // throwing up a keyboard over a phone screen the moment it opens.
       if (window.matchMedia('(min-width: 700px)').matches) {
@@ -286,7 +316,7 @@ export default function A2UIPlayground() {
               <i></i>
               <i></i>
             </span>
-            portfolio agent: live
+            portfolio agent
           </span>
           {quota ? (
             <span className="a2-launch-count">
@@ -299,8 +329,8 @@ export default function A2UIPlayground() {
 
         <div className="console-body a2-launch-body">
           <p className="a2-launch-lede">
-            Ask a question about the work and an agent answers by composing a user interface for it
-            — cards, charts, diagrams, timelines, not paragraphs. Nothing here is pre-recorded.
+            Ask about the work and the agent answers with an interface built for the question:
+            project cards, a chart, a timeline or a diagram.
           </p>
 
           <div className="a2-launch-row">
@@ -320,8 +350,8 @@ export default function A2UIPlayground() {
           {!started && <StarterMenu onPick={launch} />}
 
           <Alert variant="info" compact className="live-note">
-            Every question runs a real agent behind a serverless function; the key stays
-            server-side, and each visitor gets {DAILY_LIMIT} questions a day.
+            Each visitor gets {DAILY_LIMIT} questions a day, and each one is a live call to the
+            model.
           </Alert>
         </div>
       </div>
@@ -330,7 +360,11 @@ export default function A2UIPlayground() {
         className={maxed ? 'a2-drawer is-max' : 'a2-drawer'}
         ref={dialogRef}
         aria-label="Portfolio agent playground"
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          // every way out (Esc, the backdrop, the buttons) ends in the native close event
+          setOpen(false);
+          cue('close');
+        }}
         onClick={(event) => {
           // Clicks that land on the dialog itself are backdrop clicks; the
           // panel fills the dialog, so anything inside stops here.
@@ -357,7 +391,7 @@ export default function A2UIPlayground() {
                   className="a2-lamp is-min"
                   onClick={() => setOpen(false)}
                   title="Minimize"
-                  aria-label="Minimize the panel — the thread is kept"
+                  aria-label="Minimize the panel. The thread is kept."
                 >
                   <span aria-hidden="true">–</span>
                 </button>
@@ -373,7 +407,7 @@ export default function A2UIPlayground() {
                   <span aria-hidden="true">{maxed ? '»' : '«'}</span>
                 </button>
               </span>
-              portfolio agent: live
+              portfolio agent
             </span>
             <div className="a2-bar-right">
               {quota && (
@@ -484,8 +518,8 @@ export default function A2UIPlayground() {
                 onChange={(event) => setDraft(event.target.value)}
                 placeholder={
                   spent
-                    ? `Out of questions until 00:00 UTC — ${DAILY_LIMIT} a day per visitor.`
-                    : 'Ask about the work, the writing, the background…'
+                    ? `Out of questions until 00:00 UTC. Each visitor gets ${DAILY_LIMIT} a day.`
+                    : 'Ask a question…'
                 }
                 maxLength={400}
                 disabled={pending !== null || spent}

@@ -1,0 +1,191 @@
+---
+/**
+ * The box office: the first visit. Five tickets, one paper stock per film,
+ * plus House lights. Tear one: a countdown leader with the 2-pop, then the
+ * engine's projector shows that reel's title card and opens on it.
+ *
+ * A closed <dialog>, so with no JS it is never shown and the site reads as
+ * it is. The head bootstrap sets html[data-first-visit] for a fresh visitor:
+ * boxoffice.css shows the lobby from the first frame on that attribute, and
+ * boxoffice.ts upgrades it to a modal (showModal, Esc, focus).
+ */
+import { REELS, DEFAULT_REEL } from '../registry';
+import { profile } from '../../data/site';
+
+/**
+ * What each stub prints: a place in the film, and a second line only when the
+ * film has a code worth printing (K's serial, HAL, the year of the main story).
+ */
+const STOCK: Record<string, { place: string; code?: string; lang?: string }> = {
+  parasite: { place: 'Floor B1', lang: 'ko' },
+  mood: { place: 'Room 2046', code: '1962', lang: 'zh-Hant' },
+  br2049: { place: 'Spinner deck', code: 'KD6-3.7' },
+  budapest: { place: 'Lobby boy', code: '1932' },
+  odyssey: { place: 'Pod bay', code: 'HAL 9000' },
+};
+
+const house = REELS.find((r) => r.id === DEFAULT_REEL)!;
+const films = REELS.filter((r) => r.id !== DEFAULT_REEL);
+
+// The fan: tickets lean out from the middle one and drop a little.
+const fan = (i: number) => {
+  const c = i - (films.length - 1) / 2;
+  return `--i:${i};--rot:${(c * 3.5).toFixed(2)}deg;--ty:${Math.round(4 * c * c + 3 * Math.abs(c))}px`;
+};
+
+// Chasing bulbs round the marquee, in three phases.
+const SIDE = 30;
+const END = 5;
+const bulbs = {
+  top: Array.from({ length: SIDE }, (_, i) => i % 3),
+  rgt: Array.from({ length: END }, (_, i) => (SIDE + i) % 3),
+  bot: Array.from({ length: SIDE }, (_, i) => (SIDE + END + (SIDE - 1 - i)) % 3),
+  lft: Array.from({ length: END }, (_, i) => (SIDE * 2 + END + (END - 1 - i)) % 3),
+};
+
+const total = (bands: [string, number][]) => bands.reduce((s, [, w]) => s + w, 0);
+
+// '2019 · Bong Joon-ho · 2.39:1' prints as year · director, then the ratio below.
+const metaLines = (meta: string) => {
+  const parts = meta.split(' · ');
+  return [parts.slice(0, 2).join(' · '), parts.slice(2).join(' · ')].filter(Boolean);
+};
+---
+
+<dialog
+  class="boxoffice"
+  data-boxoffice
+  data-phase="pick"
+  aria-labelledby="bo-title"
+  aria-describedby="bo-lead"
+  tabindex="-1"
+>
+  <div class="bo-lobby">
+    <div class="bo-grain" aria-hidden="true"></div>
+
+    <header class="bo-top">
+      <div class="bo-id"><span class="bo-nm">{profile.name}</span></div>
+      <div class="bo-tr">
+        <span class="bo-clock" aria-hidden="true">Rosario, <span data-bo-clock>--:--</span></span>
+        <button class="bo-snd" type="button" data-sound-toggle aria-pressed="true">
+          <span class="w" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span data-sound-label>sound on</span>
+        </button>
+        <button
+          class="bo-x"
+          type="button"
+          data-bo-close
+          aria-label="Skip the films: House lights, no film"
+        >
+          <span data-bo-close-label>skip</span><kbd>esc</kbd>
+        </button>
+      </div>
+    </header>
+
+    <div class="bo-marquee" aria-hidden="true">
+      <div class="bo-bulbs top">{bulbs.top.map((p) => <i class={`bl k${p}`} />)}</div>
+      <div class="bo-bulbs rgt">{bulbs.rgt.map((p) => <i class={`bl k${p}`} />)}</div>
+      <div class="bo-bulbs bot">{bulbs.bot.map((p) => <i class={`bl k${p}`} />)}</div>
+      <div class="bo-bulbs lft">{bulbs.lft.map((p) => <i class={`bl k${p}`} />)}</div>
+      <div class="bo-board">
+        <span class="bo-billing">Now showing</span>
+        <span class="bo-feature">{profile.name}</span>
+        <span class="bo-billing">In {films.length} films</span>
+      </div>
+    </div>
+
+    <div class="bo-lead">
+      <h2 id="bo-title">Choose your screening.</h2>
+      <p id="bo-lead">Same portfolio. Five ways to see it.</p>
+    </div>
+
+    <ul class="bo-tix" aria-label="Tickets">
+      {
+        films.map((r, i) => {
+          const stock = STOCK[r.id] ?? { place: 'Row A' };
+          const label = [r.title, r.year, r.director].filter(Boolean).join(', ');
+          return (
+            <li class="bo-tkw" style={fan(i)}>
+              <button
+                class="bo-tk"
+                type="button"
+                data-bo-ticket={r.id}
+                data-stock={r.id}
+                data-label={label}
+                aria-label={`${label}. Tear the ticket to start the screening`}
+              >
+                <span class="tk-main">
+                  <span class="tk-deco" aria-hidden="true" />
+                  <span class="tk-top">
+                    <span>Admit one</span>
+                    <span>Reel {r.n}</span>
+                  </span>
+                  <span class="tk-bc" aria-hidden="true">
+                    {r.bands.map(([c, w]) => (
+                      <i
+                        style={`background:${c};flex-grow:${w};flex-basis:${(w / total(r.bands)) * 100}%`}
+                      />
+                    ))}
+                  </span>
+                  <span class="tk-ttl">{r.title}</span>
+                  {r.native && (
+                    <span class="tk-ko" lang={stock.lang}>
+                      {r.native}
+                    </span>
+                  )}
+                  <span class="tk-meta">
+                    {metaLines(r.meta).map((l) => (
+                      <span>{l}</span>
+                    ))}
+                  </span>
+                  <span class="tk-now" aria-hidden="true">
+                    Admitted
+                  </span>
+                </span>
+                <span class="tk-stub">
+                  <span>{stock.place}</span>
+                  {stock.code && <span>{stock.code}</span>}
+                </span>
+                <span class="tk-hint" aria-hidden="true">
+                  <span class="h-tear">tear to start ↓</span>
+                  <span class="h-seat">back to your seat</span>
+                </span>
+              </button>
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    <footer class="bo-foot">
+      <a class="bo-house" href="#readme" data-bo-house>
+        <span class="bo-house-sw" aria-hidden="true">
+          {
+            house.bands.map(([c, w]) => (
+              <i
+                style={`background:${c};flex-grow:${w};flex-basis:${(w / total(house.bands)) * 100}%`}
+              />
+            ))
+          }
+        </span>
+        <span class="bo-house-t">
+          <b>{house.title}</b>
+          <span>no film, straight to the portfolio →</span>
+        </span>
+        <span class="bo-house-now">lights up</span>
+      </a>
+      <span class="bo-fine">Fan homages, not affiliated with the films or their studios.</span>
+    </footer>
+  </div>
+
+  <div class="bo-screen" aria-hidden="true">
+    <div class="bo-leader">
+      <span class="bo-sweep"></span>
+      <span class="bo-cross"></span>
+      <span class="bo-ring r1"></span>
+      <span class="bo-ring r2"></span>
+      <span class="bo-num" data-bo-num>3</span>
+    </div>
+    <div class="bo-flash"></div>
+  </div>
+</dialog>

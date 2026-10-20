@@ -1,0 +1,477 @@
+/* ============================================================
+   reels/engine.css: what every reel shares.
+     1. the editorial-ui tokens registered as colours, so a reel's act
+        change cross-fades instead of snapping,
+     2. stage / slug / title-card visibility defaults (the generated head
+        CSS shows the active reel's),
+     3. the switcher and the sound toggle in the rail,
+     4. the projector: cue marks, the bars, title card.
+   Reel-specific styling lives in src/reels/<id>/reel.css.
+   ============================================================ */
+
+/* ---- 1. tokens that animate ---- */
+@property --paper {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fbfaf6;
+}
+@property --paper-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #f4f2ec;
+}
+@property --paper-3 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ece9df;
+}
+@property --page {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #e9e7e1;
+}
+@property --ink {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1a1814;
+}
+@property --ink-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #3a362f;
+}
+@property --muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #807a6f;
+}
+@property --rule {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #e5e0d5;
+}
+@property --amber {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #f2a03c;
+}
+@property --amber-deep {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #c77a1f;
+}
+@property --amber-soft {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fbe6c8;
+}
+
+/* Only while a film is screening: House lights keeps editorial-ui's own timing.
+   One ease per change: body eases the root's act tokens for everything that
+   inherits them, sections ease their own. Any element further down that also
+   transitioned would stack a second ease on top (the rail used to). */
+html:root:not([data-reel='house']) body,
+html:root:not([data-reel='house']) section[data-sec] {
+  transition:
+    --paper 0.8s,
+    --paper-2 0.8s,
+    --paper-3 0.8s,
+    --page 0.8s,
+    --ink 0.8s,
+    --ink-2 0.8s,
+    --muted 0.8s,
+    --rule 0.8s,
+    --amber 0.8s,
+    --amber-deep 0.8s,
+    --amber-soft 0.8s;
+}
+
+/* ---- 2. one reel's things show only under that reel ---- */
+.reel-stage,
+.reel-slug,
+.pj-title,
+.cinema-opening {
+  display: none;
+}
+.sr-only {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.reel-slug {
+  margin-left: 10px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* ---- 3. the switcher ---- */
+.reelpick .rail-sec {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.reelpick .rail-sec [data-reel-no] {
+  color: var(--amber-deep);
+}
+.reels {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 5px;
+}
+.reel {
+  position: relative;
+  height: 34px;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  background: var(--paper);
+  cursor: pointer;
+  overflow: hidden;
+  font: inherit;
+  color: inherit;
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0.9, 0.2, 1),
+    border-color 0.15s,
+    box-shadow 0.2s;
+}
+/* a 44px target without a 44px swatch */
+.reel::after {
+  content: '';
+  position: absolute;
+  inset: -5px -3px;
+}
+.reel:hover {
+  transform: translateY(-2px);
+}
+.reel:active {
+  transform: scale(0.94);
+}
+.reel .bc {
+  position: absolute;
+  inset: 3px;
+  display: flex;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.reel .bc i {
+  display: block;
+  min-width: 1px;
+}
+.reel[aria-pressed='true'] {
+  border-color: var(--ink);
+  box-shadow:
+    0 0 0 1px var(--ink),
+    0 6px 14px -8px rgba(0, 0, 0, 0.45);
+}
+/* focus wins over the pressed shadow; the ink border still marks the current reel */
+.reel:focus-visible,
+.reel[aria-pressed='true']:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+.reel-label {
+  margin-top: 8px;
+  min-height: 34px;
+  line-height: 1.3;
+}
+.reel-label b {
+  display: block;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+.reel-label span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.boxoffice-open {
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-2);
+}
+.boxoffice-open:hover {
+  color: var(--ink);
+}
+
+/* the sound toggle: only while a film is screening (House lights is silent) */
+.snd {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    transform 0.12s;
+}
+html:root:not([data-reel='house']) .snd {
+  display: inline-flex;
+}
+html:root:not([data-reel='house']) [data-theme-toggle] {
+  display: none;
+}
+.snd:hover {
+  background: var(--paper-3);
+}
+.snd:active {
+  transform: scale(0.96);
+}
+.snd .w {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10px;
+}
+/* uneven at rest, so the button reads as a level meter and not as "…" */
+.snd .w i {
+  display: block;
+  width: 2px;
+  height: 4px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.snd .w i:nth-child(2) {
+  height: 7px;
+}
+.snd .w i:nth-child(3) {
+  height: 5px;
+}
+.snd[aria-pressed='true'] .w i {
+  animation: snd-eq 0.9s ease-in-out infinite;
+}
+.snd[aria-pressed='true'] .w i:nth-child(2) {
+  animation-duration: 1.26s;
+}
+.snd[aria-pressed='true'] .w i:nth-child(3) {
+  animation-duration: 0.62s;
+}
+/* no 0%/100%: each bar rises from its own resting height */
+@keyframes snd-eq {
+  50% {
+    height: 10px;
+  }
+}
+
+/* the switcher adds ~120px to the rail: on short laptop screens let it scroll */
+@media (min-width: 821px) and (max-height: 740px) {
+  .rail {
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+@media (max-width: 820px) {
+  .reelpick {
+    order: 2;
+    flex: 1 0 100%;
+  }
+  /* the swatches have no names on a phone: say which one is screening */
+  .reel-label {
+    min-height: 0;
+    margin-top: 6px;
+  }
+  .reel-label span {
+    display: none;
+  }
+  /* the only way back to the box office on a phone: keep it, as a quiet link */
+  .boxoffice-open {
+    display: block;
+    margin-top: 10px;
+    min-height: 24px;
+  }
+}
+
+/* ---- 4. the projector ---- */
+.projector {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+}
+.projector:is([data-state='cue'], [data-state='close'], [data-state='card'], [data-state='open']) {
+  visibility: visible;
+}
+.projector:is([data-state='cue'], [data-state='close'], [data-state='card']) {
+  pointer-events: auto;
+}
+.pj-dim {
+  position: absolute;
+  inset: 0;
+  background: #050605;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.projector:is([data-state='close'], [data-state='card']) .pj-dim {
+  opacity: 1;
+}
+/* letterbox when the film is wider than the screen, pillarbox when it is
+   narrower; the engine sets --pj-ratio from the incoming reel */
+.pj-bar {
+  position: absolute;
+  background: #000;
+  transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.pj-t,
+.pj-b {
+  left: 0;
+  right: 0;
+  height: max(0px, calc((100vh - 100vw / var(--pj-ratio, 2.39)) / 2));
+}
+.pj-l,
+.pj-r {
+  top: 0;
+  bottom: 0;
+  width: max(0px, calc((100vw - 100vh * var(--pj-ratio, 2.39)) / 2));
+}
+.pj-t {
+  top: 0;
+  transform: translateY(-101%);
+}
+.pj-b {
+  bottom: 0;
+  transform: translateY(101%);
+}
+.pj-l {
+  left: 0;
+  transform: translateX(-101%);
+}
+.pj-r {
+  right: 0;
+  transform: translateX(101%);
+}
+.projector[data-frameless] .pj-bar {
+  display: none;
+}
+.projector:is([data-state='close'], [data-state='card']) .pj-bar {
+  transform: none;
+}
+.projector.is-instant :is(.pj-dim, .pj-bar, .pj-card) {
+  transition: none;
+}
+/* the cigarette burn in the top-right corner: two flashes before a changeover */
+.pj-cue {
+  position: absolute;
+  right: 6%;
+  top: 8%;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.95) 0 38%,
+    rgba(20, 20, 18, 0.95) 40% 62%,
+    rgba(0, 0, 0, 0) 64%
+  );
+  opacity: 0;
+}
+.projector[data-state='cue'] .pj-cue {
+  animation: pj-cue 0.26s steps(1) 2;
+}
+@keyframes pj-cue {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+.pj-card {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #ecebe4;
+  opacity: 0;
+  transform: scale(0.985);
+  transition:
+    opacity 0.35s ease,
+    transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);
+  padding: 0 24px;
+}
+.projector[data-state='card'] .pj-card {
+  opacity: 1;
+  transform: none;
+}
+/* the default card, for a reel without its own `title` stage */
+.pj-title {
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.pj-native {
+  font-family: var(--font-title, var(--font-serif));
+  font-size: clamp(44px, 8vw, 72px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+.pj-name {
+  font-family: var(--font-display, var(--font-sans));
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5em;
+  margin-right: -0.5em;
+  text-transform: uppercase;
+}
+.pj-title[data-for='house'] .pj-name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(36px, 6vw, 54px);
+  letter-spacing: -0.01em;
+  margin-right: 0;
+  text-transform: none;
+}
+.pj-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(236, 235, 228, 0.62);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-film-find],
+  [data-film-find] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+html[data-motion-suspended] .reel-stage * {
+  animation-play-state: paused !important;
+}

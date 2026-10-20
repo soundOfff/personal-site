@@ -9,10 +9,10 @@ export const profile = {
   name: 'Tomas Brasca',
   monogram: 'TB',
   // mono uppercase role under the name in the rail
-  role: 'Fullstack · AI systems',
+  role: 'Full-stack · AI systems',
   // hero lede: the phrase wrapped in <em></em> renders italic + amber
-  lede: "Most LLM calls don't need the biggest model. They need a dispatcher that knows which one will <em>clear the bar</em>.",
-  sub: "I'm a backend engineer who builds the systems that make AI products work in production: routing, scale, evals, the unglamorous middle. Backend is the foundation, LLM infrastructure is the edge, and competitive-programming results are the proof. Below, an agent answers questions about all of it by generating the interface it answers in.",
+  lede: "Most LLM calls don't need the biggest model. They need a router that knows which one will <em>clear the bar</em>.",
+  sub: 'I build AI products end to end, from web and mobile to the systems behind them. At Dex, I shipped multi-LLM routing and CRM features. At Mint Mobile, I built e-commerce APIs serving 2–3M subscribers.',
 } as const;
 
 export const contact = [
@@ -33,9 +33,9 @@ export const nav = [
   { id: 'readme', label: 'readme' },
   { id: 'playground', label: 'playground' },
   { id: 'work', label: 'work index' },
-  { id: 'oss', label: 'open source' },
+  { id: 'oss', label: 'projects' },
   { id: 'log', label: 'log' },
-  { id: 'writing', label: 'writing' },
+  { id: 'writing', label: 'blog' },
   { id: 'principles', label: 'principles' },
   { id: 'stack', label: 'stack' },
   { id: 'now', label: 'now' },
@@ -46,30 +46,30 @@ export const nav = [
  * `accent: true` renders the value in amber.
  */
 export const proofs: { value: string; key: string; accent?: boolean }[] = [
-  { value: '2-3M', accent: true, key: 'users at Mint' },
-  { value: 'ICPC', key: 'SA finalist' },
-  { value: '1st', key: 'GTS alg trading' },
-  { value: 'SE II', key: 'engineer at Dex' },
-  { value: '4+', key: 'yrs fullstack' },
+  { value: '2–3M', accent: true, key: 'subscribers at Mint Mobile' },
+  { value: 'ICPC', key: 'South America finalist' },
+  { value: '1st', key: 'GTS algorithmic trading' },
+  { value: 'SE II', key: 'at Dex' },
+  { value: '5+', key: 'years full-stack' },
 ];
 
 // 06 · principles: kept from the design; they map exactly to the router work.
 export const tenets = [
   {
     title: 'Smallest model that passes',
-    body: 'Capability is a budget, not a flex. Start at the bottom of the ladder and only climb when an eval forces you to.',
+    body: 'Start with the cheapest model and move up only when an eval fails on it.',
   },
   {
     title: 'Cache before you call',
-    body: 'The cheapest token is the one you never send. Memoize aggressively; treat the model as the slow path.',
+    body: 'Check the cache before calling a model, and treat the call as the slow path.',
   },
   {
     title: 'Cap the blast radius',
-    body: 'Every public endpoint gets a rate limit and a kill switch before it gets a launch tweet.',
+    body: 'Every public endpoint gets a rate limit and a kill switch before launch. The agent on this page has both: five questions a day per visitor, and a shared daily ceiling that turns it off.',
   },
   {
     title: 'Evals are contracts',
-    body: "If a behaviour isn't measured, it isn't shipped. Write the contract down, then make it runnable.",
+    body: "Write down what a behaviour must do as an eval you can run. If there is no eval, it doesn't ship.",
   },
 ] as const;
 
@@ -82,65 +82,81 @@ export const toolbox = [
 ] as const;
 
 /**
- * 04 · log · recent activity: git-style changelog, newest first. Short
- * mono hashes are illustrative; dates are real milestones.
+ * 04 · log · recent activity: git-style changelog, newest first. Messages
+ * read as commit subjects, so no trailing full stop. `hash` is a real commit
+ * in this repo or absent: a made-up one would pass for evidence it isn't.
  */
 export const log: {
-  hash: string;
+  hash?: string;
   date: string;
   tag: string;
   msg: string;
-  /** Optional external link rendered after the message. */
+  /** Optional link rendered after the message (a new tab when external). */
   link?: { label: string; href: string };
   /** Renders as a "coming soon" node: dashed dot, muted text. */
   upcoming?: boolean;
 }[] = [
   {
-    hash: 'focusq0',
-    date: 'soon',
-    tag: 'coming soon',
-    msg: 'focus-quote, a Chrome extension for focus sessions: capture quotes from the web, set a goal, and get AI insights on which tabs were on-goal vs. distractions.',
-    upcoming: true,
+    date: '15 oct 2026',
+    tag: 'build',
+    msg: 'Build Sift: a YouTube companion that saves concept notes, source frames and diagrams to a local notebook. The Chrome extension MVP is implemented',
   },
   {
-    hash: 'a2ui001',
+    date: '11 oct 2026',
+    tag: 'build',
+    msg: 'Keep developing Second Brain, an agent-maintained wiki with a reading queue, feed triage and linked, cited pages',
+    link: { label: 'source', href: 'https://github.com/soundOfff/second-brain' },
+  },
+  {
+    date: '21 sep 2026',
+    tag: 'build',
+    msg: 'Build On-Call: monitoring events become incidents with timelines, escalation policies and responder rotations',
+  },
+  {
+    date: '01 sep 2026',
+    tag: 'build',
+    msg: 'Develop Curation Archive, a visual archive scored by a personal taste model with image deduplication and source provenance',
+  },
+  {
+    hash: '0ade814',
     date: 'jul 2026',
     tag: 'site',
-    msg: 'Replace the router demo with an A2UI conversational portfolio: ask a question, a Claude agent composes the answer as generated UI over a custom renderer.',
+    msg: 'Replace the router demo with a conversational portfolio, where a Claude agent answers in A2UI and a custom renderer draws the answer',
   },
   {
-    hash: 'unglam1',
     date: 'jun 2026',
-    tag: 'writing',
-    msg: 'Publish “The unglamorous middle”: joining my first startup three and a half years in, and learning the real job is the part nobody demos.',
+    tag: 'blog',
+    msg: 'Publish "The unglamorous middle", about joining my first startup three and a half years into my career and finding out the real job was the part nobody demos',
+    link: { label: 'read it', href: '/blog/the-unglamorous-middle' },
   },
   {
-    hash: 'eui010',
     date: 'jun 2026',
     tag: 'oss',
-    msg: 'Publish editorial-ui v0.1.0: the warm-paper, one-amber, hairline design system this site is built on.',
+    msg: 'Publish editorial-ui v0.1.0, the design system this site is built on',
   },
   {
-    hash: 'ship001',
+    hash: 'ead2d68',
     date: 'jun 2026',
     tag: 'site',
-    msg: 'Ship the personal site: Astro shell, editorial-ui design system, router island, Cloudflare Worker deploy.',
+    msg: 'Ship this site: an Astro shell on editorial-ui, the router demo as an island, deployed as a Cloudflare Worker',
   },
   {
-    hash: 'dana100',
     date: 'may 2026',
     tag: 'launch',
-    msg: 'Launch Dana: AI meeting prep that pulls context from calendar, email, and Slack so you walk in already briefed.',
+    msg: 'Launch Dana, AI meeting prep that pulls context from your calendar, email and Slack so you walk into the meeting already briefed',
     link: { label: 'danahq.com', href: 'https://danahq.com/' },
   },
 ];
 
 // 08 · now: spec sheet.
 export const now = [
-  { dt: 'Location', dd: 'Rosario, Argentina · remote-friendly (ART, UTC−3)' },
-  { dt: 'Status', dd: 'Open to senior backend / AI-infra roles & select contract work' },
+  { dt: 'Location', dd: 'Rosario, Argentina. Remote, UTC−3' },
+  { dt: 'Status', dd: 'Open to senior full-stack and AI-product roles, and select contract work' },
   { dt: 'Email', dd: 'tomibrasca97@gmail.com' },
-  { dt: 'Focus', dd: 'LLM routing, evals, cost control; high-traffic backends' },
+  {
+    dt: 'Focus',
+    dd: 'AI features end to end: LLM routing, evals, cost control and high-traffic backends',
+  },
   { dt: 'Reading', dd: 'AI Engineer' },
   { dt: 'Built with', dd: 'Astro · React island · A2UI · editorial-ui · Cloudflare' },
 ] as const;

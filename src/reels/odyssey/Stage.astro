@@ -1,0 +1,373 @@
+---
+/**
+ * Reel 05 · 2001: A Space Odyssey: reel-only markup. Rendered once per point listed in
+ * config.stages; the engine hides it unless this reel is screening.
+ *
+ *   backdrop          the act strip on the left, the star fields
+ *   rail              the console's screen: Rosario's time, the way from Earth to Jupiter
+ *   title             the title card: Sun, Earth and Moon in alignment over "2001"
+ *   in:readme         the sky the hero sits in, and a replay of the alignment
+ *   after:readme      the match cut (bone → station)
+ *   in:playground     the red lens beside the launcher, and the station floor
+ *   after:work        the "Jupiter mission" intertitle
+ *   in:log            the centrifuge drum
+ *   after:log         the intermission
+ *   after:principles  the "Jupiter and beyond the infinite" intertitle, then the star gate
+ *   in:now            the monolith
+ *   credits           end credits over the Earth's limb
+ */
+import type { StagePoint } from '../types';
+import { contact } from '../../data/site';
+
+interface Props {
+  at: StagePoint;
+}
+const { at } = Astro.props;
+
+const mail = contact.find((c) => c.href.startsWith('mailto:'))?.href ?? 'mailto:';
+
+/* Star fields: one seeded set, three box-shadow layers (two twinkle out of
+   phase, one brighter and still). Declared once, used by every sky. */
+let seed = 2001;
+const rnd = () => {
+  seed = (seed * 16807) % 2147483647;
+  return (seed - 1) / 2147483646;
+};
+const layer = (n: number) =>
+  Array.from(
+    { length: n },
+    () =>
+      `${(rnd() * 100).toFixed(1)}vw ${(rnd() * 100).toFixed(1)}vh rgba(255,255,255,${(0.3 + rnd() * 0.7).toFixed(2)})`,
+  ).join(',');
+const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${layer(46)}}:root[data-reel='odyssey'] .od-stars i:nth-child(2){box-shadow:${layer(46)}}:root[data-reel='odyssey'] .od-stars i:nth-child(3){box-shadow:${layer(16)}}`;
+---
+
+{
+  at === 'backdrop' && (
+    <>
+      <style is:inline set:html={sky} />
+      <div class="od-acts" aria-hidden="true">
+        <span class="od-rn" data-a="0">
+          I
+        </span>
+        <span class="od-seg" data-a="1">
+          <i />
+        </span>
+        <span class="od-rn" data-a="1">
+          II
+        </span>
+        <span class="od-seg" data-a="2">
+          <i />
+        </span>
+        <span class="od-rn" data-a="2">
+          III
+        </span>
+        <span class="od-seg" data-a="4">
+          <i />
+        </span>
+        <span class="od-rn" data-a="4">
+          IV
+        </span>
+        <span class="od-an">
+          <span data-a="0">The dawn of man</span>
+          <span data-a="1">TMA-1</span>
+          <span data-a="2">Jupiter mission</span>
+          <span data-a="3">Logic memory center</span>
+          <span data-a="4">Beyond the infinite</span>
+        </span>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'rail' && (
+    <div class="od-scr" aria-hidden="true">
+      <span class="od-lbl">Rosario</span>
+      <span class="od-big" data-od-clock>
+        --:--
+      </span>
+      <span class="od-plot">
+        <span class="od-lbl">Earth</span>
+        <span class="od-gauge">
+          <i />
+        </span>
+        <span class="od-lbl">Jupiter</span>
+      </span>
+    </div>
+  )
+}
+
+{
+  at === 'title' && (
+    <div class="od-title">
+      <div class="od-t-sky" aria-hidden="true">
+        <i class="od-t-sun" />
+        <i class="od-t-flare" />
+        <i class="od-t-earth" />
+        <i class="od-t-moon" />
+      </div>
+      <p class="od-t-n">2001</p>
+      <p class="od-t-s">A space odyssey</p>
+      <span class="od-t-line" />
+      <p class="od-t-c">1968 · Stanley Kubrick · the portfolio of Tomas Brasca</p>
+    </div>
+  )
+}
+
+{
+  at === 'in:readme' && (
+    <>
+      <div class="od-sky" aria-hidden="true">
+        <div class="od-stars">
+          <i />
+          <i />
+          <i />
+        </div>
+        <div class="od-align ra">
+          <span class="od-sunglow" />
+          <span class="od-sun" />
+          <span class="od-flare" />
+          <span class="od-earth" />
+          <span class="od-moon" />
+          <svg
+            class="od-orbital-trace"
+            data-film-find="odyssey"
+            data-find-zone="#readme"
+            viewBox="0 0 900 340"
+            fill="none"
+          >
+            <g class="od-orbit-plane">
+              <ellipse
+                cx="450"
+                cy="170"
+                rx="410"
+                ry="119"
+                stroke="currentColor"
+                stroke-opacity="0.36"
+              />
+              <ellipse
+                cx="450"
+                cy="170"
+                rx="348"
+                ry="90"
+                stroke="currentColor"
+                stroke-opacity="0.14"
+                stroke-dasharray="2 12"
+              />
+              <path
+                d="M30 170h58m724 0h58M450 34v30m0 212v30"
+                stroke="currentColor"
+                stroke-opacity="0.5"
+              />
+              <g transform="translate(450 170) scale(1 .29)">
+                <g class="od-orbit-craft">
+                  <circle cx="410" r="8" fill="#f2e8ca" />
+                  <path d="M383 0h19" stroke="#f2e8ca" stroke-width="3" stroke-linecap="round" />
+                </g>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <p class="od-frame">
+        <button class="od-replay" type="button" data-od-replay>
+          <span aria-hidden="true">↻</span> Replay the alignment
+        </button>
+      </p>
+    </>
+  )
+}
+
+{
+  at === 'after:readme' && (
+    <>
+      <div class="od-mc" data-od-scene="mc" aria-hidden="true">
+        <div class="od-mc-stage">
+          <div class="od-mc-dawn">
+            <svg class="od-landscape" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+              <path
+                d="m0 700 90-51 93 18 67-69 104 25 98-52 110 87 116-34 81 45 120-68 118 50 112-32 87 32 116-62 173 112v300H0Z"
+                fill="#4d322b"
+              />
+              <path
+                d="m0 788 92-34 95 24 71-73 72 17 96-36 89 80 119-20 84 68 98-38 132 31 111-99 121 31 105-55 215 51v265H0Z"
+                fill="#291e1c"
+              />
+              <path
+                d="m0 870 150-43 122 48 75-44 134 53 95-13 135 72 140-68 124 51 100-60 146 20 132-43 247 40v117H0Z"
+                fill="#151515"
+              />
+              <path
+                d="m1130 759 5-262 69-14 18 278Z"
+                fill="#101113"
+                stroke="#5c4b40"
+                stroke-width="1"
+              />
+              <path d="m1204 483 15 8 19 266-16 4Z" fill="#222125" />
+              <path
+                d="m301 865-38-42 13-66 67-22 45 41 2 61-37 38Zm-69 13-57-27-42 11-26 39 67 11Z"
+                fill="#171615"
+              />
+              <path
+                d="m278 759 58 25 52-8m-124 47 57 8 22-48"
+                stroke="#57423a"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+            <i class="od-mc-dust" />
+          </div>
+          <div class="od-mc-space">
+            <div class="od-stars">
+              <i />
+              <i />
+              <i />
+            </div>
+            <span class="od-mc-earth" />
+          </div>
+          <svg class="od-tool" viewBox="0 0 240 48" width="300" height="60">
+            <path d="M35 18c17 2 34 3 53 3l88 1c15 0 24-3 30-9 6-7 16-9 21-3 5 5 3 10-2 14 7 5 7 12 1 15-7 3-12-2-17-5-8-6-17-7-32-6l-88 1c-22 0-40 1-57 4-5 8-13 10-19 4-4-4-2-10 3-13-6-6-5-12 0-15 7-4 15 0 19 9Z" />
+          </svg>
+          <svg class="od-station" viewBox="0 0 240 48" width="300" height="60">
+            <rect x="8" y="21" width="16" height="6" rx="1" />
+            <rect x="22" y="20" width="196" height="8" rx="2" />
+            <rect x="40" y="12" width="14" height="24" rx="2" />
+            <rect class="pan" x="96" y="2" width="30" height="14" />
+            <rect class="pan" x="96" y="32" width="30" height="14" />
+            <rect x="150" y="14" width="10" height="20" rx="2" />
+            <circle cx="222" cy="24" r="7" />
+          </svg>
+        </div>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'in:playground' && (
+    <>
+      <span class="od-deck" aria-hidden="true" />
+      <div class="od-hal" aria-hidden="true">
+        <span class="od-lens">
+          <i class="g" />
+          <i class="h" />
+          <i class="l" />
+        </span>
+        <span class="od-hal-state" data-od-state>
+          Standing by
+        </span>
+        <span class="od-leds">
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'after:work' && (
+    <div class="od-card" aria-hidden="true">
+      <p class="od-cx-t">Jupiter mission</p>
+      <p class="od-cx-s">18 months later</p>
+    </div>
+  )
+}
+
+{at === 'in:log' && <span class="od-ring" aria-hidden="true" />}
+
+{
+  at === 'after:log' && (
+    <div class="od-card od-inter" data-od-zone="int" aria-hidden="true">
+      <p class="od-cx-t">Intermission</p>
+    </div>
+  )
+}
+
+{
+  at === 'after:principles' && (
+    <>
+      <div class="od-card" aria-hidden="true">
+        <p class="od-cx-t">Jupiter and beyond the infinite</p>
+      </div>
+      <div class="od-sg" data-od-scene="sg" aria-hidden="true">
+        <div class="od-sg-stage">
+          <div class="od-sg-pl t">
+            <i />
+            <i />
+          </div>
+          <div class="od-sg-pl b">
+            <i />
+            <i />
+          </div>
+          <span class="od-sg-glow" />
+        </div>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'in:now' && (
+    <div class="od-mono">
+      <div class="od-mono-sky" aria-hidden="true">
+        <i class="s" />
+        <i class="m" />
+      </div>
+      <a class="od-monolith" href={mail} aria-label="Write to Tomas Brasca by email" />
+      <p class="od-mono-cap" aria-hidden="true">
+        Touch the monolith to write
+      </p>
+    </div>
+  )
+}
+
+{
+  at === 'credits' && (
+    <div class="od-credits" data-od-zone="credits">
+      <div class="od-cr-sky" aria-hidden="true">
+        <div class="od-stars">
+          <i />
+          <i />
+          <i />
+        </div>
+        <span class="od-orb" />
+        <span class="od-cearth" />
+      </div>
+      <dl class="od-cr">
+        <div>
+          <dt>A portfolio by</dt>
+          <dd>Tomas Brasca</dd>
+        </div>
+        <div>
+          <dt>After the film</dt>
+          <dd>
+            <span>2001: A Space Odyssey, 1968</span>
+            <span>by Stanley Kubrick and Arthur C. Clarke</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Music after</dt>
+          <dd>
+            <span>Richard Strauss</span>
+            <span>György Ligeti</span>
+            <span>Johann Strauss II</span>
+            <span>Aram Khachaturian</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Performed by</dt>
+          <dd>Your browser, live, with no recordings</dd>
+        </div>
+        <div>
+          <dt>Note</dt>
+          <dd>A fan homage, not affiliated with the film</dd>
+        </div>
+      </dl>
+    </div>
+  )
+}

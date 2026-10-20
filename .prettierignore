@@ -7,3 +7,6 @@ package-lock.json
 # design references — kept verbatim as the source-of-truth prototype
 docs/adr/design
 .claude
+# the keybar is one line on purpose: a whitespace node before its first span
+# prints as a gap after a reel's .keybar::before
+src/components/Keybar.astro

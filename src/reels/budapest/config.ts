@@ -1,0 +1,166 @@
+import type { ReelConfig } from '../types';
+import { tokens } from '../tokens';
+
+/**
+ * Reel 04 · The Grand Budapest Hotel. Three eras of one hotel, one per act,
+ * and the frame changes shape with each: 1932 in Academy ratio, 1968 widened
+ * to scope, 1985 settled at flat widescreen. Everything sits on one centred
+ * axis.
+ *
+ * Contrast (WCAG, against each act's `paper`):
+ *   1932  ink 12.5 · muted 5.5 · accentInk 6.7 · card-ink on card 7.8
+ *   1968  ink 11.2 · muted 5.5 · accentInk 5.6 · card-ink on card 8.6
+ *   1985  ink 13.5 · muted 6.0 · accentInk 7.1 · card-ink on card 6.6
+ * The hotel chrome (key rack, front desk) is plum throughout: rose ink 12.4,
+ * mauve 7.9, gold 6.9.
+ */
+const budapest: ReelConfig = {
+  id: 'budapest',
+  n: '04',
+  title: 'The Grand Budapest Hotel',
+  year: 2014,
+  director: 'Wes Anderson',
+  ratio: '1.37 · 2.35 · 1.85',
+  meta: '2014 · Wes Anderson · 1.37 : 1',
+  bands: [
+    ['#F2C6D0', 3],
+    ['#E8A6B8', 2],
+    ['#5B2A6E', 2],
+    ['#B3262D', 1],
+    ['#F6E9DA', 2],
+    ['#9CC4D8', 1],
+    ['#C9A14A', 1],
+    ['#E8A6B8', 2],
+    ['#7A3B2E', 1],
+    ['#D9822B', 1],
+    ['#8A8F3A', 1],
+    ['#F2C6D0', 2],
+    ['#EDEFF2', 3],
+  ],
+  acts: [
+    {
+      code: '1932',
+      name: 'The golden age',
+      slug: 'Parts 1 to 3 · 1.37 : 1',
+      sections: ['readme', 'playground', 'work'],
+      tokens: tokens({
+        bg: '#F6D7DE',
+        surface: '#FCEFF2',
+        ink: '#2E1430',
+        ink2: '#4A2347',
+        muted: '#6E4B66',
+        line: 'rgba(46,20,48,.18)',
+        line2: 'rgba(46,20,48,.32)',
+        accent: '#B3262D',
+        accentInk: '#8E1B26',
+        accentSoft: '#F4B6C2',
+        onAccent: '#FBEFE6',
+        vars: { card: '#5B2A6E', 'card-ink': '#F6D7DE', 'card-mute': '#E9C9D6' },
+      }),
+    },
+    {
+      code: '1968',
+      name: 'The faded years',
+      slug: 'Parts 4 to 6 · 2.35 : 1',
+      sections: ['oss', 'log', 'writing'],
+      tokens: tokens({
+        bg: '#EED9AE',
+        surface: '#F7EAD0',
+        ink: '#33200F',
+        ink2: '#4D3219',
+        muted: '#6B4F2E',
+        line: 'rgba(51,32,15,.2)',
+        line2: 'rgba(51,32,15,.34)',
+        accent: '#B4541E',
+        accentInk: '#8A3B12',
+        accentSoft: '#E8C48A',
+        onAccent: '#FBEFE6',
+        vars: { card: '#5A3A1E', 'card-ink': '#F7EAD0', 'card-mute': '#E3CFA6' },
+      }),
+    },
+    {
+      code: '1985',
+      name: 'The author',
+      slug: 'Parts 7 to 9 · 1.85 : 1',
+      sections: ['principles', 'stack', 'now'],
+      tokens: tokens({
+        bg: '#DCE6EE',
+        surface: '#EEF3F7',
+        ink: '#241532',
+        ink2: '#3B2A4C',
+        muted: '#5A4F69',
+        line: 'rgba(36,21,50,.18)',
+        line2: 'rgba(36,21,50,.32)',
+        accent: '#A3212B',
+        accentInk: '#8E1B26',
+        accentSoft: '#F2C6D0',
+        onAccent: '#FBEFE6',
+        vars: { card: '#A3212B', 'card-ink': '#FBEFE6', 'card-mute': '#F6D7DE' },
+      }),
+    },
+  ],
+  type: {
+    display: "'Jost Variable', 'Futura', system-ui, sans-serif",
+    body: "'Jost Variable', system-ui, sans-serif",
+    mono: "'Courier Prime', ui-monospace, monospace",
+    title: "'Playfair Display Variable', Georgia, serif",
+  },
+  stages: [
+    'backdrop',
+    'rail',
+    'title',
+    'in:readme',
+    'in:playground',
+    'in:work',
+    'in:oss',
+    'in:log',
+    'in:writing',
+    'in:principles',
+    'in:stack',
+    'in:now',
+    'after:work',
+    'after:writing',
+    'credits',
+  ],
+  layout: { nav: 'keyrack', hero: 'diorama', flow: 'ratios', grid: 'centered' },
+  scroll: [
+    "frame matte closes to each era's aspect ratio as its interlude crosses the screen (1.37 → 2.35 → 1.85)",
+    'funicular car climbs with scroll',
+    'chapter cards open on view, card and foot as one piece; era years resolve',
+    'telegrams stamp in as they arrive',
+    'scroll progress rule on the front desk',
+  ],
+  motifs: [
+    'key rack nav with swinging keys',
+    'whip-pan section jumps: the page smears sideways, the frame stays sharp',
+    'pastel diorama hero with windows that light up, aged and cropped to scope in 1968',
+    'Part chapter cards',
+    "postage-stamp proof metrics, one issue in Mendl's pink",
+    'pastry boxes tied with a ribbon',
+    'switchboard relay agent state',
+    'guest register ledger',
+    'gilded portrait gallery',
+    'telegrams with a received-date stamp',
+    'menu du jour',
+    'house rules',
+    "Mendl's Courtesan au chocolat: three choux, a cocoa bean on top",
+    'registration card',
+    'service bell',
+  ],
+  sound: {
+    score: 'after Alexandre Desplat: balalaika, cimbalom, zither, organ, timpani; E harmonic minor',
+    hover: 'cimbalom, cotton beater, wandering the scale; brass key tink on the rack',
+    click: "the concierge's desk bell, on B",
+    section: 'projector clunk + balalaika tremolo chord over timpani: i, iv, V by era',
+    surface: 'box thud + tissue paper + a zither run to E, a string per component',
+    done: 'balalaika strokes accelerating, i to V, dead stop on E major + handbell',
+    error: 'the hotel organ losing its wind on a sour cluster',
+    signature: 'key ring, whip pan, date stamp, switchboard relay, service bell',
+    title: 'timpani roll into an organ chord, a trembling balalaika over it, dead stop',
+  },
+  credits:
+    'Inspired by The Grand Budapest Hotel, a film by Wes Anderson. Not affiliated with the film or its makers.',
+  announce: 'Screening The Grand Budapest Hotel, 2014',
+};
+
+export default budapest;

@@ -1,0 +1,277 @@
+---
+/**
+ * Reel 01 · Parasite: reel-only markup. Rendered once per point listed in
+ * config.stages; the engine hides it unless this reel is screening.
+ *
+ * The page is a house and scrolling goes down it: the living-room window
+ * (the hero), the stairs in the rain, the semi-basement and its street-level
+ * window, the bunker. Every piece here is scenery (aria-hidden) except the
+ * Morse key, which is a real button, and the end credits, which carry the
+ * homage line.
+ */
+import type { StagePoint } from '../types';
+import parasite from './config';
+import { contact, now, profile } from '../../data/site';
+
+interface Props {
+  at: StagePoint;
+}
+const { at } = Astro.props;
+
+// The credits name the stack straight from the `now` section's spec sheet.
+const builtWith = now.find((s) => s.dt === 'Built with')?.dd;
+// The Morse key's nudge points at the same address as the rail's contact list.
+const mail = contact.find((c) => c.href.startsWith('mailto:'));
+
+const floors = parasite.acts.map((a) => ({ code: a.code, native: a.native, name: a.name }));
+const tools = builtWith?.split(' · ') ?? [];
+
+// The rain: one seeded scatter, so every build draws the same storm.
+let seed = 11;
+const rnd = () => {
+  seed = (seed * 9301 + 49297) % 233280;
+  return seed / 233280;
+};
+const drops = Array.from({ length: 56 }, () => {
+  const left = (rnd() * 100).toFixed(2);
+  const h = Math.round(16 + rnd() * 36);
+  const o = (0.25 + rnd() * 0.6).toFixed(2);
+  const du = (0.5 + rnd() * 0.45).toFixed(2);
+  const de = (rnd() * 1.2).toFixed(2);
+  return `left:${left}%;height:${h}px;opacity:${o};animation-duration:${du}s;animation-delay:-${de}s`;
+});
+---
+
+{at === 'backdrop' && <div class="px-grain" aria-hidden="true" />}
+
+{
+  at === 'rail' && (
+    <p class="px-floor" aria-hidden="true">
+      {floors.map((f, i) => (
+        <span data-floor={i} title={f.name}>
+          {f.code && <b>{f.code}</b>}
+          <span lang="ko">{f.native}</span>
+        </span>
+      ))}
+    </p>
+  )
+}
+
+{
+  at === 'in:readme' && (
+    <>
+      <div class="px-window" aria-hidden="true">
+        <span class="px-sky" />
+        <span class="px-shafts" />
+        <span class="px-hedge" />
+        <span class="px-lawn" />
+        <svg class="px-tree" viewBox="0 0 240 300" fill="none">
+          <defs>
+            <linearGradient
+              id="px-canopy"
+              x1="44"
+              y1="35"
+              x2="190"
+              y2="244"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stop-color="#65765a" />
+              <stop offset="0.48" stop-color="#3d543b" />
+              <stop offset="1" stop-color="#263e2c" />
+            </linearGradient>
+          </defs>
+          <ellipse cx="126" cy="282" rx="86" ry="10" fill="#233a27" opacity="0.18" />
+          <path d="M120 280 124 169 132 130 138 132 132 193 135 280Z" fill="#514c3d" />
+          <path d="m128 224-35-42 3-4 34 29 29-45 4 3-29 61Z" fill="#514c3d" />
+          <path
+            d="M36 157c-12-18-9-39 6-53-7-18 4-37 21-42 1-24 24-37 44-31 16-19 45-16 57 2 23-4 44 13 42 34 22 11 28 37 14 55 13 23 0 48-22 54-8 27-38 38-60 24-20 16-51 12-64-9-24 4-44-11-38-34Z"
+            fill="url(#px-canopy)"
+          />
+          <path
+            d="M47 110c-2-15 9-28 24-31 0-23 24-36 43-27 17-17 40-14 52 0 21-3 40 13 36 32-18-10-31-8-47-2-16-12-34-10-48 1-24-6-42 7-60 27Z"
+            fill="#879174"
+            opacity="0.22"
+          />
+          <path
+            d="M38 153c17 13 34 9 46 0 17 16 43 14 57 3 22 12 47 5 62-9 2 26-23 48-49 45-21 20-54 14-68-4-26 7-47-9-48-35Z"
+            fill="#243e2c"
+            opacity="0.45"
+          />
+        </svg>
+        <span class="px-hidden-floor" data-film-find="parasite" data-find-zone=".px-window">
+          <span class="px-xray-lens">
+            <svg viewBox="0 0 280 190" fill="none">
+              <path
+                d="M15 64h250M15 120h250M22 174h236M30 28h220v146H30Zm81 0v92m66-92v92M30 91h81m66 0h73M75 120v54m126-54v54"
+                stroke="currentColor"
+                stroke-width="1"
+              />
+              <path
+                d="m122 121 8 8h10v8h10v8h10v8h10v8h10v12"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path d="M40 135h23v25H40zm174-57h24v30h-24z" fill="currentColor" opacity="0.14" />
+              <circle cx="91" cy="144" r="5" fill="currentColor" opacity="0.75" />
+              <path d="M86 151h10v17H86Z" fill="currentColor" opacity="0.65" />
+              <path
+                d="M196 142v16m-8-8h16M18 12h15M18 12v15m229-15h15v15M18 165v15h15m229-15v15h-15"
+                stroke="currentColor"
+                opacity="0.5"
+              />
+            </svg>
+            <span class="px-xray-label">
+              B1 <span lang="ko">지하</span>
+            </span>
+          </span>
+        </span>
+        <span class="px-dusk" />
+        <span class="px-glare" />
+        <span class="px-mull">
+          <i />
+          <i />
+          <i />
+          <i class="px-transom" />
+        </span>
+        <span class="px-kr" lang="ko">
+          기생충
+        </span>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'after:log' && (
+    <div class="px-rain" data-px-rain aria-hidden="true">
+      <div class="px-rainbox">
+        {drops.map((style) => (
+          <i class="px-drop" style={style} />
+        ))}
+      </div>
+      <div class="px-water" />
+      <p class="px-il">
+        Ki-taek and the kids run home in the rain, downhill all the way. The water gets there first.
+      </p>
+    </div>
+  )
+}
+
+{
+  at === 'in:writing' && (
+    <>
+      <div class="px-strip" data-px-strip aria-hidden="true">
+        <span class="px-fog" />
+        <span class="px-mull">
+          <i />
+          <i />
+          <i />
+        </span>
+      </div>
+      <div class="px-smoke" aria-hidden="true" />
+    </>
+  )
+}
+
+{
+  at === 'in:now' && (
+    <div class="px-bulb" aria-hidden="true">
+      <span class="px-glow" />
+      <span class="px-cord" />
+      <span class="px-glass" />
+    </div>
+  )
+}
+
+{
+  at === 'after:now' && (
+    <div class="px-bunker">
+      <div class="px-morse" data-px-morse>
+        <button
+          class="px-key"
+          type="button"
+          data-px-key
+          aria-label="Morse key"
+          aria-describedby="px-morse-hint"
+        >
+          <span class="px-plate" />
+        </button>
+        <div class="px-mread">
+          <p class="px-mk">Signal upstairs.</p>
+          <p class="px-mhint">
+            <span id="px-morse-hint">Tap for a dot, hold for a dash.</span>
+            <button class="px-lnk" type="button" data-px-send>
+              send "RESPECT"
+            </button>
+          </p>
+          <p class="px-msym" data-px-msym aria-hidden="true" />
+          <p class="px-mtxt" data-px-mtxt aria-live="polite" />
+        </div>
+        <p class="px-mdone" data-px-mdone hidden>
+          Seen upstairs.{' '}
+          {mail && (
+            <>
+              To say it in words, write to <a href={mail.href}>{mail.label}</a>.
+            </>
+          )}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+{
+  at === 'credits' && (
+    <aside class="px-credits" aria-label="End credits">
+      <p class="px-end" lang="ko" aria-hidden="true">
+        끝
+      </p>
+      <dl class="px-cr">
+        <div>
+          <dt>A portfolio by</dt>
+          <dd>
+            <span class="px-nw">{profile.name}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>After</dt>
+          <dd>
+            <span class="px-nw">
+              Parasite (<span lang="ko">기생충</span>),
+            </span>{' '}
+            <span class="px-nw">Bong Joon-ho,</span> 2019
+          </dd>
+        </div>
+        {tools.length > 0 && (
+          <div>
+            <dt>Built with</dt>
+            <dd>
+              {tools.map((t, i) => (
+                <>
+                  <span class="px-nw">{i < tools.length - 1 ? `${t},` : t}</span>{' '}
+                </>
+              ))}
+            </dd>
+          </div>
+        )}
+      </dl>
+      <p class="px-legal">
+        A fan homage. Not affiliated with <span class="px-nw">Bong Joon-ho</span>,{' '}
+        <span class="px-nw">Barunson E&amp;A</span> or <span class="px-nw">CJ ENM</span>.
+      </p>
+    </aside>
+  )
+}
+
+{
+  at === 'title' && (
+    <div class="px-title">
+      <div class="px-title-ko" lang="ko">
+        기생충
+        <span class="px-title-bar" />
+      </div>
+      <div class="px-title-en">Parasite</div>
+      <div class="px-title-sub">2019 · Bong Joon-ho · the portfolio of Tomas Brasca</div>
+    </div>
+  )
+}

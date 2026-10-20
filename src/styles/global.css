@@ -20,6 +20,12 @@
     'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
+/* editorial-ui's light --muted (#807A6F) is 4.1:1 on paper and 3.5:1 on
+   paper-3. This one holds 4.5:1 on all three grounds; dark mode keeps its own. */
+:root {
+  --muted: #6e685e;
+}
+
 /* ---- 2. base ---- */
 *,
 *::before,
@@ -57,10 +63,25 @@ a {
   color: var(--ink);
 }
 
+/* The keyboard focus ring: a paper-coloured gap, then the amber, so it reads
+   on any ground. Built from tokens, so it follows dark mode and each film's
+   act palette. */
+:root {
+  --focus-ring: 0 0 0 2px var(--paper), 0 0 0 4px var(--amber-deep);
+}
+
 :focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
   border-radius: var(--radius-control);
+}
+
+/* Forced colours (Windows high contrast) drop box-shadows: keep a real outline. */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
 }
 
 /* ---- 3. reduced motion: kill the pulse + route spinner ---- */
@@ -174,7 +195,7 @@ a {
 .railnav a .nx {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--muted-2);
+  color: var(--muted);
   width: 18px;
 }
 .railnav a:hover,
@@ -185,10 +206,10 @@ a {
 
 .rail-sec {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   margin-bottom: 6px;
 }
 .contact {
@@ -224,10 +245,10 @@ a {
 }
 .rail-foot .mono {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 
 /* ── content column ── */
@@ -254,6 +275,9 @@ a {
 .keybar b {
   color: var(--amber-deep);
   font-weight: 600;
+}
+.keybar .kb-d::before {
+  content: ' · ' / '';
 }
 .keybar a {
   text-decoration: underline;
@@ -340,9 +364,10 @@ a {
   text-transform: uppercase;
   color: var(--muted);
   margin-top: 5px;
-  /* labels cap at two lines; longer ones truncate rather than stretch the row */
+  /* three lines is what a film's narrow plaque needs for "South America finalist";
+     anything longer truncates rather than stretch the row */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -377,6 +402,12 @@ a {
 .console-bar .lights {
   display: inline-flex;
   gap: 5px;
+}
+/* On House lights the launcher's three dots would be traffic lights with
+   nothing behind them (the panel's are real buttons). The markup stays
+   because the films draw their own props in it. */
+:root[data-reel='house'] .a2-launch .lights {
+  display: none;
 }
 .console-bar .lights i {
   width: 9px;
@@ -444,7 +475,7 @@ a {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 .a2-launch .a2-starters,
 .a2-launch .live-note {
@@ -687,7 +718,7 @@ a {
   font-size: 10.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   transition: color 0.12s;
 }
 .a2-peek > summary::-webkit-details-marker {
@@ -753,7 +784,7 @@ a {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 
 /* ── composer ── */
@@ -801,7 +832,7 @@ a {
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   padding-top: 6px;
 }
 .a2-starter-group .a2-starters {
@@ -822,7 +853,7 @@ a {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--muted-2);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 .a2-quota.is-spent {
@@ -1623,9 +1654,6 @@ a.a2-post:hover .a2-post-t {
   opacity: 0.4;
   animation: ping 2.4s ease-out infinite;
 }
-.logitem.upcoming .hash {
-  color: var(--muted-2);
-}
 .logitem.upcoming .msg {
   color: var(--muted);
   font-style: italic;
@@ -1657,10 +1685,14 @@ a.a2-post:hover .a2-post-t {
   font-size: 10.5px;
   color: var(--amber-deep);
 }
+a.hash:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .logitem .date {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 .logitem .tag {
   font-family: var(--font-mono);
@@ -1684,6 +1716,9 @@ a.a2-post:hover .a2-post-t {
 }
 .logitem .msg a:hover {
   text-decoration: underline;
+}
+.logitem .msg .sep {
+  color: var(--muted);
 }
 
 /* ============================================================
@@ -1723,7 +1758,7 @@ a.a2-post:hover .a2-post-t {
 .wrow .rt {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--muted-2);
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -1767,10 +1802,10 @@ a.a2-post:hover .a2-post-t {
 }
 .toolcol .h {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   margin-bottom: 12px;
 }
 .toolcol ul {
@@ -1788,11 +1823,6 @@ a.a2-post:hover .a2-post-t {
   display: flex;
   align-items: center;
   gap: 9px;
-}
-.toolcol li::before {
-  content: '$';
-  color: var(--amber-deep);
-  font-size: 11px;
 }
 
 /* ============================================================
@@ -2360,12 +2390,6 @@ a.a2-post:hover .a2-post-t {
     grid-template-columns: 1fr;
     gap: 18px;
   }
-  .toolcol {
-    text-align: center;
-  }
-  .toolcol li {
-    justify-content: center;
-  }
 
   /* metrics: a tidy 2-up grid; an odd last card spans the full width so the
      strip never leaves a lone stretched cell */
@@ -2425,4 +2449,24 @@ a.a2-post:hover .a2-post-t {
     grid-template-columns: 1fr;
     gap: 3px;
   }
+}
+
+/* The shared identity is just the name in every film. */
+.rail .id {
+  width: fit-content;
+  color: inherit;
+  text-decoration: none;
+}
+.repo .repo-visibility {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.repo .meta {
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+article.repo {
+  cursor: default;
 }

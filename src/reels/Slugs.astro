@@ -1,0 +1,22 @@
+---
+/** Each reel's slug for one section, inside that section's keybar. */
+import type { SectionId } from './types';
+import { REELS } from './registry';
+
+interface Props {
+  sec: SectionId;
+}
+const { sec } = Astro.props;
+const slugs = REELS.flatMap((r) => {
+  const slug = r.sections?.[sec]?.slug;
+  return slug ? [{ id: r.id, slug }] : [];
+});
+---
+
+{
+  slugs.map((s) => (
+    <span class="reel-slug" data-for={s.id}>
+      {s.slug}
+    </span>
+  ))
+}

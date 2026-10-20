@@ -1,0 +1,1244 @@
+/* Five graphic compositions. Native scroll, vector geometry, no raster enlargement. */
+html:root[data-reel]:not([data-reel='house']) .content #readme {
+  display: block;
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  padding: 0 0 100px;
+  border: 0;
+  min-height: 0;
+  text-align: left;
+}
+:where(html[data-reel]:not([data-reel='house'])) .cinema-opening {
+  --camera-top: 0px;
+  --camera-bottom: 0px;
+  display: block;
+  position: relative;
+  height: 210svh;
+  background: oklch(10% 0.008 230);
+}
+html:root[data-reel]:not([data-reel='house']) .cinema-opening {
+  display: block;
+}
+.camera-pin {
+  position: sticky;
+  top: var(--camera-top);
+  height: calc(100svh - var(--camera-top) - var(--camera-bottom));
+  min-height: 420px;
+  overflow: clip;
+  isolation: isolate;
+}
+.camera-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.opening-scene {
+  --shot-p: 0;
+  --shot-a: 0;
+  --shot-b: 0;
+  --shot-cut: 0;
+  position: absolute;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+  text-align: left;
+}
+html[data-reel='parasite'] [data-opening='parasite'],
+html[data-reel='mood'] [data-opening='mood'],
+html[data-reel='br2049'] [data-opening='br2049'],
+html[data-reel='budapest'] [data-opening='budapest'],
+html[data-reel='odyssey'] [data-opening='odyssey'] {
+  display: block;
+}
+.opening-scene h1 {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+}
+.opening-scene p {
+  margin: 0;
+}
+.opening-scene svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.shot-kicker {
+  font: 400 10px/1.5 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.camera-scroll {
+  position: absolute;
+  z-index: 8;
+  left: 28px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font: 400 9px/1.4 var(--font-mono);
+  letter-spacing: 0.12em;
+  color: var(--shot-hint, #c8c7b8);
+  opacity: var(--scroll-hint, 1);
+}
+.camera-scroll > span {
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+}
+.camera-progress {
+  position: absolute;
+  z-index: 8;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgb(150 150 130 / 0.16);
+}
+.camera-progress > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--shot-hint, #c8c7b8);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* Parasite: an architectural section, read vertically through three floors. */
+html[data-reel='parasite'] .cinema-opening {
+  height: 235svh;
+  --shot-hint: #a1ae98;
+}
+.opening-parasite {
+  background: #e9e8de;
+  color: #263128;
+}
+.ps-underground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 72%;
+  height: 130%;
+  background: #14241e;
+  transform: translateY(calc(var(--shot-p) * -42svh));
+}
+.ps-copy {
+  position: absolute;
+  z-index: 2;
+  left: 8%;
+  top: 18%;
+  opacity: calc(1 - var(--shot-a));
+  transform: translateY(calc(var(--shot-a) * -45px));
+}
+.ps-copy h1 {
+  font: 600 clamp(68px, 8vw, 134px)/0.94 var(--font-display);
+  letter-spacing: -0.065em;
+  margin: 28px 0;
+}
+.ps-copy h1 em {
+  font-style: normal;
+}
+.ps-note {
+  font: 400 13px/1.7 var(--font-sans);
+  color: #5f6857;
+}
+.ps-drawing {
+  position: absolute;
+  top: 5%;
+  right: -9%;
+  width: 65%;
+  height: 155%;
+  color: #7e8d75;
+  transform: translateY(calc(var(--shot-p) * -32%));
+}
+.ps-drawing svg {
+  height: auto;
+}
+.ps-native {
+  position: absolute;
+  right: 6%;
+  top: 6%;
+  font: 400 24px/1.4 var(--font-title);
+  letter-spacing: 0.3em;
+  opacity: calc(1 - var(--shot-a));
+}
+.ps-below {
+  position: absolute;
+  z-index: 2;
+  left: 8%;
+  bottom: 22%;
+  font: 500 clamp(40px, 5vw, 80px)/1.04 var(--font-display);
+  color: #d9dfca;
+  letter-spacing: -0.045em;
+  opacity: var(--shot-b);
+  transform: translateY(calc((1 - var(--shot-b)) * 25px));
+}
+
+/* Mood: an oblique, obstructed view. The foreground moves faster than the glass. */
+html[data-reel='mood'] .cinema-opening {
+  --camera-top: var(--mood-strip);
+  height: 185svh;
+}
+html[data-reel='mood'][data-sec='0'] .mood-clock {
+  visibility: hidden;
+}
+.opening-mood {
+  color: #eee0bf;
+  background: #111d1a;
+}
+.opening-mood::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 68% 52%, #36422d, transparent 52%),
+    repeating-linear-gradient(75deg, transparent 0 50px, rgb(222 190 124 / 0.025) 50px 51px);
+}
+.mk-aperture {
+  position: absolute;
+  top: 8%;
+  bottom: 9%;
+  right: 9%;
+  width: 41%;
+  background: #2b2920;
+  border: 7px solid #291d15;
+  box-shadow: 0 0 0 1px #65543a;
+  overflow: hidden;
+  transform: translateX(calc(var(--shot-p) * -36px));
+}
+.mk-reflection {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, #1d3028 15%, #383529 55%, #141a17);
+}
+.mk-reflection > span {
+  position: absolute;
+  display: block;
+}
+.mk-reflection > span:nth-child(1) {
+  width: 70%;
+  height: 60%;
+  right: -25%;
+  top: 8%;
+  background: radial-gradient(ellipse, #d6963d 0%, #6c5028 28%, transparent 65%);
+}
+.mk-reflection > span:nth-child(2) {
+  width: 60%;
+  height: 80%;
+  left: -16%;
+  top: 40%;
+  background: radial-gradient(ellipse, #7c2621, transparent 65%);
+}
+.mk-reflection > span:nth-child(3) {
+  width: 8px;
+  height: 140%;
+  top: -20%;
+  right: 27%;
+  background: linear-gradient(90deg, transparent, #b79a63, transparent);
+  transform: rotate(-9deg);
+  opacity: 0.3;
+}
+.mk-lettering {
+  position: absolute;
+  top: 9%;
+  right: 13%;
+  writing-mode: vertical-rl;
+  font: 500 clamp(50px, 7vw, 110px)/1 var(--font-title);
+  letter-spacing: 0.16em;
+  color: #9f382b;
+  text-shadow: 1px 1px 0 #d2a253;
+  transform: translateY(calc(var(--shot-p) * -50px));
+}
+.mk-rain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+}
+.mk-mullion {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 26%;
+  width: 9px;
+  background: #1b2119;
+  box-shadow: 1px 0 0 #857045;
+}
+.mk-copy {
+  position: absolute;
+  z-index: 3;
+  left: 13%;
+  top: 29%;
+  opacity: calc(1 - var(--shot-b));
+  transform: translateX(calc(var(--shot-p) * -40px));
+}
+.mk-copy h1 {
+  margin: 30px 0;
+  font: 400 clamp(60px, 6.8vw, 112px)/1.04 var(--font-display);
+  letter-spacing: -0.03em;
+}
+.mk-copy h1 em {
+  color: #d4ad65;
+  font-weight: 400;
+}
+.mk-note {
+  font: italic 400 16px/1.7 var(--font-sans);
+  color: #b8ac8a;
+}
+.mk-screen {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  pointer-events: none;
+  transform: translateX(calc(var(--shot-p) * -19vw));
+}
+.mk-screen > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: block;
+  background: linear-gradient(90deg, #100e0b, #2c1b12 85%, #70502c);
+  box-shadow: 10px 0 25px rgb(4 9 6 / 0.35);
+}
+.mk-screen > span:nth-child(1) {
+  left: 0;
+  width: 7%;
+}
+.mk-screen > span:nth-child(2) {
+  left: 48%;
+  width: 3.2%;
+}
+.mk-screen > span:nth-child(3) {
+  right: 0;
+  width: 3%;
+}
+.mk-after {
+  position: absolute;
+  z-index: 3;
+  top: 42%;
+  left: 48%;
+  font: 400 clamp(38px, 4vw, 66px)/1.15 var(--font-display);
+  color: #e8d6ac;
+  opacity: var(--shot-b);
+  transform: translateX(calc((1 - var(--shot-b)) * 40px));
+}
+.mk-after em {
+  color: #d2a258;
+}
+.mk-rule {
+  position: absolute;
+  left: 13%;
+  bottom: 14%;
+  width: 80px;
+  height: 1px;
+  background: #aa8a4b;
+  opacity: 0.6;
+}
+
+/* Blade Runner: a macro iris scan, then a graphic cut to the routing principle. */
+html[data-reel='br2049'] .cinema-opening {
+  --camera-bottom: 64px;
+  height: 195svh;
+}
+.opening-blade {
+  color: #d1d7c9;
+  background: #09151a;
+}
+.bk-macro {
+  position: absolute;
+  inset: 0;
+  opacity: calc(1 - var(--shot-cut));
+}
+.bk-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.bk-copy .shot-kicker {
+  position: absolute;
+  left: 8%;
+  top: 12%;
+}
+.bk-copy h1 {
+  position: absolute;
+  inset: 0;
+  font: 700 clamp(86px, 10vw, 170px)/0.88 var(--font-display);
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+}
+.bk-copy h1 > span {
+  position: absolute;
+  top: 21%;
+  left: 8%;
+}
+.bk-copy h1 > em {
+  position: absolute;
+  bottom: 15%;
+  right: 8%;
+}
+.bk-copy h1 em {
+  font-style: normal;
+  color: #cc9a61;
+}
+.bk-note {
+  position: absolute;
+  left: 8%;
+  bottom: 7%;
+  font: 400 12px/1.6 var(--font-mono);
+  color: #849c91;
+}
+.bk-eye {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 95vw;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(calc(var(--shot-a) * 12deg));
+}
+.bk-eye svg {
+  width: 100%;
+  height: 100%;
+}
+.bk-scan {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 18%;
+  height: 1px;
+  background: #afdbb5;
+  opacity: 0.5;
+  box-shadow: 0 0 12px 1px #a8d09d;
+  transform: translateY(calc(var(--shot-a) * 520px));
+}
+.bk-cut {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #d28a4a;
+  color: #251d17;
+  opacity: var(--shot-cut);
+}
+.bk-cut > p {
+  position: absolute;
+  left: 9%;
+  top: 26%;
+  font: 800 clamp(80px, 10vw, 176px)/0.88 var(--font-display);
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  transform: translateY(calc((1 - var(--shot-b)) * 30px));
+}
+.bk-cut > p em {
+  font-style: normal;
+}
+.bk-solar {
+  position: absolute;
+  right: -8%;
+  top: -25%;
+  width: 64%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgb(65 41 22 / 0.2);
+  background: radial-gradient(circle at 60% 40%, #dfaa67, #c5773d 65%, #a25731);
+}
+.bk-providers {
+  position: absolute;
+  left: 9%;
+  bottom: 16%;
+  font: 400 11px/1.5 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Budapest: an overhead still life. The camera holds; the correspondence opens out. */
+html[data-reel='budapest'] .cinema-opening {
+  --camera-top: var(--gb-top);
+  --camera-bottom: var(--gb-desk);
+  --shot-hint: #6f4652;
+  height: 175svh;
+}
+html[data-reel='budapest'][data-sec='0'] .gb-matte {
+  display: none;
+}
+.opening-budapest {
+  background: #dcc0c5;
+  color: #522f41;
+}
+.opening-budapest::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgb(100 58 76 / 0.025) 3px 4px);
+}
+.gk-heading {
+  position: absolute;
+  top: 8%;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+.gk-heading h1 {
+  margin: 18px 0 0;
+  font: 500 clamp(40px, 4.6vw, 72px)/1.03 var(--font-title);
+  letter-spacing: -0.035em;
+}
+.gk-heading h1 em {
+  font-weight: 400;
+}
+.gk-desk {
+  position: absolute;
+  inset: 0;
+}
+.gk-envelope {
+  position: absolute;
+  left: 16%;
+  top: 51%;
+  width: 290px;
+  height: 200px;
+  background: #bb9b9c;
+  border: 1px solid #a68188;
+  box-shadow: 0 14px 24px -14px #8f6b73;
+  transform: rotate(calc(-16deg + var(--shot-p) * 9deg))
+    translate(calc(var(--shot-p) * -80px), calc(var(--shot-p) * 24px));
+}
+.gk-envelope-seam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 62%;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  background: #c5a7a6;
+}
+.gk-seal {
+  position: absolute;
+  left: calc(50% - 21px);
+  top: 46%;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #7c3e4e;
+  box-shadow:
+    inset 0 0 0 3px #8a4b5d,
+    0 2px 3px #946972;
+  display: grid;
+  place-items: center;
+  font: italic 500 17px var(--font-title);
+  color: #c89b9e;
+}
+.gk-envelope > p {
+  position: absolute;
+  left: 25px;
+  bottom: 22px;
+  font: 400 8px/1.6 var(--font-mono);
+  letter-spacing: 0.15em;
+}
+.gk-register {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  width: min(610px, 63%);
+  padding: 23px 28px 18px;
+  background: #efe6d2;
+  border: 1px solid #cfbda2;
+  box-shadow: 0 18px 30px -15px rgb(76 42 56 / 0.32);
+  transform: translate(-50%, -50%) rotate(calc(-4deg + var(--shot-p) * 7deg))
+    translateY(calc(var(--shot-p) * -28px));
+}
+.gk-register::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid #cdb896;
+  pointer-events: none;
+}
+.gk-register-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #c4aa88;
+  font: 400 9px/1.4 var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.gk-register-body {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 12px;
+  padding: 16px 0 12px;
+}
+.gk-index {
+  padding: 14px 0 0 8px;
+}
+.gk-index-kicker {
+  font: 400 8px/1.4 var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.gk-index > p {
+  margin-top: 16px;
+  font: 400 19px/1.2 var(--font-title);
+}
+.gk-index > p > span {
+  display: inline-block;
+  width: 25px;
+  color: #9c7b68;
+  font: 400 8px var(--font-mono);
+  vertical-align: middle;
+}
+.gk-index > i {
+  display: block;
+  width: 24px;
+  height: 1px;
+  margin: 23px 0 12px;
+  background: #bda487;
+}
+.gk-index > small {
+  font: italic 400 11px/1.6 var(--font-title);
+  color: #8a685e;
+}
+.gk-hotel {
+  max-height: 245px;
+  color: #94665b;
+}
+.gk-register-foot {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #c4aa88;
+  padding-top: 10px;
+  font: 400 8px/1.4 var(--font-mono);
+  letter-spacing: 0.04em;
+}
+.gk-key {
+  position: absolute;
+  right: 18%;
+  top: 42%;
+  width: 90px !important;
+  height: 250px !important;
+  filter: drop-shadow(4px 9px 4px rgb(76 42 56 / 0.25));
+  transform: rotate(calc(22deg - var(--shot-p) * 44deg)) translateX(calc(var(--shot-p) * 36px));
+}
+
+/* Odyssey: HAL's close-up becomes an eclipse, then the orbital plane rolls. */
+html[data-reel='odyssey'] .cinema-opening {
+  height: 225svh;
+}
+.opening-odyssey {
+  background: #0a0e11;
+  color: #e4e4da;
+}
+.ok-first {
+  position: absolute;
+  inset: 0;
+  opacity: calc(1 - var(--shot-cut));
+}
+.ok-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.ok-copy .shot-kicker {
+  position: absolute;
+  top: 11%;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+.ok-copy h1 {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: 10%;
+  text-align: center;
+  font: 300 clamp(46px, 5.2vw, 82px)/1.08 var(--font-sans);
+  letter-spacing: -0.045em;
+}
+.ok-copy h1 em {
+  font-style: normal;
+  color: #ce5441;
+}
+.ok-hal {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  bottom: 25%;
+  width: min(300px, 30%);
+  background: linear-gradient(100deg, #242b2d, #1b2227 40%, #11191d);
+  border: 1px solid #454c4c;
+  box-shadow:
+    inset 0 0 0 6px #1a2226,
+    0 20px 60px -35px #03070b;
+  transform: translate(-50%, calc(var(--shot-p) * -30px));
+}
+.ok-hal-label {
+  position: absolute;
+  top: 5%;
+  left: 8%;
+  right: 8%;
+  padding: 8px 13px;
+  background: #131a22;
+  color: #c5d7db;
+  font: 400 clamp(13px, 1.7vw, 23px)/1 var(--font-display);
+  letter-spacing: 0.08em;
+}
+.ok-hal-label > span {
+  float: right;
+  font: 400 10px var(--font-sans);
+  letter-spacing: 0.12em;
+  padding-top: 5px;
+}
+.ok-hal > svg {
+  position: absolute;
+  top: 16%;
+  width: 100%;
+  height: auto;
+}
+.ok-speaker {
+  position: absolute;
+  left: 13%;
+  right: 13%;
+  bottom: 8%;
+  height: 14%;
+  border-radius: 2px;
+  border: 1px solid #3d4546;
+  background:
+    radial-gradient(circle, #080f15 1px, transparent 1.2px) 0 0/4px 4px,
+    #283033;
+}
+.ok-orbit {
+  position: absolute;
+  inset: 0;
+  background: #090d10;
+  opacity: var(--shot-cut);
+  overflow: hidden;
+}
+.ok-stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0.6;
+}
+.ok-alignment {
+  position: absolute;
+  inset: 0;
+  transform: rotate(calc(var(--shot-b) * 22deg));
+  transform-origin: 60% 70%;
+}
+.ok-sun {
+  position: absolute;
+  left: calc(50% - 35px);
+  top: 44%;
+  width: 70px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #e2d7ad;
+  box-shadow:
+    0 0 24px 5px rgb(225 204 137 / 0.3),
+    0 0 100px 25px rgb(225 204 137 / 0.07);
+}
+.ok-moon {
+  position: absolute;
+  left: calc(50% - 59px);
+  top: calc(44% - 20px);
+  width: 118px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #0c1218;
+  box-shadow: inset 1px 2px 0 #596d7e;
+  transform: translate(calc(var(--shot-b) * -48px), calc(var(--shot-b) * -34px));
+}
+.ok-earth {
+  position: absolute;
+  left: 16%;
+  top: 72%;
+  width: 105%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 49% 0%, #122a3b, #0b121b 35%, #080d12 55%);
+  box-shadow:
+    0 -1px 0 #7f9da7,
+    0 -7px 30px -12px #789bad;
+}
+.ok-orbits {
+  position: absolute;
+  left: 17%;
+  top: 15%;
+  width: 96% !important;
+  height: 80% !important;
+  transform: rotate(-18deg);
+}
+.ok-orbit > p {
+  position: absolute;
+  left: 10%;
+  top: 22%;
+  font: 300 clamp(52px, 6.5vw, 108px)/1.06 var(--font-sans);
+  letter-spacing: -0.045em;
+}
+.ok-orbit > p em {
+  font-style: normal;
+  color: #b1bdc7;
+}
+
+/* Compositing is enabled only while this film's opening is in view. */
+.is-camera-live
+  :is(
+    .ps-drawing,
+    .ps-underground,
+    .mk-screen,
+    .mk-aperture,
+    .bk-eye,
+    .gk-register,
+    .gk-key,
+    .ok-alignment
+  ) {
+  will-change: transform;
+}
+/* The opening releases into the actual portfolio, with no second decorative interlude. */
+html:root[data-reel]:not([data-reel='house'])
+  .content
+  #readme
+  > :is(.keybar, .lede, .sub, .metrics) {
+  position: relative;
+  inset: auto;
+  transform: none;
+  width: auto;
+  max-width: min(1050px, 80%);
+  margin-inline: auto;
+  color: var(--ink);
+  text-align: left;
+}
+html:root[data-reel]:not([data-reel='house']) #readme > .keybar {
+  padding: 90px 0 0;
+  margin-block: 0 26px;
+}
+html:root[data-reel]:not([data-reel='house']) #readme::before,
+html:root[data-reel]:not([data-reel='house']) #readme::after,
+html:root[data-reel]:not([data-reel='house']) #readme > .keybar::before,
+html:root[data-reel]:not([data-reel='house']) #readme > .keybar::after {
+  display: none;
+}
+html:root[data-reel]:not([data-reel='house']) .content #readme > .lede {
+  font: 500 clamp(34px, 4.2vw, 64px)/1.1 var(--font-display);
+  letter-spacing: -0.035em;
+  margin-block: 0 30px;
+  text-wrap: balance;
+}
+html:root[data-reel]:not([data-reel='house']) #readme > .sub {
+  font: 400 16px/1.75 var(--font-sans);
+  margin-block: 0 46px;
+  max-width: min(700px, 80%);
+  margin-left: max(10%, calc((100% - 1050px) / 2));
+  color: var(--ink-2);
+}
+html:root[data-reel]:not([data-reel='house']) .content #readme > .metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px 42px;
+  padding: 25px 0 0;
+  margin-block: 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+html:root[data-reel]:not([data-reel='house']) #readme .metrics .m {
+  display: block;
+  position: static;
+  flex: 1 1 100px;
+  width: auto;
+  min-width: 90px;
+  height: auto;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: none;
+  transform: none;
+  text-align: left;
+}
+html:root[data-reel]:not([data-reel='house']) #readme .metrics .v {
+  font: 500 25px/1.15 var(--font-display);
+  color: var(--ink);
+  text-shadow: none;
+  letter-spacing: -0.02em;
+}
+html:root[data-reel]:not([data-reel='house']) #readme .metrics .k {
+  display: block;
+  font: 400 10px/1.5 var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 7px;
+  color: var(--muted);
+}
+
+/* The ship console steps aside for the opening frame. All navigation remains available. */
+@media (min-width: 901px) {
+  html:root[data-reel='odyssey'][data-sec='0'] {
+    .rail {
+      left: 28px;
+      right: 28px;
+      top: 22px;
+      bottom: auto;
+      width: auto;
+      height: 38px;
+      padding: 0;
+      flex-direction: row;
+      align-items: center;
+      gap: 24px;
+      background: transparent;
+      color: oklch(94% 0.023 85);
+      border-radius: 0;
+      box-shadow: none;
+      overflow: visible;
+    }
+    .rail .id {
+      order: 0;
+    }
+    .rail .id .nm {
+      color: oklch(94% 0.023 85);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+    .rail .od-scr,
+    .rail .contact-wrap,
+    .rail-foot > .mono,
+    .reelpick .rail-sec,
+    .reelpick .reel-label,
+    .reelpick .boxoffice-open {
+      display: none;
+    }
+    .railnav {
+      order: 1;
+      display: flex;
+      flex-direction: row;
+      gap: 18px;
+    }
+    .railnav a {
+      display: block;
+      flex: none;
+      width: auto;
+      padding: 5px 0;
+      font: 400 9px/1.4 var(--font-sans);
+      color: oklch(80% 0.01 95);
+      white-space: nowrap;
+    }
+    .railnav a:is(:nth-child(2), :nth-child(5), :nth-child(7), :nth-child(8)) {
+      display: none;
+    }
+    .railnav a .nx,
+    .railnav a::before {
+      display: none;
+    }
+    .railnav a[aria-current='true'] {
+      background: transparent;
+      color: oklch(96% 0.02 90);
+    }
+    .reelpick {
+      order: 2;
+      margin: 0 0 0 auto;
+    }
+    .reels {
+      display: flex;
+      gap: 6px;
+    }
+    .reel {
+      width: 23px;
+      height: 25px;
+    }
+    .rail-foot {
+      order: 3;
+      margin: 0;
+    }
+    .snd {
+      color: oklch(90% 0.02 90);
+      background: transparent;
+      border-color: oklch(90% 0.02 90 / 0.25);
+    }
+    .camera-copy {
+      right: 10%;
+    }
+    .camera-caption {
+      top: auto;
+      bottom: 26px;
+      right: 28px;
+      left: auto;
+    }
+    .camera-film {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .ps-copy {
+    left: 7%;
+    top: 20%;
+  }
+  .ps-copy h1 {
+    font-size: clamp(64px, 8vw, 96px);
+  }
+  .mk-copy {
+    left: 12%;
+    top: 27%;
+  }
+  .mk-copy h1 {
+    font-size: clamp(48px, 7vw, 80px);
+  }
+  .gk-register {
+    width: 68%;
+  }
+  .gk-key {
+    right: 13%;
+  }
+  .ok-copy {
+    inset: 0;
+  }
+  .ok-copy h1 {
+    font-size: clamp(44px, 6vw, 74px);
+  }
+  .ok-hal {
+    width: 30%;
+  }
+}
+@media (max-width: 700px) {
+  html:root[data-reel]:not([data-reel='house']) .cinema-opening {
+    height: 170svh;
+  }
+  .camera-pin {
+    min-height: 420px;
+  }
+  .shot-kicker {
+    font-size: 8px;
+    letter-spacing: 0.08em;
+  }
+  .camera-scroll {
+    left: 20px;
+    bottom: 20px;
+  }
+  .ps-copy {
+    top: 15%;
+    left: 7%;
+  }
+  .ps-copy h1 {
+    font-size: clamp(58px, 14vw, 90px);
+  }
+  .ps-note {
+    font-size: 11px;
+  }
+  .ps-drawing {
+    top: 30%;
+    right: -23%;
+    width: 88%;
+    height: 160%;
+  }
+  .ps-underground {
+    top: 78%;
+  }
+  .ps-native {
+    right: 7%;
+    top: 12%;
+    font-size: 25px;
+  }
+  .ps-below {
+    font-size: 42px;
+    left: 7%;
+    bottom: 24%;
+  }
+  .mk-copy {
+    left: 12%;
+    top: 21%;
+  }
+  .mk-copy h1 {
+    font-size: clamp(48px, 12vw, 78px);
+  }
+  .mk-note {
+    font-size: 14px;
+  }
+  .mk-aperture {
+    width: 58%;
+    right: 7%;
+    top: 17%;
+    bottom: 10%;
+  }
+  .mk-lettering {
+    font-size: 62px;
+  }
+  .mk-screen > span:nth-child(2) {
+    left: 61%;
+    width: 3%;
+  }
+  .mk-after {
+    left: 20%;
+    top: 55%;
+    font-size: 38px;
+  }
+  .bk-copy {
+    inset: 0;
+  }
+  .bk-copy h1 {
+    font-size: clamp(70px, 17vw, 115px);
+  }
+  .bk-note {
+    font-size: 10px;
+  }
+  .bk-eye {
+    left: 50%;
+    width: 150vw;
+    top: 50%;
+  }
+  .bk-cut > p {
+    font-size: clamp(68px, 17vw, 110px);
+    top: 24%;
+  }
+  .bk-solar {
+    width: 120%;
+    right: -70%;
+    top: -5%;
+  }
+  .bk-providers {
+    font-size: 8px;
+    bottom: 17%;
+  }
+  html[data-reel='budapest'] .cinema-opening {
+    --camera-top: 0px;
+    --camera-bottom: 0px;
+  }
+  .gk-heading {
+    top: 11%;
+  }
+  .gk-heading h1 {
+    font-size: clamp(38px, 10vw, 60px);
+  }
+  .gk-register {
+    width: 78%;
+    padding: 20px 20px 16px;
+    top: 62%;
+  }
+  .gk-register-body {
+    gap: 5px;
+    padding: 12px 0;
+  }
+  .gk-index {
+    padding: 8px 0 0;
+  }
+  .gk-index > p {
+    font-size: 15px;
+    margin-top: 12px;
+  }
+  .gk-index > p > span {
+    width: 19px;
+    font-size: 7px;
+  }
+  .gk-index > small {
+    font-size: 9px;
+  }
+  .gk-index > i {
+    margin: 16px 0 8px;
+  }
+  .gk-register-top {
+    font-size: 7px;
+  }
+  .gk-register-foot {
+    font-size: 6px;
+    gap: 8px;
+  }
+  .gk-envelope {
+    width: 190px;
+    height: 155px;
+    left: 1%;
+    top: 56%;
+  }
+  .gk-key {
+    width: 65px !important;
+    height: 200px !important;
+    right: 4%;
+    top: 39%;
+  }
+  .gk-hotel {
+    max-height: 190px;
+  }
+  .ok-copy {
+    inset: 0;
+  }
+  .ok-copy h1 {
+    font-size: clamp(34px, 9vw, 50px);
+  }
+  .ok-hal {
+    top: 20%;
+    bottom: 28%;
+    right: auto;
+    width: 52%;
+    max-width: 270px;
+  }
+  .ok-hal-label {
+    font-size: 17px;
+  }
+  .ok-hal > svg {
+    top: 10%;
+  }
+  .ok-hal-label {
+    top: 4%;
+  }
+  .ok-speaker {
+    bottom: 5%;
+    height: 10%;
+  }
+  .ok-orbit > p {
+    font-size: clamp(48px, 12vw, 76px);
+    top: 22%;
+    left: 8%;
+  }
+  .ok-sun {
+    left: calc(50% - 25px);
+    top: 50%;
+    width: 50px;
+  }
+  .ok-moon {
+    left: calc(50% - 45px);
+    top: calc(50% - 20px);
+    width: 90px;
+  }
+  .ok-earth {
+    width: 155%;
+    left: -15%;
+    top: 76%;
+  }
+  .ok-orbits {
+    width: 150% !important;
+    left: -25%;
+  }
+  html:root[data-reel]:not([data-reel='house']) #readme > .keybar {
+    padding-top: 60px;
+  }
+  html:root[data-reel]:not([data-reel='house'])
+    .content
+    #readme
+    > :is(.keybar, .lede, .sub, .metrics) {
+    max-width: 88%;
+    margin-inline: 6%;
+  }
+  html:root[data-reel]:not([data-reel='house']) .content #readme > .metrics {
+    gap: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:root[data-reel]:not([data-reel='house']) .cinema-opening {
+    height: auto;
+  }
+  .camera-pin {
+    position: relative;
+    top: 0;
+  }
+  .camera-scroll,
+  .camera-progress {
+    display: none;
+  }
+  .opening-scene {
+    --shot-p: 0 !important;
+    --shot-a: 0 !important;
+    --shot-b: 0 !important;
+    --shot-cut: 0 !important;
+  }
+  .is-camera-live * {
+    will-change: auto !important;
+  }
+}

@@ -1,0 +1,223 @@
+import type { ActInput } from '../tokens';
+import type { ReelConfig } from '../types';
+import { tokens } from '../tokens';
+
+/**
+ * Reel 03 · Blade Runner 2049. No rail: plates along the top edge and a
+ * scrubber dock along the bottom. Full-bleed acts: the opening in the Las
+ * Vegas haze, a pinned flight into Los Angeles where the proof numbers are
+ * billboards, Wallace's water-light on the agent, the ruins, the rain, and
+ * snow on the steps at the end.
+ *
+ * Contrast (WCAG, on `paper`): Las Vegas ink 7.0, muted 6.3, accent ink 6.4 ·
+ * Wallace ink 15.1, muted 6.6, accent ink 11.2 · Los Angeles ink 15.1,
+ * muted 6.8, accent ink 7.3 · snow ink 14.8, muted 5.8, accent ink 5.9.
+ */
+
+/** The haze: a touch lighter than the board's #DD7A3C so ink clears 7:1. */
+const haze: ActInput = {
+  bg: '#E3853F',
+  bg2: '#DB7C39',
+  surface: '#EC9A5A',
+  ink: '#1A0B04',
+  ink2: '#2E1306',
+  muted: '#331204',
+  muted2: '#7A3A14',
+  line: 'rgba(26,11,4,.22)',
+  line2: 'rgba(26,11,4,.42)',
+  accent: '#7A2E0E',
+  accentInk: '#2E1306',
+  accentSoft: 'rgba(122,46,14,.14)',
+  onAccent: '#FFE9D2',
+  vars: {
+    'br-glow': 'rgba(255,226,186,.5)',
+    'blue-soft': 'rgba(26,11,4,.08)',
+    'blue-ink': '#2E1306',
+    'blue-edge': 'rgba(26,11,4,.3)',
+    'sage-ink': '#1F3A14',
+    'clay-ink': '#5A1606',
+  },
+};
+
+/** The film runs 163 minutes; the scrubber's readout counts the page against it. */
+export const RUNTIME = 163 * 60;
+
+const br2049: ReelConfig = {
+  id: 'br2049',
+  n: '03',
+  title: 'Blade Runner 2049',
+  year: 2017,
+  director: 'Denis Villeneuve',
+  ratio: '2.39:1',
+  meta: '2017 · Denis Villeneuve · 2.39:1',
+  bands: [
+    ['#0F1A20', 3],
+    ['#1F3340', 2],
+    ['#3E5866', 1],
+    ['#E44D9B', 1],
+    ['#0F1A20', 1],
+    ['#8C6A2A', 2],
+    ['#C8A050', 1],
+    ['#5A3A10', 1],
+    ['#D96A1B', 3],
+    ['#F29D38', 2],
+    ['#B4521A', 2],
+    ['#F5B36B', 1],
+    ['#7A2E0E', 1],
+    ['#9AA7AD', 2],
+    ['#E6ECEE', 3],
+  ],
+  acts: [
+    {
+      code: 'LV',
+      name: 'Las Vegas haze',
+      slug: 'EXT. LAS VEGAS - DAY',
+      sections: ['readme'],
+      tokens: tokens(haze),
+    },
+    {
+      code: 'WC',
+      name: 'Wallace Corporation',
+      slug: "INT. WALLACE CORPORATION - WALLACE'S OFFICE - DAY",
+      sections: ['playground'],
+      tokens: tokens({
+        bg: '#16120B',
+        bg2: '#1C170E',
+        surface: '#241C11',
+        ink: '#F1E6CF',
+        ink2: '#D9CBAE',
+        muted: '#A8987B',
+        muted2: '#7E705A',
+        line: 'rgba(241,230,207,.14)',
+        line2: 'rgba(232,196,110,.34)',
+        accent: '#E0B354',
+        accentInk: '#E8C46F',
+        accentSoft: 'rgba(224,179,84,.12)',
+        onAccent: '#16120B',
+        vars: {
+          'br-glow': 'rgba(232,196,110,.4)',
+          'blue-soft': 'rgba(232,196,110,.07)',
+          'blue-ink': '#E8C46F',
+          'blue-edge': 'rgba(232,196,110,.3)',
+          'sage-soft': 'rgba(184,206,140,.1)',
+          'sage-ink': '#C3D49A',
+          'sage-edge': 'rgba(195,212,154,.32)',
+          'clay-soft': 'rgba(240,138,106,.12)',
+          'clay-ink': '#F29A7C',
+          'clay-edge': 'rgba(242,154,124,.36)',
+        },
+      }),
+    },
+    {
+      code: 'LV',
+      name: 'Las Vegas',
+      slug: 'EXT. LAS VEGAS - RUINS - DAY',
+      sections: ['work', 'oss', 'log'],
+      tokens: tokens(haze),
+    },
+    {
+      code: 'LA',
+      name: 'Los Angeles, rain',
+      slug: 'EXT. LOS ANGELES - NIGHT',
+      sections: ['writing', 'principles', 'stack'],
+      tokens: tokens({
+        bg: '#0E171C',
+        bg2: '#111C22',
+        surface: '#15222A',
+        ink: '#E3ECEE',
+        ink2: '#B9C8CD',
+        muted: '#8FA2A9',
+        muted2: '#62777F',
+        line: 'rgba(227,236,238,.14)',
+        line2: 'rgba(227,236,238,.26)',
+        accent: '#E44D9B',
+        accentInk: '#F27DB8',
+        accentSoft: 'rgba(228,77,155,.14)',
+        onAccent: '#0E171C',
+        vars: {
+          'br-glow': 'rgba(228,77,155,.55)',
+          'blue-soft': 'rgba(79,195,217,.08)',
+          'blue-ink': '#7FD6E4',
+          'blue-edge': 'rgba(79,195,217,.32)',
+          'sage-ink': '#9FD6A8',
+          'clay-ink': '#F27DB8',
+        },
+      }),
+    },
+    {
+      code: 'SNOW',
+      name: 'Snow on the steps',
+      slug: 'EXT. STELLINE LAB - STEPS - DAY',
+      sections: ['now'],
+      tokens: tokens({
+        bg: '#E6ECEE',
+        bg2: '#DCE4E7',
+        surface: '#F4F7F8',
+        ink: '#0F1A20',
+        ink2: '#2A3A42',
+        muted: '#4C5D65',
+        muted2: '#8C9BA2',
+        line: 'rgba(15,26,32,.16)',
+        line2: 'rgba(15,26,32,.3)',
+        accent: '#1F5F7A',
+        accentInk: '#1F5F7A',
+        accentSoft: 'rgba(31,95,122,.1)',
+        onAccent: '#F4F7F8',
+        vars: { 'br-glow': 'rgba(255,255,255,.7)' },
+      }),
+    },
+  ],
+  type: {
+    display: "'Big Shoulders Display Variable', 'Barlow', system-ui, sans-serif",
+    body: "'Barlow', system-ui, sans-serif",
+    mono: "'Share Tech Mono', ui-monospace, monospace",
+    title: "'Big Shoulders Display Variable', sans-serif",
+  },
+  sections: {
+    readme: { slug: 'EXT. LAS VEGAS - DAY' },
+    playground: { slug: "INT. WALLACE CORPORATION - WALLACE'S OFFICE - DAY" },
+    work: { slug: 'EXT. LAS VEGAS - RUINS - DAY' },
+    oss: { slug: 'EXT. LAS VEGAS - THE STATUES - CONTINUOUS' },
+    log: { slug: 'INT. CASINO - BAR - DAY' },
+    writing: { slug: 'EXT. LOS ANGELES - NIGHT' },
+    principles: { slug: 'EXT. LOS ANGELES - WALKWAY - NIGHT' },
+    stack: { slug: 'INT. RECORDS ARCHIVE - NIGHT' },
+    now: { slug: 'EXT. STELLINE LAB - STEPS - DAY' },
+  },
+  stages: ['backdrop', 'rail', 'in:readme', 'credits', 'title'],
+  layout: { nav: 'hud', hero: 'fog', flow: 'drift', grid: 'wide' },
+  scroll: [
+    'hero-parallax-monoliths',
+    'flight-pinned-billboards',
+    'hud-scrubber',
+    'act-temperature-shift',
+    'sticky-act-backdrops',
+  ],
+  motifs: [
+    'runtime-timecode',
+    'billboards',
+    'holo-freeze',
+    'caustics',
+    'baseline-waveform',
+    'carved-dates',
+    'archive-drawers',
+    'rain',
+    'snow',
+  ],
+  sound: {
+    hover: 'dry HUD tick (a ring-mod hologram flicker on the lede, rows and tenets)',
+    click: 'HUD click on a low thump',
+    section: 'CS-80 brass swell per act, in from below with late vibrato: D sus2, B♭, C, D minor',
+    surface: 'ring-mod hologram bell + brass stab, climbing D minor pentatonic with the count',
+    done: 'slow CS-80 chord, D minor whose third slides up to major',
+    error: 'distorted low growl',
+    signature: 'the braam: low saw brass driven, bent and drooping, over a clean sub',
+    title: 'braam + sub hit, metal scraping behind, a CS-80 voice rising through',
+    beds: 'rain in Los Angeles; a broken-jukebox lounge piano in Las Vegas',
+    foley: 'spinner fly-by, archive drawer, wood knock, melting snow, scanner',
+  },
+  credits: 'A fan homage, not affiliated with the film.',
+  announce: 'Screening Blade Runner 2049, 2017',
+};
+
+export default br2049;

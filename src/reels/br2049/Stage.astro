@@ -1,0 +1,230 @@
+---
+/**
+ * Reel 03 · Blade Runner 2049: reel-only markup. Rendered once per point listed in
+ * config.stages; the engine hides it unless this reel is screening.
+ *
+ *   backdrop   the act backdrops (haze + ruins, Wallace's water-light, LA rain,
+ *              snow)
+ *   rail       the readout at the right end of the scrubber dock
+ *   in:readme  the opening (haze, light shafts, parallax monoliths, fog) and
+ *              the flight into Los Angeles that the proof billboards ride on
+ *   credits    end credits, in the snow, closing on the title
+ *   title      the title card inside the projector
+ *
+ * Particles (dust, rain, snow) are sprinkled in by client.ts, so visitors who
+ * never screen this reel don't download a few hundred empty elements.
+ */
+import type { StagePoint } from '../types';
+import reel, { RUNTIME } from './config';
+
+interface Props {
+  at: StagePoint;
+}
+const { at } = Astro.props;
+const glyphs = ' .:;=+*#%@';
+const retina = Array.from({ length: 25 }, (_, row) =>
+  Array.from({ length: 67 }, (_, col) => {
+    const x = (col - 33) / 30;
+    const y = (row - 12) / 11;
+    if (Math.abs(y) > Math.pow(Math.max(0, 1 - x * x), 0.65) * 0.64) return ' ';
+    const radius = Math.hypot(x * 1.7, y);
+    if (radius < 0.19) return '@';
+    if (radius < 0.49) {
+      const ray = Math.sin(Math.atan2(y, x * 1.7) * 37 + radius * 24);
+      return glyphs[5 + Math.round((ray + 1) * 1.5)];
+    }
+    const lid = Math.abs(y) / Math.max(0.01, Math.pow(1 - x * x, 0.65) * 0.64);
+    return lid > 0.83 ? '+='[(row + col) % 2] : (row * 19 + col * 7) % 13 < 2 ? ':' : '.';
+  }).join(''),
+).join('\n');
+const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60) % 60).padStart(2, '0')}:00`;
+---
+
+{
+  at === 'backdrop' && (
+    <>
+      <div class="br-bd" aria-hidden="true">
+        <div class="br-bd-l br-bd-haze">
+          <div class="br-ruins">
+            <i class="r1" />
+            <i class="r2" />
+            <i class="r3" />
+            <i class="r4" />
+          </div>
+          <div class="br-dust" data-br-dust="28" />
+        </div>
+        <div class="br-bd-l br-bd-water">
+          <i class="cx c1" />
+          <i class="cx c2" />
+          <i class="cx l1" />
+          <i class="cx l2" />
+          <i class="cx v" />
+        </div>
+        <div class="br-bd-l br-bd-rain">
+          <div class="br-rain" data-br-rain="48" />
+        </div>
+        <div class="br-bd-l br-bd-snow">
+          <div class="br-snow" data-br-snow="46" />
+        </div>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'rail' && (
+    <div class="br-ro" aria-hidden="true">
+      <b data-br-ro="name">readme</b>
+      <span>
+        <span data-br-ro="tc">0:00:00</span> / {runtime}
+      </span>
+    </div>
+  )
+}
+
+{
+  at === 'in:readme' && (
+    <>
+      <div class="br-hero" aria-hidden="true">
+        <div class="br-haze h1" />
+        <div class="br-haze h2" />
+        <div class="br-shafts">
+          <i />
+          <i />
+          <i />
+        </div>
+        <div class="br-mono m-far">
+          <i class="a" />
+          <i class="b" />
+          <i class="c" />
+          <i class="d" />
+        </div>
+        <div class="br-mono m-mid">
+          <i class="e" />
+          <i class="f" />
+        </div>
+        <div class="br-mono m-near">
+          <i class="g" />
+          <i class="h" />
+        </div>
+        <svg class="br-ruin-scene" viewBox="0 0 900 900" preserveAspectRatio="xMaxYMax meet">
+          <defs>
+            <linearGradient
+              id="br-stone"
+              x1="120"
+              y1="80"
+              x2="690"
+              y2="900"
+              gradientUnits="userSpaceOnUse"
+            >
+              <>
+                <stop stop-color="#7d381f" />
+                <stop offset="1" stop-color="#b95f2d" stop-opacity="0.15" />
+              </>
+            </linearGradient>
+          </defs>
+          <path
+            d="M460 900V355l-20-10 10-31 18-8 8-144 24-17 21 12 11 146 29 13 6 32-22 10 13 542Z"
+            fill="url(#br-stone)"
+          />
+          <path
+            d="M530 900 611 481 674 378 735 353 798 377 862 472 900 900Zm132-49 37-299 34-58 35 62 35 295Z"
+            fill="url(#br-stone)"
+            fill-rule="evenodd"
+          />
+          <path
+            d="M630 490 679 416 735 389 789 414 842 489M644 516l45-72 45-21 45 21 46 72M656 543l40-70 38-18 37 18 40 70"
+            stroke="#e0a16b"
+            stroke-opacity="0.16"
+            stroke-width="3"
+            fill="none"
+          />
+          <path
+            d="M492 197v129m20-112 5 103m103 250-49 307m250-305 48 305"
+            stroke="#e7a976"
+            stroke-opacity="0.12"
+            stroke-width="3"
+          />
+        </svg>
+        <div class="br-dust" data-br-dust="34" />
+        <div class="br-fog" />
+      </div>
+      <button
+        class="br-retina"
+        type="button"
+        data-film-find="br2049"
+        data-find-zone=".br-hero"
+        data-find-action="scan"
+        aria-label="Run the retinal scan"
+      >
+        <span class="br-retina-frame" aria-hidden="true">
+          <span class="br-retina-id">NEXUS · 2049</span>
+          <pre class="br-retina-eye">{retina}</pre>
+          <span class="br-retina-beam" />
+          <span class="br-retina-scale">01 ──── 02 ──── 03</span>
+        </span>
+      </button>
+      <div class="br-flight" aria-hidden="true">
+        <div class="br-pin">
+          <div class="br-fl-sky" />
+          <div class="br-fl-city" data-br-city="90" />
+          <div class="br-fl-rain">
+            <div class="br-rain" data-br-rain="40" />
+          </div>
+          <i class="br-fm c" />
+          <i class="br-fm l" />
+          <i class="br-fm r" />
+          <div class="br-fl-o">
+            <div class="br-dust" data-br-dust="26" />
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+{
+  at === 'credits' && (
+    <div class="br-credits">
+      <dl>
+        <div>
+          <dt>A portfolio by</dt>
+          <dd>Tomas Brasca</dd>
+        </div>
+        <div>
+          <dt>Screened through</dt>
+          <dd>
+            {reel.title}, {reel.director}, {reel.year}
+          </dd>
+        </div>
+        <div>
+          <dt>Light after</dt>
+          <dd>Roger Deakins</dd>
+        </div>
+        <div>
+          <dt>Sound after</dt>
+          <dd>Hans Zimmer and Benjamin Wallfisch</dd>
+        </div>
+      </dl>
+      <p class="br-note">{reel.credits}</p>
+      <p class="br-end" aria-hidden="true">
+        <span class="br-end-t">Blade Runner</span>
+        <span class="br-end-n">2049</span>
+      </p>
+    </div>
+  )
+}
+
+{
+  at === 'title' && (
+    <div class="br-title">
+      <span class="br-title-haze" />
+      <span class="br-title-t">Blade Runner</span>
+      <span class="br-title-t br-title-n">2049</span>
+      <span class="br-title-line" />
+      <span class="br-title-s">
+        {reel.year} · {reel.director} · the portfolio of Tomas Brasca
+      </span>
+    </div>
+  )
+}

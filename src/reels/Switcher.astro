@@ -1,0 +1,39 @@
+---
+/**
+ * The reel switcher in the rail: a film strip of each reel's palette. The
+ * label under it follows hover/focus, then settles back on the reel that is
+ * screening. The engine wires it (data-reel-*).
+ */
+import { REELS } from './registry';
+
+const total = (bands: [string, number][]) => bands.reduce((s, [, w]) => s + w, 0);
+---
+
+<div class="reelpick">
+  <div class="rail-sec"><span>Reel</span><span data-reel-no>00</span></div>
+  <div class="reels" role="group" aria-label="Screen this site through a film">
+    {
+      REELS.map((r) => (
+        <button
+          class="reel"
+          type="button"
+          data-reel-pick={r.id}
+          aria-pressed="false"
+          aria-label={r.year ? `${r.title}, ${r.year}` : `${r.title}, no film`}
+        >
+          <span class="bc" aria-hidden="true">
+            {r.bands.map(([c, w]) => (
+              <i
+                style={`background:${c};flex-grow:${w};flex-basis:${(w / total(r.bands)) * 100}%`}
+              />
+            ))}
+          </span>
+        </button>
+      ))
+    }
+  </div>
+  <div class="reel-label" aria-hidden="true">
+    <b data-reel-title>{REELS[0].title}</b><span data-reel-meta>{REELS[0].meta}</span>
+  </div>
+  <button class="boxoffice-open" type="button" data-boxoffice-open>box office</button>
+</div>

@@ -1,0 +1,24 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-08T23:30:00Z" },
+  "title": "Portfolio Redesign Variants",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1440, "h": 3800, "title": "01 · Living Paper", "expand": "fill", "is_interactive": true },
+    "InstrumentPanel.dc.html": { "x": 1520, "y": 0, "w": 1440, "h": 3800, "title": "02 · Instrument Panel", "expand": "fill", "is_interactive": true },
+    "DraftingSheet.dc.html": { "x": 3040, "y": 0, "w": 1440, "h": 4000, "title": "03 · Drafting Sheet", "expand": "fill", "is_interactive": true },
+    "BootSequence.dc.html": { "x": 4560, "y": 0, "w": 1440, "h": 3800, "title": "04 · Boot Sequence", "expand": "fill", "is_interactive": true },
+    "Desk.dc.html": { "x": 6080, "y": 0, "w": 1440, "h": 3800, "title": "05 · Desk", "expand": "fill", "is_interactive": true }
+  },
+  "order": ["Main.dc.html", "InstrumentPanel.dc.html", "DraftingSheet.dc.html", "BootSequence.dc.html", "Desk.dc.html"],
+  "notes": {
+    "title": { "kind": "title1", "x": 0, "y": -440, "maxW": 7520, "text": "Portfolio redesign · five directions, least to most radical. Press Play on any board: sound is on, click once to unlock audio." },
+    "n01": { "x": 0, "y": -300, "w": 640, "maxH": 190, "fill": "gray", "text": "01 · LIVING PAPER — the evolution. Today's Workbench, made alive: watercolor wash + grain, a monogram that draws itself, a role title that cycles with per-character blur, hairlines that draw as you scroll, a rail pill that springs to the hovered item. Sound: whisper-level paper ticks, one soft chime. Borrowed from: jhey, nerdy, siddz, Painting Loaders." },
+    "n02": { "x": 1520, "y": -300, "w": 640, "maxH": 190, "fill": "gray", "text": "02 · INSTRUMENT PANEL — dark. The rail is a physical instrument: a goo marker that travels between sections, odometer digits everywhere, live telemetry in a dot-matrix voice, a highlight that glides to the hovered row, five-bar agent status. Sound: electronic ticks, pitched wood per rail step, arrival chord. Borrowed from: nerdy, shwn, siddz, Nexvyn bars." },
+    "n03": { "x": 3040, "y": -300, "w": 640, "maxH": 190, "fill": "gray", "text": "03 · DRAFTING SHEET — the page is an engineering drawing of itself. On load it plots its own wireframe with mono tags and dimensions, then inks in. Rulers track the cursor, sections are sheets 00–08, the title block is the changelog, hairlines wobble like graphite. Generated UI drafts itself before filling. Sound: pencil ticks, plotter sweep, mechanical clicks. Borrowed from: imdaryl, jhey." },
+    "n04": { "x": 4560, "y": -300, "w": 640, "maxH": 190, "fill": "gray", "text": "04 · BOOT SEQUENCE — the agent composes the homepage in front of you. A compose log runs, surfaces blur in slot by slot, the lede un-redacts from XXXX bars, numbers roll into place, a pipeline spine fills on the right. Then it is a calm page; replay anytime. Sound: a streaming drone while composing, a click per committed surface, a chime when done. Borrowed from: jhey, shwn, interior.dev, imdaryl." },
+    "n05": { "x": 6080, "y": -300, "w": 640, "maxH": 190, "fill": "gray", "text": "05 · DESK — tactile. Index cards you press (they tilt toward your pointer) and send into the playground slot to ask the agent, a keycap send button, nouns in the readme that fan out artifacts on hover, a physical theme switch. Sound: keycaps, wood blocks pitched per card, a whoosh, a chime. Borrowed from: lelezhang, harshsingh, shwn, 1iad." }
+  },
+  "designSystems": []
+}

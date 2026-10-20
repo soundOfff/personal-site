@@ -1,0 +1,3592 @@
+@import '@fontsource-variable/bodoni-moda/opsz.css';
+@import '@fontsource-variable/bodoni-moda/opsz-italic.css';
+@import '@fontsource/spectral/400.css';
+@import '@fontsource/spectral/400-italic.css';
+@import '@fontsource/spectral/500.css';
+@import '@fontsource/courier-prime/400.css';
+@import '@fontsource/courier-prime/700.css';
+
+/* ============================================================
+   Reel 02 · In the Mood for Love.
+   Nine rooms off one corridor. The rail becomes a strip of brass doorplates;
+   every section is a scene seen through its doorway, in its own colour,
+   with a lamp if the scene is at night. Courier is kept for the screenplay
+   slugs; everything else is set in the serifs.
+   Every rule lives inside :root[data-reel='mood'] (keyframes and @property
+   are top level, prefixed 'mood-'), except the title card, which belongs to
+   the projector and is scoped to .projector[data-title='mood'].
+   ============================================================ */
+
+/* Noto Serif TC, but only for the glyphs the title needs: the browser fetches
+   a subset file only when one of these characters renders. Every other hanzi
+   falls through to the system's Song / Ming serif. */
+@font-face {
+  font-family: 'Mood Serif TC';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('../../../node_modules/@fontsource-variable/noto-serif-tc/files/noto-serif-tc-121-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range: U+82B1, U+6A23, U+83EF;
+}
+@font-face {
+  font-family: 'Mood Serif TC';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('../../../node_modules/@fontsource-variable/noto-serif-tc/files/noto-serif-tc-122-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range: U+5E74;
+}
+
+/* the stairs crossing's progress: 0 at the top of the scene, 1 at the bottom */
+@property --mood-p {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0.5;
+}
+
+:root[data-reel='mood'] {
+  --mood-night: #0e0907;
+  --mood-cream: #f0e4c9;
+  --mood-cream-2: #dccdae;
+  --mood-brass: #b48a4a;
+  --mood-brass-2: #d8b072;
+  --mood-wood: #2e1b10;
+  --mood-wall: #1b0b09;
+  --mood-amber-l: #f0c27a;
+  --mood-plate: linear-gradient(180deg, #e2bd7e, #c9a05c 55%, #ae8644);
+  --mood-slow: cubic-bezier(0.45, 0, 0.2, 1);
+  --mood-ease: cubic-bezier(0.25, 0.1, 0.15, 1);
+  --mood-door: 820px;
+  --mood-strip: 58px;
+  --mood-room: 0;
+  --mood-cjk: 'Mood Serif TC', 'Songti TC', 'STSong', 'Noto Serif CJK TC', 'PMingLiU', serif;
+  --radius-card: 3px;
+  --radius-control: 3px;
+  --radius-chip: 3px;
+
+  & body {
+    background: var(--mood-night);
+  }
+  & ::selection {
+    background: #b0281f;
+    color: var(--mood-cream);
+  }
+  & :focus-visible {
+    outline: 2px solid var(--amber-deep);
+    outline-offset: 3px;
+    box-shadow: none;
+  }
+
+  /* ---------- film grain (an feTurbulence tile, no image files) ---------- */
+  & .mood-grain {
+    /* just past the viewport: the jitter is a few px, so the layer stays small */
+    position: fixed;
+    inset: -48px;
+    z-index: 70;
+    pointer-events: none;
+    opacity: 0.11;
+    mix-blend-mode: overlay;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.6 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
+      0 0 / 192px 192px;
+  }
+
+  /* ============================================================
+     THE STRIP: the rail as a sticky band of brass doorplates
+     ============================================================ */
+  & .shell {
+    display: block;
+    max-width: none;
+    min-height: 0;
+    border: 0;
+    background: var(--mood-night);
+  }
+  & .rail {
+    /* one palette for the strip, whatever room is in view */
+    --paper: #1c120e;
+    --paper-2: #24160f;
+    --paper-3: #34221a;
+    --ink: var(--mood-cream);
+    --ink-2: var(--mood-cream-2);
+    --muted: #bbaa8b;
+    --muted-2: #a69a7e;
+    --rule: rgba(180, 138, 74, 0.28);
+    --rule-2: rgba(180, 138, 74, 0.45);
+    --amber: #b0281f;
+    --amber-deep: var(--mood-amber-l);
+    --amber-soft: rgba(224, 166, 75, 0.16);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    height: auto;
+    min-height: var(--mood-strip);
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px 14px;
+    padding: 8px 18px;
+    border: 0;
+    border-bottom: 1px solid rgba(180, 138, 74, 0.4);
+    background: linear-gradient(180deg, #1c120e, #110a08);
+    box-shadow: 0 10px 30px -18px #000;
+    color: var(--ink);
+  }
+
+  /* who: a red chop and an italic name */
+  & .rail .id {
+    order: 0;
+    flex: none;
+    gap: 11px;
+  }
+  & .rail .tile {
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 3px;
+    background: #a3201a;
+    color: #f6e7c8;
+    font: 700 12.5px/1 var(--font-display);
+    letter-spacing: 0.04em;
+    box-shadow: inset 0 0 0 2px rgba(246, 231, 200, 0.25);
+    rotate: -4deg;
+  }
+  & .rail .id .nm {
+    font: italic 500 18px/1.1 var(--font-display);
+    letter-spacing: 0;
+  }
+  & .rail .id .rl {
+    font: 400 13px/1.2 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  /* the doorplates: each room's name; only 2046 has a number */
+  & .railnav {
+    order: 1;
+    flex-direction: row;
+    gap: 6px;
+    margin: 0 auto;
+    padding: 4px 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  & .railnav::-webkit-scrollbar {
+    display: none;
+  }
+  & .railnav a {
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 44px;
+    height: 40px;
+    padding: 0 7px;
+    border-radius: 3px;
+    background: #2a1b12;
+    box-shadow:
+      inset 0 0 0 1px rgba(216, 176, 114, 0.45),
+      inset 0 0 0 3px #2a1b12,
+      inset 0 0 0 4px rgba(216, 176, 114, 0.18),
+      0 2px 4px rgba(0, 0, 0, 0.5);
+    color: var(--mood-brass-2);
+    font: italic 400 13px/1.1 var(--font-sans);
+    white-space: nowrap;
+    transition:
+      transform 0.3s var(--mood-ease),
+      box-shadow 0.35s,
+      background-color 0.35s,
+      color 0.35s;
+  }
+  /* the shared "00"… index stays in the markup for readers, at no size */
+  & .railnav a .nx {
+    width: auto;
+    font-size: 0;
+    line-height: 1;
+    color: inherit;
+  }
+  & .railnav a[href='#writing'] .nx::before {
+    content: '2046';
+    content: '2046' / '';
+    display: block;
+    font: 600 14px/1 var(--font-display);
+    font-style: normal;
+    letter-spacing: 0.06em;
+  }
+  & .railnav a:hover {
+    transform: translateY(-1px);
+    background: #2a1b12;
+    color: var(--mood-amber-l);
+    box-shadow:
+      inset 0 0 0 1px rgba(216, 176, 114, 0.85),
+      inset 0 0 0 3px #2a1b12,
+      inset 0 0 0 4px rgba(216, 176, 114, 0.3),
+      0 4px 10px rgba(0, 0, 0, 0.6);
+  }
+  & .railnav a[aria-current='true'] {
+    background: var(--mood-plate);
+    color: #24160a;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 240, 200, 0.75),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(240, 194, 122, 0.5),
+      0 0 22px 2px rgba(224, 166, 75, 0.45);
+  }
+
+  /* the reel switcher as a radio dial: stations, and a red needle */
+  & .reelpick {
+    order: 2;
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+  }
+  & .reelpick .rail-sec {
+    display: none;
+  }
+  & .reels {
+    position: relative;
+    display: flex;
+    gap: 0;
+    height: 40px;
+    padding: 0 4px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #e9dcbf, #d5c39c);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.35),
+      inset 0 2px 6px rgba(0, 0, 0, 0.25),
+      0 0 0 2px #3a2416;
+  }
+  & .reels::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 21px;
+    width: 2px;
+    background: #b0281f;
+    box-shadow: 0 0 6px rgba(176, 40, 31, 0.7);
+    transform: translateX(calc(var(--needle, 0) * 36px));
+    transition: transform 0.45s cubic-bezier(0.3, 1.3, 0.5, 1);
+    pointer-events: none;
+  }
+  & .reels:has(> :nth-child(2)[aria-pressed='true']) {
+    --needle: 1;
+  }
+  & .reels:has(> :nth-child(3)[aria-pressed='true']) {
+    --needle: 2;
+  }
+  & .reels:has(> :nth-child(4)[aria-pressed='true']) {
+    --needle: 3;
+  }
+  & .reels:has(> :nth-child(5)[aria-pressed='true']) {
+    --needle: 4;
+  }
+  & .reels:has(> :nth-child(6)[aria-pressed='true']) {
+    --needle: 5;
+  }
+  & .reels:has(> :nth-child(1):is(:hover, :focus-visible)) {
+    --needle: 0;
+  }
+  & .reels:has(> :nth-child(2):is(:hover, :focus-visible)) {
+    --needle: 1;
+  }
+  & .reels:has(> :nth-child(3):is(:hover, :focus-visible)) {
+    --needle: 2;
+  }
+  & .reels:has(> :nth-child(4):is(:hover, :focus-visible)) {
+    --needle: 3;
+  }
+  & .reels:has(> :nth-child(5):is(:hover, :focus-visible)) {
+    --needle: 4;
+  }
+  & .reels:has(> :nth-child(6):is(:hover, :focus-visible)) {
+    --needle: 5;
+  }
+  & .reel {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 36px;
+    height: 40px;
+    padding: 6px 0 3px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    overflow: visible;
+    color: #2a1712;
+  }
+  & .reel:hover {
+    transform: none;
+  }
+  & .reel[aria-pressed='true'] {
+    border: 0;
+    box-shadow: none;
+  }
+  & .reel::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    width: 1px;
+    height: 5px;
+    background: rgba(58, 36, 22, 0.55);
+  }
+  & .reel .bc {
+    position: static;
+    flex: none;
+    width: 24px;
+    height: 9px;
+    border-radius: 0;
+    box-shadow: 0 0 0 1px rgba(42, 23, 18, 0.35);
+  }
+  /* station numbers follow the switcher's order: 00 (House lights) … 05 */
+  & .reels {
+    counter-reset: mood-station -1;
+  }
+  & .reel {
+    counter-increment: mood-station;
+  }
+  & .reel::after {
+    content: counter(mood-station, decimal-leading-zero);
+    position: static;
+    inset: auto;
+    font: 700 10px/1 var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+  & .reel[aria-pressed='true']::after {
+    color: #8a1d15;
+  }
+  & .reel:focus-visible {
+    outline-offset: -2px;
+    outline-color: #8a1d15;
+  }
+  /* the station name, as a tip under the dial */
+  & .reel-label {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 3;
+    min-height: 0;
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid rgba(180, 138, 74, 0.45);
+    background: #1c120e;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+    pointer-events: none;
+  }
+  & .reel-label :is(b, span) {
+    display: inline;
+    margin: 0;
+    font: italic 400 14px/1.4 var(--font-sans);
+    letter-spacing: 0;
+    color: var(--mood-cream);
+  }
+  & .reel-label span::before {
+    content: ' · ';
+  }
+  & .reelpick:is(:hover, :focus-within) .reel-label {
+    opacity: 1;
+    transform: none;
+  }
+  /* the rail's controls, and every small label below: Spectral small caps */
+  & :is(.boxoffice-open, .contact-wrap .rail-sec, .reelpick .rail-sec, .snd) {
+    font: 400 14px/1 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+    text-transform: none;
+  }
+  & .boxoffice-open {
+    margin: 0;
+    padding: 6px 9px 7px;
+    border: 1px solid rgba(180, 138, 74, 0.4);
+    border-radius: 3px;
+    text-decoration: none;
+    color: var(--mood-brass-2);
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+  & .boxoffice-open:hover {
+    background: var(--mood-brass-2);
+    color: #24160a;
+  }
+
+  /* contact: a brass tab that drops its card on hover or focus */
+  & .contact-wrap {
+    order: 3;
+    position: relative;
+    flex: none;
+  }
+  & .contact-wrap .rail-sec {
+    margin: 0;
+    padding: 6px 10px 7px;
+    border: 1px solid rgba(180, 138, 74, 0.4);
+    border-radius: 3px;
+    color: var(--mood-brass-2);
+    cursor: default;
+  }
+  & .contact {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 3;
+    min-width: 260px;
+    padding: 8px 6px;
+    border-top: 8px solid transparent;
+    background: #1c120e padding-box;
+    box-shadow:
+      inset 0 0 0 1px rgba(180, 138, 74, 0.45),
+      0 18px 30px -12px #000;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+    pointer-events: none;
+  }
+  & .contact-wrap:is(:hover, :focus-within) .contact {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  & .contact a {
+    font: 400 14.5px/1.3 var(--font-sans);
+    padding: 7px 9px;
+    border-radius: 2px;
+  }
+  & .contact a svg {
+    color: var(--mood-brass-2);
+  }
+
+  & .rail-foot {
+    order: 4;
+    flex: none;
+    margin: 0;
+    gap: 10px;
+  }
+  & .rail-foot .mono {
+    display: none;
+  }
+  & .snd {
+    height: 30px;
+    border-color: rgba(180, 138, 74, 0.45);
+    border-radius: 3px;
+    color: var(--mood-cream-2);
+  }
+  & .snd:hover {
+    background: rgba(216, 176, 114, 0.12);
+  }
+
+  /* ============================================================
+     THE CORRIDOR: every section a room, seen through its doorway
+     ============================================================ */
+  /* one continuous corridor wall behind every room; rooms paint only their doorway */
+  & .content {
+    padding: 0;
+    background:
+      linear-gradient(
+        90deg,
+        transparent calc(50% - 480px),
+        rgba(0, 0, 0, 0.62) calc(50% - 410px),
+        rgba(0, 0, 0, 0.62) calc(50% + 410px),
+        transparent calc(50% + 480px)
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgba(240, 228, 201, 0.028) 0 1px,
+        transparent 1px 18px,
+        rgba(0, 0, 0, 0.18) 18px 20px,
+        transparent 20px 38px
+      ),
+      var(--mood-wall);
+  }
+  & .block {
+    position: relative;
+    isolation: isolate;
+    border-top: 0;
+    color: var(--ink);
+    scroll-margin-top: var(--mood-strip);
+  }
+  & :where(.block:not(#readme), .mood-annex) {
+    --side: max(0px, calc((100% - var(--mood-door)) / 2));
+    --inset: 66px;
+    display: flow-root;
+    padding: 0 var(--side);
+    background-color: var(--paper);
+    background-clip: content-box;
+  }
+  & .block:not(#readme)::before {
+    content: '';
+    display: block;
+    height: 76px;
+  }
+  & .block:not(#readme)::after {
+    content: '';
+    display: block;
+    height: 64px;
+  }
+  & .block:not(#readme) > :not(.reel-stage, astro-island),
+  & .block:not(#readme) > astro-island > .console,
+  & .mood-annex > :not(.mood-room) {
+    margin-inline: var(--inset);
+  }
+
+  /* the door jambs, the night rooms' sconces, and 2046's lintel (Stage.astro) */
+  & .mood-room {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  & .mood-room::before,
+  & .mood-room::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+    background: var(--mood-wood);
+  }
+  & .mood-room::before {
+    left: var(--side);
+    box-shadow:
+      inset -1px 0 0 rgba(216, 176, 114, 0.22),
+      -1px 0 0 rgba(0, 0, 0, 0.6);
+  }
+  & .mood-room::after {
+    right: var(--side);
+    box-shadow:
+      inset 1px 0 0 rgba(216, 176, 114, 0.22),
+      1px 0 0 rgba(0, 0, 0, 0.6);
+  }
+  & .mood-room .wall {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--side);
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+  & .mood-room .wall.is-l {
+    left: 0;
+  }
+  & .mood-room .wall.is-r {
+    right: 0;
+  }
+  & .mood-room .sconce {
+    position: absolute;
+    top: 30%;
+    width: 22px;
+    height: 34px;
+    border-radius: 11px 11px 4px 4px;
+    background: linear-gradient(180deg, #f6d9a0, #c98b3a);
+    box-shadow: 0 0 18px 6px rgba(224, 166, 75, 0.45);
+  }
+  & .mood-room .sconce::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 32px;
+    width: 6px;
+    height: 16px;
+    background: #3a2416;
+  }
+  & .mood-room .pool {
+    position: absolute;
+    top: calc(30% - 160px);
+    width: 340px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      rgba(224, 166, 75, 0.2),
+      rgba(224, 166, 75, 0.08) 55%,
+      transparent
+    );
+  }
+  & .mood-room .is-l .sconce {
+    right: 24%;
+  }
+  & .mood-room .is-r .sconce {
+    left: 24%;
+  }
+  & .mood-room .is-l .pool {
+    right: calc(24% - 160px);
+  }
+  & .mood-room .is-r .pool {
+    left: calc(24% - 160px);
+  }
+  & .mood-room .lintel {
+    position: absolute;
+    top: 0;
+    left: var(--side);
+    right: var(--side);
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 14px;
+    background: linear-gradient(180deg, #4a2c1a, var(--mood-wood));
+    box-shadow:
+      0 1px 0 rgba(216, 176, 114, 0.3),
+      0 8px 14px rgba(0, 0, 0, 0.45);
+  }
+  & .mood-room .plate {
+    margin-top: 7px;
+    padding: 6px 12px 5px;
+    border-radius: 3px;
+    background: var(--mood-plate);
+    color: #24160a;
+    font: 600 16px/1 var(--font-display);
+    letter-spacing: 0.08em;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 240, 200, 0.7),
+      0 3px 6px rgba(0, 0, 0, 0.55);
+  }
+
+  /* each room's heading: the section name set in Bodoni, then the scene's
+     slug the way a script sets it, Courier caps with no tracking */
+  & .block:not(#readme) > .keybar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font: 400 12px/1.4 var(--font-mono);
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+  & .block:not(#readme) > .keybar b {
+    font: 600 31px/1.1 var(--font-display);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink);
+  }
+  & .block > .keybar .reel-slug[data-for='mood'] {
+    flex-basis: 100%;
+    margin: 0;
+    font-family: var(--font-mono), var(--mood-cjk);
+    font-size: 13px;
+    letter-spacing: 0;
+    color: var(--amber-deep);
+  }
+  & .block > .keybar a {
+    color: var(--amber-deep);
+    text-decoration-style: solid;
+  }
+
+  /* ---------- three wallpapers: the landing's lattice, one blossom on two
+     grounds, and 2046's 原稿紙. At full strength in the doorway's margins
+     and washed out behind the words, the way you see the paper round
+     someone standing in a door. The newspaper and the taxi are plain. ---------- */
+  & :is(#playground, #work, #log, #writing, #now, .mood-secret) {
+    --wash: linear-gradient(
+      90deg,
+      transparent calc(var(--side) + var(--inset) - 30px),
+      color-mix(in srgb, var(--paper) var(--wash-k, 82%), transparent)
+        calc(var(--side) + var(--inset) + 14px) calc(100% - var(--side) - var(--inset) - 14px),
+      transparent calc(100% - var(--side) - var(--inset) + 30px)
+    );
+  }
+  /* the noodle stall: the same jade lattice as the landing */
+  & #playground {
+    background-image:
+      var(--wash),
+      repeating-linear-gradient(60deg, rgba(240, 228, 201, 0.06) 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(-60deg, rgba(240, 228, 201, 0.06) 0 1px, transparent 1px 22px);
+  }
+  /* oxblood flora: a four-petal blossom in amber, red at the heart */
+  & #work {
+    background-image:
+      var(--wash),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='%23F0C27A' fill-opacity='.17'%3E%3Cellipse cx='28' cy='19.5' rx='4' ry='6.5'/%3E%3Cellipse cx='28' cy='36.5' rx='4' ry='6.5'/%3E%3Cellipse cx='19.5' cy='28' rx='6.5' ry='4'/%3E%3Cellipse cx='36.5' cy='28' rx='6.5' ry='4'/%3E%3C/g%3E%3Ccircle cx='28' cy='28' r='2.6' fill='%23C22E22' fill-opacity='.7'/%3E%3Cg fill='%23F0E4C9' fill-opacity='.09'%3E%3Ccircle cx='0' cy='0' r='2.4'/%3E%3Ccircle cx='56' cy='0' r='2.4'/%3E%3Ccircle cx='0' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='56' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:
+      auto,
+      56px 56px;
+  }
+  /* navy blossom: the same flower, smaller, in cream */
+  & #log {
+    background-image:
+      var(--wash),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='%23F0E4C9' fill-opacity='.15'%3E%3Cellipse cx='28' cy='19.5' rx='4' ry='6.5'/%3E%3Cellipse cx='28' cy='36.5' rx='4' ry='6.5'/%3E%3Cellipse cx='19.5' cy='28' rx='6.5' ry='4'/%3E%3Cellipse cx='36.5' cy='28' rx='6.5' ry='4'/%3E%3C/g%3E%3Ccircle cx='28' cy='28' r='2.4' fill='%23EBBC6C' fill-opacity='.5'/%3E%3C/svg%3E");
+    background-size:
+      auto,
+      42px 42px;
+  }
+  /* 原稿紙: rows of red squares, one character to a square, a gutter between rows */
+  & #writing {
+    --wash-k: 55%;
+    background-image:
+      var(--wash),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='36'%3E%3Cpath d='M0 .5H28M0 28.5H28M.5 0V29' fill='none' stroke='%238A1D15' stroke-opacity='.24'/%3E%3C/svg%3E");
+    background-size:
+      auto,
+      28px 36px;
+    background-position:
+      0 0,
+      calc(var(--side) + var(--inset)) 6px;
+  }
+  /* the felt, under the one lamp over the table */
+  & #stack {
+    background-image: radial-gradient(
+      ellipse 70% 360px at 50% 0,
+      rgba(224, 166, 75, 0.16),
+      transparent 70%
+    );
+  }
+  /* Angkor Wat: sandstone laid in courses, the joints offset, a lit edge under each */
+  & #now,
+  & .mood-secret {
+    background-image:
+      var(--wash),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpath d='M0 29.25H120M0 59.25H120M1 0V29.25M61 29.25V60' fill='none' stroke='%233C2A16' stroke-opacity='.28' stroke-width='1.5'/%3E%3Cpath d='M0 31H120M0 1H120' fill='none' stroke='%23FFF6E0' stroke-opacity='.3'/%3E%3C/svg%3E");
+    background-size:
+      auto,
+      120px 60px;
+  }
+
+  /* ============================================================
+     THE LANDING (readme): two lacquered doors, side by side, the way
+     the two flats are next door to each other
+     ============================================================ */
+  & #readme {
+    --side: 0px;
+    --door-h: clamp(400px, calc(100vh - 230px), 560px);
+    --door-w: clamp(176px, 15vw, 226px);
+    --dado: 230px;
+    display: grid;
+    /* the title's wall, the words, the window's wall, her door, a strip of
+       wall, his door, the end of the landing */
+    grid-template-columns:
+      minmax(136px, 0.9fr) minmax(0, 500px) minmax(150px, 1fr) var(--door-w)
+      clamp(26px, 2.6vw, 40px) var(--door-w) minmax(36px, 0.5fr);
+    grid-template-rows: minmax(40px, 1fr) auto auto auto auto minmax(28px, 1fr) 56px;
+    column-gap: 0;
+    min-height: min(calc(100vh - var(--mood-strip)), 880px);
+    padding: 40px 40px 0;
+    overflow: clip;
+    background: #14302a;
+    text-align: left;
+  }
+  & .mood-hall {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  & .mood-hall i {
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+  & .mood-hall .wp {
+    top: 0;
+    bottom: calc(56px + var(--dado));
+    background-color: #14302a;
+    background-image:
+      repeating-linear-gradient(60deg, rgba(240, 228, 201, 0.035) 0 1px, transparent 1px 26px),
+      repeating-linear-gradient(-60deg, rgba(240, 228, 201, 0.035) 0 1px, transparent 1px 26px),
+      repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.14) 0 2px, transparent 2px 52px);
+  }
+  & .mood-hall .dado {
+    bottom: calc(56px + var(--dado) - 14px);
+    height: 14px;
+    background: linear-gradient(180deg, #4a2c1a, #2a170e);
+    box-shadow:
+      0 1px 0 rgba(216, 176, 114, 0.25),
+      0 6px 10px rgba(0, 0, 0, 0.4);
+  }
+  & .mood-hall .wain {
+    bottom: 56px;
+    height: calc(var(--dado) - 14px);
+    background-color: #2e0d0a;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.25) 0 2px,
+      transparent 2px 120px
+    );
+  }
+  & .mood-hall .floor {
+    bottom: 0;
+    height: 56px;
+    background: linear-gradient(180deg, #1a0e0b, #0b0605);
+    box-shadow: inset 0 1px 0 rgba(216, 176, 114, 0.14);
+  }
+  & .mood-hall .vig {
+    inset: 0;
+    background:
+      radial-gradient(ellipse 46% 55% at 40% 40%, rgba(224, 166, 75, 0.18), transparent 62%),
+      radial-gradient(ellipse 120% 100% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.7));
+  }
+
+  /* a window beside the doors: a street lamp, and rain only in its light */
+  & .mood-window {
+    position: relative;
+    grid-column: 3;
+    grid-row: 1 / 7;
+    align-self: start;
+    justify-self: center;
+    margin-top: 56px;
+    width: 112px;
+    height: 260px;
+    overflow: hidden;
+    border: 9px solid var(--mood-wood);
+    background: linear-gradient(180deg, #081114, #11222a 70%, #1b2e36);
+    box-shadow:
+      inset 0 0 0 1px rgba(216, 176, 114, 0.25),
+      0 18px 30px -18px rgba(0, 0, 0, 0.9);
+  }
+  & .mood-window i {
+    position: absolute;
+    display: block;
+  }
+  & .mood-window .pole {
+    right: 26px;
+    top: 30px;
+    bottom: 0;
+    width: 2px;
+    background: #03080a;
+  }
+  & .mood-window .lamp {
+    right: 22px;
+    top: 22px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ffe3a6;
+    box-shadow:
+      0 0 12px 4px rgba(255, 210, 130, 0.75),
+      0 0 44px 20px rgba(224, 166, 75, 0.35);
+  }
+  & .mood-window .mv {
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    margin-left: -3px;
+    background: var(--mood-wood);
+  }
+  & .mood-window .mh {
+    top: 44%;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--mood-wood);
+  }
+  & .mood-window .glass {
+    inset: 0;
+    background: linear-gradient(125deg, rgba(255, 255, 255, 0.08), transparent 40%);
+  }
+  & .mood-cone {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask-image: radial-gradient(ellipse 70% 95% at 76% 6%, #000 16%, transparent 72%);
+    mask-image: radial-gradient(ellipse 70% 95% at 76% 6%, #000 16%, transparent 72%);
+  }
+  & .mood-drop {
+    position: absolute;
+    top: -40px;
+    width: 1px;
+    background: linear-gradient(rgba(255, 226, 170, 0), rgba(255, 226, 170, 0.9));
+    animation: mood-fall 0.6s linear infinite paused;
+  }
+  & [data-mood-rain][data-on] .mood-drop {
+    animation-play-state: running;
+  }
+  & .mood-window .mood-drop {
+    --fall: 300px;
+  }
+
+  /* the title, set vertically on the wall before the words */
+  & .mood-vtitle {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1 / 7;
+    align-self: start;
+    justify-self: start;
+    margin: 52px 0 0 clamp(0px, 1.4vw, 30px);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  & .mood-vtitle .zh {
+    writing-mode: vertical-rl;
+    font: 900 54px/1 var(--mood-cjk);
+    letter-spacing: 0.2em;
+    color: #b0281f;
+    text-shadow: 0 0 30px rgba(176, 40, 31, 0.35);
+  }
+  & .mood-vtitle .en {
+    writing-mode: vertical-rl;
+    font: italic 400 15px/1 var(--font-display);
+    color: var(--muted);
+  }
+
+  /* the words: slug, lede, sub, figures */
+  & #readme > .keybar {
+    grid-area: 2 / 2;
+    margin: 0 0 18px;
+    font: 400 13px/1.5 var(--font-mono);
+    letter-spacing: 0;
+    text-wrap: balance;
+    color: var(--amber-deep);
+  }
+  & #readme > .keybar b {
+    font-weight: 400;
+    color: inherit;
+  }
+  & #readme > .keybar .reel-slug[data-for='mood'] {
+    margin: 0;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+  & #readme > .keybar .reel-slug[data-for='mood']::before {
+    content: ' · ';
+  }
+  & #readme > .lede {
+    grid-area: 3 / 2;
+    font: 500 38px/1.14 var(--font-display);
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+  & #readme > .lede em {
+    color: var(--mood-amber-l);
+  }
+  & #readme > .sub {
+    grid-area: 4 / 2;
+    max-width: 48ch;
+    margin: 18px 0 0;
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+
+  /* the figures: one run of type under the words, no boxes; the run reaches
+     into the gap before the doors rather than orphan one figure */
+  & #readme > .metrics {
+    grid-area: 5 / 2 / 6 / 4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    margin: 26px 18px 0 0;
+    padding-top: 16px;
+    border: 0;
+    border-top: 1px solid rgba(216, 176, 114, 0.22);
+    border-radius: 0;
+    overflow: visible;
+    background: none;
+  }
+  & #readme .metrics .m {
+    flex: none;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  & #readme .metrics .m .v {
+    font: 600 21px/1.1 var(--font-display);
+    letter-spacing: 0;
+    color: var(--ink);
+    transition: color 0.6s var(--mood-slow);
+  }
+  & #readme .metrics .m:hover .v {
+    color: var(--mood-amber-l);
+  }
+  & #readme .metrics .m .v em {
+    font-style: italic;
+    color: var(--mood-amber-l);
+  }
+  & #readme .metrics .m .k {
+    margin-top: 3px;
+    font: 400 14px/1.3 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    white-space: nowrap;
+    display: block;
+    overflow: visible;
+    color: #cbbe9f;
+  }
+
+  /* the doors: the hero's two links, lacquered, panelled, plated */
+  & #readme > .startrow {
+    display: contents;
+  }
+  & #readme .startrow > a,
+  & #readme .mood-doorway {
+    grid-row: 1 / 7;
+    align-self: end;
+    height: var(--door-h);
+  }
+  & #readme .startrow > a:first-child,
+  & #readme .mood-doorway.is-l {
+    grid-column: 4;
+  }
+  & #readme .startrow > a:last-child,
+  & #readme .mood-doorway.is-r {
+    grid-column: 6;
+  }
+  & #readme .startrow > a {
+    --leaf: #1e4a3e;
+    --sheen: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.28),
+      rgba(255, 255, 255, 0.05) 35%,
+      rgba(0, 0, 0, 0.18)
+    );
+    position: relative;
+    z-index: 2;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 46px 12px 0;
+    border: 0;
+    border-radius: 0;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cg fill='rgba(0,0,0,.13)' stroke='rgba(0,0,0,.5)'%3E%3Crect x='12' y='24' width='76' height='22' vector-effect='non-scaling-stroke'/%3E%3Crect x='12' y='50' width='76' height='22' vector-effect='non-scaling-stroke'/%3E%3Crect x='12' y='76' width='76' height='18' vector-effect='non-scaling-stroke'/%3E%3C/g%3E%3Cg fill='none' stroke='rgba(255,236,190,.09)'%3E%3Crect x='14.6' y='25.3' width='70.8' height='19.4' vector-effect='non-scaling-stroke'/%3E%3Crect x='14.6' y='51.3' width='70.8' height='19.4' vector-effect='non-scaling-stroke'/%3E%3Crect x='14.6' y='77.3' width='70.8' height='15.4' vector-effect='non-scaling-stroke'/%3E%3C/g%3E%3C/svg%3E")
+        0 0 / 100% 100% no-repeat,
+      var(--sheen),
+      var(--leaf);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+    filter: none;
+    color: #24160a;
+    font: italic 500 15.5px/1.3 var(--font-display);
+    letter-spacing: 0;
+    text-align: center;
+    text-decoration: none;
+    text-transform: none;
+    white-space: normal;
+    transform: perspective(1400px) rotateY(0deg);
+    transform-origin: left center;
+    transition: transform 1.2s var(--mood-slow);
+  }
+  & #readme .startrow > a:last-child {
+    --leaf: #6a1712;
+    --sheen: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.18),
+      rgba(255, 255, 255, 0.05) 65%,
+      rgba(0, 0, 0, 0.28)
+    );
+    transform-origin: right center;
+  }
+  & #readme .startrow > a svg {
+    display: none;
+  }
+  /* the brass doorplate behind the link's own words */
+  & #readme .startrow > a::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 34px;
+    left: 50%;
+    width: 160px;
+    max-width: calc(100% - 16px);
+    height: 44px;
+    border-radius: 3px;
+    background: var(--mood-plate);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 240, 200, 0.7),
+      0 3px 6px rgba(0, 0, 0, 0.55);
+    translate: -50% 0;
+  }
+  /* the knob */
+  & #readme .startrow > a::after {
+    content: '';
+    position: absolute;
+    top: 52%;
+    right: 16px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fce5b0, var(--mood-brass) 45%, #4e3514);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.6);
+  }
+  & #readme .startrow > a:last-child::after {
+    right: auto;
+    left: 16px;
+  }
+  & #readme .startrow > a:focus-visible {
+    outline: 2px solid var(--mood-amber-l);
+    outline-offset: 4px;
+  }
+  /* ajar on hover / focus, open on click */
+  & #readme .startrow > a:first-child:is(:hover, :focus-visible),
+  & #readme:has(.mood-doorway.is-l:is(.is-ajar, :hover)) .startrow > a:first-child {
+    transform: perspective(1400px) rotateY(24deg);
+  }
+  & #readme .startrow > a:last-child:is(:hover, :focus-visible),
+  & #readme:has(.mood-doorway.is-r:is(.is-ajar, :hover)) .startrow > a:last-child {
+    transform: perspective(1400px) rotateY(-24deg);
+  }
+  & #readme[data-mood-open='l'] .startrow > a:first-child {
+    transform: perspective(1400px) rotateY(78deg);
+  }
+  & #readme[data-mood-open='r'] .startrow > a:last-child {
+    transform: perspective(1400px) rotateY(-78deg);
+  }
+  /* the doorway behind each door: lamplight, the frame, a spill on the floor */
+  & .mood-doorway {
+    position: relative;
+    z-index: 1;
+    display: block;
+    cursor: pointer;
+  }
+  & .mood-doorway i {
+    position: absolute;
+    display: block;
+    font-style: normal;
+  }
+  & .mood-doorway .inner {
+    inset: 0;
+    background: radial-gradient(
+      ellipse 90% 70% at 50% 35%,
+      #f7dda4,
+      #e0a64b 38%,
+      #8a4a1a 75%,
+      #3a1a0c
+    );
+  }
+  & .mood-doorway .inner::after {
+    content: '';
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    bottom: 0;
+    height: 62%;
+    background: radial-gradient(
+      ellipse 50% 40% at 50% 100%,
+      rgba(42, 23, 18, 0.5),
+      transparent 70%
+    );
+  }
+  & .mood-doorway .frame {
+    inset: -12px -12px 0;
+    border: 12px solid var(--mood-wood);
+    border-bottom: 0;
+    box-shadow:
+      inset 0 0 0 1px rgba(216, 176, 114, 0.25),
+      0 0 0 1px rgba(0, 0, 0, 0.6),
+      0 40px 60px -30px rgba(0, 0, 0, 0.9);
+    pointer-events: none;
+  }
+  & .mood-doorway .spill {
+    left: -30%;
+    right: -30%;
+    bottom: -46px;
+    height: 80px;
+    background: radial-gradient(
+      ellipse 45% 60% at 50% 0%,
+      rgba(240, 194, 122, 0.5),
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 1s var(--mood-slow);
+    pointer-events: none;
+  }
+  & .mood-doorway.is-ajar .spill,
+  & #readme:has(.startrow > a:first-child:is(:hover, :focus-visible)) .mood-doorway.is-l .spill,
+  & #readme:has(.startrow > a:last-child:is(:hover, :focus-visible)) .mood-doorway.is-r .spill,
+  & #readme[data-mood-open='l'] .mood-doorway.is-l .spill,
+  & #readme[data-mood-open='r'] .mood-doorway.is-r .spill {
+    opacity: 1;
+  }
+
+  /* ============================================================
+     THE STAIRS: she goes down for noodles, he comes up, and they
+     pass on the narrow flight. Pinned and scrubbed by the scroll,
+     slowest as they pass.
+     ============================================================ */
+  /* A tight frame: the near wall blocks half of it, out of focus, and the
+     stairs climb away to the lamp. Geometry is in container units of the
+     1.66:1 shot (cqw across, cqh down). */
+  & .mood-stairs {
+    --mood-p: 0.5;
+    position: relative;
+    height: 1800px;
+    background: #0b0706;
+  }
+  & .mood-stairs .pin {
+    position: sticky;
+    top: var(--mood-strip);
+    height: min(calc(100vh - var(--mood-strip)), 780px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    overflow: clip;
+  }
+  & .mood-stairs .shot {
+    position: relative;
+    height: min(640px, calc(100vh - var(--mood-strip) - 112px), calc(92vw / 1.66));
+    aspect-ratio: 1.66 / 1;
+    container-type: size;
+    overflow: hidden;
+    background: #0a1012;
+    box-shadow:
+      0 0 0 1px rgba(216, 176, 114, 0.22),
+      0 40px 80px -40px #000;
+  }
+  & .mood-stairs .shot > i,
+  & .mood-stairs .shot > span {
+    position: absolute;
+    display: block;
+  }
+  /* the lane past the top of the stairs */
+  & .mood-stairs .sky {
+    inset: 0;
+    background:
+      radial-gradient(ellipse 24% 46% at 79% 5%, rgba(224, 166, 75, 0.32), transparent 70%),
+      linear-gradient(180deg, #0b1416, #142225 34%, #18130f);
+  }
+  /* the far wall, with the lamp bracketed to it */
+  & .mood-stairs .far {
+    inset: 0;
+    clip-path: polygon(78% 0, 100% 0, 100% 100%, 71.4% 100%, 78.2% 40%);
+    background:
+      radial-gradient(ellipse 22% 34% at 80% 8%, rgba(224, 166, 75, 0.24), transparent 70%),
+      linear-gradient(90deg, #120f0d, #241e19 30%, #17120f);
+  }
+  /* the flight, narrowing as it climbs away from us */
+  & .mood-stairs .steps {
+    left: 0;
+    right: 0;
+    top: 40%;
+    bottom: 0;
+    clip-path: polygon(61% 0, 78.2% 0, 71.4% 100%, 30.5% 100%);
+    background: #2b2622;
+  }
+  & .mood-stairs .steps::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 30% 55% at 72% 0%, rgba(224, 166, 75, 0.2), transparent 70%),
+      linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.5));
+  }
+  /* wet stone: a lit nosing, the tread, then the riser in shadow */
+  & .mood-stairs .steps i {
+    display: block;
+    background: linear-gradient(180deg, #8d8376 0 1.5px, #5d554c 1.5px 32%, #352e28 32%);
+  }
+  & .mood-stairs .steps i:nth-child(1) {
+    height: 2.5cqh;
+  }
+  & .mood-stairs .steps i:nth-child(2) {
+    height: 2.7cqh;
+  }
+  & .mood-stairs .steps i:nth-child(3) {
+    height: 3.1cqh;
+  }
+  & .mood-stairs .steps i:nth-child(4) {
+    height: 3.53cqh;
+  }
+  & .mood-stairs .steps i:nth-child(5) {
+    height: 3.94cqh;
+  }
+  & .mood-stairs .steps i:nth-child(6) {
+    height: 4.36cqh;
+  }
+  & .mood-stairs .steps i:nth-child(7) {
+    height: 4.98cqh;
+  }
+  & .mood-stairs .steps i:nth-child(8) {
+    height: 5.6cqh;
+  }
+  & .mood-stairs .steps i:nth-child(9) {
+    height: 6.23cqh;
+  }
+  & .mood-stairs .steps i:nth-child(10) {
+    height: 6.85cqh;
+  }
+  & .mood-stairs .steps i:nth-child(11) {
+    height: 7.68cqh;
+  }
+  & .mood-stairs .steps i:nth-child(12) {
+    height: 8.53cqh;
+  }
+  & .mood-stairs .slamp {
+    left: 79%;
+    top: 5%;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background: #ffe3a6;
+    box-shadow:
+      0 0 14px 5px rgba(255, 210, 130, 0.8),
+      0 0 60px 30px rgba(224, 166, 75, 0.3);
+  }
+  & .mood-stairs .mood-drop {
+    --fall: 110cqh;
+  }
+  /* Feet at the bottom centre of each box. She starts small under the lamp
+     and ends half behind the near wall; he starts close, cut at the knees,
+     and climbs to where she began. At --mood-p 0.5 they share a step. */
+  & .mood-stairs .fig {
+    width: 20cqh;
+    height: 84cqh;
+    transform-origin: 50% 100%;
+  }
+  & .mood-stairs .fig b {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 8.6cqh;
+    height: 10.4cqh;
+    margin-left: -4.3cqh;
+    border-radius: 50% 50% 44% 44% / 58% 58% 42% 42%;
+    background: #140a08;
+  }
+  & .mood-stairs .fig > i {
+    position: absolute;
+    inset: 10cqh 0 0;
+  }
+  & .mood-stairs .fig.her {
+    left: calc(67.2cqw - 10cqh);
+    top: -42cqh;
+    translate: calc(var(--mood-p) * -24.8cqw) calc(var(--mood-p) * 70cqh);
+    scale: calc(0.3 + var(--mood-p) * 0.7);
+  }
+  /* her hair, set high */
+  & .mood-stairs .fig.her b {
+    width: 9.4cqh;
+    height: 11cqh;
+    margin-left: -4.7cqh;
+    border-radius: 50% 50% 40% 40% / 64% 64% 36% 36%;
+  }
+  /* her cheongsam: high collar, fitted waist, a narrow skirt to the calf,
+     and a different one each time she takes the stairs */
+  & .mood-stairs .fig.her > i {
+    clip-path: polygon(
+      40% 0,
+      60% 0,
+      62% 4%,
+      84% 9%,
+      90% 15%,
+      80% 33%,
+      77% 41%,
+      86% 55%,
+      80% 96%,
+      62% 96%,
+      60% 100%,
+      40% 100%,
+      38% 96%,
+      20% 96%,
+      14% 55%,
+      23% 41%,
+      20% 33%,
+      10% 15%,
+      16% 9%,
+      38% 4%
+    );
+    background-color: #9c2a1e;
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.4),
+        transparent 32%,
+        transparent 62%,
+        rgba(0, 0, 0, 0.5)
+      ),
+      radial-gradient(circle at 30% 30%, rgba(240, 194, 122, 0.6) 0 0.45cqh, transparent 0.6cqh),
+      radial-gradient(circle at 70% 70%, rgba(240, 228, 201, 0.4) 0 0.35cqh, transparent 0.5cqh);
+    background-size:
+      100% 100%,
+      2.4cqh 2.4cqh,
+      3.1cqh 3.1cqh;
+  }
+  & .mood-stairs[data-dress='1'] .fig.her > i {
+    background-color: #2f5d4e;
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.4),
+        transparent 32%,
+        transparent 62%,
+        rgba(0, 0, 0, 0.5)
+      ),
+      repeating-linear-gradient(
+        45deg,
+        rgba(240, 228, 201, 0.32) 0 0.25cqh,
+        transparent 0.25cqh 2.2cqh
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        rgba(240, 228, 201, 0.32) 0 0.25cqh,
+        transparent 0.25cqh 2.2cqh
+      );
+    background-size: 100% 100%;
+  }
+  & .mood-stairs[data-dress='2'] .fig.her > i {
+    background-color: #c98b3a;
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.35),
+        transparent 32%,
+        transparent 62%,
+        rgba(0, 0, 0, 0.45)
+      ),
+      radial-gradient(circle at 50% 50%, rgba(122, 23, 18, 0.7) 0 0.7cqh, transparent 0.85cqh);
+    background-size:
+      100% 100%,
+      3.2cqh 3.2cqh;
+  }
+  & .mood-stairs[data-dress='3'] .fig.her > i {
+    background-color: #1f3b3a;
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.4),
+        transparent 32%,
+        transparent 62%,
+        rgba(0, 0, 0, 0.5)
+      ),
+      radial-gradient(circle at 25% 25%, rgba(240, 228, 201, 0.6) 0 0.8cqh, transparent 0.95cqh),
+      radial-gradient(circle at 75% 75%, rgba(224, 166, 75, 0.5) 0 0.5cqh, transparent 0.65cqh);
+    background-size:
+      100% 100%,
+      4cqh 4cqh,
+      4cqh 4cqh;
+  }
+  & .mood-stairs .fig.him {
+    left: calc(51.6cqw - 10cqh);
+    top: 28cqh;
+    translate: calc(var(--mood-p) * 19.2cqw) calc(var(--mood-p) * -70cqh);
+    scale: calc(1 - var(--mood-p) * 0.7);
+  }
+  /* a dark suit, the white of the collar */
+  & .mood-stairs .fig.him > i {
+    clip-path: polygon(30% 0, 70% 0, 95% 7%, 100% 36%, 92% 100%, 8% 100%, 0 36%, 5% 7%);
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.45),
+        transparent 35%,
+        transparent 60%,
+        rgba(0, 0, 0, 0.5)
+      ),
+      radial-gradient(ellipse 50% 100% at 50% 0, #e9e2d2 60%, transparent 64%) 50% 0 / 26% 1.8cqh
+        no-repeat,
+      #26262b;
+  }
+  /* the thermos she takes for the noodles */
+  & .mood-stairs .fig .th {
+    position: absolute;
+    right: -6%;
+    top: 47%;
+    width: 18%;
+    height: 12%;
+    border-radius: 0.8cqh;
+    background:
+      linear-gradient(rgba(240, 228, 201, 0.55), rgba(240, 228, 201, 0.55)) 0 26% / 100% 10%
+        no-repeat,
+      linear-gradient(90deg, #a3201a, #d8483a, #7a1712);
+  }
+  /* the wall in the foreground, out of focus, with the street's notices on it */
+  & .mood-stairs .swall {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 44%;
+    background-color: #1a1512;
+    background-image:
+      linear-gradient(90deg, transparent 82%, rgba(224, 166, 75, 0.08) 96%, rgba(0, 0, 0, 0.5)),
+      radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.3) 0 2px, transparent 3px),
+      radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.04) 0 2px, transparent 3px);
+    background-size:
+      100% 100%,
+      19px 21px,
+      23px 17px;
+    box-shadow: 18px 0 30px -12px rgba(0, 0, 0, 0.85);
+    filter: blur(1.5px);
+  }
+  & .mood-stairs .po {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    padding: 1.6cqh 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    writing-mode: vertical-rl;
+    font: 700 5cqh/1 var(--mood-cjk);
+    font-style: normal;
+    letter-spacing: 0.14em;
+  }
+  & .mood-stairs .po.a {
+    left: 14%;
+    top: 12%;
+    width: 15%;
+    height: 34%;
+    background: #8e2a1e;
+    color: rgba(20, 10, 8, 0.78);
+    rotate: -2deg;
+    clip-path: polygon(0 0, 100% 0, 100% 88%, 84% 100%, 0 100%);
+  }
+  & .mood-stairs .po.b {
+    left: 40%;
+    top: 18%;
+    width: 15%;
+    height: 34%;
+    background: #c9b48a;
+    color: rgba(138, 29, 21, 0.8);
+    rotate: 1.5deg;
+  }
+  & .mood-stairs .po.c {
+    left: 20%;
+    top: 58%;
+    width: 15%;
+    height: 22%;
+    background: #2f5d4e;
+    color: rgba(240, 228, 201, 0.7);
+    rotate: 1deg;
+    clip-path: polygon(0 0, 92% 0, 100% 100%, 0 100%);
+  }
+  & .mood-stairs .po.d {
+    left: 58%;
+    top: 62%;
+    width: 22%;
+    height: 22%;
+    background: #b98a3a;
+    opacity: 0.6;
+    rotate: -1deg;
+    clip-path: polygon(0 4%, 100% 0, 96% 100%, 4% 92%);
+  }
+  & .mood-stairs .sglow {
+    inset: 0;
+    background: radial-gradient(ellipse 110% 90% at 60% 45%, transparent 50%, rgba(0, 0, 0, 0.62));
+    pointer-events: none;
+  }
+  & .mood-stairs .cap {
+    width: min(1062px, 92vw);
+    margin: 0;
+    font: italic 400 16px/1.4 var(--font-sans);
+    color: #bbaa8b;
+  }
+
+  /* ============================================================
+     EXT. NOODLE STALL (playground)
+     ============================================================ */
+  & #playground .console,
+  & .a2-panel {
+    --paper: #24130e;
+    --paper-2: #1c0f0b;
+    --paper-3: #33201a;
+    --ink: var(--mood-cream);
+    --ink-2: var(--mood-cream-2);
+    --muted: #bbaa8b;
+    --muted-2: #a69a7e;
+    --rule: rgba(216, 176, 114, 0.22);
+    --rule-2: rgba(216, 176, 114, 0.4);
+    --amber: #c9a05c;
+    --amber-deep: #ebbc6c;
+    --amber-soft: rgba(224, 166, 75, 0.14);
+    --blue-soft: #1e3340;
+    --blue-ink: #8fbcd0;
+    --blue-edge: #2d4859;
+    --sage-soft: #233326;
+    --sage-ink: #a4c49c;
+    --sage-edge: #354a38;
+    --clay-soft: #3a241a;
+    --clay-ink: #e0967a;
+    --clay-edge: #4e332a;
+    color: var(--ink);
+  }
+  & #playground .console {
+    border: 0;
+    border-radius: 4px;
+    background: var(--paper);
+    box-shadow:
+      0 0 0 1px rgba(216, 176, 114, 0.35),
+      0 0 0 5px #1a0d0a,
+      0 0 0 6px rgba(216, 176, 114, 0.2),
+      0 30px 60px -30px rgba(0, 0, 0, 0.9);
+  }
+  & :is(#playground .console, .a2-panel) .console-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(216, 176, 114, 0.3);
+    background: linear-gradient(180deg, #3a1e14, #2a150f);
+  }
+  & :is(#playground .console, .a2-panel) .console-bar .who {
+    gap: 12px;
+    font: 600 16px/1 var(--font-display);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    color: var(--ink);
+  }
+  & :is(#playground .console, .a2-panel) :is(.a2-launch-count, .a2-quota, .a2-reset) {
+    font: italic 400 14px/1 var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+  }
+  /* the thermos: three wisps of steam, a lid, a red body with a cream band */
+  & #playground .console-bar .lights {
+    position: relative;
+    display: block;
+    flex: none;
+    width: 20px;
+    height: 30px;
+  }
+  & #playground .console-bar .lights::before {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    left: 4px;
+    right: 4px;
+    top: 3px;
+    height: 6px;
+    border-radius: 2px;
+    background: #c9a05c;
+    transform-origin: 0 100%;
+    transition: transform 0.45s var(--mood-ease);
+  }
+  & #playground .console-bar .lights::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    top: 8px;
+    bottom: 0;
+    border-radius: 3px 3px 4px 4px;
+    background:
+      radial-gradient(4px 3px at 50% 11px, rgba(240, 228, 201, 0.6) 96%, transparent),
+      linear-gradient(90deg, #a3201a, #d8483a 45%, #7a1712);
+    box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.25);
+    transition: box-shadow 0.6s;
+  }
+  & #playground .console-bar .lights i {
+    position: absolute;
+    left: 7px;
+    bottom: 28px;
+    width: 6px;
+    height: 18px;
+    border-radius: 6px;
+    background: rgba(240, 228, 201, 0.6);
+    filter: blur(2px);
+    opacity: 0;
+  }
+  & #playground .console-bar .lights i:nth-child(2) {
+    left: 1px;
+  }
+  & #playground .console-bar .lights i:nth-child(3) {
+    left: 13px;
+  }
+  &[data-mood-agent='speak'] #playground .console-bar .lights::before {
+    transform: rotate(-34deg);
+  }
+  &[data-mood-agent='done'] #playground .console-bar .lights::after {
+    box-shadow:
+      inset 0 -5px 0 rgba(0, 0, 0, 0.25),
+      0 0 14px 3px rgba(224, 166, 75, 0.5);
+  }
+  & #playground .console-body {
+    padding: 18px 18px 16px;
+  }
+  & #playground .a2-launch-lede {
+    max-width: 60ch;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  & :is(#playground .console, .a2-panel) :is(.a2-launch-hint, .a2-starter-lbl) {
+    font: italic 400 14px/1.3 var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+  }
+  & :is(#playground .console, .a2-panel) .a2-starter-lbl {
+    font-style: normal;
+    font-size: 15px;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+  }
+  /* brass: the stall's one button */
+  & :is(#playground .console, .a2-panel) .btn-amber,
+  & .mood-brass {
+    height: 44px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 3px;
+    background: var(--mood-plate);
+    color: #24160a;
+    font: 600 16px/1 var(--font-display);
+    letter-spacing: 0.01em;
+    text-transform: none;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 240, 200, 0.7),
+      0 3px 6px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition:
+      transform 0.12s,
+      filter 0.15s;
+  }
+  & :is(#playground .console, .a2-panel) .btn-amber:hover,
+  & .mood-brass:hover {
+    filter: brightness(1.08);
+  }
+  & :is(#playground .console, .a2-panel) .btn-amber:active,
+  & .mood-brass:active {
+    transform: scale(0.97);
+  }
+  & :is(#playground .console, .a2-panel) .btn-amber:focus-visible,
+  & .mood-brass:focus-visible {
+    outline: 2px solid var(--mood-amber-l);
+    outline-offset: 3px;
+  }
+  & :is(#playground .console, .a2-panel) .btn[disabled] {
+    filter: grayscale(0.6) brightness(0.8);
+  }
+  /* the questions you can ask, written up like a stall's orders */
+  & :is(#playground .console, .a2-panel) .a2-action {
+    padding: 6px 13px 7px;
+    border: 1px solid rgba(216, 176, 114, 0.45);
+    border-radius: 17px;
+    background: transparent;
+    color: var(--ink-2);
+    font: italic 400 14.5px/1.2 var(--font-sans);
+    transition:
+      background-color 0.15s,
+      color 0.15s,
+      transform 0.12s;
+  }
+  & :is(#playground .console, .a2-panel) .a2-action:hover {
+    border-color: var(--mood-cream);
+    background: var(--mood-cream);
+    color: #2a1712;
+  }
+  & :is(#playground .console, .a2-panel) .a2-action:active {
+    transform: scale(0.96);
+  }
+  & :is(#playground .console, .a2-panel) .alert.is-info {
+    border: 1px dashed rgba(216, 176, 114, 0.35);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--muted);
+    font: italic 400 14px/1.55 var(--font-sans);
+  }
+
+  /* the slideover: the inside of the stall */
+  & .a2-drawer::backdrop {
+    background: rgb(8 5 4 / 0.62);
+  }
+  & .a2-panel {
+    border-left: 0;
+    background: #1c0f0b;
+    box-shadow:
+      inset 1px 0 0 rgba(216, 176, 114, 0.4),
+      inset 6px 0 0 #120806,
+      inset 7px 0 0 rgba(216, 176, 114, 0.18);
+  }
+  & .a2-panel-bar .who {
+    position: relative;
+  }
+  & .a2-panel-bar .who::before {
+    content: '';
+    flex: none;
+    width: 14px;
+    height: 24px;
+    border-radius: 3px 3px 4px 4px;
+    background:
+      linear-gradient(#c9a05c, #c9a05c) 50% 0 / 10px 5px no-repeat,
+      radial-gradient(4px 3px at 50% 9px, rgba(240, 228, 201, 0.6) 96%, transparent),
+      linear-gradient(90deg, #a3201a, #d8483a 45%, #7a1712) 50% 100% / 14px 20px no-repeat;
+    transition: filter 0.6s;
+  }
+  & .a2-panel-bar .who::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    bottom: 20px;
+    width: 6px;
+    height: 16px;
+    border-radius: 6px;
+    background: rgba(240, 228, 201, 0.6);
+    filter: blur(2px);
+    opacity: 0;
+  }
+  &[data-mood-agent='done'] .a2-panel-bar .who::before {
+    filter: drop-shadow(0 0 6px rgba(224, 166, 75, 0.7));
+  }
+  & .a2-lamp {
+    background: radial-gradient(circle at 35% 35%, #fce5b0, var(--mood-brass) 45%, #4e3514);
+    color: #24160a;
+  }
+  & .a2-lamp.is-close {
+    background: radial-gradient(circle at 35% 35%, #f3a397, #b0281f 50%, #5e1410);
+    color: #f6e7c8;
+  }
+  & .a2-panel-scroll {
+    background-color: #1c0f0b;
+    background-image:
+      repeating-linear-gradient(60deg, rgba(240, 228, 201, 0.03) 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(-60deg, rgba(240, 228, 201, 0.03) 0 1px, transparent 1px 22px);
+  }
+  & .a2-panel-foot {
+    background: #24130e;
+    border-top-color: rgba(216, 176, 114, 0.3);
+  }
+  & .a2-ask {
+    font: italic 400 15px/1.5 var(--font-sans);
+  }
+  & :is(#playground .console, .a2-panel) .input {
+    height: 44px;
+    border: 1px solid rgba(216, 176, 114, 0.4);
+    border-radius: 3px;
+    background: #140b08;
+    color: var(--mood-cream);
+    font: 400 15px/1 var(--font-sans);
+  }
+  & :is(#playground .console, .a2-panel) .input::placeholder {
+    color: #a8977a;
+  }
+  & :is(#playground .console, .a2-panel) .input:focus {
+    border-color: var(--mood-amber-l);
+    box-shadow: 0 0 0 3px rgba(224, 166, 75, 0.25);
+    background: #140b08;
+  }
+  & :is(#playground .console, .a2-panel) .input[disabled] {
+    background: #1c0f0b;
+    color: #a8977a;
+  }
+  /* every answer comes on cream paper, with Tomas's chop in the corner */
+  & .a2-surface {
+    --paper: #efe3c8;
+    --paper-2: #e4d5b4;
+    --paper-3: #dccba8;
+    --ink: #2a1712;
+    --ink-2: #4a3426;
+    --muted: #6b5440;
+    --muted-2: #6e5843;
+    --rule: rgba(42, 23, 18, 0.16);
+    --rule-2: rgba(42, 23, 18, 0.3);
+    --amber: #b0281f;
+    --amber-deep: #8a1d15;
+    --amber-soft: rgba(176, 40, 31, 0.12);
+    --on-accent: #f6e7c8;
+    --blue-soft: #e0ebf1;
+    --blue-ink: #2e5c73;
+    --blue-edge: #bcd3dd;
+    --sage-soft: #e1ebdf;
+    --sage-ink: #4a6a47;
+    --sage-edge: #c6d7c2;
+    --clay-soft: #f2ddd3;
+    --clay-ink: #a04b26;
+    --clay-edge: #e8c7b7;
+    position: relative;
+    padding: 16px 18px 18px;
+    border-radius: 2px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.8);
+  }
+  /* the same seal as the rail's: a chop says who, not what */
+  & .a2-surface::after {
+    content: 'TB';
+    content: 'TB' / '';
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    background: #a3201a;
+    color: #f6e7c8;
+    font: 700 12.5px/1 var(--font-display);
+    letter-spacing: 0.04em;
+    box-shadow: inset 0 0 0 2px rgba(246, 231, 200, 0.25);
+    rotate: 4deg;
+  }
+  & .a2-surface > .a2-stack > :first-child {
+    padding-right: 40px;
+  }
+  & .a2-surface .a2-heading h3 {
+    font: 600 19px/1.25 var(--font-display);
+  }
+  & .a2-surface .a2-text {
+    font-size: 14.5px;
+  }
+  & .a2-surface .a2-action:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  & .a2-surface .a2-action {
+    border-color: var(--rule-2);
+    color: var(--ink-2);
+  }
+
+  /* ============================================================
+     INT. SHIPPING OFFICE (work): smoke curls off a row you linger on
+     ============================================================ */
+  & #work .idx {
+    width: calc(100% - 2 * var(--inset));
+  }
+  & #work .idx td {
+    padding: 20px 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  & #work .idx tbody tr:hover td {
+    background: transparent;
+  }
+  & #work .idx .n {
+    width: 78px;
+    padding-left: 0;
+    font: italic 400 40px/1 var(--font-display);
+    color: var(--amber-deep);
+  }
+  & #work .idx .proj b {
+    width: fit-content;
+    padding-bottom: 2px;
+    font: 600 23px/1.2 var(--font-display);
+    letter-spacing: 0;
+    color: var(--ink);
+    background: linear-gradient(var(--amber-deep), var(--amber-deep)) left 100% / 0 1px no-repeat;
+    transition: background-size 0.9s var(--mood-slow);
+  }
+  & #work .idx tr:is(:hover, :focus-within) .proj b {
+    color: var(--ink);
+    background-size: 100% 1px;
+  }
+  & #work .idx .proj span {
+    margin-top: 6px;
+    max-width: 52ch;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  & #work .idx .stk {
+    font: 400 14px/1.45 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--muted);
+  }
+  & #work .idx .yr {
+    font: italic 400 16px/1.45 var(--font-display);
+    font-variant-numeric: oldstyle-nums;
+    color: var(--muted);
+  }
+  & #work .idx .stk {
+    width: 150px;
+  }
+  & #work .idx .yr {
+    position: relative;
+    padding-right: 0;
+  }
+  & #work .idx .yr::before,
+  & #work .idx .yr::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    bottom: 55%;
+    width: 10px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(240, 228, 201, 0.42);
+    filter: blur(5px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  & #work .idx .yr::after {
+    right: 21px;
+  }
+
+  /* ============================================================
+     INT. NEWSPAPER OFFICE (open source): clippings
+     ============================================================ */
+  & #oss .repos {
+    display: grid;
+    gap: 26px;
+  }
+  & #oss .repo {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 12px;
+    padding: 18px 20px 28px;
+    border: 0;
+    background: #e6dcc5;
+    color: #22180f;
+    box-shadow: 0 14px 26px -16px rgba(0, 0, 0, 0.85);
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - 8px),
+      96% 100%,
+      92% calc(100% - 6px),
+      87% 100%,
+      82% calc(100% - 7px),
+      76% 100%,
+      70% calc(100% - 5px),
+      64% 100%,
+      58% calc(100% - 7px),
+      52% 100%,
+      46% calc(100% - 6px),
+      40% 100%,
+      34% calc(100% - 8px),
+      28% 100%,
+      22% calc(100% - 5px),
+      16% 100%,
+      10% calc(100% - 7px),
+      5% 100%,
+      0 calc(100% - 6px)
+    );
+    rotate: -0.8deg;
+    transition:
+      rotate 0.7s var(--mood-slow),
+      translate 0.7s var(--mood-slow);
+  }
+  & #oss .repo:nth-child(even) {
+    rotate: 0.9deg;
+  }
+  & #oss .repo:is(:hover, :focus-visible) {
+    rotate: 0deg;
+    translate: 0 -3px;
+  }
+  & #oss .repo:focus-visible {
+    outline-color: #8a1d15;
+    outline-offset: -10px;
+  }
+  /* over each clipping, the flag of the paper it was cut from, ruled off twice */
+  & #oss .repo::before {
+    content: 'github.com';
+    content: 'github.com' / '';
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 3px double rgba(34, 24, 15, 0.45);
+    font: 700 15px/1.2 var(--font-display);
+    font-variant-caps: small-caps;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    color: #3a2a1e;
+  }
+  & #oss .repo .meta {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    font: italic 400 14px/1.3 var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
+    color: #5e4a36;
+  }
+  & #oss .repo .nm {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font: 700 26px/1.15 var(--font-display);
+    color: #22180f;
+  }
+  & #oss .repo .nm .org {
+    font: 400 14px/1 var(--font-mono);
+    color: #5e4a36;
+  }
+  & #oss .repo:hover .nm {
+    color: #8a1d15;
+  }
+  & #oss .repo .desc {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    max-width: 62ch;
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #3a2a1e;
+  }
+
+  /* ============================================================
+     INT. MRS. SUEN'S FLAT, DAY (log): tear-off calendar leaves
+     ============================================================ */
+  & #log .log {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 22px;
+  }
+  & #log .logitem {
+    position: relative;
+    display: block;
+    background: #efe3c8;
+    color: #2a1712;
+    box-shadow: 0 12px 22px -14px rgba(0, 0, 0, 0.85);
+    transform-origin: 50% 0;
+    rotate: -1.2deg;
+    transition:
+      rotate 0.8s var(--mood-slow),
+      translate 0.8s var(--mood-slow);
+  }
+  & #log .logitem:nth-child(even) {
+    rotate: 1deg;
+  }
+  & #log .logitem:hover {
+    rotate: 0deg;
+    translate: 0 -2px;
+  }
+  & #log .logitem::before {
+    content: attr(data-mood-month);
+    display: block;
+    min-height: 36px;
+    padding: 9px 12px;
+    background: #a3201a;
+    color: #f6e7c8;
+    font: 900 18px/1 var(--mood-cjk);
+    letter-spacing: 0.1em;
+  }
+  & #log .logitem::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    z-index: 2;
+    width: 11px;
+    height: 11px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f0c27a, #8a5a20);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+  }
+  & #log .logitem .gutter {
+    display: none;
+  }
+  & #log .logitem .lbody {
+    position: relative;
+    padding: 10px 12px 16px;
+  }
+  & #log .logitem .lbody::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    background: linear-gradient(225deg, transparent 45%, rgba(0, 0, 0, 0.2) 50%, #d9c9a6 56%);
+    transition:
+      width 0.5s var(--mood-slow),
+      height 0.5s var(--mood-slow);
+  }
+  & #log .logitem:hover .lbody::after {
+    width: 36px;
+    height: 36px;
+  }
+  & #log .logitem .top {
+    gap: 6px 10px;
+  }
+  & #log .logitem .date {
+    order: -1;
+    flex-basis: 100%;
+    font: italic 500 30px/1.05 var(--font-display);
+    color: #2a1712;
+  }
+  & #log .logitem :is(.hash, .tag) {
+    padding: 0;
+    border: 0;
+    font: 400 12px/1.3 var(--font-mono);
+    letter-spacing: 0;
+    text-transform: none;
+    color: #6b5440;
+  }
+  & #log .logitem .tag {
+    font: italic 400 14px/1.3 var(--font-sans);
+  }
+  & #log .logitem .hash {
+    color: #8a1d15;
+  }
+  & #log .logitem .msg {
+    margin-top: 6px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: #4a3426;
+  }
+  & #log .logitem .msg a {
+    color: #8a1d15;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  & #log .logitem.upcoming::before {
+    background: #4a3426;
+  }
+  & #log .logitem.upcoming :is(.date, .msg) {
+    font-style: italic;
+    color: #6b5440;
+  }
+
+  /* ============================================================
+     INT. HOTEL ROOM 2046 (writing): the serial, by hand on 原稿紙
+     ============================================================ */
+  /* the curtains hang inside the jambs here, so the words sit further in */
+  & #writing {
+    --inset: 110px;
+  }
+  & #writing .wrow {
+    grid-template-columns: 110px minmax(0, 1fr) auto;
+    padding: 14px 0 13px;
+    border-bottom: 0;
+  }
+  & #writing .wrow :is(.d, .rt) {
+    font: italic 400 14.5px/1.4 var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+  & #writing .wrow .t {
+    position: relative;
+    justify-self: start;
+    font: italic 500 23px/1.25 var(--font-display);
+    letter-spacing: 0;
+    color: var(--ink);
+  }
+  /* a stroke of red ink under the title you are over, drawn as the nib goes across */
+  & #writing .wrow .t::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    bottom: -5px;
+    width: calc(100% + 6px);
+    height: 7px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5.2 C 30 3.4, 62 6.4, 96 4.4 S 160 2.6, 199 4.6' fill='none' stroke='%238a1d15' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E")
+      0 0 / 100% 100% no-repeat;
+    clip-path: inset(0 100% 0 0);
+  }
+  & #writing .wrow:is(:hover, :focus-visible) .t::after {
+    clip-path: inset(0 0 0 0);
+  }
+
+  /* ============================================================
+     INT. TAXI (principles): numbers in outline, inked on hover
+     ============================================================ */
+  & #principles .tenets {
+    gap: 32px 34px;
+  }
+  & #principles .tenet .nn {
+    font: italic 700 58px/1 var(--font-display);
+    color: transparent;
+    -webkit-text-stroke: 1px var(--amber-deep);
+    transition: color 1.2s var(--mood-slow);
+  }
+  & #principles .tenet:hover .nn {
+    color: #a3201a;
+  }
+  & #principles .tenet h3 {
+    margin: 8px 0 6px;
+    font: 600 22px/1.2 var(--font-display);
+    letter-spacing: 0;
+  }
+  & #principles .tenet p {
+    max-width: none;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ============================================================
+     INT. MRS. SUEN'S FLAT, NIGHT (stack): the mahjong tiles
+     ============================================================ */
+  & #stack .toolbox {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 26px 22px;
+  }
+  & #stack .toolcol {
+    text-align: left;
+  }
+  & #stack .toolcol .h {
+    margin-bottom: 12px;
+    font: 400 15px/1 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+    text-transform: none;
+    color: var(--muted);
+  }
+  /* each column a player's rack of tiles, stood on end along the table's edge */
+  & #stack .toolcol ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px 5px;
+    padding: 0 0 12px;
+    border-bottom: 6px solid #3a2416;
+    box-shadow: 0 6px 10px -6px rgba(0, 0, 0, 0.8);
+  }
+  /* an ivory face over a green back, the name painted in red, green or blue */
+  & #stack .toolcol li {
+    display: block;
+    padding: 9px 10px 8px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #f6ecd4, #e6d8b8);
+    color: #a3201a;
+    font: 500 15px/1 var(--font-sans);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+      0 4px 0 #2f5d4e,
+      0 5px 0 #1d3d33,
+      0 7px 8px -2px rgba(0, 0, 0, 0.55);
+    transition: translate 0.35s var(--mood-ease);
+  }
+  & #stack .toolcol li:nth-child(3n + 2) {
+    color: #2f5d4e;
+  }
+  & #stack .toolcol li:nth-child(3n) {
+    color: #22406a;
+  }
+  & #stack .toolcol li::before {
+    content: none;
+  }
+  & #stack .toolcol li:hover {
+    translate: 0 -6px;
+  }
+
+  /* ============================================================
+     EXT. ANGKOR WAT (now): the wall, then the credits
+     ============================================================ */
+  & #now .specs {
+    display: flex;
+    flex-direction: column;
+  }
+  & #now .spec {
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 0;
+    border-top: 1px solid var(--rule);
+  }
+  & #now .spec:first-child {
+    border-top: 0;
+  }
+  & #now .spec dt {
+    font: 400 15px/1.45 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+    text-transform: none;
+    color: var(--muted);
+  }
+  & #now .spec dd {
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  /* out here the doorframe is cut stone, not wood */
+  & :is(#now, .mood-secret) .mood-room::before,
+  & :is(#now, .mood-secret) .mood-room::after {
+    background: #7d6c4e;
+  }
+  /* 2046: the red curtains of the hotel corridor */
+  & .mood-room .curtain {
+    position: absolute;
+    top: 24px;
+    bottom: 0;
+    z-index: 1;
+    display: block;
+    width: 72px;
+    background: repeating-linear-gradient(
+      90deg,
+      #7a1712 0 10px,
+      #9c2219 10px 16px,
+      #5e1410 16px 26px
+    );
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+  }
+  /* each sways from its own rail, inward, never over the jamb */
+  & .mood-room .curtain.is-l {
+    --sway: 2.5deg;
+    left: calc(var(--side) + 14px);
+    border-radius: 0 0 46px 0;
+    transform-origin: 0 0;
+  }
+  & .mood-room .curtain.is-r {
+    --sway: -2.5deg;
+    right: calc(var(--side) + 14px);
+    border-radius: 0 0 0 46px;
+    transform-origin: 100% 0;
+  }
+
+  /* after the last room: the wall at Angkor in the same daylight, then the
+     end credits on black */
+  & .mood-annex {
+    position: relative;
+    isolation: isolate;
+    color: var(--ink);
+  }
+  & .mood-secret {
+    --paper: #c6b894;
+    --ink: #22130f;
+    --ink-2: #45322a;
+    --muted: #56432f;
+    --amber-deep: #741a12;
+  }
+  & .mood-credits {
+    --paper: #100c0a;
+    --ink: var(--mood-cream);
+    --ink-2: var(--mood-cream-2);
+    --muted: #b7a98e;
+    --amber-deep: #e0a64b;
+  }
+  & .mood-secret-panel {
+    margin-block: 4px 44px;
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 28px;
+    align-items: center;
+  }
+  /* a block of the temple's sandstone, and the hole worn into it */
+  & .mood-wallhole {
+    position: relative;
+    width: 180px;
+    height: 150px;
+    overflow: hidden;
+    background: radial-gradient(circle at 30% 30%, #b09a74, #8a7454 60%, #6a5638);
+    box-shadow:
+      inset 0 0 26px rgba(40, 28, 14, 0.55),
+      0 10px 22px -14px rgba(40, 28, 14, 0.9);
+  }
+  & .mood-wallhole::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* the block's joints, and weather: darker where rain runs down it */
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpath d='M0 29.25H120M0 59.25H120M1 0V29.25M61 29.25V60' fill='none' stroke='%23000' stroke-opacity='.3' stroke-width='1.5'/%3E%3Cpath d='M0 31H120M0 1H120' fill='none' stroke='%23FFF0D2' stroke-opacity='.1'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 30% 60% at 78% 20%, rgba(40, 46, 30, 0.35), transparent 70%),
+      radial-gradient(ellipse 40% 30% at 15% 85%, rgba(40, 46, 30, 0.3), transparent 70%);
+    background-size:
+      150px 75px,
+      100% 100%,
+      100% 100%;
+    background-position:
+      -40px 2px,
+      0 0,
+      0 0;
+  }
+  & .mood-wallhole .hole {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46px;
+    height: 34px;
+    margin: -17px 0 0 -23px;
+    border-radius: 42% 58% 51% 49% / 55% 44% 56% 45%;
+    background: radial-gradient(ellipse at 50% 40%, #0a0605, #2a1c12 70%, #5a4a36);
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.8);
+  }
+  & .mood-wallhole .mud {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 60px;
+    height: 48px;
+    margin: -24px 0 0 -30px;
+    border-radius: 46% 54% 48% 52%;
+    background: radial-gradient(circle at 40% 35%, #7a6040, #4e3a22 70%);
+    box-shadow:
+      inset -2px -3px 6px rgba(0, 0, 0, 0.4),
+      0 2px 3px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: scale(0.2);
+    transition:
+      transform 0.7s cubic-bezier(0.3, 1.4, 0.5, 1),
+      opacity 0.3s;
+  }
+  & .mood-wallhole.is-sealed .mud {
+    opacity: 1;
+    transform: none;
+  }
+  & .mood-wallhole .wsp {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    max-width: 170px;
+    overflow: hidden;
+    font: italic 400 15px/1.2 var(--font-display);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--mood-cream);
+    text-shadow: 0 1px 3px #000;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+  & .mood-wallhole.is-whisper .wsp {
+    animation: mood-into 0.9s var(--mood-slow) both;
+  }
+  & .mood-secret-form .slab {
+    display: block;
+    margin-bottom: 4px;
+    font: 600 21px/1.3 var(--font-display);
+    color: var(--ink);
+  }
+  & .mood-secret-form .shint {
+    margin: 0 0 12px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  & .mood-secret-form .srow {
+    display: flex;
+    gap: 8px;
+  }
+  & .mood-secret-form .sin {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid rgba(216, 176, 114, 0.45);
+    border-radius: 3px;
+    background: #140b08;
+    color: var(--mood-cream);
+    font: italic 400 16px/1 var(--font-display);
+  }
+  & .mood-secret-form .sin::placeholder {
+    color: #a8977a;
+  }
+  & .mood-secret-form .sin:focus-visible {
+    outline: 2px solid var(--mood-amber-l);
+    outline-offset: 2px;
+    border-color: var(--mood-amber-l);
+  }
+  & .mood-secret-form .sdone {
+    min-height: 1.55em;
+    margin: 12px 0 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  & .mood-credits {
+    text-align: center;
+  }
+  & .mood-credits-in {
+    padding: 30px 0 40px;
+    border-top: 1px solid rgba(240, 228, 201, 0.2);
+  }
+  & .mood-credits .cr {
+    display: grid;
+    gap: 4px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  & .mood-credits .cr > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: 18px;
+    align-items: baseline;
+    padding: 4px 0;
+  }
+  & .mood-credits .cr dt {
+    text-align: right;
+    font: italic 400 14.5px/1.4 var(--font-sans);
+    color: var(--muted);
+  }
+  & .mood-credits .cr dd {
+    margin: 0;
+    text-align: left;
+    font: 500 17px/1.4 var(--font-display);
+    color: var(--mood-cream);
+  }
+  & .mood-credits .cr-note {
+    margin: 22px 0 0;
+    font: italic 400 13.5px/1.5 var(--font-sans);
+    color: var(--muted);
+  }
+
+  /* the footer: the last of the credits' black */
+  & .content > .foot {
+    --side: max(0px, calc((100% - var(--mood-door)) / 2));
+    --muted: #b7a98e;
+    --amber-deep: #e0a64b;
+    justify-content: center;
+    gap: 12px 26px;
+    margin: 0;
+    padding: 22px calc(var(--side) + 40px) 34px;
+    border: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0 var(--side),
+      var(--mood-wood) 0 calc(var(--side) + 14px),
+      #100c0a 0 calc(100% - var(--side) - 14px),
+      var(--mood-wood) 0 calc(100% - var(--side)),
+      transparent 0
+    );
+    font: 400 15px/1.4 var(--font-sans);
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+    text-transform: none;
+    color: var(--muted);
+  }
+  & .content > .foot .foot-links {
+    gap: 20px;
+  }
+  & .content > .foot a {
+    padding: 2px 4px;
+    color: var(--mood-cream-2);
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+  & .content > .foot a:hover {
+    background: var(--amber-deep);
+    color: #2a1712;
+  }
+
+  /* ---------- the wall clock: time passes as you walk the corridor ---------- */
+  & .mood-clock {
+    position: fixed;
+    left: max(16px, calc((100vw - 848px) / 4 - 59px));
+    bottom: 26px;
+    z-index: 20;
+    width: 118px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition:
+      opacity 0.8s var(--mood-slow),
+      transform 0.8s var(--mood-slow),
+      visibility 0s linear 0.8s;
+  }
+  &[data-mood-inside]:not([data-mood-stairs]) .mood-clock {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    pointer-events: auto;
+    transition:
+      opacity 0.8s var(--mood-slow),
+      transform 0.8s var(--mood-slow);
+  }
+  & .mood-clock .face {
+    position: relative;
+    display: block;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #f6ebd2, #e2d2ae 70%, #c9b68e);
+    box-shadow:
+      0 0 0 5px #3a2416,
+      0 0 0 6px rgba(216, 176, 114, 0.4),
+      0 12px 24px -8px rgba(0, 0, 0, 0.8);
+  }
+  & .mood-clock .face i {
+    position: absolute;
+    display: block;
+  }
+  & .mood-clock .ticks {
+    inset: 0;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from -1deg, #2a1712 0 2deg, transparent 2deg 30deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 41px, #000 42px 48px, transparent 49px);
+    mask: radial-gradient(circle, transparent 0 41px, #000 42px 48px, transparent 49px);
+  }
+  & .mood-clock :is(.hh, .mm) {
+    left: 50%;
+    bottom: 50%;
+    border-radius: 2px;
+    transform-origin: 50% 100%;
+    transition: rotate 1.2s var(--mood-slow);
+  }
+  & .mood-clock .hh {
+    width: 4px;
+    height: 26px;
+    margin-left: -2px;
+    background: #2a1712;
+    rotate: calc(var(--mood-room) * 14deg);
+  }
+  & .mood-clock .mm {
+    width: 2.5px;
+    height: 40px;
+    margin-left: -1.25px;
+    background: #8a1d15;
+    rotate: calc(var(--mood-room) * 160deg);
+  }
+  & .mood-clock .dot {
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    margin: -4px 0 0 -4px;
+    border-radius: 50%;
+    background: #2a1712;
+  }
+  & .mood-clock .yr {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    font: 600 16px/1 var(--font-display);
+    letter-spacing: 0.04em;
+    color: var(--mood-amber-l);
+    text-shadow: 0 1px 2px #000;
+  }
+  & .mood-clock:focus-visible {
+    outline-color: var(--mood-amber-l);
+    border-radius: 50%;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  /* narrower desktops: the doorplates take a second row of the strip */
+  @media (max-width: 1599px) {
+    & .rail .id .rl {
+      display: none;
+    }
+  }
+  @media (max-width: 1439px) and (min-width: 821px) {
+    --mood-strip: 106px;
+    & .railnav {
+      order: 5;
+      flex-basis: 100%;
+      justify-content: center;
+      margin: 0;
+    }
+    & .rail {
+      flex-wrap: wrap;
+    }
+    & .reelpick {
+      margin-left: auto;
+    }
+  }
+  @media (max-width: 1259px) {
+    & .mood-window,
+    & .mood-vtitle {
+      display: none;
+    }
+    /* no title on the wall, no window: the words, then the two doors */
+    & #readme {
+      grid-template-columns:
+        minmax(0, 0.4fr) minmax(0, 520px) minmax(40px, 1fr) var(--door-w)
+        clamp(26px, 2.6vw, 40px) var(--door-w) minmax(24px, 0.3fr);
+    }
+  }
+  @media (max-width: 1200px) {
+    & .mood-clock {
+      display: none;
+    }
+  }
+  /* too narrow for one run beside the doors: three and two, not four and one */
+  @media (max-width: 1099px) and (min-width: 961px) {
+    & #readme > .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, max-content);
+    }
+  }
+  @media (max-width: 960px) {
+    & .block:not(#readme),
+    & .mood-annex,
+    & #now {
+      --side: 0px;
+      --inset: 26px;
+      border-inline: 6px solid var(--mood-wood);
+    }
+    & .block:not(#readme)::before {
+      height: 64px;
+    }
+    & .block:not(#readme)::after {
+      height: 48px;
+    }
+    & .content > .foot {
+      --side: 0px;
+      padding-inline: 24px;
+      background: #100c0a;
+      border-inline: 6px solid var(--mood-wood);
+    }
+    & .mood-room::before,
+    & .mood-room::after,
+    & .mood-room :is(.wall, .curtain) {
+      display: none;
+    }
+    & .mood-secret-panel {
+      margin-top: 0;
+      grid-template-columns: minmax(0, 1fr);
+    }
+    & .mood-wallhole {
+      width: 100%;
+    }
+    & #log .log,
+    & #principles .tenets,
+    & #stack .toolbox {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    & #writing .wrow {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    & #writing .wrow .t {
+      grid-column: 1 / -1;
+      grid-row: 1;
+    }
+    & #writing .wrow .d {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    & #writing .wrow .rt {
+      grid-column: 2;
+      grid-row: 2;
+    }
+    & #now .spec {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
+
+    /* the hero stacks: words first, then the two doors side by side */
+    & #readme {
+      --door-h: 320px;
+      --dado: 130px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto auto auto auto auto 56px;
+      column-gap: 22px;
+      min-height: 0;
+      padding: 30px 18px 0;
+      border-inline: 0;
+    }
+    & #readme > .keybar {
+      grid-area: 1 / 1 / 2 / 3;
+    }
+    & #readme > .lede {
+      grid-area: 2 / 1 / 3 / 3;
+      font-size: 30px;
+    }
+    & #readme > .sub {
+      grid-area: 3 / 1 / 4 / 3;
+    }
+    & #readme > .metrics {
+      grid-area: 4 / 1 / 5 / 3;
+    }
+    & #readme .startrow > a,
+    & #readme .mood-doorway {
+      grid-row: 5;
+      width: min(100%, 230px);
+      margin-top: 52px;
+    }
+    /* side by side, as upstairs: her door against his */
+    & #readme .startrow > a:first-child,
+    & #readme .mood-doorway.is-l {
+      grid-column: 1;
+      justify-self: end;
+    }
+    & #readme .startrow > a:last-child,
+    & #readme .mood-doorway.is-r {
+      grid-column: 2;
+      justify-self: start;
+    }
+    /* a shorter door: the plate sits higher, above the first panel */
+    & #readme .startrow > a {
+      padding-top: 26px;
+    }
+    & #readme .startrow > a::before {
+      top: 14px;
+      height: 40px;
+    }
+    & .mood-stairs {
+      height: 1300px;
+    }
+  }
+  @media (max-width: 820px) {
+    --mood-strip: 0px;
+    & .rail {
+      position: static;
+      flex-wrap: wrap;
+      gap: 12px 16px;
+      padding: 16px 18px 12px;
+    }
+    & .railnav {
+      display: flex;
+      order: 3;
+      flex-basis: calc(100% + 36px);
+      justify-content: flex-start;
+      margin: 0 -18px;
+      padding: 4px 18px 6px;
+    }
+    & .reelpick {
+      order: 2;
+      flex: 1 0 100%;
+      justify-content: space-between;
+    }
+    & .rail-foot {
+      order: 1;
+      margin-left: auto;
+    }
+    & .reelpick .rail-sec {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin: 0;
+      color: var(--muted);
+    }
+    /* the frame runs edge to edge, held in the middle of the phone */
+    & .mood-stairs .pin {
+      top: max(0px, calc(50svh - 200px));
+      height: min(100svh, 400px);
+    }
+    & .mood-stairs .shot {
+      height: calc(100vw / 1.66);
+      box-shadow: none;
+    }
+    & .mood-stairs .cap {
+      width: auto;
+      align-self: stretch;
+      padding-inline: 18px;
+    }
+  }
+  @media (max-width: 600px) {
+    & #readme > .metrics {
+      gap: 12px 22px;
+    }
+    & #readme .startrow > a {
+      font-size: 14px;
+      padding-inline: 10px;
+    }
+    & #readme .startrow > a::before {
+      width: calc(100% - 20px);
+    }
+    & #readme > .lede {
+      font-size: 27px;
+    }
+    & .block:not(#readme) > .keybar b {
+      font-size: 27px;
+    }
+    & #work .idx {
+      table-layout: fixed;
+    }
+    & #work .idx td {
+      padding: 16px 4px;
+    }
+    & #work .idx .n {
+      width: 46px;
+      font-size: 30px;
+    }
+    & #work .idx .yr {
+      width: 46px;
+    }
+    & #work .idx .proj b {
+      font-size: 19px;
+    }
+    & #log .logitem .date {
+      font-size: 26px;
+    }
+    & #writing .wrow .t {
+      font-size: 20px;
+    }
+    & .mood-secret-form .srow {
+      flex-direction: column;
+    }
+    /* in a column, flex: 1 would size the field's height from zero */
+    & .mood-secret-form .sin {
+      flex: none;
+    }
+    /* the credits roll one name under its role, as a film's do */
+    & .mood-credits .cr > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      padding: 6px 0;
+    }
+    & .mood-credits .cr :is(dt, dd) {
+      text-align: center;
+    }
+  }
+  @media (max-width: 400px) {
+    & .block:not(#readme),
+    & .mood-annex,
+    & #now {
+      --inset: 18px;
+    }
+  }
+
+  /* ============================================================
+     MOTION (only for those who have not asked for less)
+     ============================================================ */
+  @media (prefers-reduced-motion: no-preference) {
+    & .mood-grain {
+      animation: mood-grain 1s steps(6) infinite;
+    }
+    & .mood-window .lamp {
+      animation: mood-flicker 9s linear infinite;
+    }
+    & .mood-room .curtain {
+      animation: mood-sway 7s ease-in-out infinite;
+    }
+    & .mood-room .curtain.is-r {
+      animation-delay: -3.5s;
+    }
+    &[data-mood-agent='think'] #playground .console-bar .lights::before {
+      animation: mood-jiggle 0.3s steps(2) infinite;
+    }
+    &:is([data-mood-agent='think'], [data-mood-agent='speak']) #playground .console-bar .lights i,
+    &:is([data-mood-agent='think'], [data-mood-agent='speak']) .a2-panel-bar .who::after {
+      animation: mood-steam 1.5s ease-out infinite;
+    }
+    & #playground .console-bar .lights i:nth-child(2) {
+      animation-delay: 0.5s;
+    }
+    & #playground .console-bar .lights i:nth-child(3) {
+      animation-delay: 1s;
+    }
+    & .a2-surface::after {
+      animation: mood-chop 0.42s cubic-bezier(0.3, 1.4, 0.5, 1) 0.25s both;
+    }
+    & #work .idx tr:hover .yr::before {
+      animation: mood-wisp 2.8s ease-out both;
+    }
+    & #work .idx tr:hover .yr::after {
+      animation: mood-wisp 2.8s ease-out 0.6s both;
+    }
+    & #writing .wrow .t::after {
+      transition: clip-path 0.55s var(--mood-ease);
+    }
+
+    /* a room's lamp is out until you reach it; then it warms up and stays lit */
+    & .mood-room .sconce {
+      transition:
+        filter 0.8s var(--mood-ease),
+        box-shadow 0.8s var(--mood-ease);
+    }
+    & .mood-room .pool {
+      transition: opacity 1.3s var(--mood-slow) 0.1s;
+    }
+    &[data-mood='on'] [data-sec]:not([data-mood-lit]) .mood-room .sconce {
+      filter: brightness(0.5) saturate(0.7);
+      box-shadow: none;
+    }
+    &[data-mood='on'] [data-sec]:not([data-mood-lit]) .mood-room .pool {
+      opacity: 0;
+    }
+
+    @supports (animation-timeline: view()) {
+      & .mood-stairs {
+        view-timeline: --mood-stairs block;
+      }
+      /* the curve is client.ts's pace(): quick at the ends, slow as they pass */
+      & .mood-stairs .shot {
+        animation: mood-stairs
+          linear(
+            0,
+            0.17 10%,
+            0.314 20%,
+            0.414 30%,
+            0.47 40%,
+            0.5 50%,
+            0.53 60%,
+            0.586 70%,
+            0.686 80%,
+            0.83 90%,
+            1
+          )
+          both;
+        animation-timeline: --mood-stairs;
+        animation-range: contain 0% contain 100%;
+      }
+      & .mood-room :is(.sconce, .pool) {
+        animation: mood-par linear both;
+        animation-timeline: view();
+        animation-range: cover 0% cover 100%;
+      }
+    }
+    @supports (animation-timeline: scroll()) {
+      & .mood-clock .mm {
+        animation: mood-mm linear both;
+        animation-timeline: scroll(root);
+      }
+      & .mood-clock .hh {
+        animation: mood-hh linear both;
+        animation-timeline: scroll(root);
+      }
+    }
+  }
+
+  /* reduced motion: the stairs become a still, the rain hangs in the air */
+  @media (prefers-reduced-motion: reduce) {
+    & .mood-stairs {
+      height: auto;
+    }
+    & .mood-stairs .pin {
+      position: static;
+      height: auto;
+      padding: 56px 16px;
+    }
+    & .mood-drop {
+      top: var(--y);
+      animation: none !important;
+    }
+  }
+}
+
+/* ============================================================
+   THE TITLE CARD (inside the projector, before the root switches)
+   ============================================================ */
+.projector[data-title='mood'] .mood-title {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(100vw - 48px);
+  height: 100vh;
+  color: #f0e4c9;
+}
+.projector[data-title='mood'] .mood-title .t-cone {
+  position: absolute;
+  inset: max(0px, (100vh - 100vw / 2.39) / 2) 0;
+  overflow: hidden;
+  -webkit-mask-image: radial-gradient(ellipse 30% 75% at 76% 8%, #000 12%, transparent 72%);
+  mask-image: radial-gradient(ellipse 30% 75% at 76% 8%, #000 12%, transparent 72%);
+}
+.projector[data-title='mood'] .mood-title .mood-drop {
+  position: absolute;
+  top: -40px;
+  width: 1px;
+  background: linear-gradient(rgba(255, 226, 170, 0), rgba(255, 226, 170, 0.9));
+  opacity: 0;
+  animation: mood-fall 0.6s linear infinite paused;
+  --fall: 100vh;
+}
+.projector[data-title='mood'][data-state='card'] .mood-title .mood-drop {
+  animation-play-state: running;
+}
+.projector[data-title='mood'] .mood-title .t-lamp {
+  position: absolute;
+  left: 76%;
+  top: calc(max(0px, (100vh - 100vw / 2.39) / 2) + 3%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffe3a6;
+  box-shadow:
+    0 0 16px 6px rgba(255, 210, 130, 0.8),
+    0 0 120px 60px rgba(224, 166, 75, 0.25);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.projector[data-title='mood'][data-state='card'] .mood-title .t-lamp {
+  opacity: 1;
+}
+.projector[data-title='mood'] .mood-title .t-in {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+.projector[data-title='mood'] .mood-title .t-cn {
+  writing-mode: vertical-rl;
+  font:
+    900 72px/1 'Mood Serif TC',
+    'Songti TC',
+    'Noto Serif CJK TC',
+    serif;
+  letter-spacing: 0.24em;
+  color: #b0281f;
+  opacity: 0;
+}
+.projector[data-title='mood'] .mood-title .t-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+.projector[data-title='mood'] .mood-title .t-en {
+  font:
+    italic 400 30px/1.15 'Bodoni Moda Variable',
+    Georgia,
+    serif;
+  opacity: 0;
+}
+.projector[data-title='mood'] .mood-title .t-sub {
+  font:
+    italic 400 16px/1.3 'Spectral',
+    Georgia,
+    serif;
+  color: #bbaa8b;
+  opacity: 0;
+}
+/* one long, even rise each, the slow motion the film walks in */
+.projector[data-title='mood'][data-state='card'] .mood-title .t-cn {
+  animation: mood-fadein 0.9s cubic-bezier(0.45, 0, 0.2, 1) 0.05s both;
+}
+.projector[data-title='mood'][data-state='card'] .mood-title :is(.t-en, .t-sub) {
+  animation: mood-fadein 0.7s cubic-bezier(0.45, 0, 0.2, 1) 0.32s both;
+}
+.projector[data-title='mood'][data-state='card'] .mood-title .t-sub {
+  animation-delay: 0.44s;
+}
+.projector[data-title='mood']:is([data-state='open']) .mood-title :is(.t-cn, .t-en, .t-sub) {
+  opacity: 1;
+}
+@media (max-width: 600px) {
+  .projector[data-title='mood'] .mood-title .t-in {
+    gap: 20px;
+  }
+  .projector[data-title='mood'] .mood-title .t-cn {
+    font-size: 52px;
+  }
+  .projector[data-title='mood'] .mood-title .t-en {
+    font-size: 22px;
+  }
+  .projector[data-title='mood'] .mood-title .t-sub {
+    font-size: 14px;
+  }
+}
+
+/* ---------- keyframes ---------- */
+@keyframes mood-grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  17% {
+    transform: translate(-29px, 19px);
+  }
+  33% {
+    transform: translate(17px, -37px);
+  }
+  50% {
+    transform: translate(-41px, -11px);
+  }
+  67% {
+    transform: translate(31px, 27px);
+  }
+  83% {
+    transform: translate(-7px, 43px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes mood-fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes mood-fall {
+  to {
+    transform: translateY(var(--fall, 260px));
+  }
+}
+@keyframes mood-flicker {
+  0%,
+  93%,
+  100% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0.45;
+  }
+  95% {
+    opacity: 1;
+  }
+  96.5% {
+    opacity: 0.6;
+  }
+}
+@keyframes mood-stairs {
+  from {
+    --mood-p: 0;
+  }
+  to {
+    --mood-p: 1;
+  }
+}
+@keyframes mood-par {
+  from {
+    translate: 0 70px;
+  }
+  to {
+    translate: 0 -70px;
+  }
+}
+@keyframes mood-mm {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 1440deg;
+  }
+}
+@keyframes mood-hh {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 120deg;
+  }
+}
+@keyframes mood-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scaleY(0.6);
+  }
+  30% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6px, -24px) scaleY(1.3);
+  }
+}
+@keyframes mood-jiggle {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-2px) rotate(-4deg);
+  }
+}
+@keyframes mood-chop {
+  from {
+    opacity: 0;
+    scale: 1.8;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes mood-wisp {
+  0% {
+    opacity: 0;
+    transform: translate(0, 10px) scale(0.6) rotate(0deg);
+  }
+  25% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(14px, -64px) scale(1.7) rotate(25deg);
+  }
+}
+@keyframes mood-sway {
+  0%,
+  100% {
+    transform: skewX(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewX(var(--sway, 2.5deg)) scaleX(1.12);
+  }
+}
+@keyframes mood-into {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -170%) scale(1.15);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+    filter: blur(2px);
+  }
+}
+
+/* Shorter room index and doors that remain usable without the removed hero links. */
+:root[data-reel='mood'] {
+  .railnav {
+    flex: 0 1 auto;
+    gap: 4px;
+  }
+  .railnav a {
+    min-width: 42px;
+    height: 36px;
+    padding-inline: 9px;
+  }
+  .railnav a:is([href='#playground'], [href='#log'], [href='#principles'], [href='#stack']) {
+    display: none;
+  }
+  #readme .mood-doorway {
+    perspective: 1400px;
+    outline-offset: 12px;
+  }
+  .mood-door-leaf {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(90deg, rgb(6 17 13 / 0.45), transparent 30%, rgb(6 17 13 / 0.2)),
+      repeating-linear-gradient(0deg, transparent 0 23%, rgb(5 15 12 / 0.25) 23% 24%), #234a3c;
+    box-shadow:
+      inset 0 0 0 2px #142e26,
+      inset 0 0 0 12px rgb(13 26 19 / 0.2);
+    transform-origin: left center;
+    transition: transform 1.2s var(--mood-slow);
+  }
+  .is-r .mood-door-leaf {
+    background-color: #66271d;
+    transform-origin: right center;
+  }
+  .mood-door-leaf b {
+    position: absolute;
+    top: 17%;
+    left: 50%;
+    translate: -50% 0;
+    padding: 7px 14px;
+    border: 1px solid #7e582d;
+    background: linear-gradient(115deg, #a4773b, #dec38a 40%, #a77c43);
+    color: #302110;
+    font: italic 500 16px/1.2 var(--font-display);
+    box-shadow: 0 2px 5px rgb(0 0 0 / 0.35);
+  }
+  .mood-door-leaf .handle {
+    right: 12%;
+    top: 48%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #c5a367;
+    box-shadow: 0 2px 4px #140e08;
+  }
+  .is-r .mood-door-leaf .handle {
+    right: auto;
+    left: 12%;
+  }
+  .mood-doorway.is-l:is(:hover, :focus-visible, .is-ajar) .mood-door-leaf {
+    transform: rotateY(-24deg);
+  }
+  .mood-doorway.is-r:is(:hover, :focus-visible, .is-ajar) .mood-door-leaf {
+    transform: rotateY(24deg);
+  }
+  #readme[data-mood-open='l'] .is-l .mood-door-leaf {
+    transform: rotateY(-76deg);
+  }
+  #readme[data-mood-open='r'] .is-r .mood-door-leaf {
+    transform: rotateY(76deg);
+  }
+  .mood-stairs {
+    --mood-dress: #843426;
+  }
+  .mood-stairs[data-dress='1'] {
+    --mood-dress: #33564a;
+  }
+  .mood-stairs[data-dress='2'] {
+    --mood-dress: #9b8251;
+  }
+  .mood-stairs[data-dress='3'] {
+    --mood-dress: #545f68;
+  }
+  .mood-stairs .mood-person {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(3px 4px 4px rgb(0 0 0 / 0.35));
+  }
+  .mood-stairs .swall {
+    background-size:
+      100% 100%,
+      5px 7px,
+      9px 11px;
+    filter: blur(2px);
+  }
+  .mood-stairs .steps i {
+    background: linear-gradient(180deg, #706c5b 0 1px, #443f35 1px 30%, #252923 32%);
+  }
+  .mood-stairs .sglow {
+    background:
+      radial-gradient(ellipse 38% 90% at 76% 0%, rgb(235 185 106 / 0.13), transparent 80%),
+      radial-gradient(ellipse 95% 90% at 62% 45%, transparent 38%, rgb(0 0 0 / 0.64));
+  }
+  .block {
+    scroll-margin-top: calc(var(--mood-strip) + 16px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-reel='mood'] .mood-door-leaf {
+    transition: none;
+  }
+}
+
+/* Designeer / Lagan Bansal: digital water, translated into corridor-window reflections. */
+:root[data-reel='mood'] {
+  .mood-liquid-memory {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    contain: paint;
+    color: #d7aa6b;
+  }
+  .mood-liquid-streak {
+    position: absolute;
+    inset: -20%;
+    background: linear-gradient(
+      115deg,
+      transparent 27%,
+      rgb(214 131 65 / 0.16) 35%,
+      rgb(235 190 109 / 0.3) 41%,
+      transparent 54%
+    );
+    transform: translateX(calc(var(--find-x, 0) * 12px));
+    transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .mood-liquid-title {
+    position: absolute;
+    right: 12%;
+    top: 16%;
+    writing-mode: vertical-rl;
+    font: 700 clamp(20px, 2.3vw, 36px)/1.2 var(--mood-cjk);
+    letter-spacing: 0.2em;
+    color: #c4563b;
+    opacity: 0.3;
+    transform: translate(calc(var(--find-x, 0) * -5px), calc(var(--find-y, 0) * -7px));
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .mood-water-ring {
+    position: absolute;
+    bottom: 8%;
+    left: 30%;
+    width: 52%;
+    aspect-ratio: 4 / 1;
+    border: 1px solid rgb(219 175 102 / 0.5);
+    border-radius: 50%;
+    opacity: 0.35;
+  }
+  .mood-water-ring.is-b {
+    left: 8%;
+    bottom: 16%;
+    width: 34%;
+  }
+  .mood-water-ring.is-c {
+    left: 48%;
+    bottom: 21%;
+    width: 30%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mood-water-ring {
+      animation: mood-memory-ring 5.8s ease-out infinite paused;
+    }
+    .mood-water-ring.is-b {
+      animation-delay: -2.1s;
+    }
+    .mood-water-ring.is-c {
+      animation-delay: -4.2s;
+    }
+    .mood-liquid-memory.is-live .mood-water-ring {
+      animation-play-state: running;
+    }
+  }
+}
+@keyframes mood-memory-ring {
+  0% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.55;
+  }
+  90%,
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}

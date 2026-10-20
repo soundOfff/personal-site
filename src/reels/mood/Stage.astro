@@ -1,0 +1,339 @@
+---
+/**
+ * Reel 02 · In the Mood for Love: reel-only markup. Rendered once per point
+ * listed in config.stages; the engine hides it unless this reel is screening.
+ *
+ *   backdrop          film grain
+ *   in:readme         the landing: wallpaper, wainscot, a rain window, two doorways
+ *   after:readme      the stairs crossing (pinned, scroll-scrubbed)
+ *   in:<room>         the doorway's jambs, and a lamp on the wall if the scene is at night
+ *   in:writing        + the lintel's one room plate, 2046, and the crimson curtains
+ *   after:now         the wall at Angkor Wat you tell a secret to (client-side only)
+ *   credits           end credits and the wall clock
+ *   title             花樣年華 in the projector: a lamp, rain in its cone
+ */
+import type { StagePoint } from '../types';
+
+interface Props {
+  at: StagePoint;
+}
+const { at } = Astro.props;
+
+// Rain: deterministic, so server and client agree and nothing reflows.
+let seed = 2046;
+const rnd = () => {
+  seed = (seed * 9301 + 49297) % 233280;
+  return seed / 233280;
+};
+const drops = (count: number, minH: number, maxH: number) =>
+  Array.from({ length: count }, () => {
+    const l = (rnd() * 100).toFixed(2);
+    const h = Math.round(minH + rnd() * (maxH - minH));
+    const o = (0.35 + rnd() * 0.6).toFixed(2);
+    const du = (0.45 + rnd() * 0.35).toFixed(2);
+    const de = (rnd() * 1.1).toFixed(2);
+    // --y: where the drop hangs in the still frame (reduced motion)
+    const y = Math.round(rnd() * 90);
+    return `left:${l}%;height:${h}px;opacity:${o};animation-duration:${du}s;animation-delay:-${de}s;--y:${y}%`;
+  });
+
+// Which walls carry a lit sconce, after the slug's time of day: none by day,
+// one at night, both in the hotel corridor outside 2046.
+const rooms: Partial<Record<StagePoint, ('l' | 'r')[]>> = {
+  'in:playground': ['r'],
+  'in:work': [],
+  'in:oss': ['l'],
+  'in:log': [],
+  'in:writing': ['l', 'r'],
+  'in:principles': ['r'],
+  'in:stack': ['l'],
+  'in:now': [],
+};
+const lamps = rooms[at];
+const heroRain = at === 'in:readme' ? drops(26, 12, 26) : [];
+const stairRain = at === 'after:readme' ? drops(34, 16, 34) : [];
+const titleRain = at === 'title' ? drops(40, 18, 40) : [];
+
+const credits: [string, string][] = [
+  ['A portfolio by', 'Tomas Brasca'],
+  ['Screened through', 'In the Mood for Love, Wong Kar-wai, 2000'],
+  ['Rooms and cheongsams after', 'William Chang Suk-ping'],
+  ['The waltz after', 'Shigeru Umebayashi'],
+];
+---
+
+{at === 'backdrop' && <div class="mood-grain" aria-hidden="true" />}
+
+{
+  at === 'in:readme' && (
+    <>
+      <span class="mood-hall" aria-hidden="true">
+        <i class="wp" />
+        <i class="dado" />
+        <i class="wain" />
+        <i class="floor" />
+        <i class="vig" />
+      </span>
+      <span class="mood-window" aria-hidden="true" data-mood-rain="hero">
+        <i class="pole" />
+        <i class="lamp" />
+        <span class="mood-cone">
+          {heroRain.map((s) => (
+            <i class="mood-drop" style={s} />
+          ))}
+        </span>
+        <i class="mv" />
+        <i class="mh" />
+        <i class="glass" />
+        <span class="mood-liquid-memory" data-film-find="mood" data-find-zone=".mood-window">
+          <span class="mood-liquid-streak" />
+          <span class="mood-liquid-title" lang="zh-Hant">
+            花樣年華
+          </span>
+          <span class="mood-water-ring is-a" />
+          <span class="mood-water-ring is-b" />
+          <span class="mood-water-ring is-c" />
+        </span>
+      </span>
+      <span class="mood-vtitle" aria-hidden="true">
+        <span class="zh">花樣年華</span>
+        <span class="en">In the Mood for Love</span>
+      </span>
+      <a
+        class="mood-doorway is-l"
+        href="#playground"
+        aria-label="Open the portfolio playground"
+        data-mood-door="l"
+      >
+        <i class="inner" />
+        <i class="frame" />
+        <i class="spill" />
+        <span class="mood-door-leaf">
+          <>
+            <b>Playground</b>
+            <i class="handle" />
+          </>
+        </span>
+      </a>
+      <a class="mood-doorway is-r" href="#work" aria-label="See the work" data-mood-door="r">
+        <i class="inner" />
+        <i class="frame" />
+        <i class="spill" />
+        <span class="mood-door-leaf">
+          <>
+            <b>Work</b>
+            <i class="handle" />
+          </>
+        </span>
+      </a>
+    </>
+  )
+}
+
+{
+  at === 'after:readme' && (
+    <div class="mood-stairs" aria-hidden="true" data-mood-stairs>
+      <div class="pin">
+        <div class="shot" data-mood-rain="stairs">
+          <i class="sky" />
+          <i class="far" />
+          <span class="steps">
+            {Array.from({ length: 12 }, () => (
+              <i />
+            ))}
+          </span>
+          <i class="slamp" />
+          <span class="fig her">
+            <svg class="mood-person" viewBox="0 0 200 840" fill="none">
+              <path d="m75 630 4 137 18 16 11-10-3-138m14-2 4 141 17 7 9-12-5-139" fill="#bba080" />
+              <path
+                d="m75 767 22 7 13 12-2 16-39-3 2-16m49-13 20-2 14 20-1 14-35-3Z"
+                fill="#110e10"
+              />
+              <path d="M83 73h34l4 44-20 18-20-18Z" fill="#bda181" />
+              <path
+                d="M60 40C61 9 87-3 110 4c26 6 35 31 28 61l-12 28-19 10-26-11-17-22Z"
+                fill="#141110"
+              />
+              <path
+                d="m83 104-25 22-24 39-3 114 14 117 13-2-3-125 15-71 7 85-16 122 1 265c29 17 59 18 84-2l-1-259-15-129 8-90 13 83-2 121 14 5 9-127-6-115-25-37-23-21-14 11-8-5Z"
+                fill="var(--mood-dress, #843426)"
+              />
+              <path
+                d="m83 112 13 20 13-9 14 13M77 285c12 9 37 10 51 0M105 140l12 132 10 170-4 210"
+                stroke="#d2a86b"
+                stroke-opacity="0.3"
+                stroke-width="3"
+              />
+              <path d="m54 396 1 30-9 4-6-13 4-23m102-1-3 28 10 5 8-12-2-19" fill="#bda181" />
+              <path
+                d="M65 155 54 267l9 127 3 233m67-470 10 111-6 131 3 228"
+                stroke="#120e0d"
+                stroke-opacity="0.28"
+                stroke-width="9"
+              />
+            </svg>
+            <span class="th" />
+          </span>
+          <span class="fig him">
+            <svg class="mood-person" viewBox="0 0 200 840" fill="none">
+              <path d="m72 87 6 35 23 13 22-16 2-39" fill="#b49c81" />
+              <path
+                d="M65 43C64 12 89-1 111 4c24 5 33 24 29 50l-6 32-22 17-24-7-17-20Z"
+                fill="#151315"
+              />
+              <path
+                d="m78 116-28 14-28 50-7 153 19 105 14-5-7-109 19-85 5 178-6 156 8 215 25 4 12-217 12 216 27-3 5-216-8-155 2-179 17 82-2 117 14 1 12-125-10-148-29-41-27-14-17 17Z"
+                fill="#28282b"
+              />
+              <path d="m78 117 24 16 20-16-17 94Z" fill="#d8d0bd" />
+              <path d="m99 135 8 1 5 17-8 70-9-69Z" fill="#342322" />
+              <path
+                d="m77 125-12 41 24 43 14 55m22-139 13 42-24 43-11 54v147"
+                stroke="#101519"
+                stroke-width="5"
+              />
+              <path
+                d="m69 785-7 25 3 16 38-1-3-18-9-19m27-2-3 25 8 15 37-2-9-19-12-20"
+                fill="#101114"
+              />
+              <path d="m33 433-2 26 12 6 7-18-3-15m115-6-3 27 10 7 8-15-3-18" fill="#b49c81" />
+              <path d="m65 420 39 8 36-10m-35 11-4 153" stroke="#101519" stroke-width="4" />
+            </svg>
+          </span>
+          <span class="mood-cone">
+            {stairRain.map((s) => (
+              <i class="mood-drop" style={s} />
+            ))}
+          </span>
+          {/* in front of them both: the camera shoots past this wall, and she slips behind it */}
+          <span class="swall">
+            <i class="po a">吉屋招租</i>
+            <i class="po b">粥粉麵飯</i>
+            <i class="po c">跌打</i>
+            <i class="po d" />
+          </span>
+          <i class="sglow" />
+        </div>
+        <p class="cap">Hong Kong, 1962</p>
+      </div>
+    </div>
+  )
+}
+
+{
+  lamps && (
+    <span class="mood-room" aria-hidden="true">
+      {lamps.map((side) => (
+        <span class={`wall is-${side}`}>
+          <i class="pool" />
+          <i class="sconce" />
+        </span>
+      ))}
+      {at === 'in:writing' && (
+        <>
+          <span class="lintel">
+            <b class="plate">2046</b>
+          </span>
+          <i class="curtain is-l" />
+          <i class="curtain is-r" />
+        </>
+      )}
+    </span>
+  )
+}
+
+{
+  at === 'after:now' && (
+    <div class="mood-annex mood-secret">
+      <span class="mood-room" aria-hidden="true" />
+      <div class="mood-secret-panel">
+        <div class="mood-wallhole" aria-hidden="true" data-mood-hole>
+          <i class="hole" />
+          <span class="wsp" data-mood-whisper />
+          <i class="mud" />
+        </div>
+        <form class="mood-secret-form" method="dialog" data-mood-secret>
+          <label class="slab" for="mood-secret">
+            Tell the wall a secret
+          </label>
+          <p class="shint" id="mood-secret-hint">
+            Whisper it into the hole, then cover it with mud. Nothing you type leaves this page.
+          </p>
+          <div class="srow">
+            <input
+              id="mood-secret"
+              class="sin"
+              type="text"
+              maxlength="120"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="whisper something…"
+              aria-describedby="mood-secret-hint"
+            />
+            <button class="mood-brass" type="submit">
+              Seal it
+            </button>
+          </div>
+          <p class="sdone" aria-live="polite" data-mood-sealed />
+        </form>
+      </div>
+    </div>
+  )
+}
+
+{
+  at === 'credits' && (
+    <>
+      <div class="mood-annex mood-credits">
+        <span class="mood-room" aria-hidden="true">
+          <span class="wall is-l" />
+          <span class="wall is-r" />
+        </span>
+        <div class="mood-credits-in">
+          <dl class="cr">
+            {credits.map(([k, v]) => (
+              <div>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p class="cr-note">A fan homage, not affiliated with the film.</p>
+        </div>
+      </div>
+      <button class="mood-clock" type="button" aria-label="Ring the wall clock" data-mood-clock>
+        <span class="face" aria-hidden="true">
+          <i class="ticks" />
+          <i class="hh" />
+          <i class="mm" />
+          <i class="dot" />
+        </span>
+        <span class="yr" aria-hidden="true" data-mood-year>
+          1962
+        </span>
+      </button>
+    </>
+  )
+}
+
+{
+  at === 'title' && (
+    <div class="mood-title">
+      <span class="mood-cone t-cone">
+        {titleRain.map((s) => (
+          <i class="mood-drop" style={s} />
+        ))}
+      </span>
+      <span class="t-lamp" />
+      <span class="t-in">
+        <span class="t-cn">花樣年華</span>
+        <span class="t-col">
+          <span class="t-en">In the Mood for Love</span>
+          <span class="t-sub">Wong Kar-wai, 2000</span>
+          <span class="t-sub">A portfolio by Tomas Brasca</span>
+        </span>
+      </span>
+    </div>
+  )
+}

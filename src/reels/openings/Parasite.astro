@@ -1,0 +1,86 @@
+---
+const steps = Array.from({ length: 14 }, (_, i) => `M${365 + i * 14} ${468 + i * 17}h28v17`);
+---
+
+<div class="opening-scene opening-parasite" data-opening="parasite">
+  <div class="ps-underground" aria-hidden="true"></div>
+  <div class="ps-copy">
+    <p class="shot-kicker">01 / Parasite</p>
+    <h1>Look<br /><em>beneath.</em></h1>
+    <p class="ps-note">Interfaces above.<br />Systems underneath.</p>
+  </div>
+  <p class="ps-below" aria-hidden="true">The work<br />behind the work.</p>
+  <div class="ps-drawing" aria-hidden="true">
+    <svg viewBox="0 0 800 1100" fill="none">
+      <defs>
+        <pattern id="ps-lawn" width="12" height="14" patternUnits="userSpaceOnUse"
+          ><path d="m2 10 2-4m5 6 1-3" stroke="#617457" stroke-width=".7"></path></pattern
+        >
+        <pattern id="ps-concrete" width="40" height="32" patternUnits="userSpaceOnUse"
+          ><circle cx="4" cy="4" r="1" fill="#777b6c" opacity=".3"></circle></pattern
+        >
+      </defs>
+      <path d="M68 74h660v408H68Z" fill="#d7d9ca"></path>
+      <path d="M68 74h660v408H68Z" fill="url(#ps-concrete)"></path>
+      <path d="M388 160h340v245H388Z" fill="#a7b18e"></path>
+      <path d="M388 340h340v65H388Z" fill="url(#ps-lawn)"></path>
+      <path d="M475 344v-97m0 57-23-25m23 3 29-33" stroke="#394333" stroke-width="4"></path>
+      <path
+        d="M438 210c-27-28-1-67 28-62 20-31 65-17 63 15 33 7 34 48 4 58 9 28-29 43-45 25-31 20-65-7-50-36Z"
+        fill="#485e43"></path>
+      <path
+        d="M445 178c7-18 24-21 35-15 19-18 43-4 37 14"
+        stroke="#748563"
+        stroke-width="8"
+        stroke-linecap="round"></path>
+      <path d="M68 74h660v25H68Zm0 386h660v27H68Z" fill="#262e25"></path>
+      <path d="M98 100v360m290-360v360m169-360v360m149-360v360" stroke="#273329" stroke-width="9"
+      ></path>
+      <path d="M100 406h286v54H100Z" fill="#92917b"></path>
+      <path d="M124 340h176v66H124Z" fill="#6d705e"></path>
+      <path d="M135 351h154m-95 0v43m52-43v43" stroke="#b1b29c" stroke-width="1"></path>
+      <path d="M160 340v-78m-20-2h40l-5-48h-30Z" stroke="#7f806c" stroke-width="2"></path>
+      <path d="M68 487h660v376H68Z" fill="#17231f"></path>
+      <path d="M68 487h660v376H68Z" fill="url(#ps-concrete)" opacity=".3"></path>
+      <path d="M90 526h225v21H90Zm0 220h225v21H90Z" fill="#85917b"></path>
+      <path d="M90 547h225v199H90Z" fill="#253c30"></path>
+      <path d="M90 646h225m-112-99v199" stroke="#121c17" stroke-width="8"></path>
+      <path d="M365 487v254h224" stroke="#98a78a" stroke-width="2"></path>
+      {steps.map((d) => <path d={d} stroke="#98a78a" stroke-width="2" />)}
+      <path d="M68 863h660v21H68Z" fill="#91a080"></path>
+      <path d="M590 884v85" stroke="#a0aa92" stroke-width="1"></path>
+      <ellipse cx="590" cy="972" rx="6" ry="10" fill="#e5cb83"></ellipse>
+      <path d="m590 974-70 93h140Z" fill="#e5cb83" opacity=".05"></path>
+      <path d="M68 884v190h660V884" stroke="#657763" stroke-width="1"></path>
+      <path
+        d="M38 74v1000m-9-1000h18m-18 413h18m-18 397h18m-18 190h18"
+        stroke="currentColor"
+        opacity=".35"></path>
+      <text
+        x="22"
+        y="290"
+        transform="rotate(-90 22 290)"
+        fill="currentColor"
+        font-size="10"
+        letter-spacing="2">1F</text
+      >
+      <text
+        x="22"
+        y="715"
+        transform="rotate(-90 22 715)"
+        fill="currentColor"
+        font-size="10"
+        letter-spacing="2">B1</text
+      >
+      <text
+        x="22"
+        y="1030"
+        transform="rotate(-90 22 1030)"
+        fill="currentColor"
+        font-size="10"
+        letter-spacing="2">B2</text
+      >
+    </svg>
+  </div>
+  <span class="ps-native" lang="ko" aria-hidden="true">기생충</span>
+</div>
