@@ -1,6 +1,5 @@
 import type { ReelContext } from './types';
 
-const FILMS = new Set(['parasite', 'mood', 'br2049', 'budapest', 'odyssey']);
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const smooth = (n: number) => {
   const p = clamp(n);
@@ -9,11 +8,10 @@ const smooth = (n: number) => {
 
 /** A small scroll clock. Each film interprets the phases with its own composition. */
 export function mountCamera(ctx: ReelContext): () => void {
-  if (!FILMS.has(ctx.reel.id)) return () => {};
   const track = document.querySelector<HTMLElement>('[data-camera]');
   const pin = track?.querySelector<HTMLElement>('.camera-pin');
   const scene = track?.querySelector<HTMLElement>(`[data-opening='${ctx.reel.id}']`);
-  if (!track || !pin || !scene) return () => {};
+  if (!track || !pin || !scene || scene.dataset.openingMode === 'flow') return () => {};
   const frame = pin.querySelector<HTMLElement>('.camera-frame')!;
   const progress = pin.querySelector<HTMLElement>('.camera-progress > span');
   const on = { passive: true, signal: ctx.signal };

@@ -1,38 +1,31 @@
----
-const rain = Array.from({ length: 52 }, (_, i) => ({
-  x: (i * 97) % 700,
-  y: (i * 173) % 980,
-  l: 15 + ((i * 7) % 90),
-}));
----
-
-<div class="opening-scene opening-mood" data-opening="mood">
-  <div class="mk-aperture" aria-hidden="true">
-    <div class="mk-reflection"><span></span><span></span><span></span></div>
-    <div class="mk-lettering" lang="zh-Hant">花樣年華</div>
-    <svg class="mk-rain" viewBox="0 0 700 1000" preserveAspectRatio="xMidYMid slice">
-      <defs
-        ><linearGradient id="mk-water" x2="0" y2="1"
-          ><stop stop-color="#f6cf8a" stop-opacity="0"></stop><stop
-            offset="1"
-            stop-color="#f6cf8a"
-            stop-opacity=".5"></stop></linearGradient
-        ></defs
-      >
-      {
-        rain.map(({ x, y, l }) => (
-          <path d={`M${x} ${y}v${l}`} stroke="url(#mk-water)" stroke-width={y % 3 ? '.6' : '1.2'} />
-        ))
-      }
-    </svg>
-    <div class="mk-mullion"></div>
+<div class="opening-scene opening-mood" data-opening="mood" data-opening-mode="flow">
+  <div
+    class="mk-photo"
+    role="img"
+    aria-label="Amber hotel passage seen through dark timber screens, a letter on the table and rain on the jade-lit window"
+  >
   </div>
-  <div class="mk-copy">
+  <div class="mk-title">
     <p class="shot-kicker">02 / In the Mood for Love</p>
     <h1>Work<br />and <em>notes.</em></h1>
-    <p class="mk-note">Web and mobile apps,<br />with a lot of backend work.</p>
+    <p>Web and mobile apps,<br />with a lot of backend work.</p>
+    <nav aria-label="Mood opening"><a href="#work">Work ↓</a><a href="#now">Contact ↗</a></nav>
   </div>
-  <div class="mk-screen" aria-hidden="true"><span></span><span></span><span></span></div>
-  <p class="mk-after" aria-hidden="true">Projects<br /><em>and notes.</em></p>
-  <span class="mk-rule" aria-hidden="true"></span>
+  <span class="mk-native" lang="zh-Hant" aria-hidden="true">花樣年華</span>
+  <details data-opening-disclosure>
+    <summary>
+      <span class="mk-closed-label">A letter left unfinished ↗</span>
+      <span class="mk-open-label">Close the letter ×</span>
+    </summary>
+    <div class="mk-letter">
+      <p class="shot-kicker">A note from the unglamorous middle</p>
+      <h2>The part<br /><em>nobody demos.</em></h2>
+      <p>
+        The first startup came three and a half years into my career. The work that stayed with me
+        was the part that rarely appears in the demo.
+      </p>
+      <p class="mk-signature">Tomas</p>
+      <a href="/blog/the-unglamorous-middle">Read the personal essay ↗</a>
+    </div>
+  </details>
 </div>
