@@ -1,6 +1,6 @@
 ---
 title: 'Why a static site shows a dynamic demo'
-description: 'This site ships near-zero JavaScript and still runs real inference on demand. How the island + serverless split works.'
+description: 'A historical build log of the router demo: prerendered pages, one interactive island, and one server endpoint. The demo changed; the boundary still matters.'
 date: 2026-04-03
 pillar: 'Build logs'
 tags: ['astro', 'architecture', 'islands', 'cloudflare']
@@ -8,7 +8,9 @@ readingTime: '6 min'
 draft: false
 ---
 
-This site is prerendered HTML everywhere except the one feature it exists to show off: a demo that runs real inference.
+> This post describes the original router demo. In July 2026, an [A2UI portfolio agent](/work/flagship) replaced it. The examples and API path below are historical; the current endpoint is `/api/a2ui`.
+
+The original design combined prerendered pages with one interactive demo that ran inference on demand.
 
 The static half is easy to defend. The people this site is written for open dev tools out of habit. If a page that claims I build production systems takes three seconds to hydrate a hero animation, the claim is dead before the first paragraph. So: prerendered HTML, real CSS, no framework runtime. Astro does this by default and does it well.
 
@@ -91,15 +93,11 @@ A reader who lands on a blog post and leaves gets effectively no JavaScript. A r
 
 Interactivity is opt-in per component, not a tax on every page.
 
-## Numbers from the build
+## Measure the boundary
 
-From `dist/` after `astro build`, gzipped:
+The important accounting boundary is the route and component that require interaction. Check a production build and the browser's network panel to see which assets load before the island becomes visible and which arrive afterward.
 
-- **Playground island**: about 5 KB. Component, state machine, and all four fixtures.
-- **React + ReactDOM**: about 44 KB. The runtime the island drags in.
-- **Everything else**: roughly 1 KB per page, which is Astro's prefetch script. Beyond that, blog posts and case studies are pure HTML and CSS.
-
-Honest accounting: the 44 KB of React for one widget is the least elegant number on this site, and swapping in Preact would cut it to around 4 KB. But the headline holds: that cost is isolated to one island and deferred until the island is actually seen. The site a reader experiences is ~1 KB of JS until the moment they reach the one feature that earns more, and the feature's own code is smaller than any one of the font files.
+The original bundle-size snapshot is not a useful description of today's site. The agent, renderer, and cinematic pages have changed since then. A size claim needs its build revision, measurement method, and the assets it includes; the current [Flagship case study](/work/flagship) is the place to follow the replacement architecture.
 
 ## The demo is the product
 

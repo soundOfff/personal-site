@@ -1,6 +1,6 @@
 ---
-title: 'How to get a job as a software developer in big 2026'
-description: 'Two months of job hunting, four offers, and the roadmap that came out of it: the 2026 pipeline, what to actually practice, and why your AI workflow is now part of the interview.'
+title: 'Notes from a software engineering job search'
+description: 'What I practiced, where I applied, and what I learned from a remote job search, including the system design rounds I did not pass.'
 date: 2026-07-25
 pillar: 'Startup engineering & opinions'
 tags: ['career', 'interviews', 'job-hunting', 'ai']
@@ -14,10 +14,7 @@ import ScriptFig from '../../components/diagrams/ScriptFig.astro';
 import TakeHomeFig from '../../components/diagrams/TakeHomeFig.astro';
 import ReviewLoopFig from '../../components/diagrams/ReviewLoopFig.astro';
 
-So you got fired from your quality startup or your big tech company, and now
-the only questions in your head are the ones I had two months ago: what the
-hell do we study now, which area is worth betting on, and which tools are good
-to go.
+When I started looking for a remote engineering role, I needed to decide what to practice, where to apply, and how to explain the work I had already done. These are notes from that search, not a universal hiring roadmap.
 
 This started as a conversation with a friend about how we could both land a
 remote job, and it turned into the roadmap I wish someone had handed me. It
@@ -82,8 +79,7 @@ The rules I actually follow once the document exists:
   side by side. Any discrepancy between the two plants a doubt, and doubt
   tends to turn into rejection. Same story, not the same sentence twice.
 - **Edit the résumé per company.** Find people who already work there on
-  LinkedIn; their profiles are the answer key, since they're proof of what
-  got someone hired for that role. Borrow their title phrasing, reorder your
+  LinkedIn; their profiles provide clues about the team's work, not proof of why any individual was hired. Borrow their title phrasing, reorder your
   bullets toward what their listing asks for, and pick the two or three
   experiences that tell the story that fits this specific role, not the
   complete story of your career.
@@ -92,9 +88,7 @@ The rules I actually follow once the document exists:
   summary answers no one's question.
 - **No photo, no cover image.** Common in Argentina, close to taboo at US
   companies. Cut it for anything outside the local market.
-- **Run every edit through Grammarly.** A typo you'd forgive in a Slack
-  message is not one they'll forgive in the one document you control
-  completely.
+- **Proofread every edit.** A grammar checker can help, but read the final PDF yourself for errors, broken links, and awkward phrasing.
 - **No stars, bars, or 1-to-5 scores next to your skills.** They read as
   invented precision. List the skill, prove the level in the experience
   bullets instead.
@@ -131,7 +125,9 @@ link that works far more than a cover letter that says nothing.
 
 Almost every process I went through looked like this:
 
-<PipelineFig />
+<div class="diagram-scroll" tabIndex={0} role="region" aria-label="Hiring stages diagram">
+  <PipelineFig />
+</div>
 
 Two footnotes from the trenches. Outside big tech, step 3 is often not a
 formal system design round: at consultancies and small product companies it
@@ -158,7 +154,9 @@ I keep a tested file of answers that I know sound like me. Think of it as the
 script for a play where you're a famous enough actor to improvise: you can
 change the lines, but you'd better know the play.
 
-<ScriptFig />
+<div class="diagram-scroll" tabIndex={0} role="region" aria-label="Interview preparation diagram">
+  <ScriptFig />
+</div>
 
 My rules for this stage:
 
@@ -195,7 +193,9 @@ The data structures you should be able to build and use:
 - Linked lists -> easy to understand, and reversing one is the canonical
   warm-up:
 
-<LinkedListFig />
+<div class="diagram-scroll" tabIndex={0} role="region" aria-label="Linked-list reversal diagram">
+  <LinkedListFig />
+</div>
 
 - Hash tables -> must know. No negotiation on this one.
 - Binary trees -> good to know, and the exercises are genuinely fun.
@@ -241,7 +241,9 @@ Be honest about the time. They read commit timestamps, so "I gave it one
 afternoon, here's what I'd do with another day" is a fine answer and a
 suspiciously polished twenty-hour submission is not, even when it's better.
 
-<TakeHomeFig />
+<div class="diagram-scroll" tabIndex={0} role="region" aria-label="Take-home scope diagram">
+  <TakeHomeFig />
+</div>
 
 What I optimize for, in order:
 
@@ -285,10 +287,7 @@ your HR-screen script gets a second performance.
 
 ## The AI workflow question
 
-In 2026 your AI workflow is part of the interview. Canva replaced its
-computer-science-fundamentals round with an AI-assisted coding interview. Meta
-added an AI-enabled round, Google is piloting one, and AI-native startups like
-Sierra hand you agent tooling and watch what you do with it.
+An interview may ask you to explain or demonstrate how you use AI. Prepare a concrete example of what you accepted, what you rejected, and how you checked the result. Ask the recruiter which tools are allowed in that specific round; policies vary by company and can change.
 
 What they evaluate is not the size of your rig. It's judgment: when you
 rejected AI output, how you knew it was wrong, how you validate what your
@@ -297,7 +296,9 @@ follow-up question. A practiced setup, rules files, agents, a repeatable
 workflow you can rebuild in front of someone, helps you demo that judgment
 convincingly. But the setup is the prop; the review habits are the act.
 
-<ReviewLoopFig />
+<div class="diagram-scroll" tabIndex={0} role="region" aria-label="AI review workflow diagram">
+  <ReviewLoopFig />
+</div>
 
 The workflow I describe when they ask is iterative and vertical. Generate,
 test, generate again, with each pass shipping a thin but complete slice of the
@@ -310,8 +311,7 @@ Which makes the cheapest preparation obvious. Whatever you build as a showcase,
 build it with the workflow you plan to describe. The project becomes the
 portfolio link, and the process becomes the answers.
 
-One caveat before you show up with your rig: some companies still ban AI in
-interviews entirely, Amazon and Goldman among them. Check before you plug in.
+Get explicit permission before using AI in an assessment. Your normal development workflow does not determine the rules of an interview.
 
 ## The open questions
 
