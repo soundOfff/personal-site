@@ -1,0 +1,52 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import '../styles/blog.css';
+
+interface Props {
+  title: string;
+  description: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+}
+
+const { title, description, type = 'website', publishedTime } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} type={type} publishedTime={publishedTime}>
+  <div class="blog-shell">
+    <a class="reading-skip" href="#reading">Skip to content</a>
+    <header class="writing-nav">
+      <a class="writing-name" href="/">Tomas Brasca<span>.</span></a>
+      <nav aria-label="Main navigation">
+        <a href="/#work">Work</a>
+        <a href="/blog" aria-current="page">Writing</a>
+        <a href="mailto:tomibrasca97@gmail.com">Contact</a>
+        <button
+          class="reading-theme"
+          data-theme-toggle
+          aria-label="Toggle color theme"
+          type="button"
+        >
+          <svg
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            aria-hidden="true"><use href="#i-moon" data-theme-icon></use></svg
+          >
+        </button>
+      </nav>
+    </header>
+    <main id="reading" tabindex="-1"><slot /></main>
+    <footer class="writing-footer">
+      <a href="/">Tomas Brasca</a>
+      <span>Rosario, Argentina</span>
+      <nav aria-label="Writing footer">
+        <a href="/rss.xml">RSS</a><a href="https://github.com/soundOfff">GitHub</a><a
+          href="mailto:tomibrasca97@gmail.com">Email</a
+        >
+      </nav>
+    </footer>
+  </div>
+</BaseLayout>
