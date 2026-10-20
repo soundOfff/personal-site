@@ -21,6 +21,7 @@
  *   - the bunker's Morse key: tap for a dot, hold for a dash, decoded live.
  */
 import { mountOpeningDisclosure } from '../openings/disclosure';
+import { mountHouseCircuit } from './opening-circuit';
 import type { Cue, ReelContext, ReelModule } from '../types';
 import { SECTION_IDS } from '../types';
 import type { Bed } from '../sound';
@@ -110,6 +111,7 @@ const reel: ReelModule = {
       document.querySelector('[data-opening="parasite"]'),
       signal,
     );
+    const stopCircuit = mountHouseCircuit(ctx);
     const s = ctx.sound;
     const timers = new Set<number>();
     const later = (fn: () => void, ms: number): number => {
@@ -339,6 +341,7 @@ const reel: ReelModule = {
 
     return () => {
       stopOpening();
+      stopCircuit();
       timers.forEach((id) => window.clearTimeout(id));
       timers.clear();
       stopMorse();

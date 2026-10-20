@@ -112,6 +112,50 @@ const reel: ReelModule = {
     const $$ = (sel: string) => document.querySelectorAll(sel);
     const cleanups: (() => void)[] = [];
 
+    const opening = document.querySelector<HTMLElement>('[data-opening="br2049"]');
+    const macro = opening?.querySelector<HTMLElement>('.bk-macro');
+    const eye = opening?.querySelector<HTMLElement>('.bk-eye');
+    const exposure = opening?.querySelector<HTMLInputElement>('#bk-exposure');
+    const level = opening?.querySelector<HTMLOutputElement>('[data-bk-level]');
+    const reading = opening?.querySelector<HTMLElement>('[data-bk-reading]');
+    const result = opening?.querySelector<HTMLAnchorElement>('[data-bk-result]');
+    if (opening && macro && eye && exposure && level && reading && result) {
+      const diagnose = () => {
+        const value = exposure.valueAsNumber;
+        const phase =
+          value < 35
+            ? '01 / Classify the noise.'
+            : value < 70
+              ? '02 / Route the signal.'
+              : '03 / Within baseline. The smallest that passes.';
+        eye.style.setProperty('--bk-exposure', String(value / 100));
+        level.value = String(value).padStart(2, '0');
+        reading.textContent = phase;
+        exposure.setAttribute('aria-valuetext', `${value} percent. ${phase}`);
+        result.hidden = value < 70;
+      };
+      const syncCut = () => {
+        macro.inert = Number(opening.style.getPropertyValue('--shot-cut')) >= 0.98;
+        if (macro.inert && document.activeElement instanceof HTMLElement) {
+          if (macro.contains(document.activeElement)) document.activeElement.blur();
+        }
+      };
+      exposure.addEventListener('input', diagnose, { signal });
+      exposure.addEventListener('change', () => sfx.tick(kit), { signal });
+      const cutObserver = new MutationObserver(syncCut);
+      cutObserver.observe(opening, { attributes: true, attributeFilter: ['style'] });
+      diagnose();
+      syncCut();
+      cleanups.push(() => {
+        cutObserver.disconnect();
+        exposure.value = exposure.defaultValue;
+        diagnose();
+        exposure.removeAttribute('aria-valuetext');
+        eye.style.removeProperty('--bk-exposure');
+        macro.inert = false;
+      });
+    }
+
     /* ---------- particles ---------- */
     cleanups.push(sprinkle(document.body, !ctx.reducedMotion));
 

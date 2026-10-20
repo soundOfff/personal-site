@@ -17,6 +17,7 @@
  *     and in the room; the same clusters under the star gate's rush
  */
 import type { Bed } from '../sound';
+import { mountHal } from './hal';
 import type { ReelContext, ReelModule } from '../types';
 import {
   ACT_OF,
@@ -66,6 +67,7 @@ const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 function mount(ctx: ReelContext): () => void {
   const { root, signal, reducedMotion } = ctx;
   const S = ctx.sound;
+  const stopHal = mountHal(ctx);
   const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel);
   const listen = (
     target: EventTarget,
@@ -494,6 +496,7 @@ function mount(ctx: ReelContext): () => void {
   }
 
   return () => {
+    stopHal();
     window.clearInterval(clockId);
     window.clearTimeout(settle);
     timers.forEach((id) => window.clearTimeout(id));

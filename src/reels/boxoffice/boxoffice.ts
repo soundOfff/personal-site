@@ -1,18 +1,3 @@
-/**
- * The box office's behaviour. Imported from the homepage after the engine boots.
- *
- * The markup is server-rendered (BoxOffice.astro) and, on a first visit, is
- * already on screen from the head bootstrap's html[data-first-visit]. This
- * upgrades it to a modal and runs the screening:
- *
- *   tear a ticket → lights down → leader 3 → 2 (the 2-pop) → 1 → 0 → black
- *   → hand over to the engine's projector (title card, then it opens).
- *
- * Esc / the close button: on a first visit it means House lights (and is
- * remembered); reopened from the rail it just closes. During the countdown
- * Esc skips straight to the projector.
- */
-
 import {
   REELS,
   currentReel,
@@ -37,8 +22,6 @@ const CUE = {
 };
 const LEAVE_MS = 460;
 const HOUSE = REELS[0].id;
-
-/* ---------- the sounds: paper, the leader, the 2-pop (all no-ops while muted) ---------- */
 
 const sfx = {
   /** a fingernail across the ticket edge */
@@ -82,8 +65,7 @@ const sfx = {
   leaderTick(at = 0): void {
     sound.burst({ dur: 0.01, kind: 'highpass', f: 3000, vol: 0.22, at });
   },
-  /** the 2-pop: one frame (1/24 s) of a flat 1 kHz tone */
-  twoPop(): void {
+  numeralCue(): void {
     const ac = sound.ctx();
     if (!ac) return;
     const t = ac.currentTime;
@@ -274,20 +256,20 @@ function wire(dlg: HTMLDialogElement): void {
       if (num) num.textContent = '3';
       setPhase('count');
       sound.projector((CUE.black - CUE.three + 400) / 1000);
-      sfx.leaderTick();
+      sfx.numeralCue();
       sfx.leaderTick(0.5);
     });
     later(CUE.two, () => {
       if (num) num.textContent = '2';
-      sfx.twoPop();
+      sfx.numeralCue();
     });
     later(CUE.one, () => {
       if (num) num.textContent = '1';
-      sfx.leaderTick();
+      sfx.numeralCue();
     });
     later(CUE.zero, () => {
       if (num) num.textContent = '0';
-      sfx.leaderTick();
+      sfx.numeralCue();
     });
     later(CUE.black, () => setPhase('black'));
     later(CUE.handover, () => handover(id));

@@ -4,6 +4,37 @@
 @import '@fontsource/courier-prime/400.css';
 @import '@fontsource/courier-prime/700.css';
 
+html:root[data-reel='budapest'] {
+  button.gk-key {
+    display: block;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  .gk-key > svg {
+    transform-origin: 50% 0;
+  }
+  .gk-key:focus-visible {
+    outline: 2px solid #6c3e51;
+    outline-offset: 6px;
+  }
+  .gk-key:hover > svg {
+    filter: brightness(1.06);
+  }
+  [data-gk-arrival] a {
+    color: #713a4e;
+    text-underline-offset: 3px;
+  }
+  [data-gk-arrival] a:focus-visible {
+    outline: 2px solid #713a4e;
+    outline-offset: 3px;
+  }
+}
+
 /* ============================================================
    Reel 04 · The Grand Budapest Hotel.
    Every rule lives inside :root[data-reel='budapest'] (keyframes and

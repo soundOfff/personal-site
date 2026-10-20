@@ -3744,6 +3744,7 @@ html:root[data-reel='mood'] .content {
     font: 400 14px/1.8 var(--font-sans);
   }
   .mk-letter .mk-signature {
+    width: fit-content;
     margin: 15px 0;
     font: italic 400 30px/1.5 var(--font-display);
     rotate: -7deg;
@@ -3795,5 +3796,100 @@ html:root[data-reel='mood'] .content {
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+html:root[data-reel='mood'] .content .opening-mood {
+  &:has(details[open]) .mk-pane {
+    visibility: hidden;
+  }
+  .mk-pane:not([hidden]) {
+    position: absolute;
+    z-index: 1;
+    top: 32%;
+    right: 8%;
+    width: clamp(144px, 15vw, 184px);
+    color: #eee1bd;
+  }
+  .mk-pane-glass {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 6 / 5;
+    border: 1px solid #b4bd9670;
+    border-radius: 2px;
+    background: #233e3522;
+    box-shadow:
+      inset 0 0 18px #0006,
+      3px 4px 15px #0005;
+    overflow: hidden;
+  }
+  .mk-pane-note {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    margin: 0;
+    text-align: center;
+    font: 400 clamp(18px, 1.8vw, 24px)/1.3 var(--font-display);
+    text-shadow: 0 1px 8px #000;
+  }
+  .mk-pane-note em {
+    color: #e1b97b;
+  }
+  .mk-pane canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    touch-action: pan-y;
+  }
+  .mk-pane[data-pane='clear'] canvas {
+    pointer-events: none;
+  }
+  .mk-pane-hint {
+    margin: 7px 0 0;
+    color: #e5ddbf;
+    font: italic 400 11px/1.5 var(--font-display);
+    text-shadow: 0 1px 5px #000;
+  }
+  .mk-pane button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #f0deba;
+    font: 400 11px/1.5 var(--font-sans);
+    text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-shadow: 0 1px 5px #000;
+    cursor: pointer;
+  }
+  .mk-pane button:focus-visible {
+    outline: 3px solid #d6a054;
+    outline-offset: 4px;
+  }
+  details {
+    position: relative;
+    z-index: 2;
+  }
+  @media (max-width: 1000px) {
+    .mk-pane:not([hidden]) {
+      position: relative;
+      grid-area: 2 / 1;
+      justify-self: end;
+      top: auto;
+      right: auto;
+      width: 152px;
+      margin: 6px 7% 0;
+    }
+    details,
+    details[open] {
+      grid-area: 3 / 1;
+      margin-top: 12px;
+    }
   }
 }

@@ -12,7 +12,19 @@
     <nav aria-label="Mood opening"><a href="#work">Work ↓</a><a href="#now">Contact ↗</a></nav>
   </div>
   <span class="mk-native" lang="zh-Hant" aria-hidden="true">花樣年華</span>
-  <details data-opening-disclosure>
+  <div class="mk-pane" data-mk-pane hidden>
+    <div class="mk-pane-glass">
+      <p class="mk-pane-note" aria-hidden="true">
+        Someone left<br />a letter<br /><em>on the table.</em>
+      </p>
+      <canvas width="360" height="300" data-mk-fog aria-hidden="true"></canvas>
+    </div>
+    <p class="mk-pane-hint" data-mk-pane-hint aria-live="polite">Wipe across the glass.</p>
+    <button type="button" data-mk-clear aria-controls="mood-opening-letter"
+      >Clear the glass ↗</button
+    >
+  </div>
+  <details id="mood-opening-letter" data-opening-disclosure>
     <summary>
       <span class="mk-closed-label">A letter left unfinished ↗</span>
       <span class="mk-open-label">Close the letter ×</span>

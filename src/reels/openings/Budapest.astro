@@ -23,7 +23,11 @@ const windows = Array.from({ length: 28 }, (_, i) => ({
           <p><span>01</span> Dex</p><p><span>02</span> Mint Mobile</p><p>
             <span>03</span> Site agent
           </p>
-          <i></i><small>Projects<br />and notes.</small>
+          <i></i><small id="gk-concierge" aria-live="polite"
+            ><span data-gk-welcome>Projects<br />and notes.</span><span data-gk-arrival hidden
+              >Room 04. Welcome.<br /><a href="/work/flagship">Your Flagship awaits →</a></span
+            ></small
+          >
         </div>
         <svg class="gk-hotel" viewBox="0 0 320 310" fill="none" aria-hidden="true">
           <g stroke="currentColor" stroke-width=".8">
@@ -48,24 +52,33 @@ const windows = Array.from({ length: 28 }, (_, i) => ({
       </div>
       <p class="gk-register-foot">Tomas Brasca <span>Rosario, Argentina</span></p>
     </div>
-    <svg class="gk-key" viewBox="0 0 120 300" aria-hidden="true" fill="none">
-      <defs
-        ><linearGradient id="gk-brass" x2="1" y2=".6"
-          ><stop stop-color="#b38a42"></stop><stop offset=".4" stop-color="#e8cd89"></stop><stop
-            offset=".6"
-            stop-color="#c79d50"></stop><stop offset="1" stop-color="#8d6739"
-          ></stop></linearGradient
-        ></defs
-      >
-      <path
-        d="M60 27a35 35 0 1 0 0 70 35 35 0 0 0 0-70Zm0 13a22 22 0 1 1 0 44 22 22 0 0 1 0-44Z"
-        fill="url(#gk-brass)"
-        fill-rule="evenodd"></path>
-      <path d="M53 92h14v153h25v15H67v16H53Zm14 125h18v14H67Z" fill="url(#gk-brass)"></path>
-      <path d="M60 28V0" stroke="#bca176" stroke-width="1"></path>
-      <path d="m8 106 104 0v74l-52 23-52-23Z" fill="#79394b" stroke="#c5a26a"></path>
-      <text x="60" y="142" fill="#ead5a4" font-size="27" text-anchor="middle">04</text>
-      <path d="M29 157h62m-52 8h42" stroke="#c5a26a" stroke-width=".6"></path>
-    </svg>
+    <button
+      class="gk-key"
+      type="button"
+      aria-label="Register your arrival"
+      aria-pressed="false"
+      aria-controls="gk-concierge"
+      data-gk-arrival-key
+    >
+      <svg viewBox="0 0 120 300" aria-hidden="true" fill="none">
+        <defs
+          ><linearGradient id="gk-brass" x2="1" y2=".6"
+            ><stop stop-color="#b38a42"></stop><stop offset=".4" stop-color="#e8cd89"></stop><stop
+              offset=".6"
+              stop-color="#c79d50"></stop><stop offset="1" stop-color="#8d6739"
+            ></stop></linearGradient
+          ></defs
+        >
+        <path
+          d="M60 27a35 35 0 1 0 0 70 35 35 0 0 0 0-70Zm0 13a22 22 0 1 1 0 44 22 22 0 0 1 0-44Z"
+          fill="url(#gk-brass)"
+          fill-rule="evenodd"></path>
+        <path d="M53 92h14v153h25v15H67v16H53Zm14 125h18v14H67Z" fill="url(#gk-brass)"></path>
+        <path d="M60 28V0" stroke="#bca176" stroke-width="1"></path>
+        <path d="m8 106 104 0v74l-52 23-52-23Z" fill="#79394b" stroke="#c5a26a"></path>
+        <text x="60" y="142" fill="#ead5a4" font-size="27" text-anchor="middle">04</text>
+        <path d="M29 157h62m-52 8h42" stroke="#c5a26a" stroke-width=".6"></path>
+      </svg>
+    </button>
   </div>
 </div>
