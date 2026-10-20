@@ -99,6 +99,44 @@ const reel: ReelModule = {
       opts: AddEventListenerOptions = {},
     ) => document.addEventListener(type, fn, { ...opts, signal });
 
+    const arrivalKey = document.querySelector<HTMLButtonElement>('[data-gk-arrival-key]');
+    const welcome = document.querySelector<HTMLElement>('[data-gk-welcome]');
+    const arrival = document.querySelector<HTMLElement>('[data-gk-arrival]');
+    let keySwing: Animation | undefined;
+    const resetArrival = () => {
+      keySwing?.cancel();
+      arrivalKey?.setAttribute('aria-pressed', 'false');
+      arrivalKey?.setAttribute('aria-label', 'Register your arrival');
+      if (welcome) welcome.hidden = false;
+      if (arrival) arrival.hidden = true;
+    };
+    arrivalKey?.addEventListener(
+      'click',
+      () => {
+        if (!welcome || !arrival) return;
+        const registered = arrivalKey.getAttribute('aria-pressed') !== 'true';
+        arrivalKey.setAttribute('aria-pressed', String(registered));
+        arrivalKey.setAttribute(
+          'aria-label',
+          registered ? 'Return the room key' : 'Register your arrival',
+        );
+        welcome.hidden = registered;
+        arrival.hidden = !registered;
+        v.tink();
+        if (registered) v.stamp();
+        keySwing?.cancel();
+        if (!ctx.reducedMotion) {
+          keySwing = arrivalKey
+            .querySelector('svg')
+            ?.animate(
+              [{ rotate: '0deg' }, { rotate: '-7deg' }, { rotate: '4deg' }, { rotate: '0deg' }],
+              { duration: 640, easing: 'ease-out' },
+            );
+        }
+      },
+      { signal },
+    );
+
     /* ---------- the whip pan: every in-page jump from the rack or the hero ---------- */
     let whipping = false;
     const land = (id: string) => {
@@ -324,6 +362,7 @@ const reel: ReelModule = {
     });
 
     return () => {
+      resetArrival();
       quiet();
       timers.forEach((id) => window.clearTimeout(id));
       root.style.scrollBehavior = '';

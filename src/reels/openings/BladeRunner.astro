@@ -15,7 +15,24 @@ const fibers = Array.from({ length: 192 }, (_, i) => {
     <div class="bk-copy">
       <p class="shot-kicker">03 / Blade Runner 2049</p>
       <h1><span>LLM routing,</span><em>with evals.</em></h1>
-      <p class="bk-note">A case study from my work at Dex.</p>
+      <div class="bk-note bk-diagnostic" data-bk-diagnostic>
+        <label for="bk-exposure"
+          >Baseline exposure <output for="bk-exposure" data-bk-level>00</output></label
+        >
+        <input
+          id="bk-exposure"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+          step="1"
+          aria-describedby="bk-reading"
+        />
+        <p id="bk-reading" data-bk-reading>01 / Classify the noise.</p>
+        <span class="bk-result-slot"
+          ><a href="#work" data-bk-result hidden>Signal acquired. Trace the work →</a></span
+        >
+      </div>
     </div>
     <div class="bk-eye" aria-hidden="true">
       <svg viewBox="0 0 800 800" fill="none">
@@ -39,7 +56,7 @@ const fibers = Array.from({ length: 192 }, (_, i) => {
         <circle cx="400" cy="400" r="326" stroke="#7a9a8e" stroke-width="1"></circle>
         <circle cx="400" cy="400" r="313" stroke="#7a9a8e" stroke-width=".4"></circle>
         <circle cx="400" cy="400" r="115" fill="url(#bk-pupil)"></circle>
-        <circle cx="400" cy="400" r="91" fill="#050c10"></circle>
+        <circle class="bk-aperture" cx="400" cy="400" r="91" fill="#050c10"></circle>
         <path
           d="M238 243a220 220 0 0 1 190-57"
           stroke="#dbede0"

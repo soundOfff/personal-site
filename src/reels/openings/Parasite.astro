@@ -18,6 +18,22 @@
       aria-label="A dark modernist house framing a green garden, with stairs descending at the right"
     >
     </div>
+    <div class="ps-circuit" data-ps-circuit hidden>
+      <label for="ps-house-power">
+        <span class="ps-circuit-name">House circuit</span>
+        <span class="ps-circuit-floors" aria-hidden="true"><span>1F</span><span>B1</span></span>
+        <input
+          id="ps-house-power"
+          type="checkbox"
+          aria-label="Switch power to B1"
+          aria-describedby="ps-circuit-status"
+          data-ps-power
+        />
+      </label>
+      <p id="ps-circuit-status" data-ps-circuit-status aria-live="polite">
+        1F · The house is quiet.
+      </p>
+    </div>
     <details data-opening-disclosure>
       <summary>
         <span class="ps-closed-label">There is another floor ↓</span>
@@ -33,6 +49,7 @@
             transaction.
           </p>
           <a href="/work/mint">See the engineering decision ↗</a>
+          <a class="ps-morse-invitation" href="#now">The Morse key is downstairs ↓</a>
         </div>
       </div>
     </details>
