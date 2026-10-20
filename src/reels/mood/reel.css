@@ -3744,6 +3744,7 @@ html:root[data-reel='mood'] .content {
     font: 400 14px/1.8 var(--font-sans);
   }
   .mk-letter .mk-signature {
+    width: fit-content;
     margin: 15px 0;
     font: italic 400 30px/1.5 var(--font-display);
     rotate: -7deg;
