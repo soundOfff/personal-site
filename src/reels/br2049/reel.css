@@ -1757,51 +1757,6 @@
     text-align: right;
   }
 
-  /* signs down a wet street at night: one neon tube over each, staggered back */
-  #principles .tenets {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 48px;
-    max-width: 780px;
-  }
-  #principles .tenet {
-    --c: 228, 77, 155;
-    --s: #f27db8;
-    position: relative;
-    padding: 20px 0 0;
-    border: 0;
-    border-top: 2px solid rgb(var(--c));
-    border-radius: 0;
-    background: none;
-    box-shadow: none;
-  }
-  #principles .tenet:is(:nth-child(2), :nth-child(3)) {
-    --c: 79, 195, 217;
-    --s: #7fd6e4;
-  }
-  #principles .tenet:nth-child(even) {
-    margin-left: min(22%, 180px);
-  }
-  #principles .tenet .nn {
-    font: 12px/1 var(--font-mono);
-    letter-spacing: 0.14em;
-    color: var(--s);
-  }
-  /* the title takes its tube's colour, so each tenet reads as the sign it lights */
-  #principles .tenet h3 {
-    margin: 12px 0 10px;
-    font: 700 clamp(34px, 4vw, 48px) / 0.95 var(--font-display);
-    letter-spacing: 0.01em;
-    text-transform: uppercase;
-    color: var(--s);
-  }
-  #principles .tenet p {
-    max-width: 46ch;
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--ink-2);
-  }
-
   #stack .toolbox {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
@@ -2051,7 +2006,6 @@
       font-size: 26px;
     }
     #oss .repos,
-    #principles .tenets,
     #stack .toolbox {
       grid-template-columns: minmax(0, 1fr);
     }
@@ -2099,9 +2053,6 @@
     #writing .wrow .t {
       grid-column: 1 / -1;
       grid-row: 2;
-      font-size: 28px;
-    }
-    #principles .tenet h3 {
       font-size: 28px;
     }
     #now .spec {
@@ -2337,7 +2288,7 @@
        unchanged, so the browser keeps it and only starts the second one; leaving
        the plate then doesn't replay the arrival */
     /* the jump is an offset, not a transform: the lede's em is inline */
-    :is(#readme .lede em, #work .idx .proj b, #principles .tenet h3) {
+    :is(#readme .lede em, #work .idx .proj b) {
       position: relative;
     }
     #readme .lede em {
@@ -2347,9 +2298,6 @@
       animation:
         br2049-holo-on 1s steps(1) 1.6s both,
         br2049-holo 0.9s steps(1) 1;
-    }
-    #principles .tenet:hover h3 {
-      animation: br2049-holo 0.9s steps(1) 1;
     }
     .a2-surface {
       position: relative;

@@ -2271,32 +2271,6 @@
   }
 
   /* ============================================================
-     INT. TAXI (principles): numbers in outline, inked on hover
-     ============================================================ */
-  & #principles .tenets {
-    gap: 32px 34px;
-  }
-  & #principles .tenet .nn {
-    font: italic 700 58px/1 var(--font-display);
-    color: transparent;
-    -webkit-text-stroke: 1px var(--amber-deep);
-    transition: color 1.2s var(--mood-slow);
-  }
-  & #principles .tenet:hover .nn {
-    color: #a3201a;
-  }
-  & #principles .tenet h3 {
-    margin: 8px 0 6px;
-    font: 600 22px/1.2 var(--font-display);
-    letter-spacing: 0;
-  }
-  & #principles .tenet p {
-    max-width: none;
-    font-size: 15px;
-    line-height: 1.6;
-  }
-
-  /* ============================================================
      INT. MRS. SUEN'S FLAT, NIGHT (stack): the mahjong tiles
      ============================================================ */
   & #stack .toolbox {
@@ -2821,7 +2795,6 @@
       width: 100%;
     }
     & #log .log,
-    & #principles .tenets,
     & #stack .toolbox {
       grid-template-columns: minmax(0, 1fr);
     }

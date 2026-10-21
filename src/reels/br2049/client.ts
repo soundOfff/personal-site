@@ -331,7 +331,7 @@ const reel: ReelModule = {
     on($$('#work .idx tr'), 'pointerenter', () => sfx.holo(kit));
     on($$('#oss .repo'), 'pointerenter', () => sfx.tick(kit));
     on($$('#log .logitem'), 'pointerenter', () => sfx.knock(kit));
-    on($$('#writing .wrow, #principles .tenet'), 'pointerenter', () => sfx.holo(kit));
+    on($$('#writing .wrow'), 'pointerenter', () => sfx.holo(kit));
     on($$('#stack .toolcol li'), 'pointerenter', () => sfx.drawer(kit));
 
     // snow melts where the pointer passes (only while the snow is falling)

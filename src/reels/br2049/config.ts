@@ -205,7 +205,7 @@ const br2049: ReelConfig = {
     'snow',
   ],
   sound: {
-    hover: 'dry HUD tick (a ring-mod hologram flicker on the lede, rows and tenets)',
+    hover: 'dry HUD tick (a ring-mod hologram flicker on the lede and rows)',
     click: 'HUD click on a low thump',
     section: 'CS-80 brass swell per act, in from below with late vibrato: D sus2, B♭, C, D minor',
     surface: 'ring-mod hologram bell + brass stab, climbing D minor pentatonic with the count',

@@ -4,8 +4,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Rail from '../components/Rail.astro';
 import Footer from '../components/Footer.astro';
 import Keybar from '../components/Keybar.astro';
+import WorkflowDiagram from '../components/WorkflowDiagram.astro';
+import { workflow } from '../data/workflow';
 import A2UIPlayground from '../islands/A2UIPlayground';
-import { profile, proofs, tenets, toolbox, log, now } from '../data/site';
+import { profile, proofs, toolbox, log, now } from '../data/site';
 import { repos } from '../data/repos';
 import ReelHead from '../reels/ReelHead.astro';
 import Stages from '../reels/Stages.astro';
@@ -211,17 +213,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
       <section class="block" id="principles" data-sec="6">
         <Stages at="in:principles" />
         <Keybar sec="principles" label="how I work" />
-        <div class="tenets">
-          {
-            tenets.map((t, i) => (
-              <div class="tenet">
-                <div class="nn">{String(i + 1).padStart(2, '0')}</div>
-                <h3>{t.title}</h3>
-                <p>{t.body}</p>
-              </div>
-            ))
-          }
-        </div>
+        <WorkflowDiagram workflow={workflow} />
       </section>
       <Stages at="after:principles" />
 

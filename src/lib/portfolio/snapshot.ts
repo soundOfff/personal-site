@@ -17,8 +17,9 @@
  */
 
 import { getCollection } from 'astro:content';
-import { log, now, profile, proofs, tenets, toolbox } from '../../data/site';
+import { log, now, profile, proofs, toolbox } from '../../data/site';
 import { repos } from '../../data/repos';
+import { workflow } from '../../data/workflow';
 
 export interface WorkItem {
   id: string;
@@ -165,7 +166,18 @@ export async function buildSnapshot(): Promise<PortfolioSnapshot> {
       ...(item.link ? { href: item.link.href } : {}),
       upcoming: item.upcoming === true,
     })),
-    principles: tenets.map(({ title, body }) => ({ title, body })),
+    principles: workflow.stages.map((stage) => ({
+      title: stage.title,
+      body: [
+        stage.body,
+        `Owner: ${stage.owner}.`,
+        ...stage.skillGroups.map(({ source, skills }) => `${source} skills: ${skills.join(', ')}.`),
+        ...(stage.condition ? [`${stage.condition.label}: ${stage.condition.body}`] : []),
+        ...(stage.id === workflow.feedback.from
+          ? [`${workflow.feedback.label}. ${workflow.feedback.body}`]
+          : []),
+      ].join(' '),
+    })),
     toolbox: toolbox.map(({ h, items }) => ({ group: h, items: [...items] })),
     now: now.map(({ dt, dd }) => ({ key: dt, value: dd })),
   };

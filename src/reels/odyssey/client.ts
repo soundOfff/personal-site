@@ -231,7 +231,7 @@ function mount(ctx: ReelContext): () => void {
     ['.lede em', () => sweep(S)],
     ['.idx tbody tr', (el) => beep2(S, indexIn(el))],
     ['.repo', breathe],
-    ['.wrow, .tenet', () => pullModule()],
+    ['.wrow', () => pullModule()],
     [
       '.toolcol li',
       (el) => ring(S, el.closest('.toolcol') ? indexIn(el.closest('.toolcol')!) : 0, indexIn(el)),

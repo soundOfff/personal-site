@@ -43,7 +43,6 @@ import {
   sting,
   surface,
   surfaceSpan,
-  tenet,
   tickTock,
   tile,
   waltz,
@@ -332,7 +331,6 @@ const reel: ReelModule = {
       if (el.matches('.railnav a')) return harmonic(s);
       if (el.matches('.toolcol li')) return tile(s);
       if (el.matches('.repo, .logitem')) return paper(s);
-      if (el.matches('.tenet')) return tenet(s);
       // 2046: the serial is written by hand
       if (el.matches('.wrow')) return nib(s);
       if (el.matches('[data-mood-clock]')) return tickTock(s);
@@ -345,7 +343,6 @@ const reel: ReelModule = {
       '.metrics .m',
       '.repo',
       '.logitem',
-      '.tenet',
       '.wrow',
       '.idx tbody tr',
       '[data-mood-clock]',

@@ -1256,34 +1256,6 @@ html:root[data-reel='parasite'] {
       0 2px 10px 0 rgb(226 232 196 / 0.5),
       0 30px 80px 24px rgb(198 209 90 / 0.06);
   }
-  .tenets {
-    gap: 28px 40px;
-  }
-  .tenet .nn {
-    margin-bottom: 10px;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-stretch: 125%;
-    font-size: 34px;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    color: var(--muted);
-    transition: color 0.6s;
-  }
-  &[data-px-lit~='tube'] .tenet .nn {
-    color: var(--ink-2);
-  }
-  .tenet h3 {
-    margin-top: 0;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 20px;
-    letter-spacing: -0.02em;
-  }
-  .tenet p {
-    font-size: 14px;
-    line-height: 1.55;
-  }
 
   /* ---------- S#8 · stack, on the basement shelves ---------- */
   .toolbox {

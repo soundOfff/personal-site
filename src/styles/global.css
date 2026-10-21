@@ -8,7 +8,7 @@
         families we actually load,
      2. sets page-level base styles,
      3. ports the Workbench-specific layout (rail, blocks, console, index,
-        repos, log, tenets, toolbox, specs, metrics) from the design
+        repos, log, toolbox, specs, metrics) from the design
         prototype; values against tokens, never hardcoded colors.
    ============================================================ */
 
@@ -1763,36 +1763,6 @@ a.hash:hover {
 }
 
 /* ============================================================
-   PRINCIPLES: 2x2 tenets
-   ============================================================ */
-.tenets {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px 30px;
-}
-.tenet .nn {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--amber-deep);
-}
-.tenet h3 {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: 17px;
-  letter-spacing: -0.01em;
-  margin: 7px 0 0;
-  color: var(--ink);
-}
-.tenet p {
-  font-size: 12.5px;
-  color: var(--ink-2);
-  line-height: 1.5;
-  margin: 6px 0 0;
-  max-width: 42ch;
-  text-wrap: pretty;
-}
-
-/* ============================================================
    STACK: toolbox columns
    ============================================================ */
 .toolbox {
@@ -2297,8 +2267,6 @@ a.hash:hover {
   .rail-foot .mono {
     display: none;
   }
-  /* tenets + specs keep two columns through the tablet range; collapsing them
-     here leaves the wide content column half-empty. They go single-col at 600. */
   .toolbox {
     grid-template-columns: 1fr 1fr;
     gap: 20px 24px;
@@ -2373,8 +2341,6 @@ a.hash:hover {
     text-align: right;
   }
 
-  /* grids collapse to a single column at phone width */
-  .tenets,
   .specs {
     grid-template-columns: 1fr;
   }

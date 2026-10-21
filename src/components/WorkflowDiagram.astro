@@ -1,0 +1,274 @@
+---
+import type { Workflow } from '../data/workflow';
+
+interface Props {
+  workflow: Workflow;
+}
+
+const { workflow } = Astro.props;
+---
+
+<figure class="workflow" aria-labelledby="workflow-title">
+  <figcaption class="workflow-caption">
+    <h2 id="workflow-title">{workflow.title}</h2>
+    <p class="workflow-intro">{workflow.introduction}</p>
+  </figcaption>
+  <ol class="workflow-stages">
+    {
+      workflow.stages.map((stage, index) => (
+        <li class:list={['workflow-stage', `workflow-stage--${stage.id}`]}>
+          <span class="workflow-junction" aria-hidden="true">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          {(stage.id === workflow.feedback.from ||
+            workflow.feedback.to.some((destination) => destination === stage.id)) && (
+            <span class="workflow-return" aria-hidden="true" />
+          )}
+          <div class="workflow-copy">
+            <p class="workflow-owner">{stage.owner}</p>
+            <h3>{stage.title}</h3>
+            <p class="workflow-body">{stage.body}</p>
+            {stage.skillGroups.length > 0 && (
+              <ul class="workflow-skills">
+                {stage.skillGroups.map((group) => (
+                  <li>
+                    <span>{group.source}</span> · {group.skills.join(', ')}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {stage.condition && (
+              <p class="workflow-condition">
+                <strong>{stage.condition.label}</strong>
+                {stage.condition.body}
+              </p>
+            )}
+            {stage.id === workflow.feedback.from && (
+              <p class="workflow-feedback">
+                <strong>{workflow.feedback.label}</strong>
+                {workflow.feedback.body}
+              </p>
+            )}
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="workflow-sources">
+    <span>Skills I use</span>
+    {workflow.sources.map((source) => <a href={source.href}>{source.label}</a>)}
+  </p>
+</figure>
+
+<style>
+  .workflow {
+    --workflow-spine: 40px;
+    --workflow-return: 4px;
+    --workflow-node: 30px;
+    margin: 0;
+    color: var(--ink);
+    text-align: left;
+  }
+  .workflow-caption {
+    margin-bottom: 32px;
+  }
+  .workflow h2 {
+    max-width: 25ch;
+    margin: 0;
+    font: 500 clamp(25px, 3.5vw, 34px) / 1.12 var(--font-serif);
+    letter-spacing: -0.025em;
+    text-transform: none;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .workflow-intro {
+    max-width: 62ch;
+    margin: 14px 0 0;
+    font: 400 15px/1.6 var(--font-sans);
+    color: var(--ink-2);
+  }
+  .workflow-stages {
+    list-style: decimal;
+    margin: 0;
+    padding: 0;
+  }
+  .workflow-stage::marker,
+  .workflow-skills li::marker {
+    font-size: 0;
+  }
+  .workflow-stage {
+    position: relative;
+    min-width: 0;
+    padding: 0 0 30px 70px;
+  }
+  .workflow-stage::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    bottom: -15px;
+    left: var(--workflow-spine);
+    border-left: 1px solid var(--rule-2, var(--rule));
+  }
+  .workflow-stage:last-child {
+    padding-bottom: 0;
+  }
+  .workflow-stage:last-child::before {
+    display: none;
+  }
+  .workflow-junction {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: calc(var(--workflow-spine) - var(--workflow-node) / 2);
+    display: grid;
+    place-items: center;
+    width: var(--workflow-node);
+    height: var(--workflow-node);
+    border: 1px solid var(--amber-deep);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--amber-deep);
+    font: 400 11px/1 var(--font-mono);
+  }
+  .workflow-stage--frame .workflow-junction,
+  .workflow-stage--decide .workflow-junction {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .workflow-return {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--workflow-return);
+    width: calc(var(--workflow-spine) - var(--workflow-return) - var(--workflow-node) / 2);
+    border-left: 1px solid var(--amber-deep);
+    color: var(--amber-deep);
+  }
+  .workflow-return::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    border-top: 1px solid currentColor;
+  }
+  .workflow-stage--design .workflow-return {
+    top: 15px;
+    border-top: 1px solid currentColor;
+    border-top-left-radius: 8px;
+  }
+  .workflow-stage--design .workflow-return::after,
+  .workflow-stage--build .workflow-return::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    right: 0;
+    left: auto;
+    width: 5px;
+    height: 5px;
+    border: 0;
+    border-top: 1px solid currentColor;
+    border-right: 1px solid currentColor;
+    transform: rotate(45deg);
+  }
+  .workflow-stage--build .workflow-return::before {
+    top: 12px;
+  }
+  .workflow-stage--verify .workflow-return {
+    bottom: calc(100% - 15px);
+    border-bottom: 1px solid currentColor;
+    border-bottom-left-radius: 8px;
+  }
+  .workflow-stage--verify .workflow-return::after {
+    display: none;
+  }
+  .workflow-copy {
+    min-width: 0;
+  }
+  .workflow-owner {
+    margin: 0 0 5px;
+    font: 500 14px/1.4 var(--font-sans);
+    color: var(--amber-deep);
+  }
+  .workflow-stage--frame .workflow-owner,
+  .workflow-stage--decide .workflow-owner {
+    color: var(--ink);
+  }
+  .workflow h3 {
+    margin: 0;
+    font: 500 clamp(21px, 2.5vw, 25px) / 1.2 var(--font-serif);
+    letter-spacing: -0.015em;
+    text-transform: none;
+    color: var(--ink);
+  }
+  .workflow-body {
+    max-width: 57ch;
+    margin: 8px 0 0;
+    font: 400 15px/1.6 var(--font-sans);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+  .workflow-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 16px;
+    list-style: disc;
+    margin: 10px 0 0;
+    padding: 0;
+    font: 400 14px/1.6 var(--font-sans);
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+  .workflow-skills span {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .workflow-condition,
+  .workflow-feedback {
+    max-width: 56ch;
+    margin: 14px 0 0;
+    padding-left: 13px;
+    border-left: 1px solid var(--rule-2, var(--rule));
+    font: 400 14px/1.6 var(--font-sans);
+    color: var(--ink-2);
+  }
+  .workflow-condition strong,
+  .workflow-feedback strong {
+    display: block;
+    margin-bottom: 2px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .workflow-feedback {
+    border-color: var(--amber-deep);
+  }
+  .workflow-sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin: 28px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    font: 400 14px/1.5 var(--font-sans);
+    color: var(--ink-2);
+  }
+  .workflow-sources a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 600px) {
+    .workflow {
+      --workflow-spine: 30px;
+      --workflow-return: 0px;
+      --workflow-node: 26px;
+    }
+    .workflow-stage {
+      padding-left: 54px;
+    }
+    .workflow-sources > span {
+      flex-basis: 100%;
+    }
+  }
+</style>

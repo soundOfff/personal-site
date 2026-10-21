@@ -129,7 +129,6 @@ const reel: ReelModule = {
       ['.repo', v.creak],
       ['.logitem', v.clack],
       ['.wrow', v.hover],
-      ['.tenet', v.hover],
       ['.toolcol', v.squish],
       ['.gb-bell, .contact a, .foot-links a', v.hover],
     ];

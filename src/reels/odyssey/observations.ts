@@ -49,10 +49,11 @@ export const OBSERVATIONS = {
   },
   principles: {
     section: 'principles',
-    context: 'Engineering principles discuss evaluations, caching and explicit limits.',
+    context:
+      "Tomas explains his AI workflow with pstack and Matt Pocock's skills, from framing through review and a human final decision.",
     lines: [
-      'Operating principles. I find explicit limits rather comforting.',
-      'A system that admits its limits is worth examining.',
+      'The agents do the work. The final decision remains with their operator.',
+      'A failed check returns to the work. A sensible precaution.',
     ],
   },
   stack: {

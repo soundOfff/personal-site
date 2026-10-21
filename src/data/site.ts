@@ -53,26 +53,6 @@ export const proofs: { value: string; key: string; accent?: boolean }[] = [
   { value: '5+', key: 'years full-stack' },
 ];
 
-// 06 · how I work
-export const tenets = [
-  {
-    title: 'Test before changing models',
-    body: 'I use evals to check whether a cheaper model can handle a task before routing traffic to it.',
-  },
-  {
-    title: 'Cache repeated work',
-    body: 'A cached result can save an API call. The decision is what can be reused and how long it can stay valid.',
-  },
-  {
-    title: 'Set limits before launch',
-    body: 'Public demos need request limits. This agent allows five questions per IP each day and checks a shared daily quota.',
-  },
-  {
-    title: 'Turn failures into test cases',
-    body: 'A missed extraction or a bad routing decision belongs in the eval set, so it can be checked when the prompt or model changes.',
-  },
-] as const;
-
 // 07 · stack · toolbox: the tools that actually recur across the work
 // (ICPC ⇒ C++; editorial-ui ⇒ TypeScript; Dex/LLM work ⇒ Python).
 export const toolbox = [
