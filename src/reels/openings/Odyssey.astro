@@ -114,21 +114,50 @@
     </dialog>
   </div>
 </div>
-<aside class="hal-companion" data-hal-companion aria-label="HAL shipboard companion" hidden>
-  <div class="hal-companion-top">
+<aside
+  class="hal-companion"
+  data-hal-companion
+  data-state="idle"
+  aria-label="HAL shipboard companion"
+  hidden
+>
+  <button
+    class="hal-companion-orb"
+    type="button"
+    data-hal-toggle
+    aria-label="Open HAL companion"
+    aria-expanded="false"
+    aria-controls="hal-companion-panel"
+  >
     <span class="hal-companion-eye" data-hal-companion-eye aria-hidden="true"><i></i></span>
-    <span>HAL <b>9000</b></span>
-    <button type="button" data-hal-minimize aria-expanded="true">Minimize</button>
+  </button>
+  <div
+    class="hal-companion-popover"
+    id="hal-companion-panel"
+    data-hal-popover
+    role="region"
+    aria-label="HAL 9000"
+    inert
+  >
+    <div class="hal-companion-top">
+      <span>HAL <b>9000</b></span>
+      <button type="button" data-hal-companion-close aria-label="Close HAL panel">×</button>
+    </div>
+    <p data-hal-comment>I will be here if anything requires supervision.</p>
+    <small data-hal-source>Page observation</small>
+    <div class="hal-companion-controls">
+      <button type="button" data-hal-chat aria-controls="hal-dialog">Talk to HAL ↗</button>
+      <button type="button" data-hal-companion-voice aria-pressed="false">Unmute HAL</button>
+    </div>
+    <details class="hal-companion-settings">
+      <summary>Settings</summary>
+      <button type="button" data-hal-pause aria-pressed="false">Pause remarks</button>
+    </details>
   </div>
-  <div class="hal-companion-body">
-    <p data-hal-comment aria-live="polite" aria-atomic="true">
-      I will keep an eye on things. Do take your time.
-    </p>
-    <small data-hal-source>Shipboard remark</small>
-  </div>
-  <div class="hal-companion-controls">
-    <button type="button" data-hal-chat aria-controls="hal-dialog">Talk to HAL ↗</button>
-    <button type="button" data-hal-pause aria-pressed="false">Pause remarks</button>
-    <button type="button" data-hal-companion-voice aria-pressed="false">Unmute HAL</button>
-  </div>
+  <span
+    class="hal-companion-announcement"
+    data-hal-announcement
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"></span>
 </aside>

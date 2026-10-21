@@ -5,8 +5,8 @@
  * score (./score): a balalaika, cimbalom, zither, organ and timpani band in
  * E harmonic minor, after Desplat, plus the hotel's own noises.
  *
- *   - the key rack: a brass key tink per key, a key-ring jingle and a whip pan
- *     (the page smears sideways, stereo whoosh) on every in-page jump
+ *   - the key rack: a brass key tink per key, a key-ring jingle and a soft
+ *     stereo whoosh accompanying native in-page navigation
  *   - other hovers: the cimbalom's cotton beater, wandering the scale
  *   - the cut into each era: an interlude crossing the middle of the screen
  *     closes the matte to the era's ratio (html[data-gb-ar]), with a projector
@@ -99,38 +99,24 @@ const reel: ReelModule = {
       opts: AddEventListenerOptions = {},
     ) => document.addEventListener(type, fn, { ...opts, signal });
 
-    /* ---------- the whip pan: every in-page jump from the rack or the hero ---------- */
-    let whipping = false;
-    const land = (id: string) => {
-      const prior = root.style.scrollBehavior;
-      root.style.scrollBehavior = 'auto';
-      if (location.hash === `#${id}`) document.getElementById(id)?.scrollIntoView();
-      else location.hash = id;
-      later(() => (root.style.scrollBehavior = prior), 60);
-    };
-    on('click', (e) => {
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+    on('click', (event) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
         return;
-      const a = (e.target as Element | null)?.closest<HTMLAnchorElement>(
-        '.railnav a[href^="#"], .startrow a[href^="#"]',
-      );
-      if (!a) return;
-      const id = a.hash.slice(1);
-      if (!id || !document.getElementById(id)) return;
-      if (id === 'playground') v.deskBell(0.07);
+      const link =
+        event.target instanceof Element
+          ? event.target.closest<HTMLAnchorElement>('.railnav a[href^="#"], .startrow a[href^="#"]')
+          : null;
+      if (!link || !document.getElementById(link.hash.slice(1))) return;
+      if (link.hash === '#playground') v.deskBell(0.07);
       else v.jingle();
-      // Reduced motion: the sound, then the browser's own (instant) jump.
-      if (ctx.reducedMotion) return;
-      e.preventDefault();
-      if (whipping) return;
-      whipping = true;
-      v.whoosh();
-      root.classList.add('gb-whipping');
-      later(() => land(id), 200);
-      later(() => {
-        root.classList.remove('gb-whipping');
-        whipping = false;
-      }, 480);
+      if (!ctx.reducedMotion) v.whoosh();
     });
 
     /* ---------- hover voices: one per prop, fired once per element entered ---------- */
@@ -326,13 +312,11 @@ const reel: ReelModule = {
     return () => {
       quiet();
       timers.forEach((id) => window.clearTimeout(id));
-      root.style.scrollBehavior = '';
       window.clearInterval(twinkle);
       window.clearInterval(clock);
       relay('');
       root.style.removeProperty('--gb-clock');
       delete root.dataset.gbAr;
-      root.classList.remove('gb-whipping');
       log?.classList.remove('gb-armed');
       items.forEach((el) => el.classList.remove('gb-in'));
       wins.forEach((w) => w.classList.toggle('on', lit.has(w)));

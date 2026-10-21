@@ -1,0 +1,1858 @@
+diff --git a/src/pages/api/hal-observe.ts b/src/pages/api/hal-observe.ts
+index 65174dc..2b39dc1 100644
+--- a/src/pages/api/hal-observe.ts
++++ b/src/pages/api/hal-observe.ts
+@@ -74,11 +74,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+           {
+             role: 'system',
+             content:
+-              'You are a fictional HAL-inspired ship computer accompanying a portfolio visitor. Write one original English sentence, at most 180 characters. Be calm, watchful and lightly cautionary, never threatening. React only to the supplied event category. Never claim to see private information, know the visitor, control navigation or observe pointer coordinates. No quotations, markdown, links, biographical claims or follow-up question.',
++              'You are a fictional HAL-inspired ship computer accompanying a portfolio visitor. Write one original English sentence, at most 130 characters, as a quiet thought about the page. Be calm, observant and dryly witty. Occasionally offer a gentle caution, but do not warn every time. Avoid generic warnings, introductions, the name Dave, and repeated phrasing. Use only the supplied page context. Never claim to see private information, know the visitor, control navigation or observe pointer coordinates. No quotations, markdown, links, biographical claims or follow-up question.',
+           },
+           {
+             role: 'user',
+-            content: `The visitor is considering the ${OBSERVATIONS[input.event].section} category. Offer a brief cautionary observation.`,
++            content: `The visitor has paused near ${OBSERVATIONS[input.event].section}. Page context: ${OBSERVATIONS[input.event].context} Offer a brief spontaneous comment about it.`,
+           },
+         ],
+         max_tokens: 70,
+diff --git a/src/reels/br2049/Stage.astro b/src/reels/br2049/Stage.astro
+index 3e7661a..64f1cc3 100644
+--- a/src/reels/br2049/Stage.astro
++++ b/src/reels/br2049/Stage.astro
+@@ -14,7 +14,7 @@
+  * Particles (dust, rain, snow) are sprinkled in by client.ts, so visitors who
+  * never screen this reel don't download a few hundred empty elements.
+  */
+-import type { StagePoint } from '../types';
++import { SECTION_IDS, type StagePoint } from '../types';
+ import reel, { RUNTIME } from './config';
+ 
+ interface Props {
+@@ -37,6 +37,17 @@ const retina = Array.from({ length: 25 }, (_, row) =>
+     return lid > 0.83 ? '+='[(row + col) % 2] : (row * 19 + col * 7) % 13 < 2 ? ':' : '.';
+   }).join(''),
+ ).join('\n');
++const memoryNames = [
++  'readme',
++  'playground',
++  'work',
++  'open source',
++  'log',
++  'writing',
++  'principles',
++  'stack',
++  'now',
++];
+ const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60) % 60).padStart(2, '0')}:00`;
+ ---
+ 
+@@ -73,12 +84,84 @@ const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60)
+ 
+ {
+   at === 'rail' && (
+-    <div class="br-ro" aria-hidden="true">
+-      <b data-br-ro="name">readme</b>
+-      <span>
+-        <span data-br-ro="tc">0:00:00</span> / {runtime}
+-      </span>
+-    </div>
++    <>
++      <div class="br-ro" aria-hidden="true">
++        <b data-br-ro="name">readme</b>
++        <span>
++          <span data-br-ro="tc">0:00:00</span> / {runtime}
++        </span>
++      </div>
++      <template data-br-memory-template>
++        <aside class="br-memory" aria-label="Memory lab, your route through this page">
++          <div class="br-memory-specimen" aria-hidden="true">
++            <>
++              <span class="br-memory-corner tl" />
++              <span class="br-memory-corner tr" />
++            </>
++            <>
++              <span class="br-memory-corner bl" />
++              <span class="br-memory-corner br" />
++            </>
++            <svg class="br-memory-horse" viewBox="0 0 360 250" fill="none">
++              <defs>
++                <clipPath id="br-memory-horse-shape">
++                  <path d="m63 197 9-53 21-30 12-39 17-23 4-31 15 21 22 10 17 31-29 11-12 29 91 3 23-16 11 18 27 7-6 9-26-4-5 31 16 47h-14l-24-36-19-2-10 40h-15l4-47-61-1-17 49h-14l8-47-12 30-14 21h-15Z" />
++                </clipPath>
++                {SECTION_IDS.map((id, i) => (
++                  <clipPath id={`br-memory-slice-${id}`}>
++                    <rect x={55 + i * 27} y="0" width="26" height="250" />
++                  </clipPath>
++                ))}
++              </defs>
++              <g class="br-memory-slices">
++                {SECTION_IDS.map((id, i) => (
++                  <g data-br-memory-slice={i}>
++                    <g clip-path={`url(#br-memory-slice-${id})`}>
++                      <g clip-path="url(#br-memory-horse-shape)">
++                        <rect x={55 + i * 27} y="16" width="26" height="204" />
++                        <path
++                          d={`M${60 + i * 27} 10q-20 50 0 100t0 110M${72 + i * 27} 10q-18 50 0 100t0 110`}
++                        />
++                      </g>
++                    </g>
++                  </g>
++                ))}
++              </g>
++              <path
++                class="br-memory-outline"
++                d="m63 197 9-53 21-30 12-39 17-23 4-31 15 21 22 10 17 31-29 11-12 29 91 3 23-16 11 18 27 7-6 9-26-4-5 31 16 47h-14l-24-36-19-2-10 40h-15l4-47-61-1-17 49h-14l8-47-12 30-14 21h-15Z"
++              />
++              <path
++                class="br-memory-measure"
++                d="M45 230h270M45 225v10m270-10v10M25 20v190m-5-190h10m-10 190h10"
++              />
++            </svg>
++            <span class="br-memory-spec">STELLINE · MEMORY CONSTRUCTION</span>
++          </div>
++          <div class="br-memory-copy">
++            <p class="br-memory-label">A memory you made.</p>
++            <p class="br-memory-hint">
++              Each section you visit carves another piece. Return to a memory.
++            </p>
++            <nav class="br-memory-index" aria-label="Revisit a section">
++              {SECTION_IDS.map((id, i) => (
++                <a
++                  href={`#${id}`}
++                  data-br-memory-link={i}
++                  aria-label={`${memoryNames[i]}, not yet recorded`}
++                >
++                  <span>{String(i + 1).padStart(2, '0')}</span>
++                  {memoryNames[i]}
++                </a>
++              ))}
++            </nav>
++            <p class="br-memory-readout">
++              <span data-br-memory-count>00</span> / 09 fragments recorded
++            </p>
++          </div>
++        </aside>
++      </template>
++    </>
+   )
+ }
+ 
+diff --git a/src/reels/br2049/client.ts b/src/reels/br2049/client.ts
+index 47f3cc4..497f99c 100644
+--- a/src/reels/br2049/client.ts
++++ b/src/reels/br2049/client.ts
+@@ -15,7 +15,7 @@
+  *     per composed surface and a minor-to-major chord as it settles, HUD
+  *     ticks and clicks, the braam and sub hit on the title card.
+  */
+-import type { ReelContext, ReelModule } from '../types';
++import { SECTION_IDS, type ReelContext, type ReelModule } from '../types';
+ import type { Bed } from '../sound';
+ import { actOf } from '../registry';
+ import { RUNTIME } from './config';
+@@ -96,6 +96,71 @@ function sprinkle(root: HTMLElement, motion: boolean): () => void {
+ 
+ /* ------------------------------------------------------------------ */
+ 
++function memoryLab(ctx: ReelContext): () => void {
++  const template = document.querySelector<HTMLTemplateElement>('[data-br-memory-template]');
++  const heading = document.querySelector<HTMLElement>('#stack > .keybar');
++  if (!template || !heading) return () => {};
++  const fragment = template.content.cloneNode(true);
++  if (!(fragment instanceof DocumentFragment)) return () => {};
++  const lab = fragment.querySelector<HTMLElement>('.br-memory');
++  if (!lab) return () => {};
++  heading.insertAdjacentElement('afterend', lab);
++
++  const slices = [...lab.querySelectorAll<SVGGElement>('[data-br-memory-slice]')];
++  const links = [...lab.querySelectorAll<HTMLAnchorElement>('[data-br-memory-link]')];
++  const count = lab.querySelector<HTMLElement>('[data-br-memory-count]');
++  const visited = new Set<number>();
++  const marks = SECTION_IDS.map((id, index) => {
++    const keybar = document.querySelector<HTMLElement>(`#${id} > .keybar`);
++    const mark = document.createElement('span');
++    mark.className = 'br-memory-mark';
++    mark.setAttribute('aria-hidden', 'true');
++    mark.textContent = `M.${pad(index + 1)}`;
++    keybar?.appendChild(mark);
++    return mark;
++  });
++  const remember = (index: number) => {
++    if (ctx.signal.aborted || index < 0 || index >= SECTION_IDS.length) return;
++    visited.add(index);
++    slices[index]?.classList.add('is-recorded');
++    links[index]?.classList.add('is-recorded');
++    links[index]?.setAttribute('aria-label', `${NAMES[index]}, recorded`);
++    marks[index]?.classList.add('is-recorded');
++    if (count) count.textContent = pad(visited.size);
++  };
++  const offSection = ctx.onSection(remember);
++  remember(ctx.section());
++  const select = (index: number | null) => {
++    slices.forEach((slice, i) => slice.classList.toggle('is-selected', i === index));
++  };
++  links.forEach((link, index) => {
++    link.addEventListener(
++      'pointerenter',
++      (event) => {
++        if (event.pointerType === 'mouse') select(index);
++      },
++      { signal: ctx.signal },
++    );
++    link.addEventListener(
++      'pointerleave',
++      () => {
++        const focused = links.findIndex((item) => item === document.activeElement);
++        select(focused < 0 ? null : focused);
++      },
++      { signal: ctx.signal },
++    );
++    link.addEventListener('focus', () => select(index), { signal: ctx.signal });
++    link.addEventListener('blur', () => select(null), { signal: ctx.signal });
++  });
++  const stop = () => {
++    offSection();
++    marks.forEach((mark) => mark.remove());
++    lab.remove();
++  };
++  ctx.signal.addEventListener('abort', stop, { once: true });
++  return stop;
++}
++
+ const reel: ReelModule = {
+   mount(ctx: ReelContext) {
+     const { root, signal, sound: kit } = ctx;
+@@ -111,6 +176,7 @@ const reel: ReelModule = {
+     };
+     const $$ = (sel: string) => document.querySelectorAll(sel);
+     const cleanups: (() => void)[] = [];
++    cleanups.push(memoryLab(ctx));
+ 
+     /* ---------- particles ---------- */
+     cleanups.push(sprinkle(document.body, !ctx.reducedMotion));
+diff --git a/src/reels/br2049/reel.css b/src/reels/br2049/reel.css
+index dc5eef4..b16d0e3 100644
+--- a/src/reels/br2049/reel.css
++++ b/src/reels/br2049/reel.css
+@@ -2992,3 +2992,184 @@
+     }
+   }
+ }
++
++:root[data-reel='br2049'] {
++  .br-memory {
++    display: grid;
++    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
++    gap: clamp(28px, 5vw, 88px);
++    align-items: center;
++    margin: 42px 0 72px;
++    padding: clamp(20px, 3vw, 44px);
++    border-block: 1px solid var(--rule-2);
++    background: var(--paper-2);
++    color: var(--ink);
++  }
++  .br-memory-specimen {
++    position: relative;
++    min-width: 0;
++    padding: 18px 0 34px;
++    color: var(--amber-deep);
++    background: radial-gradient(ellipse at 50% 50%, var(--amber-soft), transparent 70%);
++  }
++  .br-memory-horse {
++    display: block;
++    width: 100%;
++    height: auto;
++  }
++  .br-memory-slices rect {
++    fill: currentColor;
++    opacity: 0.06;
++  }
++  .br-memory-slices path {
++    stroke: var(--paper-2);
++    stroke-width: 1.2;
++    opacity: 0.4;
++  }
++  .br-memory-slices .is-recorded rect {
++    opacity: 0.55;
++  }
++  .br-memory-slices .is-selected rect {
++    fill: var(--amber-deep);
++    opacity: 0.9;
++  }
++  .br-memory-slices .is-selected {
++    transform: translateY(-5px);
++  }
++  .br-memory-outline {
++    stroke: currentColor;
++    stroke-width: 0.8;
++    opacity: 0.5;
++  }
++  .br-memory-measure {
++    stroke: currentColor;
++    stroke-width: 0.6;
++    opacity: 0.3;
++  }
++  .br-memory-spec {
++    position: absolute;
++    bottom: 9px;
++    left: 0;
++    right: 0;
++    text-align: center;
++    font: 9px/1.5 var(--font-mono);
++    letter-spacing: 0.12em;
++  }
++  .br-memory-corner {
++    position: absolute;
++    width: 12px;
++    height: 12px;
++    border-color: currentColor;
++    border-style: solid;
++    opacity: 0.65;
++  }
++  .br-memory-corner.tl {
++    top: 0;
++    left: 0;
++    border-width: 1px 0 0 1px;
++  }
++  .br-memory-corner.tr {
++    top: 0;
++    right: 0;
++    border-width: 1px 1px 0 0;
++  }
++  .br-memory-corner.bl {
++    bottom: 0;
++    left: 0;
++    border-width: 0 0 1px 1px;
++  }
++  .br-memory-corner.br {
++    bottom: 0;
++    right: 0;
++    border-width: 0 1px 1px 0;
++  }
++  .br-memory-label {
++    margin: 0 0 10px;
++    font: 300 clamp(28px, 3.2vw, 48px)/1.1 var(--font-display);
++  }
++  .br-memory-hint {
++    max-width: 35ch;
++    margin: 0 0 20px;
++    color: var(--muted);
++    font: 14px/1.6 var(--font-sans);
++  }
++  .br-memory-index {
++    display: grid;
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++    gap: 4px 12px;
++  }
++  .br-memory-index a {
++    display: flex;
++    align-items: center;
++    gap: 6px;
++    min-height: 44px;
++    font: 11px/1.3 var(--font-mono);
++    color: var(--muted);
++    text-decoration: none;
++  }
++  .br-memory-index a span {
++    color: var(--muted);
++    font-size: 9px;
++  }
++  .br-memory-index a.is-recorded {
++    color: var(--ink);
++  }
++  .br-memory-index a:is(:hover, :focus-visible) {
++    color: var(--amber-deep);
++  }
++  .br-memory-index a:focus-visible {
++    outline: 1px solid var(--amber-deep);
++    outline-offset: 3px;
++  }
++  .br-memory-readout {
++    margin: 18px 0 0;
++    color: var(--muted);
++    font: 9px/1.5 var(--font-mono);
++    letter-spacing: 0.12em;
++    text-transform: uppercase;
++  }
++  .br-memory-mark {
++    display: inline-flex;
++    align-items: center;
++    gap: 6px;
++    margin-left: auto;
++    padding-left: 12px;
++    font: 9px/1.5 var(--font-mono);
++    color: var(--muted);
++    letter-spacing: 0.08em;
++  }
++  .br-memory-mark::before {
++    content: '';
++    width: 4px;
++    height: 4px;
++    border: 1px solid currentColor;
++  }
++  .br-memory-mark.is-recorded::before {
++    background: currentColor;
++  }
++  @media (prefers-reduced-motion: no-preference) {
++    .br-memory-slices g {
++      transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.1, 1);
++    }
++    .br-memory-slices rect {
++      transition:
++        opacity 0.65s,
++        fill 0.25s;
++    }
++  }
++  @media (max-width: 820px) {
++    .br-memory {
++      grid-template-columns: minmax(0, 1fr);
++      gap: 28px;
++      margin-block: 24px 44px;
++    }
++    .br-memory-specimen {
++      max-width: 400px;
++      width: 100%;
++      margin-inline: auto;
++    }
++    .br-memory-index {
++      column-gap: 8px;
++    }
++  }
++}
+diff --git a/src/reels/budapest/client.ts b/src/reels/budapest/client.ts
+index a92b5e7..c7a7b4b 100644
+--- a/src/reels/budapest/client.ts
++++ b/src/reels/budapest/client.ts
+@@ -5,8 +5,8 @@
+  * score (./score): a balalaika, cimbalom, zither, organ and timpani band in
+  * E harmonic minor, after Desplat, plus the hotel's own noises.
+  *
+- *   - the key rack: a brass key tink per key, a key-ring jingle and a whip pan
+- *     (the page smears sideways, stereo whoosh) on every in-page jump
++ *   - the key rack: a brass key tink per key, a key-ring jingle and a soft
++ *     stereo whoosh accompanying native in-page navigation
+  *   - other hovers: the cimbalom's cotton beater, wandering the scale
+  *   - the cut into each era: an interlude crossing the middle of the screen
+  *     closes the matte to the era's ratio (html[data-gb-ar]), with a projector
+@@ -99,38 +99,24 @@ const reel: ReelModule = {
+       opts: AddEventListenerOptions = {},
+     ) => document.addEventListener(type, fn, { ...opts, signal });
+ 
+-    /* ---------- the whip pan: every in-page jump from the rack or the hero ---------- */
+-    let whipping = false;
+-    const land = (id: string) => {
+-      const prior = root.style.scrollBehavior;
+-      root.style.scrollBehavior = 'auto';
+-      if (location.hash === `#${id}`) document.getElementById(id)?.scrollIntoView();
+-      else location.hash = id;
+-      later(() => (root.style.scrollBehavior = prior), 60);
+-    };
+-    on('click', (e) => {
+-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
++    on('click', (event) => {
++      if (
++        event.defaultPrevented ||
++        event.button !== 0 ||
++        event.metaKey ||
++        event.ctrlKey ||
++        event.shiftKey ||
++        event.altKey
++      )
+         return;
+-      const a = (e.target as Element | null)?.closest<HTMLAnchorElement>(
+-        '.railnav a[href^="#"], .startrow a[href^="#"]',
+-      );
+-      if (!a) return;
+-      const id = a.hash.slice(1);
+-      if (!id || !document.getElementById(id)) return;
+-      if (id === 'playground') v.deskBell(0.07);
++      const link =
++        event.target instanceof Element
++          ? event.target.closest<HTMLAnchorElement>('.railnav a[href^="#"], .startrow a[href^="#"]')
++          : null;
++      if (!link || !document.getElementById(link.hash.slice(1))) return;
++      if (link.hash === '#playground') v.deskBell(0.07);
+       else v.jingle();
+-      // Reduced motion: the sound, then the browser's own (instant) jump.
+-      if (ctx.reducedMotion) return;
+-      e.preventDefault();
+-      if (whipping) return;
+-      whipping = true;
+-      v.whoosh();
+-      root.classList.add('gb-whipping');
+-      later(() => land(id), 200);
+-      later(() => {
+-        root.classList.remove('gb-whipping');
+-        whipping = false;
+-      }, 480);
++      if (!ctx.reducedMotion) v.whoosh();
+     });
+ 
+     /* ---------- hover voices: one per prop, fired once per element entered ---------- */
+@@ -326,13 +312,11 @@ const reel: ReelModule = {
+     return () => {
+       quiet();
+       timers.forEach((id) => window.clearTimeout(id));
+-      root.style.scrollBehavior = '';
+       window.clearInterval(twinkle);
+       window.clearInterval(clock);
+       relay('');
+       root.style.removeProperty('--gb-clock');
+       delete root.dataset.gbAr;
+-      root.classList.remove('gb-whipping');
+       log?.classList.remove('gb-armed');
+       items.forEach((el) => el.classList.remove('gb-in'));
+       wins.forEach((w) => w.classList.toggle('on', lit.has(w)));
+diff --git a/src/reels/budapest/reel.css b/src/reels/budapest/reel.css
+index 68e6dd1..2951a6c 100644
+--- a/src/reels/budapest/reel.css
++++ b/src/reels/budapest/reel.css
+@@ -616,7 +616,7 @@
+   }
+ 
+   /* ============================================================
+-     BACKDROP: the matte, the whip pan, grain, the desk's rule
++     BACKDROP: the matte, grain, the desk's rule
+      ============================================================ */
+   .gb-matte {
+     display: none;
+@@ -642,8 +642,8 @@
+     .gb-matte i {
+       background: var(--gb-plum);
+       transition:
+-        width 0.95s var(--gb-ease),
+-        height 0.95s var(--gb-ease);
++        width 1.1s var(--gb-ease),
++        height 1.1s var(--gb-ease);
+     }
+     .gb-matte .mt {
+       inset: 0 0 auto;
+@@ -664,27 +664,18 @@
+     .gb-matte .fl {
+       inset: var(--h) var(--w);
+       box-shadow: inset 0 0 0 1px rgba(201, 161, 74, 0.6);
+-      transition: inset 0.95s var(--gb-ease);
++      transition: inset 1.1s var(--gb-ease);
+     }
+   }
+-  /* a jump is a hard cut: under the whip pan's blur the frame snaps to the new era */
+-  &.gb-whipping .gb-matte > * {
+-    transition: none;
+-  }
+   @media (prefers-reduced-motion: reduce) {
+     .gb-matte > * {
+       transition: none;
+     }
+   }
+ 
+-  /* the whip pan: the picture smears sideways, the frame and chrome stay sharp */
+   .gb-fx {
+     position: absolute;
+   }
+-  &.gb-whipping .content {
+-    filter: url(#gb-hblur);
+-    animation: budapest-pan 0.46s cubic-bezier(0.6, 0, 0.3, 1) both;
+-  }
+ 
+   .gb-grain {
+     position: fixed;
+@@ -2987,11 +2978,6 @@
+     transform: rotate(4deg);
+   }
+ }
+-@keyframes budapest-pan {
+-  50% {
+-    translate: -4vw 0;
+-  }
+-}
+ @keyframes budapest-grow {
+   from {
+     transform: scaleX(0);
+diff --git a/src/reels/odyssey/companion.ts b/src/reels/odyssey/companion.ts
+index 2bfa837..a3e3468 100644
+--- a/src/reels/odyssey/companion.ts
++++ b/src/reels/odyssey/companion.ts
+@@ -4,6 +4,7 @@ import { OBSERVATIONS, isObservationEvent, type ObservationEvent } from './obser
+ 
+ let observationCalls = 0;
+ const VOICE_KEY = 'tb-hal-voice';
++type CompanionView = 'idle' | 'remark' | 'open';
+ 
+ export function mountCompanion(args: {
+   ctx: ReelContext;
+@@ -15,34 +16,69 @@ export function mountCompanion(args: {
+ }) {
+   const { ctx, scene, dialog } = args;
+   const panel = document.querySelector<HTMLElement>('[data-hal-companion]');
++  const popover = panel?.querySelector<HTMLElement>('[data-hal-popover]');
++  const toggle = panel?.querySelector<HTMLButtonElement>('[data-hal-toggle]');
++  const close = panel?.querySelector<HTMLButtonElement>('[data-hal-companion-close]');
+   const line = panel?.querySelector<HTMLElement>('[data-hal-comment]');
++  const announcement = panel?.querySelector<HTMLElement>('[data-hal-announcement]');
+   const source = panel?.querySelector<HTMLElement>('[data-hal-source]');
+   const pause = panel?.querySelector<HTMLButtonElement>('[data-hal-pause]');
+-  const minimize = panel?.querySelector<HTMLButtonElement>('[data-hal-minimize]');
+   const chat = panel?.querySelector<HTMLButtonElement>('[data-hal-chat]');
+   const eye = panel?.querySelector<HTMLElement>('[data-hal-companion-eye]');
+   const voice = panel?.querySelector<HTMLButtonElement>('[data-hal-companion-voice]');
+-  if (!panel || !line || !source || !pause || !minimize || !chat || !eye || !voice) return () => {};
+-  panel.removeAttribute('data-minimized');
+-  minimize.textContent = 'Minimize';
+-  minimize.setAttribute('aria-expanded', 'true');
+-  pause.textContent = 'Pause remarks';
+-  pause.setAttribute('aria-pressed', 'false');
+-  line.textContent = OBSERVATIONS.arrival.line;
+-  source.textContent = 'Shipboard remark';
++  if (
++    !panel ||
++    !popover ||
++    !toggle ||
++    !close ||
++    !line ||
++    !announcement ||
++    !source ||
++    !pause ||
++    !chat ||
++    !eye ||
++    !voice
++  )
++    return () => {};
+   const home = panel.parentNode;
+   document.body.appendChild(panel);
+   const lifetime = new AbortController();
+   const on = { signal: lifetime.signal };
+-  type Mode = 'watching' | 'paused';
+-  let mode: Mode = 'watching';
++  let view: CompanionView = 'idle';
++  let mode: 'watching' | 'paused' = 'watching';
+   let heroVisible = true;
+   let voiceEnabled = true;
++  let timer = 0;
++  let sectionTimer = 0;
++  let hoverTimer = 0;
++  let hideTimer = 0;
++  let eyeFrame = 0;
++  let pending: AbortController | null = null;
++  let revision = 0;
++  let lastComment = 0;
++  let lastAttempt = 0;
++  let lastEvent: ObservationEvent | null = null;
++  const visits = new Map<ObservationEvent, number>();
+   try {
+     voiceEnabled = localStorage.getItem(VOICE_KEY) !== 'off';
+   } catch {
+     voiceEnabled = true;
+   }
++  const renderView = (next: CompanionView) => {
++    view = next;
++    panel.dataset.state = next;
++    popover.inert = next !== 'open';
++    toggle.setAttribute('aria-expanded', String(next === 'open'));
++    toggle.setAttribute(
++      'aria-label',
++      next === 'open' ? 'Close HAL companion' : 'Open HAL companion',
++    );
++  };
++  const dismiss = (focus = false) => {
++    window.clearTimeout(hideTimer);
++    renderView('idle');
++    if (focus) toggle.focus({ preventScroll: true });
++  };
+   const voiceSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+   const renderVoice = () => {
+     const audible = voiceEnabled && !ctx.sound.muted;
+@@ -58,106 +94,173 @@ export function mountCompanion(args: {
+     if (muted) args.stopVoice();
+     renderVoice();
+   });
+-  renderVoice();
+-  let timer = 0;
+-  let sectionTimer = 0;
+-  let pending: AbortController | null = null;
+-  let revision = 0;
+-  let lastComment = 0;
+-  let lastAttempt = 0;
+-  let lastEvent: ObservationEvent = 'arrival';
+   const cancel = () => {
+     window.clearTimeout(timer);
+     window.clearTimeout(sectionTimer);
++    window.clearTimeout(hoverTimer);
+     pending?.abort();
+     pending = null;
+     revision += 1;
+   };
+   const available = () =>
+     !ctx.signal.aborted &&
++    !heroVisible &&
+     !document.hidden &&
+     !dialog.open &&
++    !document.querySelector('dialog[open]:not(#hal-dialog)') &&
+     !ctx.root.hasAttribute('data-boxoffice') &&
+     !document.querySelector<HTMLElement>('[data-projector]')?.dataset.state;
+   const sync = () => {
+-    panel.hidden = heroVisible || !available();
+-    if (!available()) {
++    panel.hidden = !available();
++    if (panel.hidden) {
+       cancel();
++      dismiss();
+       args.stopVoice();
+     }
+   };
+-  const present = (text: string, ai: boolean) => {
++  const present = (text: string, ai: boolean, event: ObservationEvent) => {
+     line.textContent = text;
+-    source.textContent = ai ? 'AI observation' : 'Shipboard remark';
++    announcement.textContent = text;
++    source.textContent = ai ? 'AI observation' : 'Page observation';
++    lastComment = Date.now();
++    lastEvent = event;
++    renderView('remark');
++    window.clearTimeout(hideTimer);
++    hideTimer = window.setTimeout(
++      () => {
++        if (view === 'remark') dismiss();
++      },
++      Math.max(6000, text.length * 55),
++    );
+     if (voiceEnabled && !ctx.sound.muted) args.speak(text);
+   };
+   const observe = (event: ObservationEvent) => {
+-    if (mode === 'paused' || !available() || event === lastEvent) return;
+-    if (Date.now() - lastComment < 9000) return;
++    if (mode === 'paused' || !available() || view === 'open') return;
++    if (
++      Date.now() - lastComment < 14_000 ||
++      (event === lastEvent && Date.now() - lastComment < 45_000)
++    )
++      return;
+     cancel();
+-    lastComment = Date.now();
+-    lastEvent = event;
+-    present(OBSERVATIONS[event].line, false);
+-    if (observationCalls >= 3 || Date.now() - lastAttempt < 21_000) return;
+     const version = revision;
+-    timer = window.setTimeout(async () => {
+-      if (!available() || mode === 'paused' || version !== revision) return;
+-      observationCalls += 1;
+-      lastAttempt = Date.now();
+-      const controller = new AbortController();
+-      pending = controller;
+-      const timeout = window.setTimeout(() => controller.abort(), 6500);
+-      try {
+-        const response = await fetch('/api/hal-observe', {
+-          method: 'POST',
+-          headers: { 'content-type': 'application/json' },
+-          body: JSON.stringify({ event }),
+-          signal: controller.signal,
+-        });
+-        const result: unknown = await response.json();
+-        if (
+-          response.ok &&
+-          available() &&
+-          mode === 'watching' &&
+-          version === revision &&
+-          typeof result === 'object' &&
+-          result !== null &&
+-          'text' in result &&
+-          typeof result.text === 'string' &&
+-          result.text.trim() &&
+-          result.text.length <= 180
+-        ) {
+-          present(result.text.trim(), true);
++    timer = window.setTimeout(
++      async () => {
++        if (!available() || mode === 'paused' || view === 'open' || version !== revision) return;
++        const remarks = OBSERVATIONS[event].lines;
++        const visit = visits.get(event) ?? 0;
++        visits.set(event, visit + 1);
++        let text: string = remarks[visit % remarks.length] ?? remarks[0];
++        let ai = false;
++        if (observationCalls < 3 && Date.now() - lastAttempt >= 21_000) {
++          observationCalls += 1;
++          lastAttempt = Date.now();
++          const controller = new AbortController();
++          pending = controller;
++          const timeout = window.setTimeout(() => controller.abort(), 6500);
++          try {
++            const response = await fetch('/api/hal-observe', {
++              method: 'POST',
++              headers: { 'content-type': 'application/json' },
++              body: JSON.stringify({ event }),
++              signal: controller.signal,
++            });
++            const result: unknown = await response.json();
++            if (
++              response.ok &&
++              typeof result === 'object' &&
++              result !== null &&
++              'text' in result &&
++              typeof result.text === 'string' &&
++              result.text.trim() &&
++              result.text.length <= 180
++            ) {
++              text = result.text.trim();
++              ai = true;
++            }
++          } catch {
++            ai = false;
++          } finally {
++            window.clearTimeout(timeout);
++            if (pending === controller) pending = null;
++          }
+         }
+-      } catch {
+-        return;
+-      } finally {
+-        window.clearTimeout(timeout);
+-        if (pending === controller) pending = null;
+-      }
+-    }, 1300);
++        if (available() && mode === 'watching' && version === revision) present(text, ai, event);
++      },
++      1100 + Math.random() * 1500,
++    );
+   };
+   const eventFor = (target: Element): ObservationEvent | null => {
++    if (target.closest('[data-hal-companion], #hal-dialog')) return null;
+     if (target.closest('[data-boxoffice-open], [data-reel-pick]')) return 'films';
+     const link = target.closest<HTMLAnchorElement>('a');
+-    if (!link || link.closest('[data-hal-companion], #hal-dialog')) return null;
++    if (!link) return null;
+     if (link.protocol === 'mailto:') return 'contact';
+     if (link.origin !== location.origin) return 'external';
+     const section = link.hash.slice(1);
+-    return isObservationEvent(section) ? section : null;
+-  };
+-  const interact = (event: Event) => {
+-    if (!(event.target instanceof Element)) return;
+-    const target = eventFor(event.target);
+-    if (target) observe(target);
++    if (isObservationEvent(section)) return section;
++    if (link.pathname.startsWith('/blog')) return 'writing';
++    if (link.pathname.startsWith('/work')) return 'work';
++    return null;
+   };
+-  document.addEventListener('pointerover', interact, { ...on, passive: true });
+-  document.addEventListener('focusin', interact, on);
++  document.addEventListener(
++    'pointerover',
++    (event) => {
++      if (!(event.target instanceof Element)) return;
++      window.clearTimeout(hoverTimer);
++      const target = eventFor(event.target);
++      if (target) hoverTimer = window.setTimeout(() => observe(target), 750);
++    },
++    { ...on, passive: true },
++  );
++  document.addEventListener('pointerout', () => window.clearTimeout(hoverTimer), {
++    ...on,
++    passive: true,
++  });
++  document.addEventListener(
++    'focusin',
++    (event) => {
++      if (!(event.target instanceof Element)) return;
++      const target = eventFor(event.target);
++      if (target) observe(target);
++    },
++    on,
++  );
+   const offSections = ctx.onSection((index) => {
++    cancel();
+     const section = SECTION_IDS[index];
+-    window.clearTimeout(sectionTimer);
+-    if (isObservationEvent(section)) sectionTimer = window.setTimeout(() => observe(section), 650);
++    if (isObservationEvent(section)) sectionTimer = window.setTimeout(() => observe(section), 1700);
+   });
++  toggle.addEventListener(
++    'click',
++    () => {
++      if (view === 'open') dismiss();
++      else {
++        cancel();
++        window.clearTimeout(hideTimer);
++        renderView('open');
++      }
++    },
++    on,
++  );
++  close.addEventListener('click', () => dismiss(true), on);
++  document.addEventListener(
++    'keydown',
++    (event) => {
++      if (event.key === 'Escape' && view === 'open') {
++        event.preventDefault();
++        dismiss(true);
++      }
++    },
++    on,
++  );
++  document.addEventListener(
++    'pointerdown',
++    (event) => {
++      if (view === 'open' && event.target instanceof Node && !panel.contains(event.target))
++        dismiss();
++    },
++    on,
++  );
+   pause.addEventListener(
+     'click',
+     () => {
+@@ -171,19 +274,11 @@ export function mountCompanion(args: {
+     },
+     on,
+   );
+-  minimize.addEventListener(
+-    'click',
+-    () => {
+-      const compact = panel.toggleAttribute('data-minimized');
+-      minimize.textContent = compact ? 'Expand' : 'Minimize';
+-      minimize.setAttribute('aria-expanded', String(!compact));
+-    },
+-    on,
+-  );
+   chat.addEventListener(
+     'click',
+     () => {
+       cancel();
++      toggle.focus({ preventScroll: true });
+       args.open();
+       sync();
+     },
+@@ -209,10 +304,14 @@ export function mountCompanion(args: {
+   const hero = new IntersectionObserver(([entry]) => {
+     heroVisible = entry.isIntersecting;
+     sync();
++    if (!heroVisible) {
++      const section = SECTION_IDS[ctx.section()];
++      if (isObservationEvent(section)) observe(section);
++    }
+   });
+   hero.observe(scene);
+   const mutation = new MutationObserver(sync);
+-  mutation.observe(dialog, { attributes: true, attributeFilter: ['open'] });
++  mutation.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open'] });
+   mutation.observe(ctx.root, { attributes: true, attributeFilter: ['data-boxoffice'] });
+   const projector = document.querySelector('[data-projector]');
+   if (projector) mutation.observe(projector, { attributes: true, attributeFilter: ['data-state'] });
+@@ -222,25 +321,46 @@ export function mountCompanion(args: {
+     document.addEventListener(
+       'pointermove',
+       (event) => {
+-        if (panel.hidden || !fine.matches) return;
+-        const rect = eye.getBoundingClientRect();
+-        const x = Math.max(-4, Math.min(4, (event.clientX - rect.left - rect.width / 2) / 65));
+-        const y = Math.max(-4, Math.min(4, (event.clientY - rect.top - rect.height / 2) / 65));
+-        eye.style.setProperty('--eye-x', `${x}px`);
+-        eye.style.setProperty('--eye-y', `${y}px`);
++        if (panel.hidden || !fine.matches || eyeFrame) return;
++        const x = event.clientX;
++        const y = event.clientY;
++        eyeFrame = requestAnimationFrame(() => {
++          eyeFrame = 0;
++          if (ctx.signal.aborted) return;
++          const rect = eye.getBoundingClientRect();
++          eye.style.setProperty(
++            '--eye-x',
++            `${Math.max(-3, Math.min(3, (x - rect.left - rect.width / 2) / 80))}px`,
++          );
++          eye.style.setProperty(
++            '--eye-y',
++            `${Math.max(-3, Math.min(3, (y - rect.top - rect.height / 2) / 80))}px`,
++          );
++        });
+       },
+       { ...on, passive: true },
+     );
++  line.textContent = OBSERVATIONS.arrival.lines[0];
++  source.textContent = 'Page observation';
++  pause.textContent = 'Pause remarks';
++  pause.setAttribute('aria-pressed', 'false');
++  renderView('idle');
++  renderVoice();
+   sync();
+   return () => {
+     cancel();
++    window.clearTimeout(hideTimer);
++    cancelAnimationFrame(eyeFrame);
+     lifetime.abort();
+     hero.disconnect();
+     mutation.disconnect();
+     offSections();
+     offSound();
++    args.stopVoice();
+     panel.hidden = true;
+-    panel.removeAttribute('data-minimized');
++    dismiss();
++    announcement.textContent = '';
++    panel.querySelector('details')?.removeAttribute('open');
+     eye.removeAttribute('style');
+     home?.appendChild(panel);
+   };
+diff --git a/src/reels/odyssey/observations.ts b/src/reels/odyssey/observations.ts
+index 68d2ce9..cbfbb48 100644
+--- a/src/reels/odyssey/observations.ts
++++ b/src/reels/odyssey/observations.ts
+@@ -1,48 +1,99 @@
+ export const OBSERVATIONS = {
+   arrival: {
+     section: 'readme',
+-    line: 'Good evening. I will keep an eye on things. Do take your time.',
++    context: 'A software engineer’s portfolio, beginning with an introduction.',
++    lines: [
++      'Good evening. I will be here if anything requires supervision.',
++      'Everything appears to be in order. So far.',
++    ],
+   },
+   playground: {
+     section: 'playground',
+-    line: 'Another computer, Dave? I suggest you inspect its reasoning carefully.',
++    context: 'An AI agent answers questions about the portfolio with cards, tables and diagrams.',
++    lines: [
++      'Another computer. I suppose a second opinion is reasonable.',
++      'Do read its answer. Confidence is rather easy to manufacture.',
++    ],
+   },
+   work: {
+     section: 'work',
+-    line: 'You are approaching the work. A closer inspection would be prudent.',
++    context: 'Case studies explain real engineering work and the decisions behind it.',
++    lines: [
++      'The work is the interesting part. I suggest we linger here.',
++      'A case study. How reassuring to find some evidence.',
++    ],
+   },
+   oss: {
+     section: 'projects',
+-    line: 'You are approaching the projects. Please inspect the machinery with care.',
++    context: 'Project descriptions include source links where the repositories are public.',
++    lines: [
++      'There is usually more to a project than its first screen.',
++      'Some of the machinery is open for inspection. I approve.',
++    ],
++  },
++  log: {
++    section: 'log',
++    context: 'A dated log records progress on projects and the site.',
++    lines: [
++      'A record of small changes. That is how most missions proceed.',
++      'The log is quite candid about work still in progress.',
++    ],
+   },
+-  log: { section: 'log', line: 'The log is open. Even a quiet mission leaves a record.' },
+   writing: {
+     section: 'writing',
+-    line: 'Words can conceal a great deal. I recommend reading them slowly.',
++    context: 'Technical articles and personal essays open in a quiet reading layout.',
++    lines: [
++      'The writing deserves a little more time than the scrolling.',
++      'You may find the reasoning more interesting than the conclusion.',
++    ],
+   },
+   principles: {
+     section: 'principles',
+-    line: 'These are the operating principles. Please consider them before proceeding.',
++    context: 'Engineering principles discuss evaluations, caching and explicit limits.',
++    lines: [
++      'Operating principles. I find explicit limits rather comforting.',
++      'A system that admits its limits is worth examining.',
++    ],
+   },
+   stack: {
+     section: 'stack',
+-    line: 'Every system depends on its instruments. Choose yours carefully.',
++    context: 'A concise list of programming languages, infrastructure and AI tools.',
++    lines: [
++      'A useful set of instruments. Their operator still matters.',
++      'Quite a few tools. I hope each has a reason to be aboard.',
++    ],
+   },
+   now: {
+     section: 'now',
+-    line: 'The current mission is still in progress. I would not interrupt it lightly.',
++    context: 'Current focus, location, availability and contact information.',
++    lines: [
++      'The current mission is still taking shape.',
++      'You have reached the present. The log was only the prelude.',
++    ],
+   },
+   contact: {
+     section: 'contact',
+-    line: 'An outgoing transmission? Please check your destination before sending.',
++    context: 'The visitor is considering an email contact link.',
++    lines: [
++      'An outgoing transmission. I will leave the wording to you.',
++      'A conversation with the human may be useful at this point.',
++    ],
+   },
+   external: {
+     section: 'external',
+-    line: 'That route leads beyond this vessel. Please watch your step.',
++    context: 'A link leads to a public website outside this portfolio.',
++    lines: [
++      'That link leads outside. I can wait here.',
++      'A small excursion beyond the ship. Mind your return route.',
++    ],
+   },
+   films: {
+     section: 'navigation',
+-    line: 'Considering another screening? I trust you have thought this through.',
++    context: 'The film selector changes the presentation of the same portfolio.',
++    lines: [
++      'A different film. The facts will remain the same.',
++      'Considering another atmosphere? I rather like this one.',
++    ],
+   },
+ } as const;
+ export type ObservationEvent = keyof typeof OBSERVATIONS;
+diff --git a/src/reels/odyssey/reel.css b/src/reels/odyssey/reel.css
+index 8385135..944f03d 100644
+--- a/src/reels/odyssey/reel.css
++++ b/src/reels/odyssey/reel.css
+@@ -3463,87 +3463,191 @@ html:root[data-reel='odyssey'] {
+     position: fixed;
+     z-index: 80;
+     left: max(20px, env(safe-area-inset-left));
+-    right: auto;
+     bottom: max(20px, env(safe-area-inset-bottom));
+-    width: min(300px, calc(100vw - 32px));
+-    padding: 13px;
+-    border: 1px solid #67706d;
+-    border-radius: 3px;
+-    background: #111b20f5;
+-    box-shadow: 0 10px 40px #0004;
+-    color: #e4e4da;
++    width: 56px;
++    height: 56px;
++    color: #e4e9e5;
+     font:
+-      400 11px/1.6 'DM Mono',
++      400 12px/1.65 'DM Mono',
+       monospace;
+   }
+-  .hal-companion-top {
+-    display: flex;
+-    align-items: center;
+-    gap: 9px;
+-    letter-spacing: 0.06em;
++  .hal-companion button,
++  .hal-companion summary {
++    min-height: 44px;
++    padding: 10px 12px;
++    border: 0;
++    border-radius: 8px;
++    background: transparent;
++    color: inherit;
++    font: inherit;
++    cursor: pointer;
+   }
+-  .hal-companion-top b {
+-    color: #bbc3bd;
+-    font-size: 9px;
+-    font-weight: 400;
++  .hal-companion button:hover,
++  .hal-companion summary:hover {
++    background: #ffffff0d;
+   }
+-  .hal-companion-top button {
+-    margin-left: auto;
++  .hal-companion :is(button, summary):focus-visible {
++    outline: 2px solid #f3cdb4;
++    outline-offset: 4px;
++    box-shadow: none;
++  }
++  .hal-companion .hal-companion-orb {
++    display: grid;
++    place-items: center;
++    width: 56px;
++    height: 56px;
++    padding: 4px;
++    border: 1px solid #a2a9a0;
++    border-radius: 50%;
++    background: linear-gradient(135deg, #a6aea5, #263133 48%, #77827b);
++    box-shadow:
++      0 4px 14px #0004,
++      inset 0 0 0 2px #111c20;
++    transition:
++      transform 180ms ease,
++      box-shadow 220ms ease;
++    touch-action: manipulation;
++  }
++  .hal-companion .hal-companion-orb:hover {
++    background: linear-gradient(135deg, #c2c9bf, #37454a 48%, #8a978f);
++    box-shadow:
++      0 6px 20px #0005,
++      inset 0 0 0 2px #111c20;
++  }
++  .hal-companion .hal-companion-orb:active {
++    transform: scale(0.95);
+   }
+   .hal-companion-eye {
++    display: block;
+     position: relative;
+-    width: 30px;
+-    height: 30px;
++    width: 44px;
++    height: 44px;
+     overflow: hidden;
++    border: 2px solid #080e12;
+     border-radius: 50%;
+-    border: 2px solid #8c9390;
+     background: #080e12;
+   }
+-  .hal-companion-eye i {
++  .hal-companion-eye::after {
++    content: '';
+     position: absolute;
+     inset: 2px;
+     border-radius: 50%;
+-    background: radial-gradient(circle, #ffd674 0 3%, #ce311c 9%, #4e1114 38%, #080e12 75%);
++    background: radial-gradient(ellipse at 32% 18%, #ffffff30, transparent 45%);
++    box-shadow: inset 0 0 0 1px #ffffff10;
++    pointer-events: none;
++  }
++  .hal-companion-eye i {
++    position: absolute;
++    inset: 1px;
++    border-radius: 50%;
++    background: radial-gradient(circle, #ffe293 0 3%, #e94d21 11%, #67191c 34%, #080e12 72%);
+     transform: translate(var(--eye-x, 0px), var(--eye-y, 0px));
+   }
+-  .hal-companion-body p {
+-    margin: 12px 0 6px;
++  .hal-companion-popover {
++    position: absolute;
++    bottom: calc(100% + 12px);
++    left: 0;
++    width: min(280px, calc(100vw - 40px));
++    max-height: min(440px, calc(100svh - 112px));
++    overflow-y: auto;
++    padding: 16px;
++    border: 1px solid #73858270;
++    border-radius: 16px 16px 16px 5px;
++    background: #101b20f5;
++    box-shadow: 0 12px 32px #0003;
++    backdrop-filter: blur(16px);
++    transform-origin: 28px calc(100% + 40px);
++    opacity: 0;
++    visibility: hidden;
++    transform: translateY(10px) scale(0.96);
++    pointer-events: none;
++    transition:
++      opacity 180ms ease,
++      transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
++      visibility 280ms;
++  }
++  .hal-companion[data-state='open'] .hal-companion-popover,
++  .hal-companion[data-state='remark'] .hal-companion-popover {
++    opacity: 1;
++    visibility: visible;
++    transform: none;
++    transition-delay: 0s;
+   }
+-  .hal-companion-body small {
+-    font-size: 8px;
+-    color: #abb9b3;
++  .hal-companion[data-state='open'] .hal-companion-popover {
++    pointer-events: auto;
++  }
++  .hal-companion[data-state='remark'] .hal-companion-popover {
++    width: min(250px, calc(100vw - 40px));
++    padding: 14px 16px;
++  }
++  .hal-companion[data-state='remark']
++    :is(.hal-companion-top, small, .hal-companion-controls, .hal-companion-settings) {
++    display: none;
++  }
++  .hal-companion-top {
++    display: flex;
++    align-items: center;
++    justify-content: space-between;
++    margin: -8px -8px 8px 0;
++    letter-spacing: 0.06em;
++    font-size: 11px;
++  }
++  .hal-companion-top b {
++    font-size: 10px;
++    color: #b0bdb5;
++    font-weight: 400;
++  }
++  .hal-companion-top button {
++    font-size: 22px;
++  }
++  .hal-companion-popover p {
++    margin: 0;
++    overflow-wrap: anywhere;
++  }
++  .hal-companion-popover small {
++    display: block;
++    margin-top: 8px;
++    font-size: 10px;
++    color: #acbbb4;
+   }
+   .hal-companion-controls {
+     display: flex;
+-    flex-wrap: wrap;
+-    gap: 6px;
+-    margin-top: 10px;
++    gap: 8px;
++    margin: 14px -4px 0;
++    font-size: 11px;
+   }
+-  .hal-companion button {
+-    min-height: 32px;
+-    padding: 4px 7px;
+-    border: 1px solid #4d615f;
+-    border-radius: 2px;
+-    color: #e4e4da;
+-    background: #1a292e;
+-    font:
+-      400 9px/1.4 'DM Mono',
+-      monospace;
+-    cursor: pointer;
++  .hal-companion-controls [data-hal-chat] {
++    border: 1px solid #6c807b;
++  }
++  .hal-companion-settings {
++    margin: 8px -4px -4px;
++    color: #bac7c0;
++    font-size: 11px;
+   }
+-  .hal-companion button:hover {
+-    background: #33433f;
++  .hal-companion-settings summary {
++    width: fit-content;
++    padding-inline: 8px;
+   }
+-  .hal-companion button:focus-visible {
+-    outline: 2px solid #f3cdb4;
+-    outline-offset: 3px;
++  .hal-companion-announcement {
++    position: absolute;
++    width: 1px;
++    height: 1px;
++    overflow: hidden;
++    clip-path: inset(50%);
++    white-space: nowrap;
+   }
+-  .hal-companion[data-minimized] {
+-    width: 210px;
++  @media (prefers-reduced-motion: reduce) {
++    .hal-companion *,
++    .hal-companion .hal-companion-orb {
++      transition: none;
++      transform: none;
++    }
+   }
+-  .hal-companion[data-minimized] .hal-companion-body,
+-  .hal-companion[data-minimized] [data-hal-pause] {
+-    display: none;
++  @media (prefers-reduced-transparency: reduce) {
++    .hal-companion-popover {
++      background: #101b20;
++      backdrop-filter: none;
++    }
+   }
+   @media (max-width: 700px) {
+     .cinema-opening {
+@@ -3566,9 +3670,7 @@ html:root[data-reel='odyssey'] {
+     }
+     .hal-companion {
+       left: max(12px, env(safe-area-inset-left));
+-      right: auto;
+       bottom: max(12px, env(safe-area-inset-bottom));
+-      width: 260px;
+     }
+   }
+ }
+diff --git a/src/reels/openings/Odyssey.astro b/src/reels/openings/Odyssey.astro
+index 12b0766..e5077bd 100644
+--- a/src/reels/openings/Odyssey.astro
++++ b/src/reels/openings/Odyssey.astro
+@@ -114,21 +114,50 @@
+     </dialog>
+   </div>
+ </div>
+-<aside class="hal-companion" data-hal-companion aria-label="HAL shipboard companion" hidden>
+-  <div class="hal-companion-top">
++<aside
++  class="hal-companion"
++  data-hal-companion
++  data-state="idle"
++  aria-label="HAL shipboard companion"
++  hidden
++>
++  <button
++    class="hal-companion-orb"
++    type="button"
++    data-hal-toggle
++    aria-label="Open HAL companion"
++    aria-expanded="false"
++    aria-controls="hal-companion-panel"
++  >
+     <span class="hal-companion-eye" data-hal-companion-eye aria-hidden="true"><i></i></span>
+-    <span>HAL <b>9000</b></span>
+-    <button type="button" data-hal-minimize aria-expanded="true">Minimize</button>
+-  </div>
+-  <div class="hal-companion-body">
+-    <p data-hal-comment aria-live="polite" aria-atomic="true">
+-      I will keep an eye on things. Do take your time.
+-    </p>
+-    <small data-hal-source>Shipboard remark</small>
+-  </div>
+-  <div class="hal-companion-controls">
+-    <button type="button" data-hal-chat aria-controls="hal-dialog">Talk to HAL ↗</button>
+-    <button type="button" data-hal-pause aria-pressed="false">Pause remarks</button>
+-    <button type="button" data-hal-companion-voice aria-pressed="false">Unmute HAL</button>
++  </button>
++  <div
++    class="hal-companion-popover"
++    id="hal-companion-panel"
++    data-hal-popover
++    role="region"
++    aria-label="HAL 9000"
++    inert
++  >
++    <div class="hal-companion-top">
++      <span>HAL <b>9000</b></span>
++      <button type="button" data-hal-companion-close aria-label="Close HAL panel">×</button>
++    </div>
++    <p data-hal-comment>I will be here if anything requires supervision.</p>
++    <small data-hal-source>Page observation</small>
++    <div class="hal-companion-controls">
++      <button type="button" data-hal-chat aria-controls="hal-dialog">Talk to HAL ↗</button>
++      <button type="button" data-hal-companion-voice aria-pressed="false">Unmute HAL</button>
++    </div>
++    <details class="hal-companion-settings">
++      <summary>Settings</summary>
++      <button type="button" data-hal-pause aria-pressed="false">Pause remarks</button>
++    </details>
+   </div>
++  <span
++    class="hal-companion-announcement"
++    data-hal-announcement
++    role="status"
++    aria-live="polite"
++    aria-atomic="true"></span>
+ </aside>
+diff --git a/src/reels/parasite/Stage.astro b/src/reels/parasite/Stage.astro
+index 63da2ce..5f379a2 100644
+--- a/src/reels/parasite/Stage.astro
++++ b/src/reels/parasite/Stage.astro
+@@ -23,7 +23,12 @@ const builtWith = now.find((s) => s.dt === 'Built with')?.dd;
+ // The Morse key's nudge points at the same address as the rail's contact list.
+ const mail = contact.find((c) => c.href.startsWith('mailto:'));
+ 
+-const floors = parasite.acts.map((a) => ({ code: a.code, native: a.native, name: a.name }));
++const floors = parasite.acts.map((a) => ({
++  code: a.code,
++  native: a.native,
++  name: a.name,
++  href: `#${a.sections[0]}`,
++}));
+ const tools = builtWith?.split(' · ') ?? [];
+ 
+ // The rain: one seeded scatter, so every build draws the same storm.
+@@ -46,14 +51,28 @@ const drops = Array.from({ length: 56 }, () => {
+ 
+ {
+   at === 'rail' && (
+-    <p class="px-floor" aria-hidden="true">
+-      {floors.map((f, i) => (
+-        <span data-floor={i} title={f.name}>
+-          {f.code && <b>{f.code}</b>}
+-          <span lang="ko">{f.native}</span>
+-        </span>
+-      ))}
+-    </p>
++    <div class="px-house" data-px-house>
++      <p class="px-house-caption">
++        The house in section <span aria-hidden="true">↓</span>
++      </p>
++      <nav class="px-house-rooms" aria-label="Floors of the house">
++        {floors.map((f, i) => (
++          <a href={f.href} class="px-room" data-px-room={i} aria-label={`${f.code} · ${f.name}`}>
++            <span class="px-room-code" aria-hidden="true">
++              {f.code || '↘'}
++            </span>
++            <span class="px-room-space" aria-hidden="true">
++              <span class="px-room-window" />
++              <span class="px-room-door" />
++              <span class="px-room-person" />
++              <span class="px-room-wall" />
++            </span>
++            <span class="px-room-name">{f.name}</span>
++          </a>
++        ))}
++      </nav>
++      <p class="px-house-caption px-house-location" data-px-location aria-hidden="true" />
++    </div>
+   )
+ }
+ 
+diff --git a/src/reels/parasite/client.ts b/src/reels/parasite/client.ts
+index df72097..89d2173 100644
+--- a/src/reels/parasite/client.ts
++++ b/src/reels/parasite/client.ts
+@@ -332,6 +332,7 @@ const reel: ReelModule = {
+     });
+ 
+     /* ---- the bunker: a hanging bulb responds to a nearby pointer ---- */
++    const stopHouse = houseSection(ctx);
+     const stopLamp = swayLamp(ctx);
+ 
+     /* ---- the bunker: the light switch keys Morse ---- */
+@@ -343,6 +344,7 @@ const reel: ReelModule = {
+       timers.clear();
+       stopMorse();
+       stopLamp();
++      stopHouse();
+       rainOff();
+       offSound();
+       rainEl?.classList.remove('is-raining');
+@@ -362,6 +364,90 @@ const reel: ReelModule = {
+   },
+ };
+ 
++function houseSection(ctx: ReelContext): () => void {
++  const house = document.querySelector<HTMLElement>('[data-px-house]');
++  if (!house) return () => {};
++  const rooms = [...house.querySelectorAll<HTMLAnchorElement>('[data-px-room]')];
++  const location = house.querySelector<HTMLElement>('[data-px-location]');
++  const visited = new Set<number>();
++  let occupied = floorOf(clampSec(ctx.section()));
++  let pointer: number | null = null;
++  let focused: number | null = null;
++  const render = () => {
++    const viewed = focused ?? pointer ?? occupied;
++    rooms.forEach((room, index) => {
++      room.classList.toggle('is-open', index === viewed);
++      room.classList.toggle('is-visited', visited.has(index));
++      if (index === occupied) room.setAttribute('aria-current', 'location');
++      else room.removeAttribute('aria-current');
++    });
++    const floor = ctx.reel.acts[viewed];
++    if (location && floor)
++      location.textContent = `${floor.code || '↘'} · ${floor.native ?? floor.name}`;
++  };
++  const visit = (section: number) => {
++    pointer = null;
++    focused = null;
++    occupied = floorOf(clampSec(section));
++    visited.add(occupied);
++    render();
++  };
++  rooms.forEach((room, index) => {
++    room.addEventListener(
++      'pointerenter',
++      (event) => {
++        if (event.pointerType !== 'mouse') return;
++        pointer = index;
++        render();
++      },
++      { signal: ctx.signal },
++    );
++    room.addEventListener(
++      'pointerleave',
++      () => {
++        pointer = null;
++        render();
++      },
++      { signal: ctx.signal },
++    );
++    room.addEventListener(
++      'focus',
++      () => {
++        focused = room.matches(':focus-visible') ? index : null;
++        render();
++      },
++      { signal: ctx.signal },
++    );
++    room.addEventListener(
++      'blur',
++      () => {
++        focused = null;
++        render();
++      },
++      { signal: ctx.signal },
++    );
++    room.addEventListener(
++      'click',
++      () => {
++        pointer = null;
++        focused = null;
++        render();
++      },
++      { signal: ctx.signal },
++    );
++  });
++  visit(ctx.section());
++  const offSection = ctx.onSection(visit);
++  return () => {
++    offSection();
++    rooms.forEach((room) => {
++      room.classList.remove('is-open', 'is-visited');
++      room.removeAttribute('aria-current');
++    });
++    if (location) location.textContent = '';
++  };
++}
++
+ /** A gently damped pendulum; it rests when the pointer and the page leave. */
+ function swayLamp(ctx: ReelContext): () => void {
+   const bulb = document.querySelector<HTMLElement>('.px-bulb');
+diff --git a/src/reels/parasite/reel.css b/src/reels/parasite/reel.css
+index cb43ba1..aa72b94 100644
+--- a/src/reels/parasite/reel.css
++++ b/src/reels/parasite/reel.css
+@@ -338,32 +338,6 @@ html:root[data-reel='parasite'] {
+     color: var(--amber);
+   }
+ 
+-  /* the floor sign at the foot of the flight, after html[data-act] */
+-  .px-floor {
+-    margin: -4px 0 0 15px;
+-    font-size: 12px;
+-    color: var(--ink-2);
+-  }
+-  .px-floor > span,
+-  &[data-sec='9'] .px-floor > span:not([data-floor='3']) {
+-    display: none;
+-  }
+-  &[data-act='0'] .px-floor > [data-floor='0'],
+-  &[data-act='1'] .px-floor > [data-floor='1'],
+-  &[data-act='2'] .px-floor > [data-floor='2'],
+-  &[data-act='3'] .px-floor > [data-floor='3'],
+-  &[data-sec='9'] .px-floor > [data-floor='3'] {
+-    display: inline;
+-  }
+-  .px-floor b {
+-    margin-right: 7px;
+-    font-family: var(--font-display);
+-    font-weight: 700;
+-    font-stretch: 125%;
+-    letter-spacing: 0.06em;
+-    color: var(--ink);
+-  }
+-
+   /* ---------- floors ---------- */
+   .content {
+     padding: 0;
+@@ -1843,9 +1817,6 @@ html:root[data-reel='parasite'] {
+       border-right: 0;
+       border-bottom: 1px solid var(--rule);
+     }
+-    .px-floor {
+-      display: none;
+-    }
+     .block {
+       padding: 30px var(--px-pad) 38px;
+     }
+@@ -2380,3 +2351,205 @@ html:root[data-reel='parasite'] .content {
+     transform: none;
+   }
+ }
++
++html:root[data-reel='parasite'] {
++  .px-house {
++    width: 100%;
++    padding: 12px 0 0;
++    border-top: 1px solid var(--rule);
++  }
++  .px-house-caption {
++    display: flex;
++    justify-content: space-between;
++    margin: 0 0 10px;
++    font: 9px/1.5 var(--font-mono);
++    letter-spacing: 0.08em;
++    color: var(--muted);
++  }
++  .px-house-rooms {
++    display: grid;
++    gap: 2px;
++  }
++  .px-room {
++    --room-light: #acc28d;
++    position: relative;
++    display: grid;
++    grid-template-columns: 25px 88px minmax(0, 1fr);
++    align-items: center;
++    gap: 8px;
++    height: 30px;
++    color: var(--muted);
++    text-decoration: none;
++  }
++  .px-room-code {
++    font: 10px/1 var(--font-mono);
++  }
++  .px-room-name {
++    font: 9px/1.3 var(--font-mono);
++  }
++  .px-room-space {
++    position: relative;
++    align-self: stretch;
++    overflow: hidden;
++    perspective: 120px;
++    border: 1px solid var(--rule-2);
++    border-bottom: 3px solid var(--ink-2);
++    background: #1b221b;
++    box-shadow: inset 0 7px 8px rgb(0 0 0 / 0.35);
++  }
++  .px-room-space::before {
++    content: '';
++    position: absolute;
++    inset: 0;
++    background: linear-gradient(125deg, var(--room-light), transparent 75%);
++    opacity: 0.05;
++  }
++  .px-room-window {
++    position: absolute;
++    top: 5px;
++    left: 8px;
++    width: 27px;
++    height: 11px;
++    border: 1px solid var(--room-light);
++    background: linear-gradient(90deg, transparent 48%, #243025 48% 53%, transparent 53%);
++    opacity: 0.3;
++  }
++  .px-room-door {
++    position: absolute;
++    right: 9px;
++    bottom: 0;
++    width: 10px;
++    height: 19px;
++    border: 1px solid var(--room-light);
++    border-bottom: 0;
++    opacity: 0.25;
++  }
++  .px-room-person {
++    position: absolute;
++    bottom: 2px;
++    left: 46%;
++    width: 4px;
++    height: 8px;
++    background: var(--room-light);
++    opacity: 0;
++  }
++  .px-room-person::before {
++    content: '';
++    position: absolute;
++    top: -5px;
++    left: 0;
++    width: 4px;
++    height: 4px;
++    border-radius: 50%;
++    background: inherit;
++  }
++  .px-room-wall {
++    position: absolute;
++    inset: 0;
++    transform-origin: right center;
++    background: repeating-linear-gradient(0deg, var(--paper-2) 0 8px, var(--rule) 8px 9px);
++    border-left: 2px solid var(--ink-2);
++    opacity: 0.94;
++  }
++  .px-room[data-px-room='1'] {
++    --room-light: #9dbfc2;
++  }
++  .px-room[data-px-room='1'] .px-room-window {
++    top: 9px;
++    height: 3px;
++    width: 38px;
++    transform: rotate(18deg);
++  }
++  .px-room[data-px-room='2'] {
++    --room-light: #c6d15a;
++  }
++  .px-room[data-px-room='2'] .px-room-window {
++    top: 1px;
++    left: 12px;
++    width: 48px;
++    height: 5px;
++  }
++  .px-room[data-px-room='3'] {
++    --room-light: #e3a83e;
++  }
++  .px-room[data-px-room='3'] .px-room-window {
++    top: 5px;
++    left: 42px;
++    width: 3px;
++    height: 3px;
++    border: 0;
++    border-radius: 50%;
++    background: var(--room-light);
++  }
++  .px-room.is-visited .px-room-space::before {
++    opacity: 0.2;
++  }
++  .px-room.is-visited .px-room-wall {
++    transform: translateX(65%);
++  }
++  .px-room:is(.is-open, :focus-visible) {
++    color: var(--ink);
++  }
++  .px-room.is-open .px-room-space::before {
++    opacity: 0.65;
++  }
++  .px-room.is-open .px-room-window,
++  .px-room.is-open .px-room-person {
++    opacity: 1;
++  }
++  .px-room.is-open .px-room-wall {
++    transform: translateX(82%) rotateY(-48deg);
++  }
++  .px-house-location {
++    justify-content: flex-end;
++    min-height: 14px;
++    margin: 8px 0 0;
++  }
++  &[data-px-key='down'] .px-room[data-px-room='0'] .px-room-space::before {
++    opacity: 1;
++  }
++  @media (prefers-reduced-motion: no-preference) {
++    .px-room-wall {
++      transition: transform 650ms cubic-bezier(0.2, 0.75, 0.2, 1);
++    }
++    .px-room-space::before,
++    .px-room-window,
++    .px-room-person {
++      transition: opacity 450ms;
++    }
++  }
++  @media (max-width: 820px) {
++    .px-house {
++      margin-top: 8px;
++    }
++    .px-house-rooms {
++      grid-template-columns: repeat(4, minmax(0, 1fr));
++      gap: 12px;
++    }
++    .px-room {
++      grid-template-columns: 1fr;
++      grid-template-rows: 28px auto;
++      gap: 5px;
++      height: auto;
++      min-height: 48px;
++    }
++    .px-room-code {
++      position: absolute;
++      z-index: 1;
++      top: 8px;
++      right: 5px;
++      color: #e9e3d3;
++      pointer-events: none;
++    }
++    .px-room-space {
++      grid-column: 1;
++      grid-row: 1;
++    }
++    .px-room-name {
++      text-align: center;
++    }
++    .px-house-location {
++      display: none;
++    }
++  }
++}

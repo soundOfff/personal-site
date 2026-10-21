@@ -15,7 +15,7 @@
  *     per composed surface and a minor-to-major chord as it settles, HUD
  *     ticks and clicks, the braam and sub hit on the title card.
  */
-import type { ReelContext, ReelModule } from '../types';
+import { SECTION_IDS, type ReelContext, type ReelModule } from '../types';
 import type { Bed } from '../sound';
 import { actOf } from '../registry';
 import { RUNTIME } from './config';
@@ -96,6 +96,71 @@ function sprinkle(root: HTMLElement, motion: boolean): () => void {
 
 /* ------------------------------------------------------------------ */
 
+function memoryLab(ctx: ReelContext): () => void {
+  const template = document.querySelector<HTMLTemplateElement>('[data-br-memory-template]');
+  const heading = document.querySelector<HTMLElement>('#stack > .keybar');
+  if (!template || !heading) return () => {};
+  const fragment = template.content.cloneNode(true);
+  if (!(fragment instanceof DocumentFragment)) return () => {};
+  const lab = fragment.querySelector<HTMLElement>('.br-memory');
+  if (!lab) return () => {};
+  heading.insertAdjacentElement('afterend', lab);
+
+  const slices = [...lab.querySelectorAll<SVGGElement>('[data-br-memory-slice]')];
+  const links = [...lab.querySelectorAll<HTMLAnchorElement>('[data-br-memory-link]')];
+  const count = lab.querySelector<HTMLElement>('[data-br-memory-count]');
+  const visited = new Set<number>();
+  const marks = SECTION_IDS.map((id, index) => {
+    const keybar = document.querySelector<HTMLElement>(`#${id} > .keybar`);
+    const mark = document.createElement('span');
+    mark.className = 'br-memory-mark';
+    mark.setAttribute('aria-hidden', 'true');
+    mark.textContent = `M.${pad(index + 1)}`;
+    keybar?.appendChild(mark);
+    return mark;
+  });
+  const remember = (index: number) => {
+    if (ctx.signal.aborted || index < 0 || index >= SECTION_IDS.length) return;
+    visited.add(index);
+    slices[index]?.classList.add('is-recorded');
+    links[index]?.classList.add('is-recorded');
+    links[index]?.setAttribute('aria-label', `${NAMES[index]}, recorded`);
+    marks[index]?.classList.add('is-recorded');
+    if (count) count.textContent = pad(visited.size);
+  };
+  const offSection = ctx.onSection(remember);
+  remember(ctx.section());
+  const select = (index: number | null) => {
+    slices.forEach((slice, i) => slice.classList.toggle('is-selected', i === index));
+  };
+  links.forEach((link, index) => {
+    link.addEventListener(
+      'pointerenter',
+      (event) => {
+        if (event.pointerType === 'mouse') select(index);
+      },
+      { signal: ctx.signal },
+    );
+    link.addEventListener(
+      'pointerleave',
+      () => {
+        const focused = links.findIndex((item) => item === document.activeElement);
+        select(focused < 0 ? null : focused);
+      },
+      { signal: ctx.signal },
+    );
+    link.addEventListener('focus', () => select(index), { signal: ctx.signal });
+    link.addEventListener('blur', () => select(null), { signal: ctx.signal });
+  });
+  const stop = () => {
+    offSection();
+    marks.forEach((mark) => mark.remove());
+    lab.remove();
+  };
+  ctx.signal.addEventListener('abort', stop, { once: true });
+  return stop;
+}
+
 const reel: ReelModule = {
   mount(ctx: ReelContext) {
     const { root, signal, sound: kit } = ctx;
@@ -111,6 +176,7 @@ const reel: ReelModule = {
     };
     const $$ = (sel: string) => document.querySelectorAll(sel);
     const cleanups: (() => void)[] = [];
+    cleanups.push(memoryLab(ctx));
 
     /* ---------- particles ---------- */
     cleanups.push(sprinkle(document.body, !ctx.reducedMotion));

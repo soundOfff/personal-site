@@ -14,7 +14,7 @@
  * Particles (dust, rain, snow) are sprinkled in by client.ts, so visitors who
  * never screen this reel don't download a few hundred empty elements.
  */
-import type { StagePoint } from '../types';
+import { SECTION_IDS, type StagePoint } from '../types';
 import reel, { RUNTIME } from './config';
 
 interface Props {
@@ -37,6 +37,17 @@ const retina = Array.from({ length: 25 }, (_, row) =>
     return lid > 0.83 ? '+='[(row + col) % 2] : (row * 19 + col * 7) % 13 < 2 ? ':' : '.';
   }).join(''),
 ).join('\n');
+const memoryNames = [
+  'readme',
+  'playground',
+  'work',
+  'open source',
+  'log',
+  'writing',
+  'principles',
+  'stack',
+  'now',
+];
 const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60) % 60).padStart(2, '0')}:00`;
 ---
 
@@ -73,12 +84,84 @@ const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60)
 
 {
   at === 'rail' && (
-    <div class="br-ro" aria-hidden="true">
-      <b data-br-ro="name">readme</b>
-      <span>
-        <span data-br-ro="tc">0:00:00</span> / {runtime}
-      </span>
-    </div>
+    <>
+      <div class="br-ro" aria-hidden="true">
+        <b data-br-ro="name">readme</b>
+        <span>
+          <span data-br-ro="tc">0:00:00</span> / {runtime}
+        </span>
+      </div>
+      <template data-br-memory-template>
+        <aside class="br-memory" aria-label="Memory lab, your route through this page">
+          <div class="br-memory-specimen" aria-hidden="true">
+            <>
+              <span class="br-memory-corner tl" />
+              <span class="br-memory-corner tr" />
+            </>
+            <>
+              <span class="br-memory-corner bl" />
+              <span class="br-memory-corner br" />
+            </>
+            <svg class="br-memory-horse" viewBox="0 0 360 250" fill="none">
+              <defs>
+                <clipPath id="br-memory-horse-shape">
+                  <path d="m63 197 9-53 21-30 12-39 17-23 4-31 15 21 22 10 17 31-29 11-12 29 91 3 23-16 11 18 27 7-6 9-26-4-5 31 16 47h-14l-24-36-19-2-10 40h-15l4-47-61-1-17 49h-14l8-47-12 30-14 21h-15Z" />
+                </clipPath>
+                {SECTION_IDS.map((id, i) => (
+                  <clipPath id={`br-memory-slice-${id}`}>
+                    <rect x={55 + i * 27} y="0" width="26" height="250" />
+                  </clipPath>
+                ))}
+              </defs>
+              <g class="br-memory-slices">
+                {SECTION_IDS.map((id, i) => (
+                  <g data-br-memory-slice={i}>
+                    <g clip-path={`url(#br-memory-slice-${id})`}>
+                      <g clip-path="url(#br-memory-horse-shape)">
+                        <rect x={55 + i * 27} y="16" width="26" height="204" />
+                        <path
+                          d={`M${60 + i * 27} 10q-20 50 0 100t0 110M${72 + i * 27} 10q-18 50 0 100t0 110`}
+                        />
+                      </g>
+                    </g>
+                  </g>
+                ))}
+              </g>
+              <path
+                class="br-memory-outline"
+                d="m63 197 9-53 21-30 12-39 17-23 4-31 15 21 22 10 17 31-29 11-12 29 91 3 23-16 11 18 27 7-6 9-26-4-5 31 16 47h-14l-24-36-19-2-10 40h-15l4-47-61-1-17 49h-14l8-47-12 30-14 21h-15Z"
+              />
+              <path
+                class="br-memory-measure"
+                d="M45 230h270M45 225v10m270-10v10M25 20v190m-5-190h10m-10 190h10"
+              />
+            </svg>
+            <span class="br-memory-spec">STELLINE · MEMORY CONSTRUCTION</span>
+          </div>
+          <div class="br-memory-copy">
+            <p class="br-memory-label">A memory you made.</p>
+            <p class="br-memory-hint">
+              Each section you visit carves another piece. Return to a memory.
+            </p>
+            <nav class="br-memory-index" aria-label="Revisit a section">
+              {SECTION_IDS.map((id, i) => (
+                <a
+                  href={`#${id}`}
+                  data-br-memory-link={i}
+                  aria-label={`${memoryNames[i]}, not yet recorded`}
+                >
+                  <span>{String(i + 1).padStart(2, '0')}</span>
+                  {memoryNames[i]}
+                </a>
+              ))}
+            </nav>
+            <p class="br-memory-readout">
+              <span data-br-memory-count>00</span> / 09 fragments recorded
+            </p>
+          </div>
+        </aside>
+      </template>
+    </>
   )
 }
 

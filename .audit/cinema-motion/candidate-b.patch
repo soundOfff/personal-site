@@ -1,0 +1,613 @@
+diff --git a/src/reels/br2049/Stage.astro b/src/reels/br2049/Stage.astro
+index 3e7661a..8da72ac 100644
+--- a/src/reels/br2049/Stage.astro
++++ b/src/reels/br2049/Stage.astro
+@@ -14,7 +14,7 @@
+  * Particles (dust, rain, snow) are sprinkled in by client.ts, so visitors who
+  * never screen this reel don't download a few hundred empty elements.
+  */
+-import type { StagePoint } from '../types';
++import { SECTION_IDS, type StagePoint } from '../types';
+ import reel, { RUNTIME } from './config';
+ 
+ interface Props {
+@@ -37,6 +37,17 @@ const retina = Array.from({ length: 25 }, (_, row) =>
+     return lid > 0.83 ? '+='[(row + col) % 2] : (row * 19 + col * 7) % 13 < 2 ? ':' : '.';
+   }).join(''),
+ ).join('\n');
++const memoryNames = [
++  'readme',
++  'playground',
++  'work',
++  'open source',
++  'log',
++  'writing',
++  'principles',
++  'stack',
++  'now',
++];
+ const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60) % 60).padStart(2, '0')}:00`;
+ ---
+ 
+@@ -85,6 +96,63 @@ const runtime = `${Math.floor(RUNTIME / 3600)}:${String(Math.floor(RUNTIME / 60)
+ {
+   at === 'in:readme' && (
+     <>
++      <template data-br-memory-template>
++        <aside class="br-memory" aria-label="Memory lab, your route through this page">
++          <div class="br-memory-specimen" aria-hidden="true">
++            <>
++              <span class="br-memory-corner tl" />
++              <span class="br-memory-corner tr" />
++            </>
++            <>
++              <span class="br-memory-corner bl" />
++              <span class="br-memory-corner br" />
++            </>
++            <svg class="br-memory-horse" viewBox="0 0 360 250" fill="none">
++              <defs>
++                <clipPath id="br-memory-horse-shape">
++                  <path d="m63 197 9-53 21-30 12-39 17-23 4-31 15 21 22 10 17 31-29 11-12 29 91 3 23-16 11 18 27 7-6 9-26-4-5 31 16 47h-14l-24-36-19-2-10 40h-15l4-47-61-1-17 49h-14l8-47-12 30-14 21h-15Z" />
++                </clipPath>
++              </defs>
++              <g class="br-memory-slices" clip-path="url(#br-memory-horse-shape)">
++                {SECTION_IDS.map((id, i) => (
++                  <g data-br-memory-slice={i}>
++                    <rect x={55 + i * 27} y="16" width="26" height="204" />
++                    <path
++                      d={`M${60 + i * 27} 10q-20 50 0 100t0 110M${72 + i * 27} 10q-18 50 0 100t0 110`}
++                    />
++                  </g>
++                ))}
++              </g>
++              <path
++                class="br-memory-outline"
++                d="m63 197 9-53 21-30 12-39 17-23 4-31 15 21 22 10 17 31-29 11-12 29 91 3 23-16 11 18 27 7-6 9-26-4-5 31 16 47h-14l-24-36-19-2-10 40h-15l4-47-61-1-17 49h-14l8-47-12 30-14 21h-15Z"
++              />
++              <path
++                class="br-memory-measure"
++                d="M45 230h270M45 225v10m270-10v10M25 20v190m-5-190h10m-10 190h10"
++              />
++            </svg>
++            <span class="br-memory-spec">STELLINE · MEMORY CONSTRUCTION</span>
++          </div>
++          <div class="br-memory-copy">
++            <p class="br-memory-label">A memory you made.</p>
++            <p class="br-memory-hint">
++              Each section you visit carves another piece. Return to a memory.
++            </p>
++            <nav class="br-memory-index" aria-label="Revisit a section">
++              {SECTION_IDS.map((id, i) => (
++                <a href={`#${id}`} data-br-memory-link={i}>
++                  <span>{String(i + 1).padStart(2, '0')}</span>
++                  {memoryNames[i]}
++                </a>
++              ))}
++            </nav>
++            <p class="br-memory-readout" aria-hidden="true">
++              <span data-br-memory-count>00</span> / 09 fragments recorded
++            </p>
++          </div>
++        </aside>
++      </template>
+       <div class="br-hero" aria-hidden="true">
+         <div class="br-haze h1" />
+         <div class="br-haze h2" />
+diff --git a/src/reels/br2049/client.ts b/src/reels/br2049/client.ts
+index 47f3cc4..5c188ff 100644
+--- a/src/reels/br2049/client.ts
++++ b/src/reels/br2049/client.ts
+@@ -15,7 +15,7 @@
+  *     per composed surface and a minor-to-major chord as it settles, HUD
+  *     ticks and clicks, the braam and sub hit on the title card.
+  */
+-import type { ReelContext, ReelModule } from '../types';
++import { SECTION_IDS, type ReelContext, type ReelModule } from '../types';
+ import type { Bed } from '../sound';
+ import { actOf } from '../registry';
+ import { RUNTIME } from './config';
+@@ -96,6 +96,71 @@ function sprinkle(root: HTMLElement, motion: boolean): () => void {
+ 
+ /* ------------------------------------------------------------------ */
+ 
++function memoryLab(ctx: ReelContext): () => void {
++  const template = document.querySelector<HTMLTemplateElement>('[data-br-memory-template]');
++  const heading = document.querySelector('#stack > .keybar');
++  if (!template || !heading) return () => {};
++  const fragment = template.content.cloneNode(true);
++  if (!(fragment instanceof DocumentFragment)) return () => {};
++  const lab = fragment.querySelector<HTMLElement>('.br-memory');
++  if (!lab) return () => {};
++  heading.after(fragment);
++
++  const slices = [...lab.querySelectorAll<SVGGElement>('[data-br-memory-slice]')];
++  const links = [...lab.querySelectorAll<HTMLAnchorElement>('[data-br-memory-link]')];
++  const count = lab.querySelector<HTMLElement>('[data-br-memory-count]');
++  const visited = new Set<number>();
++  const marks = SECTION_IDS.map((id, index) => {
++    const keybar = document.querySelector(`#${id} > .keybar`);
++    const mark = document.createElement('span');
++    mark.className = 'br-memory-mark';
++    mark.setAttribute('aria-hidden', 'true');
++    mark.textContent = `M.${pad(index + 1)}`;
++    keybar?.appendChild(mark);
++    return mark;
++  });
++  const remember = (index: number) => {
++    if (ctx.signal.aborted || index < 0 || index >= SECTION_IDS.length) return;
++    visited.add(index);
++    slices[index]?.classList.add('is-recorded');
++    links[index]?.classList.add('is-recorded');
++    marks[index]?.classList.add('is-recorded');
++    if (count) count.textContent = pad(visited.size);
++  };
++  const offSection = ctx.onSection(remember);
++  remember(ctx.section());
++  const select = (index: number | null) => {
++    slices.forEach((slice, i) => slice.classList.toggle('is-selected', i === index));
++  };
++  links.forEach((link, index) => {
++    link.addEventListener(
++      'pointerenter',
++      (event) => {
++        if (event.pointerType === 'mouse') select(index);
++      },
++      { signal: ctx.signal },
++    );
++    link.addEventListener(
++      'pointerleave',
++      () => {
++        const focused = links.findIndex((item) => item === document.activeElement);
++        select(focused < 0 ? null : focused);
++      },
++      { signal: ctx.signal },
++    );
++    link.addEventListener('focus', () => select(index), { signal: ctx.signal });
++    link.addEventListener('blur', () => select(null), { signal: ctx.signal });
++    link.addEventListener('click', () => remember(index), { signal: ctx.signal });
++  });
++  const stop = () => {
++    offSection();
++    marks.forEach((mark) => mark.remove());
++    lab.remove();
++  };
++  ctx.signal.addEventListener('abort', stop, { once: true });
++  return stop;
++}
++
+ const reel: ReelModule = {
+   mount(ctx: ReelContext) {
+     const { root, signal, sound: kit } = ctx;
+@@ -111,6 +176,7 @@ const reel: ReelModule = {
+     };
+     const $$ = (sel: string) => document.querySelectorAll(sel);
+     const cleanups: (() => void)[] = [];
++    cleanups.push(memoryLab(ctx));
+ 
+     /* ---------- particles ---------- */
+     cleanups.push(sprinkle(document.body, !ctx.reducedMotion));
+diff --git a/src/reels/br2049/reel.css b/src/reels/br2049/reel.css
+index dc5eef4..f43ddae 100644
+--- a/src/reels/br2049/reel.css
++++ b/src/reels/br2049/reel.css
+@@ -2992,3 +2992,184 @@
+     }
+   }
+ }
++
++:root[data-reel='br2049'] {
++  .br-memory {
++    display: grid;
++    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
++    gap: clamp(28px, 5vw, 88px);
++    align-items: center;
++    margin: 42px 0 72px;
++    padding: clamp(20px, 3vw, 44px);
++    border-block: 1px solid var(--rule-2);
++    background: var(--paper-2);
++    color: var(--ink);
++  }
++  .br-memory-specimen {
++    position: relative;
++    min-width: 0;
++    padding: 18px 0 34px;
++    color: var(--blue-ink);
++    background: radial-gradient(ellipse at 50% 50%, var(--blue-soft), transparent 70%);
++  }
++  .br-memory-horse {
++    display: block;
++    width: 100%;
++    height: auto;
++  }
++  .br-memory-slices rect {
++    fill: var(--blue-ink);
++    opacity: 0.06;
++  }
++  .br-memory-slices path {
++    stroke: var(--paper-2);
++    stroke-width: 1.2;
++    opacity: 0.4;
++  }
++  .br-memory-slices .is-recorded rect {
++    opacity: 0.55;
++  }
++  .br-memory-slices .is-selected rect {
++    fill: var(--amber-deep);
++    opacity: 0.9;
++  }
++  .br-memory-slices .is-selected {
++    transform: translateY(-5px);
++  }
++  .br-memory-outline {
++    stroke: currentColor;
++    stroke-width: 0.8;
++    opacity: 0.5;
++  }
++  .br-memory-measure {
++    stroke: currentColor;
++    stroke-width: 0.6;
++    opacity: 0.3;
++  }
++  .br-memory-spec {
++    position: absolute;
++    bottom: 9px;
++    left: 0;
++    right: 0;
++    text-align: center;
++    font: 9px/1.5 var(--font-mono);
++    letter-spacing: 0.12em;
++  }
++  .br-memory-corner {
++    position: absolute;
++    width: 12px;
++    height: 12px;
++    border-color: currentColor;
++    border-style: solid;
++    opacity: 0.65;
++  }
++  .br-memory-corner.tl {
++    top: 0;
++    left: 0;
++    border-width: 1px 0 0 1px;
++  }
++  .br-memory-corner.tr {
++    top: 0;
++    right: 0;
++    border-width: 1px 1px 0 0;
++  }
++  .br-memory-corner.bl {
++    bottom: 0;
++    left: 0;
++    border-width: 0 0 1px 1px;
++  }
++  .br-memory-corner.br {
++    bottom: 0;
++    right: 0;
++    border-width: 0 1px 1px 0;
++  }
++  .br-memory-label {
++    margin: 0 0 10px;
++    font: 300 clamp(28px, 3.2vw, 48px)/1.1 var(--font-display);
++  }
++  .br-memory-hint {
++    max-width: 35ch;
++    margin: 0 0 20px;
++    color: var(--muted);
++    font: 14px/1.6 var(--font-body);
++  }
++  .br-memory-index {
++    display: grid;
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++    gap: 4px 12px;
++  }
++  .br-memory-index a {
++    display: flex;
++    align-items: center;
++    gap: 6px;
++    min-height: 44px;
++    font: 11px/1.3 var(--font-mono);
++    color: var(--muted);
++    text-decoration: none;
++  }
++  .br-memory-index a span {
++    color: var(--muted);
++    font-size: 9px;
++  }
++  .br-memory-index a.is-recorded {
++    color: var(--ink);
++  }
++  .br-memory-index a:is(:hover, :focus-visible) {
++    color: var(--amber-deep);
++  }
++  .br-memory-index a:focus-visible {
++    outline: 1px solid var(--amber-deep);
++    outline-offset: 3px;
++  }
++  .br-memory-readout {
++    margin: 18px 0 0;
++    color: var(--muted);
++    font: 9px/1.5 var(--font-mono);
++    letter-spacing: 0.12em;
++    text-transform: uppercase;
++  }
++  .br-memory-mark {
++    display: inline-flex;
++    align-items: center;
++    gap: 6px;
++    margin-left: auto;
++    padding-left: 12px;
++    font: 9px/1.5 var(--font-mono);
++    color: var(--muted);
++    letter-spacing: 0.08em;
++  }
++  .br-memory-mark::before {
++    content: '';
++    width: 4px;
++    height: 4px;
++    border: 1px solid currentColor;
++  }
++  .br-memory-mark.is-recorded::before {
++    background: currentColor;
++  }
++  @media (prefers-reduced-motion: no-preference) {
++    .br-memory-slices g {
++      transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.1, 1);
++    }
++    .br-memory-slices rect {
++      transition:
++        opacity 0.65s,
++        fill 0.25s;
++    }
++  }
++  @media (max-width: 820px) {
++    .br-memory {
++      grid-template-columns: minmax(0, 1fr);
++      gap: 28px;
++      margin-block: 24px 44px;
++    }
++    .br-memory-specimen {
++      max-width: 400px;
++      width: 100%;
++      margin-inline: auto;
++    }
++    .br-memory-index {
++      column-gap: 8px;
++    }
++  }
++}
+diff --git a/src/reels/parasite/Stage.astro b/src/reels/parasite/Stage.astro
+index 63da2ce..e4b67c7 100644
+--- a/src/reels/parasite/Stage.astro
++++ b/src/reels/parasite/Stage.astro
+@@ -46,14 +46,65 @@ const drops = Array.from({ length: 56 }, () => {
+ 
+ {
+   at === 'rail' && (
+-    <p class="px-floor" aria-hidden="true">
+-      {floors.map((f, i) => (
+-        <span data-floor={i} title={f.name}>
+-          {f.code && <b>{f.code}</b>}
+-          <span lang="ko">{f.native}</span>
+-        </span>
+-      ))}
+-    </p>
++    <>
++      <div class="px-house-section" aria-hidden="true">
++        <div class="px-house-caption">
++          <>
++            <span>House section</span>
++            <span data-px-depth>+1F</span>
++          </>
++        </div>
++        <svg viewBox="0 0 220 156" fill="none">
++          <defs>
++            <pattern id="px-section-earth" width="6" height="6" patternUnits="userSpaceOnUse">
++              <path d="M0 6 6 0" stroke="currentColor" stroke-opacity=".12" />
++            </pattern>
++          </defs>
++          <path d="M0 58h220v98H0Z" fill="url(#px-section-earth)" />
++          <path class="px-section-street" d="M0 58h220" />
++          <g class="px-section-room" data-px-room="0">
++            <path d="M15 48V17h170v31H15ZM9 14h182M22 21v23m28-23v23m55-23v23m73-23v23" />
++            <path class="px-room-light" d="M22 21h156v23H22Z" />
++          </g>
++          <g class="px-section-room" data-px-room="1">
++            <path d="M185 48v10h-13v9h-13v9h-13v9h-13" />
++          </g>
++          <g class="px-section-room" data-px-room="2">
++            <path d="M103 70h81v31h-81ZM108 70v-9h33v9m-30-8v7m11-7v7m11-7v7" />
++            <path class="px-room-light" d="M107 74h73v23h-73Z" />
++          </g>
++          <g class="px-section-room" data-px-room="3">
++            <path d="M103 101v10H88v9H73v9H58m0-12h67v30H58Zm33 0v12m-5 0h10" />
++            <path class="px-room-light" d="M62 121h59v22H62Z" />
++          </g>
++          <path
++            class="px-section-trace"
++            d="M28 38H176V52H165V62H152V72H140V86H118V105H100V115H84V132H73"
++          />
++          <circle class="px-section-person" data-px-person cx="28" cy="38" r="3" />
++          <text x="3" y="54">
++            STREET LEVEL
++          </text>
++          <text x="190" y="36">
++            1F
++          </text>
++          <text x="190" y="88">
++            B1
++          </text>
++          <text x="132" y="139">
++            B2
++          </text>
++        </svg>
++      </div>
++      <p class="px-floor" aria-hidden="true">
++        {floors.map((f, i) => (
++          <span data-floor={i} title={f.name}>
++            {f.code && <b>{f.code}</b>}
++            <span lang="ko">{f.native}</span>
++          </span>
++        ))}
++      </p>
++    </>
+   )
+ }
+ 
+diff --git a/src/reels/parasite/client.ts b/src/reels/parasite/client.ts
+index df72097..9066c5c 100644
+--- a/src/reels/parasite/client.ts
++++ b/src/reels/parasite/client.ts
+@@ -333,6 +333,7 @@ const reel: ReelModule = {
+ 
+     /* ---- the bunker: a hanging bulb responds to a nearby pointer ---- */
+     const stopLamp = swayLamp(ctx);
++    const stopHouse = houseSection(ctx);
+ 
+     /* ---- the bunker: the light switch keys Morse ---- */
+     const stopMorse = morse(ctx, later, cancel);
+@@ -343,6 +344,7 @@ const reel: ReelModule = {
+       timers.clear();
+       stopMorse();
+       stopLamp();
++      stopHouse();
+       rainOff();
+       offSound();
+       rainEl?.classList.remove('is-raining');
+@@ -362,6 +364,60 @@ const reel: ReelModule = {
+   },
+ };
+ 
++function houseSection(ctx: ReelContext): () => void {
++  const house = document.querySelector<HTMLElement>('.px-house-section');
++  const person = house?.querySelector<SVGCircleElement>('[data-px-person]');
++  const trace = house?.querySelector<SVGPathElement>('.px-section-trace');
++  const depth = house?.querySelector<HTMLElement>('[data-px-depth]');
++  if (!house || !person || !trace) return () => {};
++
++  const sections = SECTION_IDS.map((id) => document.getElementById(id));
++  const rooms = [...house.querySelectorAll<SVGGElement>('[data-px-room]')];
++  const distance = trace.getTotalLength();
++  const positions = [0, 0.17, 0.34, 0.45, 0.54, 0.65, 0.73, 0.87, 1];
++  const depthLabels = ['+1F', 'stairs', '−B1', '−B2'];
++  let frame = 0;
++  const update = () => {
++    frame = 0;
++    if (ctx.signal.aborted) return;
++    const index = clampSec(ctx.section());
++    const current = sections[index];
++    const next = sections[index + 1];
++    let progress = 0;
++    if (!ctx.reducedMotion && current && next) {
++      const top = current.getBoundingClientRect().top;
++      const span = next.getBoundingClientRect().top - top;
++      progress = Math.max(0, Math.min(1, (innerHeight * 0.35 - top) / Math.max(1, span)));
++    }
++    const from = positions[index] ?? 0;
++    const to = positions[index + 1] ?? from;
++    const point = trace.getPointAtLength((from + (to - from) * progress) * distance);
++    person.setAttribute('cx', point.x.toFixed(2));
++    person.setAttribute('cy', point.y.toFixed(2));
++    const floor = floorOf(index);
++    rooms.forEach((room, i) => room.classList.toggle('is-current', i === floor));
++    if (depth) depth.textContent = depthLabels[floor] ?? '';
++  };
++  const schedule = () => {
++    if (!frame && !ctx.signal.aborted) frame = requestAnimationFrame(update);
++  };
++  const offSection = ctx.onSection(schedule);
++  if (!ctx.reducedMotion)
++    window.addEventListener('scroll', schedule, { passive: true, signal: ctx.signal });
++  window.addEventListener('resize', schedule, { passive: true, signal: ctx.signal });
++  update();
++  const stop = () => {
++    cancelAnimationFrame(frame);
++    offSection();
++    rooms.forEach((room) => room.classList.remove('is-current'));
++    person.setAttribute('cx', '28');
++    person.setAttribute('cy', '38');
++    if (depth) depth.textContent = '+1F';
++  };
++  ctx.signal.addEventListener('abort', stop, { once: true });
++  return stop;
++}
++
+ /** A gently damped pendulum; it rests when the pointer and the page leave. */
+ function swayLamp(ctx: ReelContext): () => void {
+   const bulb = document.querySelector<HTMLElement>('.px-bulb');
+diff --git a/src/reels/parasite/reel.css b/src/reels/parasite/reel.css
+index cb43ba1..8f53d4d 100644
+--- a/src/reels/parasite/reel.css
++++ b/src/reels/parasite/reel.css
+@@ -2380,3 +2380,72 @@ html:root[data-reel='parasite'] .content {
+     transform: none;
+   }
+ }
++
++:root[data-reel='parasite'] {
++  .px-house-section {
++    width: 100%;
++    color: var(--muted);
++    pointer-events: none;
++  }
++  .px-house-caption {
++    display: flex;
++    justify-content: space-between;
++    font: 9px/1.5 var(--font-mono);
++    letter-spacing: 0.1em;
++    text-transform: uppercase;
++  }
++  .px-house-section svg {
++    display: block;
++    width: 100%;
++    height: auto;
++    margin-top: 8px;
++    overflow: visible;
++  }
++  .px-section-room {
++    stroke: currentColor;
++    stroke-width: 1;
++    opacity: 0.38;
++  }
++  .px-section-room.is-current {
++    color: var(--amber-deep);
++    opacity: 1;
++  }
++  .px-room-light {
++    stroke: none;
++    fill: currentColor;
++    opacity: 0;
++  }
++  .is-current .px-room-light {
++    opacity: 0.15;
++  }
++  .px-section-street {
++    stroke: var(--ink);
++    stroke-width: 1.5;
++  }
++  .px-section-trace {
++    stroke: currentColor;
++    stroke-width: 0.6;
++    stroke-dasharray: 2 4;
++    opacity: 0.35;
++  }
++  .px-section-person {
++    fill: var(--amber-deep);
++    stroke: var(--paper);
++    stroke-width: 1.5;
++  }
++  .px-house-section text {
++    fill: currentColor;
++    font: 6px var(--font-mono);
++    letter-spacing: 0.05em;
++  }
++  @media (max-width: 820px) {
++    .px-house-section {
++      display: none;
++    }
++  }
++  @media (max-height: 850px) and (min-width: 821px) {
++    .px-house-section svg {
++      max-height: 100px;
++    }
++  }
++}

@@ -23,7 +23,12 @@ const builtWith = now.find((s) => s.dt === 'Built with')?.dd;
 // The Morse key's nudge points at the same address as the rail's contact list.
 const mail = contact.find((c) => c.href.startsWith('mailto:'));
 
-const floors = parasite.acts.map((a) => ({ code: a.code, native: a.native, name: a.name }));
+const floors = parasite.acts.map((a) => ({
+  code: a.code,
+  native: a.native,
+  name: a.name,
+  href: `#${a.sections[0]}`,
+}));
 const tools = builtWith?.split(' · ') ?? [];
 
 // The rain: one seeded scatter, so every build draws the same storm.
@@ -46,14 +51,28 @@ const drops = Array.from({ length: 56 }, () => {
 
 {
   at === 'rail' && (
-    <p class="px-floor" aria-hidden="true">
-      {floors.map((f, i) => (
-        <span data-floor={i} title={f.name}>
-          {f.code && <b>{f.code}</b>}
-          <span lang="ko">{f.native}</span>
-        </span>
-      ))}
-    </p>
+    <div class="px-house" data-px-house>
+      <p class="px-house-caption">
+        The house in section <span aria-hidden="true">↓</span>
+      </p>
+      <nav class="px-house-rooms" aria-label="Floors of the house">
+        {floors.map((f, i) => (
+          <a href={f.href} class="px-room" data-px-room={i} aria-label={`${f.code} · ${f.name}`}>
+            <span class="px-room-code" aria-hidden="true">
+              {f.code || '↘'}
+            </span>
+            <span class="px-room-space" aria-hidden="true">
+              <span class="px-room-window" />
+              <span class="px-room-door" />
+              <span class="px-room-person" />
+              <span class="px-room-wall" />
+            </span>
+            <span class="px-room-name">{f.name}</span>
+          </a>
+        ))}
+      </nav>
+      <p class="px-house-caption px-house-location" data-px-location aria-hidden="true" />
+    </div>
   )
 }
 

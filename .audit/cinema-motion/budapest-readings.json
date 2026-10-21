@@ -1,0 +1,18 @@
+[
+  {
+    "era": "0",
+    "phase": "before",
+    "transition": "width 1.1s cubic-bezier(0.2, 0.8, 0.2, 1), height 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)",
+    "viewport": [
+      1422,
+      800
+    ],
+    "width": 0
+  },
+  {
+    "era": "2",
+    "phase": "returning",
+    "whipping": false,
+    "width": 96.90104675292967
+  }
+]

@@ -616,7 +616,7 @@
   }
 
   /* ============================================================
-     BACKDROP: the matte, the whip pan, grain, the desk's rule
+     BACKDROP: the matte, grain, the desk's rule
      ============================================================ */
   .gb-matte {
     display: none;
@@ -642,8 +642,8 @@
     .gb-matte i {
       background: var(--gb-plum);
       transition:
-        width 0.95s var(--gb-ease),
-        height 0.95s var(--gb-ease);
+        width 1.1s var(--gb-ease),
+        height 1.1s var(--gb-ease);
     }
     .gb-matte .mt {
       inset: 0 0 auto;
@@ -664,12 +664,8 @@
     .gb-matte .fl {
       inset: var(--h) var(--w);
       box-shadow: inset 0 0 0 1px rgba(201, 161, 74, 0.6);
-      transition: inset 0.95s var(--gb-ease);
+      transition: inset 1.1s var(--gb-ease);
     }
-  }
-  /* a jump is a hard cut: under the whip pan's blur the frame snaps to the new era */
-  &.gb-whipping .gb-matte > * {
-    transition: none;
   }
   @media (prefers-reduced-motion: reduce) {
     .gb-matte > * {
@@ -677,13 +673,8 @@
     }
   }
 
-  /* the whip pan: the picture smears sideways, the frame and chrome stay sharp */
   .gb-fx {
     position: absolute;
-  }
-  &.gb-whipping .content {
-    filter: url(#gb-hblur);
-    animation: budapest-pan 0.46s cubic-bezier(0.6, 0, 0.3, 1) both;
   }
 
   .gb-grain {
@@ -2985,11 +2976,6 @@
   }
   50% {
     transform: rotate(4deg);
-  }
-}
-@keyframes budapest-pan {
-  50% {
-    translate: -4vw 0;
   }
 }
 @keyframes budapest-grow {
