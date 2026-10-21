@@ -13,6 +13,7 @@ import 'editorial-ui/styles.css';
 import '../styles/global.css';
 
 import { site, profile, contact } from '../data/site';
+import { pageUrl, siteUrl } from '../lib/site-origin';
 
 // Icon sprite, inlined once per page. Chrome doesn't resolve cross-document
 // SVG <use> references, so fragment-only refs (#i-moon) against an inline
@@ -24,10 +25,14 @@ interface Props {
   description?: string;
   /** OG/Twitter share image, resolved against `site` to an absolute URL. */
   image?: string;
-  /** `article` flips og:type and emits BlogPosting/Article structured data. */
+  /** `article` flips og:type and emits article structured data. */
   type?: 'website' | 'article';
   /** ISO date for articles → og:article:published_time + schema datePublished. */
   publishedTime?: string;
+  articleKind?: 'BlogPosting' | 'Article';
+  headline?: string;
+  pageKind?: 'WebPage' | 'ProfilePage' | 'CollectionPage';
+  markdownPath?: string;
   /** Keep a page out of the index (used by 404). */
   noindex?: boolean;
 }
@@ -38,24 +43,27 @@ const {
   image = '/og.png',
   type = 'website',
   publishedTime,
+  articleKind = 'Article',
+  headline = title,
+  pageKind = Astro.url.pathname === '/' ? 'ProfilePage' : 'WebPage',
+  markdownPath = Astro.url.pathname === '/' ? '/index.md' : undefined,
   noindex = false,
 } = Astro.props;
 
 // Absolute URLs are required by crawlers and social unfurlers.
-const siteOrigin = Astro.site ?? new URL(Astro.url.origin);
-const canonical = new URL(Astro.url.pathname, siteOrigin).href;
-const ogImage = new URL(image, siteOrigin).href;
-const rssUrl = new URL('/rss.xml', siteOrigin).href;
+const rootUrl = siteUrl();
+const canonical = pageUrl(Astro.url.pathname);
+const ogImage = siteUrl(image);
+const rssUrl = siteUrl('/rss.xml');
 
 // Profile links → schema.org `sameAs` (external profiles only).
 const sameAs = contact.filter((c) => c.href.startsWith('http')).map((c) => c.href);
 
 const person = {
   '@type': 'Person',
-  '@id': `${siteOrigin.href}#person`,
+  '@id': `${rootUrl}#person`,
   name: profile.name,
-  url: siteOrigin.href,
-  image: ogImage,
+  url: rootUrl,
   jobTitle: profile.role,
   email: 'tomibrasca97@gmail.com',
   address: {
@@ -74,38 +82,66 @@ const person = {
   sameAs,
 };
 
-// @graph lets a Person, WebSite, and (for posts) an Article coexist cleanly.
+// Page and article entities share one author identity.
 const graph: Record<string, unknown>[] = [
   person,
   {
     '@type': 'WebSite',
-    '@id': `${siteOrigin.href}#website`,
-    url: siteOrigin.href,
+    '@id': `${rootUrl}#website`,
+    url: rootUrl,
     name: `${profile.name} · ${profile.role}`,
+    inLanguage: 'en',
+    author: { '@id': `${rootUrl}#person` },
+    publisher: { '@id': `${rootUrl}#person` },
+  },
+  {
+    '@type': pageKind,
+    '@id': canonical,
+    url: canonical,
+    name: title,
     description,
     inLanguage: 'en',
-    author: { '@id': `${siteOrigin.href}#person` },
-    publisher: { '@id': `${siteOrigin.href}#person` },
+    isPartOf: { '@id': `${rootUrl}#website` },
+    ...(pageKind === 'ProfilePage' ? { mainEntity: { '@id': `${rootUrl}#person` } } : {}),
+    ...(pageKind === 'CollectionPage' ? { mainEntity: { '@id': `${canonical}#blog` } } : {}),
+    ...(type === 'article' ? { mainEntity: { '@id': `${canonical}#article` } } : {}),
   },
 ];
 
+if (pageKind === 'CollectionPage') {
+  graph.push({
+    '@type': 'Blog',
+    '@id': `${canonical}#blog`,
+    url: canonical,
+    name: title,
+    description,
+    inLanguage: 'en',
+    author: { '@id': `${rootUrl}#person` },
+    publisher: { '@id': `${rootUrl}#person` },
+  });
+}
+
 if (type === 'article') {
   graph.push({
-    '@type': 'BlogPosting',
+    '@type': articleKind,
     '@id': `${canonical}#article`,
-    headline: title,
+    headline,
+    ...(articleKind === 'BlogPosting' ? { isPartOf: { '@id': `${pageUrl('/blog')}#blog` } } : {}),
     description,
     url: canonical,
     image: ogImage,
     inLanguage: 'en',
-    ...(publishedTime ? { datePublished: publishedTime, dateModified: publishedTime } : {}),
-    author: { '@id': `${siteOrigin.href}#person` },
-    publisher: { '@id': `${siteOrigin.href}#person` },
+    ...(publishedTime ? { datePublished: publishedTime } : {}),
+    author: { '@id': `${rootUrl}#person` },
+    publisher: { '@id': `${rootUrl}#person` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
   });
 }
 
-const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replaceAll(
+  '<',
+  '\\u003c',
+);
 
 const robots = noindex
   ? 'noindex, nofollow'
@@ -120,6 +156,12 @@ const robots = noindex
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {
+      markdownPath && (
+        <link rel="alternate" type="text/markdown" title="Markdown" href={siteUrl(markdownPath)} />
+      )
+    }
+    {!noindex && <link rel="describedby" type="text/plain" href={siteUrl('/llms.txt')} />}
     <meta name="author" content={profile.name} />
     <meta name="generator" content={Astro.generator} />
     <meta name="robots" content={robots} />
@@ -139,7 +181,7 @@ const robots = noindex
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={`${profile.name} · ${profile.role}`} />
     {publishedTime && <meta property="article:published_time" content={publishedTime} />}
-    {type === 'article' && <meta property="article:author" content={profile.name} />}
+    {type === 'article' && <meta property="article:author" content={rootUrl} />}
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -159,7 +201,7 @@ const robots = noindex
     <!-- Page-specific head (the homepage's reel bootstrap + generated CSS). -->
     <slot name="head" />
 
-    <!-- Structured data (Person + WebSite, plus Article on posts). -->
+    <!-- Structured data -->
     <script type="application/ld+json" is:inline set:html={jsonLd} />
 
     <!-- No-FOUC theme bootstrap: set data-theme before first paint. -->

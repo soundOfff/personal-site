@@ -7,12 +7,23 @@ interface Props {
   description: string;
   type?: 'website' | 'article';
   publishedTime?: string;
+  headline?: string;
+  markdownPath: string;
 }
 
-const { title, description, type = 'website', publishedTime } = Astro.props;
+const { title, description, type = 'website', publishedTime, headline, markdownPath } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} type={type} publishedTime={publishedTime}>
+<BaseLayout
+  title={title}
+  description={description}
+  type={type}
+  publishedTime={publishedTime}
+  headline={headline}
+  articleKind="BlogPosting"
+  pageKind={type === 'website' ? 'CollectionPage' : 'WebPage'}
+  markdownPath={markdownPath}
+>
   <div class="blog-shell">
     <a class="reading-skip" href="#reading">Skip to content</a>
     <header class="writing-nav">

@@ -1,14 +1,15 @@
 // @ts-check
+import { URL } from 'node:url';
 import { defineConfig, sessionDrivers } from 'astro/config';
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
+import { SITE_ORIGIN } from './src/lib/site-origin';
 
 // https://astro.build/config
 export default defineConfig({
-  // TODO: set the real production domain once chosen (drives canonical URLs / sitemap).
-  site: 'https://tomasbrasca.dev',
+  site: SITE_ORIGIN,
 
   // The site is static-first (near-zero JS). Only the live-mode Playground endpoint
   // opts into on-demand rendering via `export const prerender = false`.
@@ -34,7 +35,19 @@ export default defineConfig({
   },
 
   // sitemap emits /sitemap-index.xml at build time — robots.txt points at it.
-  integrations: [react(), mdx(), sitemap()],
+  integrations: [
+    react(),
+    mdx(),
+    sitemap({
+      filter: (page) => {
+        const path = new URL(page).pathname.replace(/\/$/, '') || '/';
+        return (
+          !/\.[^/]+$/.test(path) &&
+          (path === '/' || path === '/blog' || /^\/(blog|work)\/.+/.test(path))
+        );
+      },
+    }),
+  ],
 
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
 

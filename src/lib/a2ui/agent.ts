@@ -20,6 +20,7 @@
  * of this site makes about routing. Override with `A2UI_MODEL`.
  */
 
+import { SITE_ORIGIN } from '../site-origin';
 import { contextBlock, renderTool, systemInstructions } from './prompt';
 import { RENDERABLE_TYPES, countComponents, toMessages, type RenderInput } from './validate';
 import type { A2uiMessage, HistoryTurn, TurnMeta } from './types';
@@ -29,8 +30,8 @@ const DEFAULT_MODEL = 'anthropic/claude-haiku-4.5';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 /** Sent for OpenRouter's attribution listings; harmless if the site moves. */
-const APP_URL = 'https://tomasbrasca.dev';
-const APP_TITLE = 'tomasbrasca.dev · a2ui portfolio agent';
+const APP_URL = SITE_ORIGIN;
+const APP_TITLE = `${new URL(SITE_ORIGIN).hostname} · a2ui portfolio agent`;
 
 /** Generous enough for a twelve-component surface, tight enough to bound cost. */
 const MAX_TOKENS = 2048;
