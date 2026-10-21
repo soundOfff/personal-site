@@ -2148,126 +2148,84 @@ html:root[data-reel='parasite'] .content {
   .opening-parasite[data-opening-mode='flow'] {
     position: relative;
     inset: auto;
+    width: min(100%, 1120px);
+    margin-inline: auto;
     overflow: visible;
-    padding: 36px 5% 0;
+    padding: 40px 5% 0;
     color: #263128;
     background: #e9e8de;
   }
   .ps-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 30px;
     padding-bottom: 28px;
   }
   .ps-heading .shot-kicker {
-    margin-bottom: 20px;
+    margin-bottom: 22px;
+    color: #586152;
   }
   .ps-heading h1 {
-    font: 500 clamp(38px, 4.8vw, 76px)/1.08 var(--font-display);
-    letter-spacing: -0.055em;
-  }
-  .ps-heading h1 em {
-    font-style: normal;
-    font-weight: 350;
+    font: 500 clamp(32px, 4.5vw, 56px)/1.12 var(--font-display);
+    letter-spacing: -0.045em;
+    text-wrap: balance;
   }
   .ps-intro {
-    flex-shrink: 0;
-    font: 400 13px/1.7 var(--font-sans);
+    margin-top: 14px;
+    font: 400 15px/1.6 var(--font-sans);
     color: #586152;
   }
   .opening-parasite nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 22px;
+    gap: 0 26px;
     margin-top: 12px;
   }
   .opening-parasite a {
     display: inline-flex;
     align-items: center;
+    min-width: 44px;
     min-height: 44px;
     color: inherit;
+    font: 400 13px/1.5 var(--font-sans);
     text-decoration: underline;
-    text-underline-offset: 5px;
+    text-underline-offset: 4px;
+  }
+  .opening-parasite a:hover {
+    text-decoration-thickness: 2px;
   }
   .opening-parasite :is(a, summary):focus-visible {
-    outline: 3px solid #a3572e;
-    outline-offset: 5px;
-  }
-  .ps-frame {
-    position: relative;
-    isolation: isolate;
-    background: #14251f;
+    outline: 2px solid #a3572e;
+    outline-offset: 4px;
   }
   .ps-photo {
-    height: clamp(320px, 38vw, 580px);
+    width: 100%;
+    aspect-ratio: 12 / 5;
+    max-height: 420px;
     background: url('../../assets/openings/parasite.avif') 60% center / cover;
   }
   .ps-frame details {
     overflow: clip;
     color: #e5e6d4;
-    background: #14251f;
+    background: #263128;
   }
   .ps-frame summary {
     display: flex;
-    align-items: stretch;
-    justify-content: end;
-    min-height: 76px;
-    padding: 14px 6% 18px;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 20px;
     list-style: none;
     cursor: pointer;
-    color: #eddbb2;
-    background: linear-gradient(#213329, #19281f);
-    border-bottom: 6px solid #553b27;
-    box-shadow: inset 0 -2px #956b42;
-    font: 400 12px/1.5 var(--font-mono);
+    color: #e5e6d4;
+    background: #3d4738;
+    font: 400 11px/1.5 var(--font-mono);
   }
   .ps-frame summary::-webkit-details-marker {
     display: none;
   }
-  .ps-shelf-books {
-    display: flex;
-    gap: 4px;
-    align-items: end;
-    margin-right: 6px;
+  .ps-frame summary:hover {
+    background: #46503f;
   }
-  .ps-shelf-books i {
-    display: block;
-    height: 42px;
-    width: 12px;
-    border: 1px solid #8c8260;
-    border-block-width: 4px;
-    background: #424d38;
-  }
-  .ps-shelf-books i:nth-child(2) {
-    height: 49px;
-    width: 18px;
-    background: #655b42;
-  }
-  .ps-book {
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    min-height: 48px;
-    padding: 8px 18px 8px 10px;
-    border: 1px solid #b09a63;
-    border-left: 6px solid #c3a469;
-    background: #4a5037;
-    box-shadow: 3px 3px 0 #0b1612;
-    transform-origin: left center;
-  }
-  .ps-book-mark {
-    border-right: 1px solid #b09a63;
-    padding-right: 12px;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-  }
-  .ps-frame summary:hover .ps-book {
-    background: #596045;
-  }
-  .ps-frame summary:focus-visible .ps-book {
-    outline: 3px solid #e4b770;
-    outline-offset: 4px;
+  .ps-frame summary:focus-visible {
+    outline-color: #eddbb2;
+    outline-offset: -4px;
   }
   .ps-open-label,
   details[open]:not([data-passage-state='closed']) .ps-closed-label {
@@ -2276,118 +2234,56 @@ html:root[data-reel='parasite'] .content {
   details[open]:not([data-passage-state='closed']) .ps-open-label {
     display: inline;
   }
-  details[open]:not([data-passage-state='closed']) .ps-book {
-    transform: perspective(500px) rotateY(-12deg) translateX(-8px);
-    background: #676345;
-  }
   .ps-under {
     display: grid;
-    grid-template-columns: minmax(130px, 0.6fr) minmax(0, 1fr);
-    align-items: center;
-    gap: 8%;
-    padding: 40px 7% 54px;
-    background: linear-gradient(125deg, #2d3022, #14251f 65%);
+    grid-template-columns: 84px minmax(0, 1fr);
+    align-items: start;
+    gap: 32px;
+    padding: 34px 28px 38px;
   }
-  .ps-stairwell {
-    position: relative;
-    min-height: 240px;
-    align-self: stretch;
-    overflow: hidden;
-    border: 1px solid #666247;
-    background: linear-gradient(110deg, #111e19 25%, #665235 100%);
-    box-shadow: inset 8px 0 24px #07150c;
-  }
-  .ps-level {
-    position: absolute;
-    top: 18px;
-    left: 16px;
-    font: 350 34px/1 var(--font-display);
-    color: #d1bc83;
-  }
-  .ps-stair-light {
-    position: absolute;
-    top: 28px;
-    right: 22%;
-    width: 4px;
-    height: 29px;
-    background: #f4d695;
-    box-shadow: 0 0 38px 14px #d3a45b66;
-  }
-  .ps-stair-flight {
-    position: absolute;
-    inset: 34% -10% -30% 15%;
-    background: repeating-linear-gradient(#826e49 0 3px, #323426 3px 30px);
-    transform: skewY(28deg);
-    border-left: 5px solid #a28c5f;
-    box-shadow: -10px 0 30px #081a10;
+  .ps-under .ps-steps {
+    width: 84px;
+    height: 68px;
+    margin-top: 18px;
+    color: #87917a;
   }
   .ps-under .shot-kicker {
-    margin-bottom: 18px;
+    margin-bottom: 12px;
+    color: #b7beaa;
   }
   .ps-under h2 {
-    margin: 0 0 18px;
-    font: 500 clamp(32px, 4vw, 60px)/1.08 var(--font-display);
-    letter-spacing: -0.045em;
+    margin: 0 0 12px;
     color: inherit;
-  }
-  .ps-under h2 em {
-    font-style: normal;
-    font-weight: 350;
+    font: 500 clamp(25px, 3vw, 36px)/1.15 var(--font-display);
+    letter-spacing: -0.035em;
   }
   .ps-under p:not(.shot-kicker) {
+    max-width: 52ch;
     font: 400 14px/1.7 var(--font-sans);
   }
   .ps-under a {
     margin-top: 12px;
-    font: 400 12px/1.5 var(--font-sans);
-  }
-  @media (max-width: 1000px) {
-    .ps-heading {
-      display: block;
-    }
-    .ps-intro {
-      margin-top: 24px;
-    }
   }
   @media (max-width: 650px) {
     .opening-parasite[data-opening-mode='flow'] {
-      padding-top: 30px;
+      padding: 26px 20px 0;
     }
-    .ps-heading h1 {
-      font-size: clamp(34px, 9vw, 48px);
+    .ps-heading {
+      padding-bottom: 20px;
+    }
+    .ps-heading .shot-kicker {
+      margin-bottom: 16px;
     }
     .ps-photo {
-      height: 340px;
-    }
-    .ps-frame summary {
-      padding-inline: 14px;
-      justify-content: center;
-    }
-    .ps-shelf-books {
-      display: none;
-    }
-    .ps-book {
-      padding-right: 10px;
-      gap: 8px;
-      font-size: 10px;
+      aspect-ratio: 4 / 3;
+      max-height: 300px;
     }
     .ps-under {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 24px;
-      padding: 20px 25px 36px;
+      display: block;
+      padding: 26px 20px 28px;
     }
-    .ps-level {
-      font-size: 30px;
-    }
-    .ps-stairwell {
-      min-height: 150px;
-    }
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .ps-book {
-      transition:
-        transform 0.52s cubic-bezier(0.22, 0.75, 0.18, 1),
-        background-color 0.3s;
+    .ps-under .ps-steps {
+      display: none;
     }
   }
 }
