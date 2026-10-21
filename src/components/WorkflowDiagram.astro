@@ -8,88 +8,155 @@ interface Props {
 const { workflow } = Astro.props;
 ---
 
-<figure class="workflow" aria-labelledby="workflow-title">
+<figure class="workflow" aria-labelledby="workflow-title" data-workflow>
   <figcaption class="workflow-caption">
     <h2 id="workflow-title">{workflow.title}</h2>
     <p class="workflow-intro">{workflow.introduction}</p>
   </figcaption>
-  <div class="workflow-graph">
-    <div class="workflow-edges" aria-hidden="true">
-      <span class="workflow-edge workflow-edge--frame-design"></span>
-      <span class="workflow-edge workflow-edge--design-build"></span>
-      <span class="workflow-edge workflow-edge--build-review"></span>
-      <span class="workflow-edge workflow-edge--review-decide"></span>
-      <span class="workflow-edge workflow-edge--return-build"></span>
-      <span class="workflow-return-design">
-        <span class="workflow-return-design-start"></span>
-        <span class="workflow-return-design-rise"></span>
-        <span class="workflow-return-design-across"></span>
-        <span class="workflow-edge workflow-return-design-end"></span>
-      </span>
+  <p class="workflow-instruction">Select a stage to see the work, the tools and my decision.</p>
+  <div class="workflow-body">
+    <div class="workflow-graph">
+      <div class="workflow-edges" aria-hidden="true">
+        <span class="workflow-edge workflow-edge--frame-design"></span>
+        <span class="workflow-edge workflow-edge--design-build"></span>
+        <span class="workflow-edge workflow-edge--build-review"></span>
+        <span class="workflow-edge workflow-edge--review-decide"></span>
+        <span class="workflow-edge workflow-edge--return-build"></span>
+        <span class="workflow-return-design">
+          <span class="workflow-return-design-start"></span>
+          <span class="workflow-return-design-rise"></span>
+          <span class="workflow-return-design-across"></span>
+          <span class="workflow-edge workflow-return-design-end"></span>
+        </span>
+      </div>
+      <ol class="workflow-stages">
+        {
+          workflow.stages.map((stage, index) => (
+            <li class:list={['workflow-stage', `workflow-stage--${stage.id}`]}>
+              <a
+                class="workflow-stage-link"
+                href={`#workflow-${stage.id}`}
+                data-workflow-stage={stage.id}
+              >
+                <p class="workflow-owner">{stage.owner}</p>
+                <h3>
+                  <span class="workflow-number" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  {stage.label}
+                </h3>
+                <p class="workflow-hint">{stage.hint}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="workflow-feedback-key">
+        <p>
+          Checks fail <span aria-hidden="true">→</span><span class="sr-only">return to</span> Build
+        </p>
+        <p>
+          Approach fails <span aria-hidden="true">→</span><span class="sr-only">return to</span> Design
+        </p>
+      </div>
     </div>
-    <ol class="workflow-stages">
+    <div class="workflow-inspector">
       {
-        workflow.stages.map((stage, index) => (
-          <li class:list={['workflow-stage', `workflow-stage--${stage.id}`]}>
-            <p class="workflow-owner">{stage.owner}</p>
-            <h3>
-              <span class="workflow-number" aria-hidden="true">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              {stage.label}
-            </h3>
-            <p class="workflow-hint">{stage.hint}</p>
-          </li>
-        ))
+        workflow.stages.map((stage, index) => {
+          const previous = workflow.stages[index - 1];
+          const next = workflow.stages[index + 1];
+          return (
+            <section
+              class="workflow-detail"
+              id={`workflow-${stage.id}`}
+              aria-labelledby={`workflow-${stage.id}-title`}
+              tabindex="-1"
+              data-workflow-panel={stage.id}
+            >
+              <p class="workflow-detail-meta">
+                {String(index + 1).padStart(2, '0')} /{' '}
+                {String(workflow.stages.length).padStart(2, '0')} · {stage.owner}
+              </p>
+              <h3 id={`workflow-${stage.id}-title`}>{stage.title}</h3>
+              <p class="workflow-detail-intro">{stage.body}</p>
+              <dl class="workflow-handoff">
+                <div>
+                  <>
+                    <dt>Input</dt>
+                    <dd>{stage.input}</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>The work</dt>
+                    <dd>{stage.action}</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>Output</dt>
+                    <dd>{stage.output}</dd>
+                  </>
+                </div>
+                <div class="workflow-decision">
+                  <>
+                    <dt>My decision</dt>
+                    <dd>{stage.humanDecision}</dd>
+                  </>
+                </div>
+              </dl>
+              {stage.skillGroups.length > 0 && (
+                <div class="workflow-skills">
+                  <h4>Skills I use here</h4>
+                  {stage.skillGroups.map((group) => (
+                    <div class="workflow-skill-group">
+                      <p class="workflow-skill-source">{group.source}</p>
+                      <ul>
+                        {group.skills.map((skill) => (
+                          <li>
+                            <code>{skill.name}</code>
+                            <span>{skill.purpose}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {stage.condition && (
+                <p class="workflow-condition">
+                  <strong>{stage.condition.label}</strong>
+                  {stage.condition.body}
+                </p>
+              )}
+              {stage.id === workflow.feedback.from && (
+                <p class="workflow-condition">
+                  <strong>{workflow.feedback.label}</strong>
+                  {workflow.feedback.body}
+                </p>
+              )}
+              <nav class="workflow-stage-navigation" aria-label="Explore workflow stages">
+                {previous && (
+                  <a href={`#workflow-${previous.id}`} data-workflow-stage={previous.id}>
+                    ← {previous.label}
+                  </a>
+                )}
+                {next && (
+                  <a href={`#workflow-${next.id}`} data-workflow-stage={next.id}>
+                    {next.label} →
+                  </a>
+                )}
+              </nav>
+            </section>
+          );
+        })
       }
-    </ol>
-    <div class="workflow-feedback-key">
-      <p>
-        Checks fail <span aria-hidden="true">→</span><span class="sr-only">return to</span> Build
-      </p>
-      <p>
-        Approach fails <span aria-hidden="true">→</span><span class="sr-only">return to</span> Design
-      </p>
     </div>
   </div>
-  <details class="workflow-details">
-    <summary>Tools &amp; details</summary>
-    <div class="workflow-details-content">
-      {
-        workflow.stages.map((stage) => (
-          <section class="workflow-detail">
-            <h4>{stage.title}</h4>
-            <p>{stage.body}</p>
-            {stage.skillGroups.length > 0 && (
-              <ul class="workflow-skills">
-                {stage.skillGroups.map((group) => (
-                  <li>
-                    <strong>{group.source}</strong> · {group.skills.join(', ')}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {stage.condition && (
-              <p class="workflow-condition">
-                <strong>{stage.condition.label}</strong>
-                {stage.condition.body}
-              </p>
-            )}
-            {stage.id === workflow.feedback.from && (
-              <p class="workflow-condition">
-                <strong>{workflow.feedback.label}</strong>
-                {workflow.feedback.body}
-              </p>
-            )}
-          </section>
-        ))
-      }
-      <p class="workflow-sources">
-        <span>Skills I use</span>
-        {workflow.sources.map((source) => <a href={source.href}>{source.label}</a>)}
-      </p>
-    </div>
-  </details>
+  <p class="workflow-sources">
+    <span>The skill collections</span>
+    {workflow.sources.map((source) => <a href={source.href}>{source.label}</a>)}
+  </p>
 </figure>
 
 <style>
@@ -98,6 +165,7 @@ const { workflow } = Astro.props;
     --workflow-row-gap: 32px;
     --workflow-gutter: max(32px, 12%);
     --workflow-column: calc((100% - var(--workflow-gutter)) / 2);
+    container-type: inline-size;
     margin: 0;
     color: var(--ink);
     text-align: left;
@@ -136,7 +204,7 @@ const { workflow } = Astro.props;
   .workflow-stage {
     box-sizing: border-box;
     min-width: 0;
-    padding: 12px 14px;
+    padding: 0;
     border: 1px solid var(--amber-deep);
     background: var(--paper);
   }
@@ -310,51 +378,154 @@ const { workflow } = Astro.props;
     padding-left: 8px;
     border-left: 1px dashed var(--amber-deep);
   }
-  .workflow-details {
-    margin-top: 12px;
-    border-top: 1px solid var(--rule);
-    font: 400 14px/1.6 var(--font-sans);
+  .workflow-instruction {
+    margin: 0 0 18px;
     color: var(--ink-2);
+    font: 400 12px/1.5 var(--font-sans);
   }
-  .workflow-details summary {
-    width: fit-content;
-    padding: 9px 0;
-    color: var(--ink);
-    cursor: pointer;
+  .workflow-body {
+    display: grid;
+    align-items: start;
+    gap: 26px;
+    min-width: 0;
   }
-  .workflow-details summary:focus-visible,
+  .workflow-stage-link {
+    display: block;
+    height: 100%;
+    padding: 12px 14px;
+    color: inherit;
+    text-decoration: none;
+    transition: background 120ms;
+  }
+  .workflow-stage-link:hover {
+    background: var(--paper-2);
+  }
+  .workflow-stage-link[aria-current='step'] {
+    background: var(--paper-2);
+    box-shadow: inset 3px 0 0 var(--amber-deep);
+  }
+  .workflow-stage-link:focus-visible,
+  .workflow-stage-navigation a:focus-visible,
   .workflow-sources a:focus-visible {
     outline: 2px solid var(--amber-deep);
     outline-offset: 4px;
   }
-  .workflow-details-content {
-    padding: 12px 0 0;
+  .workflow-inspector {
+    min-width: 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-2);
+    font: 400 14px/1.6 var(--font-sans);
+  }
+  .workflow-detail {
+    scroll-margin-top: 100px;
   }
   .workflow-detail + .workflow-detail {
-    margin-top: 24px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
   }
-  .workflow-detail h4 {
+  .workflow[data-enhanced] .workflow-detail {
     margin: 0;
-    color: var(--ink);
-    font: 500 21px/1.2 var(--font-serif);
-    text-transform: none;
+    padding: 0;
+    border: 0;
   }
-  .workflow-detail p {
-    max-width: 62ch;
-    margin: 8px 0 0;
+  .workflow-detail-meta {
+    margin: 0 0 8px;
+    color: var(--amber-deep);
+    font: 400 10px/1.5 var(--font-mono);
+  }
+  .workflow-detail h3 {
+    display: block;
+    margin: 0;
+    font: 500 27px/1.15 var(--font-serif);
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .workflow-detail-intro {
+    margin: 10px 0 18px;
+  }
+  .workflow-handoff {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+  }
+  .workflow-handoff dt {
+    margin-bottom: 3px;
+    color: var(--ink);
+    font: 500 10px/1.5 var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .workflow-handoff dd {
+    margin: 0;
+  }
+  .workflow-decision {
+    padding-left: 12px;
+    border-left: 2px solid var(--amber-deep);
+  }
+  .workflow-decision dd {
+    color: var(--ink);
   }
   .workflow-skills {
-    margin: 8px 0 0;
-    padding-left: 18px;
-    overflow-wrap: anywhere;
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
   }
-  .workflow-skills strong,
-  .workflow-condition strong {
-    font-weight: 600;
+  .workflow-skills h4 {
+    margin: 0 0 10px;
     color: var(--ink);
+    font: 500 16px/1.3 var(--font-serif);
+    text-transform: none;
+  }
+  .workflow-skill-group + .workflow-skill-group {
+    margin-top: 12px;
+  }
+  .workflow-skill-source {
+    margin: 0 0 5px;
+    font: 500 10px/1.5 var(--font-mono);
+    color: var(--ink);
+  }
+  .workflow-skills ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .workflow-skills li {
+    display: grid;
+    gap: 2px;
+    font-size: 12px;
+  }
+  .workflow-skills code {
+    width: fit-content;
+    overflow-wrap: anywhere;
+    color: var(--ink);
+    font: 400 11px/1.5 var(--font-mono);
+  }
+  .workflow-condition {
+    margin: 18px 0 0;
+    font-size: 12px;
   }
   .workflow-condition strong {
     display: block;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .workflow-stage-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+    border-top: 1px solid var(--rule);
+  }
+  .workflow-stage-navigation a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--ink);
+    text-underline-offset: 4px;
   }
   .workflow-sources {
     display: flex;
@@ -363,12 +534,25 @@ const { workflow } = Astro.props;
     margin: 24px 0 0;
     padding-top: 14px;
     border-top: 1px solid var(--rule);
+    color: var(--ink-2);
+    font: 400 12px/1.5 var(--font-sans);
   }
   .workflow-sources a {
     color: var(--ink);
     text-decoration: underline;
     text-underline-offset: 4px;
     overflow-wrap: anywhere;
+  }
+  @container (min-width: 820px) {
+    .workflow-body {
+      grid-template-columns: minmax(360px, 1fr) minmax(340px, 1fr);
+      gap: 36px;
+    }
+    .workflow-inspector {
+      padding: 0 0 0 26px;
+      border-top: 0;
+      border-left: 1px solid var(--rule);
+    }
   }
   .sr-only {
     position: absolute;
@@ -380,7 +564,7 @@ const { workflow } = Astro.props;
     white-space: nowrap;
   }
   @media (max-width: 480px) {
-    .workflow-stage {
+    .workflow-stage-link {
       padding: 10px;
     }
     .workflow h3 {
@@ -392,3 +576,49 @@ const { workflow } = Astro.props;
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-workflow]').forEach((workflow) => {
+    const links = [...workflow.querySelectorAll<HTMLAnchorElement>('[data-workflow-stage]')];
+    const panels = [...workflow.querySelectorAll<HTMLElement>('[data-workflow-panel]')];
+    const firstPanel = panels[0];
+    if (!firstPanel) return;
+
+    function selectPanel(selected: HTMLElement) {
+      panels.forEach((panel) => {
+        panel.hidden = panel !== selected;
+      });
+      links.forEach((link) => {
+        if (link.hash === `#${selected.id}`) link.setAttribute('aria-current', 'step');
+        else link.removeAttribute('aria-current');
+      });
+    }
+
+    function panelFromHash() {
+      return panels.find((panel) => `#${panel.id}` === window.location.hash);
+    }
+
+    selectPanel(panelFromHash() ?? firstPanel);
+    workflow.dataset.enhanced = '';
+
+    links.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        if (
+          event.defaultPrevented ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        )
+          return;
+        const panel = panels.find((candidate) => `#${candidate.id}` === link.hash);
+        if (panel) selectPanel(panel);
+      });
+    });
+
+    window.addEventListener('hashchange', () => {
+      selectPanel(panelFromHash() ?? firstPanel);
+    });
+  });
+</script>

@@ -36,7 +36,7 @@ export const nav = [
   { id: 'oss', label: 'projects' },
   { id: 'log', label: 'log' },
   { id: 'writing', label: 'blog' },
-  { id: 'principles', label: 'how I work' },
+  { id: 'principles', label: 'AI workflow' },
   { id: 'stack', label: 'tools' },
   { id: 'now', label: 'now' },
 ] as const;

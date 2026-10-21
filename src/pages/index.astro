@@ -5,6 +5,7 @@ import Rail from '../components/Rail.astro';
 import Footer from '../components/Footer.astro';
 import Keybar from '../components/Keybar.astro';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
+import WorkflowPreview from '../components/WorkflowPreview.astro';
 import { workflow } from '../data/workflow';
 import A2UIPlayground from '../islands/A2UIPlayground';
 import { profile, proofs, toolbox, log, now } from '../data/site';
@@ -55,7 +56,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
       <section class="block" id="readme" data-sec="0">
         <Opening />
         <Keybar sec="readme" label="about" />
-        <p class="lede" set:html={profile.lede} />
+        <h1 class="lede" set:html={profile.lede} />
         <p class="sub">{profile.sub}</p>
         <div class="metrics">
           {
@@ -67,6 +68,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
             ))
           }
         </div>
+        <WorkflowPreview workflow={workflow} />
       </section>
 
       {/* 01 · playground (the one interactive island) */}
@@ -212,7 +214,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
       {/* 06 · principles · how I build */}
       <section class="block" id="principles" data-sec="6">
         <Stages at="in:principles" />
-        <Keybar sec="principles" label="how I work" />
+        <Keybar sec="principles" label="AI workflow" />
         <WorkflowDiagram workflow={workflow} />
       </section>
       <Stages at="after:principles" />

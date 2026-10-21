@@ -171,7 +171,14 @@ export async function buildSnapshot(): Promise<PortfolioSnapshot> {
       body: [
         stage.body,
         `Owner: ${stage.owner}.`,
-        ...stage.skillGroups.map(({ source, skills }) => `${source} skills: ${skills.join(', ')}.`),
+        `Input: ${stage.input}`,
+        `Action: ${stage.action}`,
+        `Output: ${stage.output}`,
+        `My decision: ${stage.humanDecision}`,
+        ...stage.skillGroups.map(
+          ({ source, skills }) =>
+            `${source} skills: ${skills.map(({ name, purpose }) => `${name}: ${purpose}`).join(' ')}`,
+        ),
         ...(stage.condition ? [`${stage.condition.label}: ${stage.condition.body}`] : []),
         ...(stage.id === workflow.feedback.from
           ? [`${workflow.feedback.label}. ${workflow.feedback.body}`]
