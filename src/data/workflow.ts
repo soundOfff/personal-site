@@ -8,6 +8,8 @@ type SkillGroup = Readonly<{
 type WorkflowStage<Id extends WorkflowStageId = WorkflowStageId> = Readonly<{
   id: Id;
   title: string;
+  label: string;
+  hint: string;
   body: string;
   owner: 'Me' | 'Agents + me';
   skillGroups: readonly SkillGroup[];
@@ -34,12 +36,14 @@ export type Workflow = Readonly<{
 }>;
 
 export const workflow: Workflow = {
-  title: 'AI helps with the work. I own the decisions.',
+  title: 'My AI workflow',
   introduction:
-    "I use pstack to coordinate agents, with Matt Pocock's skills to sharpen the brief, explore interfaces and build useful slices. Each change gets the tools it needs.",
+    "I use pstack and Matt Pocock's skills. I set the direction and make the final call.",
   stages: [
     {
       id: 'frame',
+      label: 'Frame',
+      hint: 'Goal & constraints',
       title: 'Frame the problem',
       body: 'I set the goal, constraints and what success means.',
       owner: 'Me',
@@ -51,6 +55,8 @@ export const workflow: Workflow = {
     },
     {
       id: 'design',
+      label: 'Design',
+      hint: 'Choose an approach',
       title: 'Understand, then choose',
       body: 'Agents inspect the code and explain the tradeoffs. I choose a direction.',
       owner: 'Agents + me',
@@ -65,6 +71,8 @@ export const workflow: Workflow = {
     },
     {
       id: 'build',
+      label: 'Build',
+      hint: 'One useful slice',
       title: 'Build one useful slice',
       body: 'Agents implement a complete piece of the change. I use behavior-focused tests where they help, and TDD when the task calls for it.',
       owner: 'Agents + me',
@@ -73,6 +81,8 @@ export const workflow: Workflow = {
     },
     {
       id: 'verify',
+      label: 'Review',
+      hint: 'Test & challenge',
       title: 'Check the real result',
       body: 'Agents exercise the behavior and review the change independently. I use extra challenge when a decision needs it.',
       owner: 'Agents + me',
@@ -84,6 +94,8 @@ export const workflow: Workflow = {
     },
     {
       id: 'decide',
+      label: 'Decide',
+      hint: 'My final call',
       title: 'Make the final call',
       body: 'I review the evidence and decide what is ready to ship.',
       owner: 'Me',

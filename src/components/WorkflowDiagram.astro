@@ -13,26 +13,58 @@ const { workflow } = Astro.props;
     <h2 id="workflow-title">{workflow.title}</h2>
     <p class="workflow-intro">{workflow.introduction}</p>
   </figcaption>
-  <ol class="workflow-stages">
-    {
-      workflow.stages.map((stage, index) => (
-        <li class:list={['workflow-stage', `workflow-stage--${stage.id}`]}>
-          <span class="workflow-junction" aria-hidden="true">
-            {String(index + 1).padStart(2, '0')}
-          </span>
-          {(stage.id === workflow.feedback.from ||
-            workflow.feedback.to.some((destination) => destination === stage.id)) && (
-            <span class="workflow-return" aria-hidden="true" />
-          )}
-          <div class="workflow-copy">
+  <div class="workflow-graph">
+    <div class="workflow-edges" aria-hidden="true">
+      <span class="workflow-edge workflow-edge--frame-design"></span>
+      <span class="workflow-edge workflow-edge--design-build"></span>
+      <span class="workflow-edge workflow-edge--build-review"></span>
+      <span class="workflow-edge workflow-edge--review-decide"></span>
+      <span class="workflow-edge workflow-edge--return-build"></span>
+      <span class="workflow-return-design">
+        <span class="workflow-return-design-start"></span>
+        <span class="workflow-return-design-rise"></span>
+        <span class="workflow-return-design-across"></span>
+        <span class="workflow-edge workflow-return-design-end"></span>
+      </span>
+    </div>
+    <ol class="workflow-stages">
+      {
+        workflow.stages.map((stage, index) => (
+          <li class:list={['workflow-stage', `workflow-stage--${stage.id}`]}>
             <p class="workflow-owner">{stage.owner}</p>
-            <h3>{stage.title}</h3>
-            <p class="workflow-body">{stage.body}</p>
+            <h3>
+              <span class="workflow-number" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              {stage.label}
+            </h3>
+            <p class="workflow-hint">{stage.hint}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="workflow-feedback-key">
+      <p>
+        Checks fail <span aria-hidden="true">→</span><span class="sr-only">return to</span> Build
+      </p>
+      <p>
+        Approach fails <span aria-hidden="true">→</span><span class="sr-only">return to</span> Design
+      </p>
+    </div>
+  </div>
+  <details class="workflow-details">
+    <summary>Tools &amp; details</summary>
+    <div class="workflow-details-content">
+      {
+        workflow.stages.map((stage) => (
+          <section class="workflow-detail">
+            <h4>{stage.title}</h4>
+            <p>{stage.body}</p>
             {stage.skillGroups.length > 0 && (
               <ul class="workflow-skills">
                 {stage.skillGroups.map((group) => (
                   <li>
-                    <span>{group.source}</span> · {group.skills.join(', ')}
+                    <strong>{group.source}</strong> · {group.skills.join(', ')}
                   </li>
                 ))}
               </ul>
@@ -44,213 +76,293 @@ const { workflow } = Astro.props;
               </p>
             )}
             {stage.id === workflow.feedback.from && (
-              <p class="workflow-feedback">
+              <p class="workflow-condition">
                 <strong>{workflow.feedback.label}</strong>
                 {workflow.feedback.body}
               </p>
             )}
-          </div>
-        </li>
-      ))
-    }
-  </ol>
-  <p class="workflow-sources">
-    <span>Skills I use</span>
-    {workflow.sources.map((source) => <a href={source.href}>{source.label}</a>)}
-  </p>
+          </section>
+        ))
+      }
+      <p class="workflow-sources">
+        <span>Skills I use</span>
+        {workflow.sources.map((source) => <a href={source.href}>{source.label}</a>)}
+      </p>
+    </div>
+  </details>
 </figure>
 
 <style>
   .workflow {
-    --workflow-spine: 40px;
-    --workflow-return: 4px;
-    --workflow-node: 30px;
+    --workflow-node-height: 100px;
+    --workflow-row-gap: 32px;
+    --workflow-gutter: max(32px, 12%);
+    --workflow-column: calc((100% - var(--workflow-gutter)) / 2);
     margin: 0;
     color: var(--ink);
     text-align: left;
   }
   .workflow-caption {
-    margin-bottom: 32px;
+    margin-bottom: 18px;
   }
   .workflow h2 {
-    max-width: 25ch;
     margin: 0;
-    font: 500 clamp(25px, 3.5vw, 34px) / 1.12 var(--font-serif);
+    font: 500 clamp(25px, 3.5vw, 32px) / 1.12 var(--font-serif);
     letter-spacing: -0.025em;
     text-transform: none;
     color: var(--ink);
-    text-wrap: balance;
   }
   .workflow-intro {
     max-width: 62ch;
-    margin: 14px 0 0;
-    font: 400 15px/1.6 var(--font-sans);
+    margin: 10px 0 0;
+    font: 400 14px/1.5 var(--font-sans);
     color: var(--ink-2);
   }
+  .workflow-graph {
+    position: relative;
+    max-width: 640px;
+    height: calc(3 * var(--workflow-node-height) + 2 * var(--workflow-row-gap));
+  }
   .workflow-stages {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, var(--workflow-node-height));
+    gap: var(--workflow-row-gap) var(--workflow-gutter);
     list-style: decimal;
     margin: 0;
     padding: 0;
   }
-  .workflow-stage::marker,
-  .workflow-skills li::marker {
+  .workflow-stage {
+    box-sizing: border-box;
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1px solid var(--amber-deep);
+    background: var(--paper);
+  }
+  .workflow-stage::marker {
     font-size: 0;
   }
-  .workflow-stage {
-    position: relative;
-    min-width: 0;
-    padding: 0 0 30px 70px;
-  }
-  .workflow-stage::before {
-    content: '';
-    position: absolute;
-    top: 15px;
-    bottom: -15px;
-    left: var(--workflow-spine);
-    border-left: 1px solid var(--rule-2, var(--rule));
-  }
-  .workflow-stage:last-child {
-    padding-bottom: 0;
-  }
-  .workflow-stage:last-child::before {
-    display: none;
-  }
-  .workflow-junction {
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    left: calc(var(--workflow-spine) - var(--workflow-node) / 2);
-    display: grid;
-    place-items: center;
-    width: var(--workflow-node);
-    height: var(--workflow-node);
-    border: 1px solid var(--amber-deep);
-    border-radius: 50%;
-    background: var(--paper);
-    color: var(--amber-deep);
-    font: 400 11px/1 var(--font-mono);
-  }
-  .workflow-stage--frame .workflow-junction,
-  .workflow-stage--decide .workflow-junction {
+  .workflow-stage--frame,
+  .workflow-stage--decide {
     border-color: var(--ink);
-    color: var(--ink);
   }
-  .workflow-return {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: var(--workflow-return);
-    width: calc(var(--workflow-spine) - var(--workflow-return) - var(--workflow-node) / 2);
-    border-left: 1px solid var(--amber-deep);
-    color: var(--amber-deep);
+  .workflow-stage--frame {
+    grid-area: 1 / 1;
   }
-  .workflow-return::after {
-    content: '';
-    position: absolute;
-    top: 15px;
-    left: 0;
-    right: 0;
-    border-top: 1px solid currentColor;
+  .workflow-stage--design {
+    grid-area: 1 / 2;
   }
-  .workflow-stage--design .workflow-return {
-    top: 15px;
-    border-top: 1px solid currentColor;
-    border-top-left-radius: 8px;
+  .workflow-stage--build {
+    grid-area: 2 / 2;
   }
-  .workflow-stage--design .workflow-return::after,
-  .workflow-stage--build .workflow-return::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    right: 0;
-    left: auto;
-    width: 5px;
-    height: 5px;
-    border: 0;
-    border-top: 1px solid currentColor;
-    border-right: 1px solid currentColor;
-    transform: rotate(45deg);
+  .workflow-stage--verify {
+    grid-area: 2 / 1;
   }
-  .workflow-stage--build .workflow-return::before {
-    top: 12px;
-  }
-  .workflow-stage--verify .workflow-return {
-    bottom: calc(100% - 15px);
-    border-bottom: 1px solid currentColor;
-    border-bottom-left-radius: 8px;
-  }
-  .workflow-stage--verify .workflow-return::after {
-    display: none;
-  }
-  .workflow-copy {
-    min-width: 0;
+  .workflow-stage--decide {
+    grid-area: 3 / 1;
   }
   .workflow-owner {
     margin: 0 0 5px;
-    font: 500 14px/1.4 var(--font-sans);
     color: var(--amber-deep);
+    font: 500 12px/1.2 var(--font-sans);
   }
   .workflow-stage--frame .workflow-owner,
   .workflow-stage--decide .workflow-owner {
     color: var(--ink);
   }
   .workflow h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
     margin: 0;
-    font: 500 clamp(21px, 2.5vw, 25px) / 1.2 var(--font-serif);
+    color: var(--ink);
+    font: 500 23px/1.15 var(--font-serif);
     letter-spacing: -0.015em;
     text-transform: none;
-    color: var(--ink);
   }
-  .workflow-body {
-    max-width: 57ch;
-    margin: 8px 0 0;
-    font: 400 15px/1.6 var(--font-sans);
+  .workflow-number {
     color: var(--ink-2);
-    text-wrap: pretty;
+    font: 400 10px/1 var(--font-mono);
+    letter-spacing: 0;
+  }
+  .workflow-hint {
+    margin: 5px 0 0;
+    color: var(--ink-2);
+    font: 400 13px/1.35 var(--font-sans);
+  }
+  .workflow-edges {
+    position: absolute;
+    inset: 0;
+    color: var(--ink-2);
+    pointer-events: none;
+  }
+  .workflow-edge {
+    position: absolute;
+    box-sizing: border-box;
+  }
+  .workflow-edge::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-top: 1px solid currentColor;
+    border-right: 1px solid currentColor;
+  }
+  .workflow-edge--frame-design,
+  .workflow-edge--build-review,
+  .workflow-edge--return-build {
+    left: var(--workflow-column);
+    width: var(--workflow-gutter);
+    border-top: 1px solid currentColor;
+  }
+  .workflow-edge--frame-design {
+    top: calc(var(--workflow-node-height) / 2);
+  }
+  .workflow-edge--frame-design::after,
+  .workflow-edge--return-build::after {
+    top: -3px;
+    right: 1px;
+    transform: rotate(45deg);
+  }
+  .workflow-edge--design-build,
+  .workflow-edge--review-decide {
+    height: var(--workflow-row-gap);
+    border-left: 1px solid currentColor;
+  }
+  .workflow-edge--design-build {
+    top: var(--workflow-node-height);
+    left: calc(100% - var(--workflow-column) / 2);
+  }
+  .workflow-edge--review-decide {
+    top: calc(2 * var(--workflow-node-height) + var(--workflow-row-gap));
+    left: calc(var(--workflow-column) / 2);
+  }
+  .workflow-edge--design-build::after,
+  .workflow-edge--review-decide::after {
+    bottom: 1px;
+    left: -3px;
+    transform: rotate(135deg);
+  }
+  .workflow-edge--build-review {
+    top: calc(1.5 * var(--workflow-node-height) + var(--workflow-row-gap));
+  }
+  .workflow-edge--build-review::after {
+    top: -3px;
+    left: 1px;
+    transform: rotate(225deg);
+  }
+  .workflow-edge--return-build {
+    top: calc(1.8 * var(--workflow-node-height) + var(--workflow-row-gap));
+    border-top-style: dashed;
+    color: var(--amber-deep);
+  }
+  .workflow-return-design {
+    color: var(--amber-deep);
+  }
+  .workflow-return-design > span {
+    position: absolute;
+    box-sizing: border-box;
+  }
+  .workflow-return-design-start {
+    top: calc(1.2 * var(--workflow-node-height) + var(--workflow-row-gap));
+    left: var(--workflow-column);
+    width: calc(var(--workflow-gutter) / 2);
+    border-top: 1px dashed currentColor;
+  }
+  .workflow-return-design-rise {
+    top: calc(var(--workflow-node-height) + var(--workflow-row-gap) / 2);
+    left: 50%;
+    height: calc(0.2 * var(--workflow-node-height) + var(--workflow-row-gap) / 2);
+    border-left: 1px dashed currentColor;
+  }
+  .workflow-return-design-across {
+    top: calc(var(--workflow-node-height) + var(--workflow-row-gap) / 2);
+    left: 50%;
+    width: calc(var(--workflow-gutter) / 2 + var(--workflow-column) / 4);
+    border-top: 1px dashed currentColor;
+  }
+  .workflow-return-design-end {
+    top: var(--workflow-node-height);
+    left: calc(100% - 0.75 * var(--workflow-column));
+    height: calc(var(--workflow-row-gap) / 2);
+    border-left: 1px dashed currentColor;
+  }
+  .workflow-return-design-end::after {
+    top: 1px;
+    left: -3px;
+    transform: rotate(-45deg);
+  }
+  .workflow-feedback-key {
+    position: absolute;
+    top: calc(2 * (var(--workflow-node-height) + var(--workflow-row-gap)));
+    right: 0;
+    display: grid;
+    align-content: center;
+    gap: 9px;
+    width: var(--workflow-column);
+    height: var(--workflow-node-height);
+    color: var(--ink-2);
+    font: 400 12px/1.4 var(--font-sans);
+  }
+  .workflow-feedback-key p {
+    margin: 0;
+    padding-left: 8px;
+    border-left: 1px dashed var(--amber-deep);
+  }
+  .workflow-details {
+    margin-top: 12px;
+    border-top: 1px solid var(--rule);
+    font: 400 14px/1.6 var(--font-sans);
+    color: var(--ink-2);
+  }
+  .workflow-details summary {
+    width: fit-content;
+    padding: 9px 0;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .workflow-details summary:focus-visible,
+  .workflow-sources a:focus-visible {
+    outline: 2px solid var(--amber-deep);
+    outline-offset: 4px;
+  }
+  .workflow-details-content {
+    padding: 12px 0 0;
+  }
+  .workflow-detail + .workflow-detail {
+    margin-top: 24px;
+  }
+  .workflow-detail h4 {
+    margin: 0;
+    color: var(--ink);
+    font: 500 21px/1.2 var(--font-serif);
+    text-transform: none;
+  }
+  .workflow-detail p {
+    max-width: 62ch;
+    margin: 8px 0 0;
   }
   .workflow-skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px 16px;
-    list-style: disc;
-    margin: 10px 0 0;
-    padding: 0;
-    font: 400 14px/1.6 var(--font-sans);
-    color: var(--ink-2);
+    margin: 8px 0 0;
+    padding-left: 18px;
     overflow-wrap: anywhere;
   }
-  .workflow-skills span {
+  .workflow-skills strong,
+  .workflow-condition strong {
     font-weight: 600;
     color: var(--ink);
   }
-  .workflow-condition,
-  .workflow-feedback {
-    max-width: 56ch;
-    margin: 14px 0 0;
-    padding-left: 13px;
-    border-left: 1px solid var(--rule-2, var(--rule));
-    font: 400 14px/1.6 var(--font-sans);
-    color: var(--ink-2);
-  }
-  .workflow-condition strong,
-  .workflow-feedback strong {
+  .workflow-condition strong {
     display: block;
-    margin-bottom: 2px;
-    font-weight: 600;
-    color: var(--ink);
-  }
-  .workflow-feedback {
-    border-color: var(--amber-deep);
   }
   .workflow-sources {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 18px;
-    margin: 28px 0 0;
-    padding-top: 16px;
+    gap: 6px 18px;
+    margin: 24px 0 0;
+    padding-top: 14px;
     border-top: 1px solid var(--rule);
-    font: 400 14px/1.5 var(--font-sans);
-    color: var(--ink-2);
   }
   .workflow-sources a {
     color: var(--ink);
@@ -258,17 +370,25 @@ const { workflow } = Astro.props;
     text-underline-offset: 4px;
     overflow-wrap: anywhere;
   }
-  @media (max-width: 600px) {
-    .workflow {
-      --workflow-spine: 30px;
-      --workflow-return: 0px;
-      --workflow-node: 26px;
-    }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  @media (max-width: 480px) {
     .workflow-stage {
-      padding-left: 54px;
+      padding: 10px;
     }
-    .workflow-sources > span {
-      flex-basis: 100%;
+    .workflow h3 {
+      gap: 5px;
+      font-size: 21px;
+    }
+    .workflow-hint {
+      font-size: 12px;
     }
   }
 </style>
