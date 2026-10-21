@@ -1,5 +1,7 @@
 dist
 .astro
+.audit/**
+.prototypes/**
 .wrangler
 node_modules
 pnpm-lock.yaml

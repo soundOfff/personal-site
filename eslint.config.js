@@ -9,6 +9,9 @@ export default tseslint.config(
     ignores: [
       'dist/**',
       '.astro/**',
+      '.audit/**',
+      '.claude/**',
+      '.prototypes/**',
       '.wrangler/**',
       'node_modules/**',
       'docs/adr/design/**',
