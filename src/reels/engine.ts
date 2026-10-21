@@ -279,11 +279,16 @@ export async function switchReel(id: string, opts: SwitchOptions = {}): Promise<
   const preload = prepare(next.id);
 
   if (opts.instant || reducedMotion.matches || !projector) {
-    const mod = await preload;
-    apply(next);
-    restartAtTop();
-    await mount(next, mod);
-    announce(next.announce);
+    switching = true;
+    try {
+      const mod = await preload;
+      apply(next);
+      restartAtTop();
+      await mount(next, mod);
+      announce(next.announce);
+    } finally {
+      switching = false;
+    }
     return;
   }
 

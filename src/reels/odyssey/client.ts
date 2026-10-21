@@ -4,8 +4,6 @@
  * against ctx.signal is torn down when it stops.
  *
  *   - the ship console: Rosario's time, and the page as the way from Earth to Jupiter
- *   - the red lens: tracks the cursor, and answers the playground's cues; its
- *     five lamps are the visitor's five questions a day
  *   - the hero: Sun, Earth and Moon parallax, a replay of the alignment
  *   - the match cut (bone → station) and the star gate, scrubbed by scroll
  *   - the logic memory hum, the monolith
@@ -49,15 +47,13 @@ import {
 
 type AgentState = 'idle' | 'listen' | 'think' | 'speak' | 'done' | 'error';
 const AGENT_LABEL: Record<AgentState, string> = {
-  idle: 'Standing by',
-  listen: 'Go ahead',
+  idle: 'Channel ready',
+  listen: 'Awaiting input',
   think: 'Computing',
   speak: 'Transmitting',
   done: 'Received',
-  error: 'AE-35 unit fault',
+  error: 'Transmission interrupted',
 };
-/** the lamps beside the lens, one per question a visitor gets each day */
-const LAMPS = 5;
 
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
@@ -104,7 +100,6 @@ function mount(ctx: ReelContext): () => void {
   tickClock();
   const clockId = window.setInterval(tickClock, 30_000);
 
-  /* ---------- the agent: lens state and the playground's cues ---------- */
   const stateEl = $('[data-od-state]');
   let panelOpen = false;
   let thinking: Hum | null = null;
@@ -123,19 +118,6 @@ function mount(ctx: ReelContext): () => void {
     thinking = null;
   };
   setAgent('idle');
-  /* The lamps follow the quota the playground prints once the server has
-     counted ("4 of 5 left today"). Until then all five stay lit. The island
-     renders the count after its cue, and on the daily-cap path only after the
-     error, so watch its section rather than time a read off the cues. */
-  const pg = $('.block[data-sec="1"]');
-  const readQuota = () => {
-    const text = pg?.querySelector('.a2-launch-count, .a2-quota')?.textContent ?? '';
-    const m = /(\d+)\s*(?:of|\/)\s*(\d+)/.exec(text);
-    if (m) root.dataset.odLeft = String(Math.min(LAMPS, Number(m[1])));
-  };
-  readQuota();
-  const quotaMO = new MutationObserver(readQuota);
-  if (pg) quotaMO.observe(pg, { childList: true, subtree: true, characterData: true });
   ctx.onCue((cue) => {
     switch (cue.name) {
       case 'open':
@@ -442,39 +424,29 @@ function mount(ctx: ReelContext): () => void {
   listen(window, 'resize', schedule, { passive: true });
   schedule();
 
-  /* ---------- the pointer: the lens follows it, the sky leans with it ---------- */
   let praf = 0;
   let mx = 0;
   let my = 0;
   const sky = $('.od-sky');
   const hero = $('.block[data-sec="0"]');
   let heroOn = true;
-  const lenses = [...document.querySelectorAll<HTMLElement>('.od-lens')];
   const moved = () => {
     praf = 0;
     const composer = $('.a2-drawer[open] .a2-composer');
-    const targets = composer ? [...lenses, composer] : lenses;
-    // reads
-    const rects = targets.map((el) => el.getBoundingClientRect());
+    const bounds = composer?.getBoundingClientRect();
     const w = window.innerWidth;
     const h = window.innerHeight;
-    // writes
     if (heroOn && sky) {
       sky.style.setProperty('--mx', ((mx / w - 0.5) * 2).toFixed(3));
       sky.style.setProperty('--my', ((my / h - 0.5) * 2).toFixed(3));
     }
-    targets.forEach((el, i) => {
-      const r = rects[i];
-      if (!r.width) return;
-      const cx = el === composer ? r.left + 20 : r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
-      const dx = mx - cx;
-      const dy = my - cy;
-      const d = Math.max(1, Math.hypot(dx, dy));
-      const k = Math.min(1, d / 420);
-      el.style.setProperty('--lx', ((dx / d) * k).toFixed(3));
-      el.style.setProperty('--ly', ((dy / d) * k).toFixed(3));
-    });
+    if (!composer || !bounds?.width) return;
+    const dx = mx - (bounds.left + 20);
+    const dy = my - (bounds.top + bounds.height / 2);
+    const distance = Math.max(1, Math.hypot(dx, dy));
+    const reach = Math.min(1, distance / 420);
+    composer.style.setProperty('--lx', ((dx / distance) * reach).toFixed(3));
+    composer.style.setProperty('--ly', ((dy / distance) * reach).toFixed(3));
   };
   let heroIO: IntersectionObserver | null = null;
   if (!reducedMotion) {
@@ -504,12 +476,10 @@ function mount(ctx: ReelContext): () => void {
     if (praf) cancelAnimationFrame(praf);
     zoneIO.disconnect();
     sceneIO.disconnect();
-    quotaMO.disconnect();
     heroIO?.disconnect();
     offSound();
     [redHum, gate, entr, monolith, thinking, station].forEach((b) => b?.stop(0.3));
     delete root.dataset.odAgent;
-    delete root.dataset.odLeft;
     document
       .querySelectorAll<HTMLElement>('[data-od-cut]')
       .forEach((el) => delete el.dataset.odCut);
@@ -518,7 +488,7 @@ function mount(ctx: ReelContext): () => void {
       el.classList.remove('is-on', 'is-cut');
       el.style.removeProperty('--p');
     });
-    lenses.forEach((el) => {
+    document.querySelectorAll<HTMLElement>('.a2-composer').forEach((el) => {
       el.style.removeProperty('--lx');
       el.style.removeProperty('--ly');
     });

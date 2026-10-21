@@ -6,18 +6,22 @@
 
 **Budapest, un encuadre que se desliza.** Los enlaces vuelven a usar el desplazamiento suave del navegador. El marco cambia durante 1,1 segundos y puede cambiar de dirección sin terminar antes la animación anterior. Se eliminó el salto diferido con desenfoque que forzaba el corte.
 
-**Parasite, una casa que recuerda el recorrido.** Las cuatro plantas tienen habitaciones distintas. Al bajar se abre la habitación correspondiente y las plantas visitadas conservan algo de luz. Se pueden inspeccionar con puntero o teclado y usar como enlaces reales. En móvil la casa pasa a una tira de cuatro habitaciones. El Morse del sótano ilumina la planta superior.
+**Parasite, un pasadizo de servicio.** El lomo de un libro abre el nivel oculto debajo de la foto de la casa. La estantería y la escalera acompañan una apertura que puede cambiar de dirección durante el movimiento. El texto y el enlace del caso siguen en el flujo de lectura. La maqueta lateral de cuatro plantas se retiró por pedido del usuario, porque repetía la navegación principal.
 
 **Blade Runner, un recuerdo construido al navegar.** Un caballo tallado aparece en el archivo, dentro de Tools. Cada sección visitada registra una pieza. Inspeccionar una pieza con foco o puntero la levanta respecto de la silueta. Sus enlaces permiten volver a las secciones. Al cambiar de película empieza un recuerdo nuevo.
+
+**Blade Runner, cámara Esper.** Cada caso tiene un control Inspect que abre un visor junto a su fila. Architecture y Tradeoff cambian el recorte fotográfico y muestran fragmentos del caso real. El título original conserva su enlace. Escape cierra y devuelve el foco al control. El visor queda debajo del caso en pantallas estrechas.
+
+**2001, una transmisión.** El HAL grande del bloque del agente se reemplazó por una franja con el recorrido Tierra–Júpiter y el estado de la transmisión. El HAL de la apertura y el pequeño acompañante conservan sus funciones.
+
+**Home, una colección de películas.** La entrada se presenta como un catálogo oscuro con cuatro pósters gráficos y sus datos. Elegir una película entra directamente, sin tickets ni cuenta regresiva. House lights permite acceder al portfolio editorial.
 
 ## Alternativas que vale la pena explorar después
 
 | Película | Idea | Cómo responde | Qué habría que cuidar |
 | --- | --- | --- | --- |
-| Parasite | Pasadizo de servicio | Tocar el lomo de un libro en el lateral abre una sección de la pared y permite mirar el nivel oculto. | Que sea una exploración opcional y nunca una puerta obligatoria para leer o navegar. |
 | Parasite | La misma lluvia, dos casas | Sustituir el interludio de lluvia actual por dos ventanas que muestran el mismo tiempo desde arriba y abajo. | Reemplazar la escena existente para no duplicar el efecto. Mantener la comparación legible sin movimiento. |
 | Parasite | Luz prestada | El gesto del Morse del sótano produce una respuesta arquitectónica arriba, con la lámpara y las habitaciones como un solo sistema. | La casa implementada ya contiene una primera conexión. Una ampliación debería reforzar esa relación y no añadir indicadores. |
-| Blade Runner | Cámara Esper | Inspeccionar un caso de trabajo desarrolla un detalle de su evidencia en un marco contiguo. El foco de teclado y el toque producen el mismo resultado. | Reutilizar el contenido del caso para evitar dos versiones del texto. No interceptar el enlace que abre el caso. |
 | Blade Runner | Archivo físico | El caso bajo la línea de lectura sale unos milímetros de una estantería con canto y base visibles. | La propuesta A lo implementa como alternativa. No lo sumé al caballo para mantener una única idea de memoria. |
 | Blade Runner | Cámara Wallace | La luz reflejada sobre el espacio arquitectónico responde a la inspección de un proyecto y vuelve lentamente al reposo. | Debe vincularse a una acción concreta y no quedar como otro resplandor o paralaje permanente. |
 

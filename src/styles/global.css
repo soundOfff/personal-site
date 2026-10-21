@@ -2481,11 +2481,6 @@ article.repo {
   font: 500 clamp(22px, 3vw, 27px) / 1.25 var(--font-serif);
   letter-spacing: -0.02em;
 }
-:root[data-reel='odyssey'] .block[data-sec='1']:not(:has(.a2-launch-count)) .od-leds i {
-  background: var(--od-unlit);
-  box-shadow: none;
-  animation: none;
-}
 :root .a2-launch .a2-launch-lede {
   font-size: 14px;
   line-height: 1.65;

@@ -385,65 +385,6 @@
     transform: translateX(12px);
   }
 
-  /* ---------------- the red lens (the launcher; the composer draws its own) ---------------- */
-  & .od-lens {
-    --lx: 0;
-    --ly: 0;
-    position: relative;
-    border-radius: 50%;
-    background: radial-gradient(circle, #1a1a1a 0 56%, #090909 57%);
-  }
-  & .od-lens .g {
-    content: '';
-    position: absolute;
-    inset: 13%;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      rgba(255, 59, 47, 0.96) 0,
-      rgba(196, 20, 12, 0.86) 26%,
-      rgba(90, 8, 6, 0.62) 52%,
-      rgba(0, 0, 0, 0) 72%
-    );
-    animation: odyssey-breathe 4.2s ease-in-out infinite;
-  }
-  /* hot spot (follows the cursor) and glint (drifts against it) */
-  & .od-lens .h {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background:
-      radial-gradient(
-        circle at calc(50% + var(--lx) * 7%) calc(50% + var(--ly) * 7%),
-        #fff4c2 0,
-        #ffd24a 4.5%,
-        rgba(255, 210, 74, 0) 10%
-      ),
-      radial-gradient(
-        ellipse 13% 7% at calc(36% - var(--lx) * 4%) calc(26% - var(--ly) * 3%),
-        rgba(255, 255, 255, 0.6),
-        rgba(255, 255, 255, 0)
-      );
-  }
-  & .od-lens {
-    display: block;
-    flex: none;
-    width: 104px;
-    height: 104px;
-    box-shadow:
-      0 0 0 6px #cfd1cd,
-      0 0 0 7px #9ea19c,
-      0 10px 24px -8px rgba(0, 0, 0, 0.6);
-  }
-  & .od-lens i {
-    position: absolute;
-    display: block;
-  }
-  & .od-lens .l {
-    display: none;
-  }
-
   /* ---------------- section heads: kicker, title, axis ---------------- */
   & .keybar {
     display: flex;
@@ -956,10 +897,9 @@
     opacity: 1;
   }
 
-  /* ---------------- 01 · playground: the lens beside the launcher ---------------- */
   & [data-sec='1'] {
     display: grid;
-    grid-template-columns: 184px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     align-content: start;
   }
   & [data-sec='1'] > .keybar {
@@ -981,54 +921,53 @@
     );
     pointer-events: none;
   }
-  & .od-hal {
+  & .od-mission {
     grid-column: 1;
     grid-row: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding: 28px 14px;
-    background: linear-gradient(180deg, #f6f6f4, #e4e5e1);
-    border: 1px solid var(--rule);
-    border-right: 0;
-    border-radius: 6px 0 0 6px;
-  }
-  /* two lines held open, so "AE-35 unit fault" doesn't push the lamps down */
-  & .od-hal-state {
     display: grid;
-    place-items: center;
-    min-height: 2.9em;
-    font: 400 10.5px/1.45 var(--font-display);
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    text-align: center;
-    text-wrap: balance;
-    color: #111214;
+    grid-template-columns: minmax(120px, 180px) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 16px;
+    padding: 10px 0;
+    border-block: 1px solid var(--rule);
+    color: var(--muted);
   }
-  & .od-leds {
-    display: flex;
-    gap: 6px;
-  }
-  /* one lamp per question left today; until the server counts, all five */
-  & .od-leds i {
+  & .od-mission-orbit {
     display: block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--od-lit);
-    box-shadow: 0 0 6px var(--od-lit);
-    transition:
-      background-color 0.3s,
-      box-shadow 0.3s;
+    width: 100%;
+    height: 48px;
+  }
+  & .od-mission-orbit text {
+    fill: currentColor;
+    font: 7px var(--font-mono);
+    letter-spacing: 0.08em;
+  }
+  & .od-mission-label,
+  & .od-mission-state {
+    margin: 0;
+    font: 9px/1.6 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  & .od-mission-label {
+    color: var(--ink);
+  }
+  & .od-mission-label span {
+    display: block;
+    color: var(--muted);
+  }
+  & .od-mission-state {
+    max-width: 23ch;
+    text-align: right;
   }
 
   /* the launcher card */
   & .a2-launch {
-    grid-column: 2;
-    grid-row: 2;
+    grid-column: 1;
+    grid-row: 3;
     border: 1px solid var(--rule);
-    border-radius: 0 6px 6px 0;
+    border-radius: 6px;
     background: var(--paper-3);
     box-shadow: 0 30px 60px -40px rgba(17, 18, 20, 0.45);
   }
@@ -2380,31 +2319,23 @@
     & .od-sg {
       height: 900px;
     }
-    & [data-sec='1'] {
-      grid-template-columns: minmax(0, 1fr);
+    & .od-mission {
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 2px 16px;
+      padding-block: 8px;
     }
-    & .od-hal {
+    & .od-mission-orbit {
       grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+    & .od-mission-label {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    & .od-mission-state {
+      grid-column: 2;
       grid-row: 2;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 10px 14px;
-      padding: 14px;
-      border-right: 1px solid var(--rule);
-      border-bottom: 0;
-      border-radius: 6px 6px 0 0;
-    }
-    & .od-hal .od-lens {
-      width: 52px;
-      height: 52px;
-      box-shadow:
-        0 0 0 3px #cfd1cd,
-        0 0 0 4px #9ea19c;
-    }
-    & .a2-launch {
-      grid-column: 1;
-      grid-row: 3;
-      border-radius: 0 0 6px 6px;
+      text-align: left;
     }
     & .a2-launch-body {
       padding: 18px 16px;
@@ -2571,40 +2502,22 @@
   transform: none;
 }
 
-/* ---------------- the agent: the lens and the lamps answer the playground's cues ---------------- */
-:root[data-reel='odyssey'][data-od-agent='think'] .od-lens .g,
 :root[data-reel='odyssey'][data-od-agent='think'] .a2-composer::before {
   animation-duration: 0.8s;
 }
-:root[data-reel='odyssey'][data-od-agent='speak'] .od-lens .g,
 :root[data-reel='odyssey'][data-od-agent='speak'] .a2-composer::before {
   animation: odyssey-flash 0.32s steps(2) infinite;
 }
-:root[data-reel='odyssey'][data-od-agent='error'] .od-lens .g,
 :root[data-reel='odyssey'][data-od-agent='error'] .a2-composer::before {
   animation: odyssey-flash 0.16s steps(2) 6;
   opacity: 0.4;
 }
-/* the questions already spent today go dark */
-:root[data-reel='odyssey'][data-od-left='0'] .od-leds i,
-:root[data-reel='odyssey'][data-od-left='1'] .od-leds i:nth-child(n + 2),
-:root[data-reel='odyssey'][data-od-left='2'] .od-leds i:nth-child(n + 3),
-:root[data-reel='odyssey'][data-od-left='3'] .od-leds i:nth-child(n + 4),
-:root[data-reel='odyssey'][data-od-left='4'] .od-leds i:nth-child(n + 5) {
-  background: var(--od-unlit);
-  box-shadow: none;
+:root[data-reel='odyssey']:is([data-od-agent='think'], [data-od-agent='speak'])
+  :is(.od-mission-craft, .od-mission-state) {
+  color: var(--ink);
 }
-/* while the agent computes, the lamp this question spends blinks */
-@media (prefers-reduced-motion: no-preference) {
-  :root[data-reel='odyssey'][data-od-agent='think']:is(:not([data-od-left]), [data-od-left='5'])
-    .od-leds
-    i:nth-child(5),
-  :root[data-reel='odyssey'][data-od-agent='think'][data-od-left='4'] .od-leds i:nth-child(4),
-  :root[data-reel='odyssey'][data-od-agent='think'][data-od-left='3'] .od-leds i:nth-child(3),
-  :root[data-reel='odyssey'][data-od-agent='think'][data-od-left='2'] .od-leds i:nth-child(2),
-  :root[data-reel='odyssey'][data-od-agent='think'][data-od-left='1'] .od-leds i:nth-child(1) {
-    animation: odyssey-spend 0.6s steps(1) infinite;
-  }
+:root[data-reel='odyssey'][data-od-agent='error'] .od-mission-state {
+  color: #a63227;
 }
 
 /* ---------------- the title card, inside the projector ---------------- */
@@ -2755,12 +2668,6 @@
   50% {
     opacity: 0.6;
     transform: scale(0.97);
-  }
-}
-@keyframes odyssey-spend {
-  50% {
-    background: var(--od-unlit);
-    box-shadow: none;
   }
 }
 @keyframes odyssey-scanl {

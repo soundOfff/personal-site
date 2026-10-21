@@ -20,7 +20,7 @@
  *     it's done, a deceptive cadence on error,
  *   - the bunker's Morse key: tap for a dot, hold for a dash, decoded live.
  */
-import { mountOpeningDisclosure } from '../openings/disclosure';
+import { mountServicePassage } from './service-passage';
 import type { Cue, ReelContext, ReelModule } from '../types';
 import { SECTION_IDS } from '../types';
 import type { Bed } from '../sound';
@@ -106,10 +106,7 @@ const clampSec = (i: number) => Math.max(0, Math.min(LAST, i));
 const reel: ReelModule = {
   mount(ctx) {
     const { root, signal } = ctx;
-    const stopOpening = mountOpeningDisclosure(
-      document.querySelector('[data-opening="parasite"]'),
-      signal,
-    );
+    const stopOpening = mountServicePassage(ctx);
     const s = ctx.sound;
     const timers = new Set<number>();
     const later = (fn: () => void, ms: number): number => {
@@ -332,7 +329,6 @@ const reel: ReelModule = {
     });
 
     /* ---- the bunker: a hanging bulb responds to a nearby pointer ---- */
-    const stopHouse = houseSection(ctx);
     const stopLamp = swayLamp(ctx);
 
     /* ---- the bunker: the light switch keys Morse ---- */
@@ -344,7 +340,6 @@ const reel: ReelModule = {
       timers.clear();
       stopMorse();
       stopLamp();
-      stopHouse();
       rainOff();
       offSound();
       rainEl?.classList.remove('is-raining');
@@ -363,90 +358,6 @@ const reel: ReelModule = {
     overture(ctx.sound);
   },
 };
-
-function houseSection(ctx: ReelContext): () => void {
-  const house = document.querySelector<HTMLElement>('[data-px-house]');
-  if (!house) return () => {};
-  const rooms = [...house.querySelectorAll<HTMLAnchorElement>('[data-px-room]')];
-  const location = house.querySelector<HTMLElement>('[data-px-location]');
-  const visited = new Set<number>();
-  let occupied = floorOf(clampSec(ctx.section()));
-  let pointer: number | null = null;
-  let focused: number | null = null;
-  const render = () => {
-    const viewed = focused ?? pointer ?? occupied;
-    rooms.forEach((room, index) => {
-      room.classList.toggle('is-open', index === viewed);
-      room.classList.toggle('is-visited', visited.has(index));
-      if (index === occupied) room.setAttribute('aria-current', 'location');
-      else room.removeAttribute('aria-current');
-    });
-    const floor = ctx.reel.acts[viewed];
-    if (location && floor)
-      location.textContent = `${floor.code || '↘'} · ${floor.native ?? floor.name}`;
-  };
-  const visit = (section: number) => {
-    pointer = null;
-    focused = null;
-    occupied = floorOf(clampSec(section));
-    visited.add(occupied);
-    render();
-  };
-  rooms.forEach((room, index) => {
-    room.addEventListener(
-      'pointerenter',
-      (event) => {
-        if (event.pointerType !== 'mouse') return;
-        pointer = index;
-        render();
-      },
-      { signal: ctx.signal },
-    );
-    room.addEventListener(
-      'pointerleave',
-      () => {
-        pointer = null;
-        render();
-      },
-      { signal: ctx.signal },
-    );
-    room.addEventListener(
-      'focus',
-      () => {
-        focused = room.matches(':focus-visible') ? index : null;
-        render();
-      },
-      { signal: ctx.signal },
-    );
-    room.addEventListener(
-      'blur',
-      () => {
-        focused = null;
-        render();
-      },
-      { signal: ctx.signal },
-    );
-    room.addEventListener(
-      'click',
-      () => {
-        pointer = null;
-        focused = null;
-        render();
-      },
-      { signal: ctx.signal },
-    );
-  });
-  visit(ctx.section());
-  const offSection = ctx.onSection(visit);
-  return () => {
-    offSection();
-    rooms.forEach((room) => {
-      room.classList.remove('is-open', 'is-visited');
-      room.removeAttribute('aria-current');
-    });
-    if (location) location.textContent = '';
-  };
-}
 
 /** A gently damped pendulum; it rests when the pointer and the page leave. */
 function swayLamp(ctx: ReelContext): () => void {

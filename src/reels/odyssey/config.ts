@@ -178,7 +178,7 @@ const odyssey: ReelConfig = {
   layout: { nav: 'console', hero: 'alignment', flow: 'odyssey', grid: 'axial' },
   scroll: ['alignment parallax', 'match cut', 'centrifuge drum', 'star gate', 'Earth to Jupiter'],
   motifs: [
-    'red lens agent',
+    'mission transmission',
     'act intertitles',
     'intermission',
     'match cut',
@@ -187,7 +187,6 @@ const odyssey: ReelConfig = {
     'luminous floor',
     'monolith 1:4:9',
     'Rosario clock',
-    'quota lamps',
   ],
   sound: {
     hover: 'console tick, tuned to C',

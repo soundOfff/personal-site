@@ -20,6 +20,7 @@ import type { Bed } from '../sound';
 import { actOf } from '../registry';
 import { RUNTIME } from './config';
 import * as sfx from './score';
+import { mountEsper } from './esper';
 
 const NAMES = [
   'readme',
@@ -177,6 +178,7 @@ const reel: ReelModule = {
     const $$ = (sel: string) => document.querySelectorAll(sel);
     const cleanups: (() => void)[] = [];
     cleanups.push(memoryLab(ctx));
+    cleanups.push(mountEsper(ctx));
 
     /* ---------- particles ---------- */
     cleanups.push(sprinkle(document.body, !ctx.reducedMotion));

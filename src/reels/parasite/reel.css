@@ -2223,66 +2223,131 @@ html:root[data-reel='parasite'] .content {
     outline-offset: 5px;
   }
   .ps-frame {
-    display: grid;
     position: relative;
     isolation: isolate;
-    min-height: clamp(320px, 38vw, 580px);
     background: #14251f;
   }
   .ps-photo {
-    position: absolute;
-    z-index: -1;
-    inset: 0;
+    height: clamp(320px, 38vw, 580px);
     background: url('../../assets/openings/parasite.avif') 60% center / cover;
   }
   .ps-frame details {
-    align-self: end;
-    justify-self: end;
-    margin: 24px 30px;
-    max-width: calc(100% - 60px);
+    overflow: clip;
+    color: #e5e6d4;
+    background: #14251f;
   }
   .ps-frame summary {
-    min-height: 44px;
-    padding: 13px 20px;
+    display: flex;
+    align-items: stretch;
+    justify-content: end;
+    min-height: 76px;
+    padding: 14px 6% 18px;
     list-style: none;
     cursor: pointer;
-    color: #263128;
-    background: #e9e8da;
-    font: 400 12px/1.5 var(--font-sans);
+    color: #eddbb2;
+    background: linear-gradient(#213329, #19281f);
+    border-bottom: 6px solid #553b27;
+    box-shadow: inset 0 -2px #956b42;
+    font: 400 12px/1.5 var(--font-mono);
   }
   .ps-frame summary::-webkit-details-marker {
     display: none;
   }
+  .ps-shelf-books {
+    display: flex;
+    gap: 4px;
+    align-items: end;
+    margin-right: 6px;
+  }
+  .ps-shelf-books i {
+    display: block;
+    height: 42px;
+    width: 12px;
+    border: 1px solid #8c8260;
+    border-block-width: 4px;
+    background: #424d38;
+  }
+  .ps-shelf-books i:nth-child(2) {
+    height: 49px;
+    width: 18px;
+    background: #655b42;
+  }
+  .ps-book {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 48px;
+    padding: 8px 18px 8px 10px;
+    border: 1px solid #b09a63;
+    border-left: 6px solid #c3a469;
+    background: #4a5037;
+    box-shadow: 3px 3px 0 #0b1612;
+    transform-origin: left center;
+  }
+  .ps-book-mark {
+    border-right: 1px solid #b09a63;
+    padding-right: 12px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  .ps-frame summary:hover .ps-book {
+    background: #596045;
+  }
+  .ps-frame summary:focus-visible .ps-book {
+    outline: 3px solid #e4b770;
+    outline-offset: 4px;
+  }
   .ps-open-label,
-  details[open] .ps-closed-label {
+  details[open]:not([data-passage-state='closed']) .ps-closed-label {
     display: none;
   }
-  details[open] .ps-open-label {
+  details[open]:not([data-passage-state='closed']) .ps-open-label {
     display: inline;
   }
-  .ps-frame details[open] {
-    align-self: stretch;
-    justify-self: stretch;
-    max-width: none;
-    margin: 0;
-    color: #e5e6d4;
-    background: #14251f;
-  }
-  .ps-frame details[open] summary {
-    text-align: right;
-    color: inherit;
-    background: transparent;
+  details[open]:not([data-passage-state='closed']) .ps-book {
+    transform: perspective(500px) rotateY(-12deg) translateX(-8px);
+    background: #676345;
   }
   .ps-under {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: minmax(130px, 0.6fr) minmax(0, 1fr);
+    align-items: center;
     gap: 8%;
-    padding: 20px 10% 60px;
+    padding: 40px 7% 54px;
+    background: linear-gradient(125deg, #2d3022, #14251f 65%);
+  }
+  .ps-stairwell {
+    position: relative;
+    min-height: 240px;
+    align-self: stretch;
+    overflow: hidden;
+    border: 1px solid #666247;
+    background: linear-gradient(110deg, #111e19 25%, #665235 100%);
+    box-shadow: inset 8px 0 24px #07150c;
   }
   .ps-level {
-    font: 350 clamp(52px, 8vw, 100px)/1 var(--font-display);
-    color: #a1b293;
+    position: absolute;
+    top: 18px;
+    left: 16px;
+    font: 350 34px/1 var(--font-display);
+    color: #d1bc83;
+  }
+  .ps-stair-light {
+    position: absolute;
+    top: 28px;
+    right: 22%;
+    width: 4px;
+    height: 29px;
+    background: #f4d695;
+    box-shadow: 0 0 38px 14px #d3a45b66;
+  }
+  .ps-stair-flight {
+    position: absolute;
+    inset: 34% -10% -30% 15%;
+    background: repeating-linear-gradient(#826e49 0 3px, #323426 3px 30px);
+    transform: skewY(28deg);
+    border-left: 5px solid #a28c5f;
+    box-shadow: -10px 0 30px #081a10;
   }
   .ps-under .shot-kicker {
     margin-bottom: 18px;
@@ -2319,12 +2384,20 @@ html:root[data-reel='parasite'] .content {
     .ps-heading h1 {
       font-size: clamp(34px, 9vw, 48px);
     }
-    .ps-frame {
-      min-height: 340px;
+    .ps-photo {
+      height: 340px;
     }
-    .ps-frame details {
-      margin: 18px;
-      max-width: calc(100% - 36px);
+    .ps-frame summary {
+      padding-inline: 14px;
+      justify-content: center;
+    }
+    .ps-shelf-books {
+      display: none;
+    }
+    .ps-book {
+      padding-right: 10px;
+      gap: 8px;
+      font-size: 10px;
     }
     .ps-under {
       grid-template-columns: minmax(0, 1fr);
@@ -2332,224 +2405,17 @@ html:root[data-reel='parasite'] .content {
       padding: 20px 25px 36px;
     }
     .ps-level {
-      font-size: 42px;
+      font-size: 30px;
+    }
+    .ps-stairwell {
+      min-height: 150px;
     }
   }
   @media (prefers-reduced-motion: no-preference) {
-    .ps-frame details[open] .ps-under {
-      animation: parasite-opening-descend 0.5s ease both;
-    }
-  }
-}
-@keyframes parasite-opening-descend {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-html:root[data-reel='parasite'] {
-  .px-house {
-    width: 100%;
-    padding: 12px 0 0;
-    border-top: 1px solid var(--rule);
-  }
-  .px-house-caption {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 0 10px;
-    font: 9px/1.5 var(--font-mono);
-    letter-spacing: 0.08em;
-    color: var(--muted);
-  }
-  .px-house-rooms {
-    display: grid;
-    gap: 2px;
-  }
-  .px-room {
-    --room-light: #acc28d;
-    position: relative;
-    display: grid;
-    grid-template-columns: 25px 88px minmax(0, 1fr);
-    align-items: center;
-    gap: 8px;
-    height: 30px;
-    color: var(--muted);
-    text-decoration: none;
-  }
-  .px-room-code {
-    font: 10px/1 var(--font-mono);
-  }
-  .px-room-name {
-    font: 9px/1.3 var(--font-mono);
-  }
-  .px-room-space {
-    position: relative;
-    align-self: stretch;
-    overflow: hidden;
-    perspective: 120px;
-    border: 1px solid var(--rule-2);
-    border-bottom: 3px solid var(--ink-2);
-    background: #1b221b;
-    box-shadow: inset 0 7px 8px rgb(0 0 0 / 0.35);
-  }
-  .px-room-space::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(125deg, var(--room-light), transparent 75%);
-    opacity: 0.05;
-  }
-  .px-room-window {
-    position: absolute;
-    top: 5px;
-    left: 8px;
-    width: 27px;
-    height: 11px;
-    border: 1px solid var(--room-light);
-    background: linear-gradient(90deg, transparent 48%, #243025 48% 53%, transparent 53%);
-    opacity: 0.3;
-  }
-  .px-room-door {
-    position: absolute;
-    right: 9px;
-    bottom: 0;
-    width: 10px;
-    height: 19px;
-    border: 1px solid var(--room-light);
-    border-bottom: 0;
-    opacity: 0.25;
-  }
-  .px-room-person {
-    position: absolute;
-    bottom: 2px;
-    left: 46%;
-    width: 4px;
-    height: 8px;
-    background: var(--room-light);
-    opacity: 0;
-  }
-  .px-room-person::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: 0;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: inherit;
-  }
-  .px-room-wall {
-    position: absolute;
-    inset: 0;
-    transform-origin: right center;
-    background: repeating-linear-gradient(0deg, var(--paper-2) 0 8px, var(--rule) 8px 9px);
-    border-left: 2px solid var(--ink-2);
-    opacity: 0.94;
-  }
-  .px-room[data-px-room='1'] {
-    --room-light: #9dbfc2;
-  }
-  .px-room[data-px-room='1'] .px-room-window {
-    top: 9px;
-    height: 3px;
-    width: 38px;
-    transform: rotate(18deg);
-  }
-  .px-room[data-px-room='2'] {
-    --room-light: #c6d15a;
-  }
-  .px-room[data-px-room='2'] .px-room-window {
-    top: 1px;
-    left: 12px;
-    width: 48px;
-    height: 5px;
-  }
-  .px-room[data-px-room='3'] {
-    --room-light: #e3a83e;
-  }
-  .px-room[data-px-room='3'] .px-room-window {
-    top: 5px;
-    left: 42px;
-    width: 3px;
-    height: 3px;
-    border: 0;
-    border-radius: 50%;
-    background: var(--room-light);
-  }
-  .px-room.is-visited .px-room-space::before {
-    opacity: 0.2;
-  }
-  .px-room.is-visited .px-room-wall {
-    transform: translateX(65%);
-  }
-  .px-room:is(.is-open, :focus-visible) {
-    color: var(--ink);
-  }
-  .px-room.is-open .px-room-space::before {
-    opacity: 0.65;
-  }
-  .px-room.is-open .px-room-window,
-  .px-room.is-open .px-room-person {
-    opacity: 1;
-  }
-  .px-room.is-open .px-room-wall {
-    transform: translateX(82%) rotateY(-48deg);
-  }
-  .px-house-location {
-    justify-content: flex-end;
-    min-height: 14px;
-    margin: 8px 0 0;
-  }
-  &[data-px-key='down'] .px-room[data-px-room='0'] .px-room-space::before {
-    opacity: 1;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .px-room-wall {
-      transition: transform 650ms cubic-bezier(0.2, 0.75, 0.2, 1);
-    }
-    .px-room-space::before,
-    .px-room-window,
-    .px-room-person {
-      transition: opacity 450ms;
-    }
-  }
-  @media (max-width: 820px) {
-    .px-house {
-      margin-top: 8px;
-    }
-    .px-house-rooms {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .px-room {
-      grid-template-columns: 1fr;
-      grid-template-rows: 28px auto;
-      gap: 5px;
-      height: auto;
-      min-height: 48px;
-    }
-    .px-room-code {
-      position: absolute;
-      z-index: 1;
-      top: 8px;
-      right: 5px;
-      color: #e9e3d3;
-      pointer-events: none;
-    }
-    .px-room-space {
-      grid-column: 1;
-      grid-row: 1;
-    }
-    .px-room-name {
-      text-align: center;
-    }
-    .px-house-location {
-      display: none;
+    .ps-book {
+      transition:
+        transform 0.52s cubic-bezier(0.22, 0.75, 0.18, 1),
+        background-color 0.3s;
     }
   }
 }

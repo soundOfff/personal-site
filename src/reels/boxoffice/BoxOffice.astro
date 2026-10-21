@@ -1,177 +1,169 @@
 ---
-/**
- * The box office: the first visit. Four tickets, one paper stock per film,
- * plus House lights. Tear one: a countdown leader with the 2-pop, then the
- * engine's projector shows that reel's title card and opens on it.
- *
- * A closed <dialog>, so with no JS it is never shown and the site reads as
- * it is. The head bootstrap sets html[data-first-visit] for a fresh visitor:
- * boxoffice.css shows the lobby from the first frame on that attribute, and
- * boxoffice.ts upgrades it to a modal (showModal, Esc, focus).
- */
 import { SELECTABLE_REELS, DEFAULT_REEL } from '../registry';
 import { profile } from '../../data/site';
 
-/**
- * What each stub prints: a place in the film, and a second line only when the
- * film has a code worth printing (K's serial, HAL, the year of the main story).
- */
-const STOCK: Record<string, { place: string; code?: string; lang?: string }> = {
-  parasite: { place: 'Floor B1', lang: 'ko' },
-  mood: { place: 'Room 2046', code: '1962', lang: 'zh-Hant' },
-  br2049: { place: 'Spinner deck', code: 'KD6-3.7' },
-  budapest: { place: 'Lobby boy', code: '1932' },
-  odyssey: { place: 'Pod bay', code: 'HAL 9000' },
-};
-
-const house = SELECTABLE_REELS.find((r) => r.id === DEFAULT_REEL)!;
-const films = SELECTABLE_REELS.filter((r) => r.id !== DEFAULT_REEL);
-
-// The fan: tickets lean out from the middle one and drop a little.
-const fan = (i: number) => {
-  const c = i - (films.length - 1) / 2;
-  return `--i:${i};--rot:${(c * 3.5).toFixed(2)}deg;--ty:${Math.round(4 * c * c + 3 * Math.abs(c))}px`;
-};
-
-const total = (bands: [string, number][]) => bands.reduce((s, [, w]) => s + w, 0);
-
-// '2019 · Bong Joon-ho · 2.39:1' prints as year · director, then the ratio below.
-const metaLines = (meta: string) => {
-  const parts = meta.split(' · ');
-  return [parts.slice(0, 2).join(' · '), parts.slice(2).join(' · ')].filter(Boolean);
-};
+const films = SELECTABLE_REELS.filter((reel) => reel.id !== DEFAULT_REEL);
 ---
 
 <dialog
   class="boxoffice"
   data-boxoffice
-  data-phase="pick"
   aria-labelledby="bo-title"
   aria-describedby="bo-lead"
   tabindex="-1"
 >
-  <div class="bo-lobby">
-    <div class="bo-grain" aria-hidden="true"></div>
-
+  <div class="bo-catalog">
     <header class="bo-top">
-      <div class="bo-id"><span class="bo-nm">{profile.name}</span></div>
-      <div class="bo-tr">
-        <span class="bo-clock" aria-hidden="true">Rosario, <span data-bo-clock>--:--</span></span>
-        <button class="bo-snd" type="button" data-sound-toggle aria-pressed="true">
-          <span class="w" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="bo-identity">
+        <span class="bo-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="bo-name">{profile.name}</span>
+        <span class="bo-collection">Film collection</span>
+      </div>
+      <div class="bo-controls">
+        <button class="bo-sound" type="button" data-sound-toggle aria-pressed="true">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M8 5 4 8H2v4h2l4 3V5Z" stroke="currentColor" stroke-width="1.4"></path>
+            <path
+              class="bo-sound-waves"
+              d="M11 7c2 1 2 5 0 6m3-9c4 3 4 9 0 12"
+              stroke="currentColor"
+              stroke-width="1.4"></path>
+          </svg>
           <span data-sound-label>sound on</span>
         </button>
-        <button
-          class="bo-x"
-          type="button"
-          data-bo-close
-          aria-label="Skip the films: House lights, no film"
-        >
-          <span data-bo-close-label>skip</span><kbd>esc</kbd>
+        <button class="bo-close" type="button" data-bo-close aria-label="Choose House lights">
+          <span data-bo-close-label>Skip</span><kbd>esc</kbd>
         </button>
       </div>
     </header>
 
-    <div class="bo-marquee" aria-hidden="true">
-      <div class="bo-board">
-        <span class="bo-billing">The personal picture house</span>
-        <span class="bo-feature">{profile.name}</span>
-        <span class="bo-billing">Four films · One portfolio · Admit one</span>
-      </div>
+    <div class="bo-intro">
+      <p class="bo-eyebrow">A different lens on the same work</p>
+      <h2 id="bo-title">One portfolio. Four films.</h2>
+      <p id="bo-lead">Choose a film. The work stays the same. The world around it changes.</p>
     </div>
 
-    <div class="bo-lead">
-      <h2 id="bo-title">Choose your screening.</h2>
-      <p id="bo-lead">Same portfolio. Four ways to see it.</p>
+    <div class="bo-shelf-label" aria-hidden="true">
+      <span>The collection</span><span>04 films</span>
     </div>
-
-    <ul class="bo-tix" aria-label="Tickets">
+    <ul class="bo-films" aria-label="Choose a film">
       {
-        films.map((r, i) => {
-          const stock = STOCK[r.id] ?? { place: 'Row A' };
-          const label = [r.title, r.year, r.director].filter(Boolean).join(', ');
-          return (
-            <li class="bo-tkw" style={fan(i)}>
-              <button
-                class="bo-tk"
-                type="button"
-                data-bo-ticket={r.id}
-                data-stock={r.id}
-                data-label={label}
-                aria-label={`${label}. Tear the ticket to start the screening`}
-              >
-                <span class="tk-main">
-                  <span class="tk-deco" aria-hidden="true" />
-                  <span class="tk-top">
-                    <span>Admit one</span>
-                    <span>Reel {r.n}</span>
-                  </span>
-                  <span class="tk-bc" aria-hidden="true">
-                    {r.bands.map(([c, w]) => (
-                      <i
-                        style={`background:${c};flex-grow:${w};flex-basis:${(w / total(r.bands)) * 100}%`}
+        films.map((reel) => (
+          <li>
+            <button
+              class="bo-film"
+              type="button"
+              data-bo-ticket={reel.id}
+              data-label={reel.title}
+              aria-label={`Choose ${reel.title}, ${reel.year}, directed by ${reel.director}`}
+            >
+              <span class="bo-poster" data-film={reel.id} aria-hidden="true">
+                <span class="bo-poster-no">{reel.n} / A film study</span>
+                {reel.id === 'parasite' && (
+                  <svg viewBox="0 0 240 360" fill="none">
+                    <path d="M0 267h240v93H0z" fill="#26392c" />
+                    <path d="M24 144h192v107H24z" fill="#aeb7a4" />
+                    <path d="M14 142h212v9H14zM34 166h172v61H34z" fill="#172a22" />
+                    <path
+                      d="M87 164v65m64-65v65M24 247h192M0 290h102v13h29v13h29v13h80"
+                      stroke="#d7dcc8"
+                      stroke-width="3"
+                    />
+                    <path d="M178 86v56m-4-58h9m-13 8h17" stroke="#7a8b71" stroke-width="2" />
+                    <circle cx="185" cy="242" r="14" fill="#dfa281" />
+                    <path d="M44 197h44m52 0h47" stroke="#aeb7a4" stroke-width="8" />
+                    <path d="M0 272h240" stroke="#121f19" stroke-width="15" />
+                  </svg>
+                )}
+                {reel.id === 'br2049' && (
+                  <svg viewBox="0 0 240 360" fill="none">
+                    <circle cx="120" cy="136" r="64" stroke="#f5c18a" stroke-width="1" />
+                    <circle cx="120" cy="136" r="47" fill="#f5b36d" />
+                    <path d="M120 56v27m0 106v27M41 136h28m103 0h27" stroke="#663f2f" />
+                    <path
+                      d="M0 280h20V185h24v95h16V153h31v127h15V218h17v62h18V173h36v107h18V201h27v79h18v80H0Z"
+                      fill="#8d472e"
+                    />
+                    <path
+                      d="M0 305h41V238h39v67h19v-39h36v39h31v-72h34v72h40v55H0Z"
+                      fill="#4d3028"
+                    />
+                    <path d="M120 271v64m-6-50 6-14 6 14" stroke="#f5bf8a" stroke-width="2" />
+                  </svg>
+                )}
+                {reel.id === 'budapest' && (
+                  <svg viewBox="0 0 240 360" fill="none">
+                    <path d="M0 298h240v62H0z" fill="#b58191" />
+                    <path d="M26 175h188v123H26z" fill="#d3a2ad" />
+                    <path d="M58 137h124v161H58z" fill="#eec4c5" />
+                    <path d="m50 140 17-31h106l17 31H50Z" fill="#754d65" />
+                    <path d="M100 93h40v205h-40z" fill="#f4d4cd" />
+                    <path d="m91 95 29-35 29 35H91Z" fill="#754d65" />
+                    <path d="M120 58V40m0 0 18 7-18 6" stroke="#754d65" stroke-width="2" />
+                    {[156, 188, 220, 252].map((y) => (
+                      <path
+                        d={`M70 ${y}h11v16H70zm89 0h11v16h-11zm-47 0h16v16h-16z`}
+                        fill="#805e77"
                       />
                     ))}
-                  </span>
-                  <span class="tk-ttl">{r.title}</span>
-                  {r.native && (
-                    <span class="tk-ko" lang={stock.lang}>
-                      {r.native}
-                    </span>
-                  )}
-                  <span class="tk-meta">
-                    {metaLines(r.meta).map((l) => (
-                      <span>{l}</span>
-                    ))}
-                  </span>
-                  <span class="tk-now" aria-hidden="true">
-                    Admitted
-                  </span>
+                    <path
+                      d="M36 194h10v17H36zm158 0h10v17h-10zM36 231h10v17H36zm158 0h10v17h-10zM108 298v-20a12 12 0 0 1 24 0v20"
+                      fill="#805e77"
+                    />
+                    <path
+                      d="M18 298h204m-120 9h36m-44 8h52m-60 8h68"
+                      stroke="#f4d4cd"
+                      stroke-width="3"
+                    />
+                  </svg>
+                )}
+                {reel.id === 'odyssey' && (
+                  <svg viewBox="0 0 240 360" fill="none">
+                    <circle cx="120" cy="162" r="84" stroke="#536470" />
+                    <ellipse
+                      cx="120"
+                      cy="162"
+                      rx="107"
+                      ry="30"
+                      transform="rotate(-32 120 162)"
+                      stroke="#8da2ac"
+                    />
+                    <circle cx="43" cy="218" r="5" fill="#e0e3d9" />
+                    <circle cx="166" cy="90" r="23" fill="#d3d8d5" />
+                    <path d="M0 319a287 287 0 0 1 240 0v41H0z" fill="#657680" />
+                    <path d="M0 336a287 287 0 0 1 240 0v24H0z" fill="#bcc9cc" />
+                    <path d="m100 144 41-7v155l-41 7V144Z" fill="#070b0f" stroke="#43515c" />
+                    <path
+                      d="M31 66h2m175 45h2M56 269h2m118-9h2M77 97h2m123 168h2"
+                      stroke="#d3d8d5"
+                      stroke-width="2"
+                    />
+                  </svg>
+                )}
+                <span class="bo-poster-title">{reel.title}</span>
+                <span class="bo-current">Currently viewing</span>
+                <span class="bo-choose">
+                  Choose film <span>↗</span>
                 </span>
-                <span class="tk-stub">
-                  <span>{stock.place}</span>
-                  {stock.code && <span>{stock.code}</span>}
-                </span>
-                <span class="tk-hint" aria-hidden="true">
-                  <span class="h-tear">tear to start ↓</span>
-                  <span class="h-seat">back to your seat</span>
-                </span>
-              </button>
-            </li>
-          );
-        })
+              </span>
+              <span class="bo-film-title">{reel.title}</span>
+              <span class="bo-film-meta">
+                {reel.year} <span>·</span> {reel.director}
+              </span>
+            </button>
+          </li>
+        ))
       }
     </ul>
 
-    <footer class="bo-foot">
+    <footer class="bo-footer">
       <a class="bo-house" href="#readme" data-bo-house>
-        <span class="bo-house-sw" aria-hidden="true">
-          {
-            house.bands.map(([c, w]) => (
-              <i
-                style={`background:${c};flex-grow:${w};flex-basis:${(w / total(house.bands)) * 100}%`}
-              />
-            ))
-          }
-        </span>
-        <span class="bo-house-t">
-          <b>{house.title}</b>
-          <span>no film, straight to the portfolio →</span>
-        </span>
-        <span class="bo-house-now">lights up</span>
+        <span class="bo-house-icon" aria-hidden="true">☼</span>
+        <span><b>House lights</b><span>Straight to the portfolio</span></span>
+        <span class="bo-house-arrow" aria-hidden="true">↗</span>
       </a>
-      <span class="bo-fine">Fan homages, not affiliated with the films or their studios.</span>
+      <p>A personal tribute to four favorite films.<br />Fan homages, made for this portfolio.</p>
     </footer>
-  </div>
-
-  <div class="bo-screen" aria-hidden="true">
-    <div class="bo-leader">
-      <span class="bo-sweep"></span>
-      <span class="bo-cross"></span>
-      <span class="bo-ring r1"></span>
-      <span class="bo-ring r2"></span>
-      <span class="bo-num" data-bo-num>3</span>
-    </div>
-    <div class="bo-flash"></div>
+    <p class="bo-status" role="status" aria-live="polite" data-bo-status></p>
   </div>
 </dialog>

@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Rail from '../components/Rail.astro';
 import Footer from '../components/Footer.astro';
@@ -15,8 +15,13 @@ import BoxOffice from '../reels/boxoffice/BoxOffice.astro';
 import '../reels/reels.css';
 
 // Work index: single source of truth is the `work` collection (also the case-study pages).
-const work = (await getCollection('work', ({ data }) => !data.draft)).sort((a, b) =>
-  a.data.n.localeCompare(b.data.n),
+const work = await Promise.all(
+  (await getCollection('work', ({ data }) => !data.draft))
+    .sort((a, b) => a.data.n.localeCompare(b.data.n))
+    .map(async (entry) => {
+      const { Content } = await render(entry);
+      return { entry, Content };
+    }),
 );
 
 // Writing section: homepage curates a hand-picked set, in this order.
@@ -77,7 +82,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
         <table class="idx">
           <tbody>
             {
-              work.map((w) => (
+              work.map(({ entry: w, Content }) => (
                 <tr data-href={`/work/${w.id}`}>
                   <td class="n">{w.data.n}</td>
                   <td class="proj">
@@ -85,6 +90,9 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
                       <b>{w.data.title}</b>
                     </a>
                     <span>{w.data.description}</span>
+                    <template data-esper-case>
+                      <Content />
+                    </template>
                   </td>
                   <td class="stk">{w.data.stack}</td>
                   <td class="yr">{w.data.year}</td>

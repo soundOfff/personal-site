@@ -8,7 +8,6 @@
  *   title             the title card: Sun, Earth and Moon in alignment over "2001"
  *   in:readme         the sky the hero sits in, and a replay of the alignment
  *   after:readme      the match cut (bone → station)
- *   in:playground     the red lens beside the launcher, and the station floor
  *   after:work        the "Jupiter mission" intertitle
  *   in:log            the centrifuge drum
  *   after:log         the intermission
@@ -248,22 +247,27 @@ const sky = `:root[data-reel='odyssey'] .od-stars i:nth-child(1){box-shadow:${la
   at === 'in:playground' && (
     <>
       <span class="od-deck" aria-hidden="true" />
-      <div class="od-hal" aria-hidden="true">
-        <span class="od-lens">
-          <i class="g" />
-          <i class="h" />
-          <i class="l" />
-        </span>
-        <span class="od-hal-state" data-od-state>
-          Standing by
-        </span>
-        <span class="od-leds">
-          <i />
-          <i />
-          <i />
-          <i />
-          <i />
-        </span>
+      <div class="od-mission" aria-hidden="true">
+        <svg class="od-mission-orbit" viewBox="0 0 200 48" width="200" height="48" fill="none">
+          <path d="M20 28C62 0 133 0 178 28" stroke="currentColor" stroke-dasharray="2 4" />
+          <path d="M20 28H178" stroke="currentColor" opacity="0.25" />
+          <circle cx="20" cy="28" r="3" fill="currentColor" />
+          <circle cx="178" cy="28" r="6" stroke="currentColor" />
+          <path d="M173 26H183M173 30H183" stroke="currentColor" opacity="0.5" />
+          <rect class="od-mission-craft" x="96" y="5" width="3" height="9" fill="currentColor" />
+          <text x="10" y="46">
+            EARTH
+          </text>
+          <text x="156" y="46">
+            JUPITER
+          </text>
+        </svg>
+        <p class="od-mission-label">
+          Discovery One <span>Mission transmission</span>
+        </p>
+        <p class="od-mission-state" data-od-state>
+          Channel ready
+        </p>
       </div>
     </>
   )
