@@ -80,21 +80,35 @@ raw A2UI messages behind it. The snapshot the agent is given is public: [`/data/
 Local:
 
 ```bash
-cp .dev.vars.example .dev.vars   # add ANTHROPIC_API_KEY
+cp .dev.vars.example .dev.vars   # add OPENROUTER_API_KEY
 ```
 
 Production (Cloudflare) — the key lives as a **Worker secret**, set once, surviving every deploy:
 
 ```bash
-wrangler secret put ANTHROPIC_API_KEY
+wrangler secret put OPENROUTER_API_KEY
 ```
 
-The agent defaults to `claude-haiku-4-5-20251001` — the smallest model that clears the bar,
-which is the argument the rest of the site makes. Override with the `A2UI_MODEL` var.
+The Playground defaults to `anthropic/claude-haiku-4.5`. Override it with the server-only
+`A2UI_MODEL` var. The Odyssey opening's HAL conversation uses
+`google/gemini-2.5-flash-lite`, configurable with server-only `HAL_MODEL`. Both use the
+same OpenRouter key and allowance of 3 turns per minute, 5 per visitor per day and 300
+site-wide per day. HAL sends only on explicit submission, retains at most three completed
+exchanges in memory, and limits each reply to 180 tokens and 400 characters. Opening the
+conversation and selecting a suggestion spend no allowance. Failed or cancelled upstream
+requests can still consume a turn. Missing configuration or provider failures display an
+unavailable message. HAL has no scripted AI fallback.
+
+HAL can read its greeting and real replies using the browser’s free SpeechSynthesis
+engine. Speech begins only after opening the conversation or pressing Hear HAL, respects
+the shared sound switch, and stops when the conversation closes or leaves the screen.
+The synthetic voice prefers a calm English voice when available, matches Spanish replies,
+and falls back to the device’s voice. It does not reproduce the film actor’s voice. Text
+remains available if speech is unsupported or fails. No voice provider or audio asset is required.
 
 ## Deploy
 
-This deploys as a **Cloudflare Worker** (static assets + the one on-demand `/api/a2ui`),
+This deploys as a **Cloudflare Worker** (static assets + on-demand `/api/a2ui` and `/api/hal`),
 not Cloudflare Pages — the build emits `dist/client` (assets) and `dist/server` (worker).
 
 **CI (recommended):** every push to `main` deploys via
