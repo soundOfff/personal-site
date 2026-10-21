@@ -1,0 +1,9 @@
+# Corrected intent
+
+The user clarified that Grand Budapest should stay exactly as it is. It is the taste reference, not the redesign target. Rework the OTHER FOUR film interpretations with fast, isolated prototypes for feedback. Use characteristic framing for each director, strong reconstructed imagery and one meaningful optional discovery per film. Keep Tomas, work and contact readable and directly accessible. Critique whole-page polish. Do not edit production or Grand Budapest.
+
+Read PRODUCT.md, src/pages/index.astro, src/reels/Opening.astro, src/reels/camera.css, src/reels/camera.ts, src/reels/engine.ts, src/reels/finds.ts and the four src/reels/openings/{Parasite,Mood,BladeRunner,Odyssey}.astro files. Inspect per-film Stage/client/CSS only where relevant. No writes.
+
+Candidate replacements. Parasite uses a photographed wide architectural frame with a user-triggered downward cut to its hidden infrastructure. Mood uses a frame through foreground screens with a user-opened letter or reflection. Blade Runner uses a monumental amber wide shot with a user-triggered baseline comparison of model routes. Odyssey uses a one-point-perspective spacecraft corridor with a deliberate user-triggered match cut to orbit and a constrained-systems note. Challenge these same four concepts and the existing implementation. Distinguish source-confirmed defects from visual hypotheses. Avoid turning the portfolio into a game.
+
+Read /Users/User/.codex/plugins/cache/pstack-claude/pstack/0.9.95/skills/interrogate/references/reviewer-prompt.md, rubric.md and code-quality-review.md. Use that shared template and return severity, file/line evidence and visitor impact. Finish with one strongest direction, one change to a weak direction, and the top shared polish fixes. No edits or auto-applying findings. This is a throwaway prototype phase, not a production rewrite.

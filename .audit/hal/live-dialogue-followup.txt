@@ -1,0 +1,14 @@
+HAL
+Good evening. What film has stayed with you lately?
+
+YOU
+Me gustan las películas que dejan preguntas. ¿Qué me preguntarías?
+
+HAL
+Las películas que invitan a la reflexión son fascinantes. Me pregunto qué tipo de preguntas te interesan más. ¿Prefieres las que exploran la naturaleza humana o las que cuestionan la realidad?
+
+YOU
+Prefiero las que cuestionan la realidad. ¿Recordás mi respuesta anterior?
+
+HAL
+Sí, recuerdo que prefieres las películas que cuestionan la realidad. Es un área muy rica para la exploración cinematográfica. ¿Qué aspecto de la realidad te intriga más cuando se cuestiona en una película?

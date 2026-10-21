@@ -1,6 +1,6 @@
 ---
 title: 'Building editorial-ui: hairlines over shadows'
-description: 'A build log of my npm component library: four constraints, plain CSS, and why a design system for an audience of one beats a folder of copy-pasted buttons.'
+description: 'The constraints behind a small component library, and the packaging work needed to make its CSS and React components usable.'
 date: 2026-02-10
 pillar: 'Build logs'
 tags: ['design-systems', 'react', 'css', 'open-source']
@@ -174,11 +174,7 @@ the thing.
 
 ## Eating it
 
-The site you are reading runs on these tokens: the hairlines between sections are
-`var(--rule)`, the background is `var(--paper)`, and there is exactly one amber
-action per view, including the [Playground](/#playground), where the demo's
-"route it" button is the amber of its screen. The
-[Flagship case study](/work/flagship) is the system's stress test: data-dense
-output, three providers side by side, still no shadows.
+The quiet default view of this site started from these tokens: the hairlines between sections are
+`var(--rule)`, the background is `var(--paper)`, and those rules established the original visual baseline. The site has since added cinematic interpretations, while the [portfolio agent](/work/flagship) replaced the router demo. This post records the library decisions; it is not a specification for every current page.
 
 Constraints beat choices. Four of them turned out to be a whole design system.

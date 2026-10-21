@@ -16,6 +16,7 @@
  *     entr'acte's clusters at the intermission; a Ligeti choir at the monolith
  *     and in the room; the same clusters under the star gate's rush
  */
+import { mountHal } from './hal';
 import type { Bed } from '../sound';
 import type { ReelContext, ReelModule } from '../types';
 import {
@@ -65,6 +66,7 @@ const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
    ============================================================ */
 function mount(ctx: ReelContext): () => void {
   const { root, signal, reducedMotion } = ctx;
+  const disposeHal = mountHal(ctx);
   const S = ctx.sound;
   const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel);
   const listen = (
@@ -494,6 +496,7 @@ function mount(ctx: ReelContext): () => void {
   }
 
   return () => {
+    disposeHal();
     window.clearInterval(clockId);
     window.clearTimeout(settle);
     timers.forEach((id) => window.clearTimeout(id));

@@ -44,7 +44,7 @@ export const RUNTIME = 163 * 60;
 
 const br2049: ReelConfig = {
   id: 'br2049',
-  n: '03',
+  n: '02',
   title: 'Blade Runner 2049',
   year: 2017,
   director: 'Denis Villeneuve',

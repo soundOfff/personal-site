@@ -1,0 +1,20 @@
+{
+  "pr7": {
+    "state": "MERGED",
+    "base": "main",
+    "verifiedHead": "aa695c909c46e79b3d7dcd91c4eddb3f73d2c4fd",
+    "mergeCommit": "a7ca0aa1ea301300e728a8aaf7dce536c60fc26b",
+    "originMainContainsMerge": true,
+    "baseTreeMatches": "12e059e59334cd755aa60a1cc3f133c03897cf07"
+  },
+  "pr9": {
+    "originalVerifiedHead": "8f6f1f96146f427d45da8e2a15f22594225b5ed0",
+    "finalHead": "c29ee30cdc64e890d813f46caf3d2f9c4ba42a95",
+    "exactSourceTreeMatches": "5e449e9023504d6a07bfbadf180b5e878399d4c2",
+    "stablePatchId": "0065f5d0b1f23ae5abb61071a61d7a42ef095c87",
+    "destination": "main",
+    "baseSha": "a7ca0aa1ea301300e728a8aaf7dce536c60fc26b",
+    "capturedRemoteLease": "8f6f1f96146f427d45da8e2a15f22594225b5ed0",
+    "pushSucceeded": true
+  }
+}

@@ -23,7 +23,7 @@ const slug = (...fields: string[]) => fields.join('\u00a0- ');
  */
 const odyssey: ReelConfig = {
   id: 'odyssey',
-  n: '05',
+  n: '04',
   title: '2001: A Space Odyssey',
   year: 1968,
   director: 'Stanley Kubrick',
@@ -170,12 +170,8 @@ const odyssey: ReelConfig = {
     'rail',
     'title',
     'in:readme',
-    'after:readme',
     'in:playground',
-    'after:work',
     'in:log',
-    'after:log',
-    'after:principles',
     'in:now',
     'credits',
   ],

@@ -1,0 +1,359 @@
+diff --git a/src/reels/br2049/client.ts b/src/reels/br2049/client.ts
+index 47f3cc4..59e5efd 100644
+--- a/src/reels/br2049/client.ts
++++ b/src/reels/br2049/client.ts
+@@ -112,6 +112,50 @@ const reel: ReelModule = {
+     const $$ = (sel: string) => document.querySelectorAll(sel);
+     const cleanups: (() => void)[] = [];
+ 
++    const opening = document.querySelector<HTMLElement>('[data-opening="br2049"]');
++    const macro = opening?.querySelector<HTMLElement>('.bk-macro');
++    const eye = opening?.querySelector<HTMLElement>('.bk-eye');
++    const exposure = opening?.querySelector<HTMLInputElement>('#bk-exposure');
++    const level = opening?.querySelector<HTMLOutputElement>('[data-bk-level]');
++    const reading = opening?.querySelector<HTMLElement>('[data-bk-reading]');
++    const result = opening?.querySelector<HTMLAnchorElement>('[data-bk-result]');
++    if (opening && macro && eye && exposure && level && reading && result) {
++      const diagnose = () => {
++        const value = exposure.valueAsNumber;
++        const phase =
++          value < 35
++            ? '01 / Classify the noise.'
++            : value < 70
++              ? '02 / Route the signal.'
++              : '03 / Within baseline. The smallest that passes.';
++        eye.style.setProperty('--bk-exposure', String(value / 100));
++        level.value = String(value).padStart(2, '0');
++        reading.textContent = phase;
++        exposure.setAttribute('aria-valuetext', `${value} percent. ${phase}`);
++        result.hidden = value < 70;
++      };
++      const syncCut = () => {
++        macro.inert = Number(opening.style.getPropertyValue('--shot-cut')) >= 0.98;
++        if (macro.inert && document.activeElement instanceof HTMLElement) {
++          if (macro.contains(document.activeElement)) document.activeElement.blur();
++        }
++      };
++      exposure.addEventListener('input', diagnose, { signal });
++      exposure.addEventListener('change', () => sfx.tick(kit), { signal });
++      const cutObserver = new MutationObserver(syncCut);
++      cutObserver.observe(opening, { attributes: true, attributeFilter: ['style'] });
++      diagnose();
++      syncCut();
++      cleanups.push(() => {
++        cutObserver.disconnect();
++        exposure.value = exposure.defaultValue;
++        diagnose();
++        exposure.removeAttribute('aria-valuetext');
++        eye.style.removeProperty('--bk-exposure');
++        macro.inert = false;
++      });
++    }
++
+     /* ---------- particles ---------- */
+     cleanups.push(sprinkle(document.body, !ctx.reducedMotion));
+ 
+diff --git a/src/reels/br2049/reel.css b/src/reels/br2049/reel.css
+index dc5eef4..be42204 100644
+--- a/src/reels/br2049/reel.css
++++ b/src/reels/br2049/reel.css
+@@ -5,6 +5,89 @@
+ @import '@fontsource/share-tech-mono/latin-400.css';
+ @import '@fontsource/courier-prime/latin-400.css';
+ 
++html:root[data-reel='br2049'] {
++  .bk-copy,
++  .bk-cut {
++    pointer-events: none;
++  }
++  .bk-diagnostic {
++    z-index: 3;
++    top: 44%;
++    bottom: auto;
++    width: min(320px, 68%);
++    color: #b7c9ba;
++    pointer-events: auto;
++  }
++  .bk-diagnostic label {
++    display: flex;
++    align-items: center;
++    justify-content: space-between;
++    font-size: 10px;
++    letter-spacing: 0.1em;
++    text-transform: uppercase;
++  }
++  .bk-diagnostic output {
++    color: #d4b589;
++    font-variant-numeric: tabular-nums;
++  }
++  .bk-diagnostic input {
++    display: block;
++    width: 100%;
++    height: 32px;
++    margin: 0;
++    padding: 0;
++    accent-color: #b4d1b7;
++    cursor: ew-resize;
++  }
++  .bk-diagnostic p {
++    min-height: 2.8em;
++    max-width: 30ch;
++    font: 400 10px/1.4 var(--font-mono);
++  }
++  .bk-diagnostic a {
++    display: inline-flex;
++    align-items: center;
++    min-height: 32px;
++    color: #e4bc85;
++    font-size: 10px;
++    text-underline-offset: 4px;
++  }
++  .bk-result-slot {
++    display: block;
++    min-height: 32px;
++  }
++  .bk-diagnostic a[hidden] {
++    display: none;
++  }
++  .bk-diagnostic :is(input, a):focus-visible {
++    outline: 2px solid #d8e4c9;
++    outline-offset: 5px;
++  }
++  .bk-eye > svg {
++    filter: brightness(calc(1 + var(--bk-exposure, 0) * 0.65));
++  }
++  .bk-aperture {
++    transform-box: fill-box;
++    transform-origin: center;
++    scale: calc(1 - var(--bk-exposure, 0) * 0.28);
++  }
++  .bk-scan {
++    translate: 0 calc(var(--bk-exposure, 0) * 220px);
++    opacity: calc(0.5 + var(--bk-exposure, 0) * 0.4);
++  }
++  .bk-macro[inert] {
++    pointer-events: none;
++  }
++  @media (max-width: 700px) {
++    .bk-diagnostic {
++      width: min(260px, 76%);
++    }
++    .bk-diagnostic a {
++      min-height: 28px;
++    }
++  }
++}
++
+ /* ============================================================
+    Reel 03 · Blade Runner 2049.
+    Every rule lives inside :root[data-reel='br2049'] (keyframes are the
+diff --git a/src/reels/budapest/client.ts b/src/reels/budapest/client.ts
+index a92b5e7..e4a18f1 100644
+--- a/src/reels/budapest/client.ts
++++ b/src/reels/budapest/client.ts
+@@ -99,6 +99,44 @@ const reel: ReelModule = {
+       opts: AddEventListenerOptions = {},
+     ) => document.addEventListener(type, fn, { ...opts, signal });
+ 
++    const arrivalKey = document.querySelector<HTMLButtonElement>('[data-gk-arrival-key]');
++    const welcome = document.querySelector<HTMLElement>('[data-gk-welcome]');
++    const arrival = document.querySelector<HTMLElement>('[data-gk-arrival]');
++    let keySwing: Animation | undefined;
++    const resetArrival = () => {
++      keySwing?.cancel();
++      arrivalKey?.setAttribute('aria-pressed', 'false');
++      arrivalKey?.setAttribute('aria-label', 'Register your arrival');
++      if (welcome) welcome.hidden = false;
++      if (arrival) arrival.hidden = true;
++    };
++    arrivalKey?.addEventListener(
++      'click',
++      () => {
++        if (!welcome || !arrival) return;
++        const registered = arrivalKey.getAttribute('aria-pressed') !== 'true';
++        arrivalKey.setAttribute('aria-pressed', String(registered));
++        arrivalKey.setAttribute(
++          'aria-label',
++          registered ? 'Return the room key' : 'Register your arrival',
++        );
++        welcome.hidden = registered;
++        arrival.hidden = !registered;
++        v.tink();
++        if (registered) v.stamp();
++        keySwing?.cancel();
++        if (!ctx.reducedMotion) {
++          keySwing = arrivalKey
++            .querySelector('svg')
++            ?.animate(
++              [{ rotate: '0deg' }, { rotate: '-7deg' }, { rotate: '4deg' }, { rotate: '0deg' }],
++              { duration: 640, easing: 'ease-out' },
++            );
++        }
++      },
++      { signal },
++    );
++
+     /* ---------- the whip pan: every in-page jump from the rack or the hero ---------- */
+     let whipping = false;
+     const land = (id: string) => {
+@@ -324,6 +362,7 @@ const reel: ReelModule = {
+     });
+ 
+     return () => {
++      resetArrival();
+       quiet();
+       timers.forEach((id) => window.clearTimeout(id));
+       root.style.scrollBehavior = '';
+diff --git a/src/reels/budapest/reel.css b/src/reels/budapest/reel.css
+index 68e6dd1..33c715e 100644
+--- a/src/reels/budapest/reel.css
++++ b/src/reels/budapest/reel.css
+@@ -4,6 +4,37 @@
+ @import '@fontsource/courier-prime/400.css';
+ @import '@fontsource/courier-prime/700.css';
+ 
++html:root[data-reel='budapest'] {
++  button.gk-key {
++    display: block;
++    padding: 0;
++    margin: 0;
++    border: 0;
++    border-radius: 0;
++    background: none;
++    color: inherit;
++    cursor: pointer;
++  }
++  .gk-key > svg {
++    transform-origin: 50% 0;
++  }
++  .gk-key:focus-visible {
++    outline: 2px solid #6c3e51;
++    outline-offset: 6px;
++  }
++  .gk-key:hover > svg {
++    filter: brightness(1.06);
++  }
++  [data-gk-arrival] a {
++    color: #713a4e;
++    text-underline-offset: 3px;
++  }
++  [data-gk-arrival] a:focus-visible {
++    outline: 2px solid #713a4e;
++    outline-offset: 3px;
++  }
++}
++
+ /* ============================================================
+    Reel 04 · The Grand Budapest Hotel.
+    Every rule lives inside :root[data-reel='budapest'] (keyframes and
+diff --git a/src/reels/openings/BladeRunner.astro b/src/reels/openings/BladeRunner.astro
+index e044d34..dd3e442 100644
+--- a/src/reels/openings/BladeRunner.astro
++++ b/src/reels/openings/BladeRunner.astro
+@@ -15,7 +15,24 @@ const fibers = Array.from({ length: 192 }, (_, i) => {
+     <div class="bk-copy">
+       <p class="shot-kicker">03 / Blade Runner 2049</p>
+       <h1><span>Less model.</span><em>More signal.</em></h1>
+-      <p class="bk-note">Classify. Dispatch. Evaluate.</p>
++      <div class="bk-note bk-diagnostic" data-bk-diagnostic>
++        <label for="bk-exposure"
++          >Baseline exposure <output for="bk-exposure" data-bk-level>00</output></label
++        >
++        <input
++          id="bk-exposure"
++          type="range"
++          min="0"
++          max="100"
++          value="0"
++          step="1"
++          aria-describedby="bk-reading"
++        />
++        <p id="bk-reading" data-bk-reading>01 / Classify the noise.</p>
++        <span class="bk-result-slot"
++          ><a href="#work" data-bk-result hidden>Signal acquired. Trace the work →</a></span
++        >
++      </div>
+     </div>
+     <div class="bk-eye" aria-hidden="true">
+       <svg viewBox="0 0 800 800" fill="none">
+@@ -39,7 +56,7 @@ const fibers = Array.from({ length: 192 }, (_, i) => {
+         <circle cx="400" cy="400" r="326" stroke="#7a9a8e" stroke-width="1"></circle>
+         <circle cx="400" cy="400" r="313" stroke="#7a9a8e" stroke-width=".4"></circle>
+         <circle cx="400" cy="400" r="115" fill="url(#bk-pupil)"></circle>
+-        <circle cx="400" cy="400" r="91" fill="#050c10"></circle>
++        <circle class="bk-aperture" cx="400" cy="400" r="91" fill="#050c10"></circle>
+         <path
+           d="M238 243a220 220 0 0 1 190-57"
+           stroke="#dbede0"
+diff --git a/src/reels/openings/Budapest.astro b/src/reels/openings/Budapest.astro
+index ec095a0..93c0a9d 100644
+--- a/src/reels/openings/Budapest.astro
++++ b/src/reels/openings/Budapest.astro
+@@ -23,7 +23,13 @@ const windows = Array.from({ length: 28 }, (_, i) => ({
+           <p><span>01</span> Dex</p><p><span>02</span> Mint Mobile</p><p>
+             <span>03</span> Flagship
+           </p>
+-          <i></i><small>Every detail<br />has its place.</small>
++          <i></i><small id="gk-concierge" aria-live="polite"
++            ><span data-gk-welcome>Every detail<br />has its place.</span><span
++              data-gk-arrival
++              hidden
++              >Room 04. Welcome.<br /><a href="/work/flagship">Your Flagship awaits →</a></span
++            ></small
++          >
+         </div>
+         <svg class="gk-hotel" viewBox="0 0 320 310" fill="none" aria-hidden="true">
+           <g stroke="currentColor" stroke-width=".8">
+@@ -48,24 +54,33 @@ const windows = Array.from({ length: 28 }, (_, i) => ({
+       </div>
+       <p class="gk-register-foot">Tomas Brasca <span>Rosario, Argentina</span></p>
+     </div>
+-    <svg class="gk-key" viewBox="0 0 120 300" aria-hidden="true" fill="none">
+-      <defs
+-        ><linearGradient id="gk-brass" x2="1" y2=".6"
+-          ><stop stop-color="#b38a42"></stop><stop offset=".4" stop-color="#e8cd89"></stop><stop
+-            offset=".6"
+-            stop-color="#c79d50"></stop><stop offset="1" stop-color="#8d6739"
+-          ></stop></linearGradient
+-        ></defs
+-      >
+-      <path
+-        d="M60 27a35 35 0 1 0 0 70 35 35 0 0 0 0-70Zm0 13a22 22 0 1 1 0 44 22 22 0 0 1 0-44Z"
+-        fill="url(#gk-brass)"
+-        fill-rule="evenodd"></path>
+-      <path d="M53 92h14v153h25v15H67v16H53Zm14 125h18v14H67Z" fill="url(#gk-brass)"></path>
+-      <path d="M60 28V0" stroke="#bca176" stroke-width="1"></path>
+-      <path d="m8 106 104 0v74l-52 23-52-23Z" fill="#79394b" stroke="#c5a26a"></path>
+-      <text x="60" y="142" fill="#ead5a4" font-size="27" text-anchor="middle">04</text>
+-      <path d="M29 157h62m-52 8h42" stroke="#c5a26a" stroke-width=".6"></path>
+-    </svg>
++    <button
++      class="gk-key"
++      type="button"
++      aria-label="Register your arrival"
++      aria-pressed="false"
++      aria-controls="gk-concierge"
++      data-gk-arrival-key
++    >
++      <svg viewBox="0 0 120 300" aria-hidden="true" fill="none">
++        <defs
++          ><linearGradient id="gk-brass" x2="1" y2=".6"
++            ><stop stop-color="#b38a42"></stop><stop offset=".4" stop-color="#e8cd89"></stop><stop
++              offset=".6"
++              stop-color="#c79d50"></stop><stop offset="1" stop-color="#8d6739"
++            ></stop></linearGradient
++          ></defs
++        >
++        <path
++          d="M60 27a35 35 0 1 0 0 70 35 35 0 0 0 0-70Zm0 13a22 22 0 1 1 0 44 22 22 0 0 1 0-44Z"
++          fill="url(#gk-brass)"
++          fill-rule="evenodd"></path>
++        <path d="M53 92h14v153h25v15H67v16H53Zm14 125h18v14H67Z" fill="url(#gk-brass)"></path>
++        <path d="M60 28V0" stroke="#bca176" stroke-width="1"></path>
++        <path d="m8 106 104 0v74l-52 23-52-23Z" fill="#79394b" stroke="#c5a26a"></path>
++        <text x="60" y="142" fill="#ead5a4" font-size="27" text-anchor="middle">04</text>
++        <path d="M29 157h62m-52 8h42" stroke="#c5a26a" stroke-width=".6"></path>
++      </svg>
++    </button>
+   </div>
+ </div>

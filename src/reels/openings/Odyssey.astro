@@ -1,77 +1,134 @@
----
-const stars = Array.from({ length: 48 }, (_, i) => ({
-  x: (i * 719) % 1600,
-  y: (i * 337) % 900,
-  r: i % 5 === 0 ? 1.2 : 0.55,
-}));
----
-
-<div class="opening-scene opening-odyssey" data-opening="odyssey">
+<div class="opening-scene opening-odyssey" data-opening="odyssey" data-opening-mode="flow">
   <div class="ok-first">
     <div class="ok-copy">
-      <p class="shot-kicker">05 / 2001: A Space Odyssey</p>
-      <h1><span>Always a little</span> <em>further.</em></h1>
+      <p class="shot-kicker">04 / 2001: A Space Odyssey</p>
+      <h1 data-hal-greeting>
+        <span>Good evening.</span>{' '}<em>What film has stayed with you lately?</em>
+      </h1>
     </div>
-    <div class="ok-hal" aria-hidden="true">
+    <div class="ok-hal">
       <div class="ok-hal-label">HAL <span>9000</span></div>
-      <svg viewBox="0 0 500 500" fill="none">
-        <defs>
-          <radialGradient id="ok-glass" cx=".45" cy=".44"
-            ><stop stop-color="#f7cb65"></stop><stop offset=".06" stop-color="#e37c23"></stop><stop
-              offset=".18"
-              stop-color="#a42319"></stop><stop offset=".5" stop-color="#420f12"></stop><stop
-              offset=".86"
-              stop-color="#160d11"></stop><stop offset="1" stop-color="#060c10"
-            ></stop></radialGradient
-          >
-          <linearGradient id="ok-metal" x2=".8" y2="1"
-            ><stop stop-color="#7a7d7a"></stop><stop offset=".2" stop-color="#252d31"></stop><stop
-              offset=".45"
-              stop-color="#91948f"></stop><stop offset=".52" stop-color="#333b3d"></stop><stop
-              offset="1"
-              stop-color="#0d1418"></stop></linearGradient
-          >
-        </defs>
-        <circle cx="250" cy="250" r="224" fill="url(#ok-metal)"></circle>
-        <circle cx="250" cy="250" r="211" stroke="#a9aaa0" stroke-width="1"></circle>
-        <circle cx="250" cy="250" r="200" fill="url(#ok-glass)"></circle>
-        <circle cx="250" cy="250" r="190" stroke="#5b2421" stroke-width="1"></circle>
-        <path
-          d="M108 174c33-66 111-98 181-76"
-          stroke="#f0e8d6"
-          stroke-opacity=".13"
-          stroke-width="15"
-          stroke-linecap="round"></path>
-        <path
-          d="M108 174c33-66 111-98 181-76"
-          stroke="#f0e8d6"
-          stroke-opacity=".35"
-          stroke-width="1"
-          stroke-linecap="round"></path>
-      </svg>
-      <span class="ok-speaker"></span>
-    </div>
-  </div>
-  <div class="ok-orbit" aria-hidden="true">
-    <svg class="ok-stars" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"
-      >{stars.map(({ x, y, r }) => <circle cx={x} cy={y} r={r} fill="#d3d4cd" />)}</svg
-    >
-    <div class="ok-alignment">
-      <span class="ok-sun"></span><span class="ok-moon"></span><span class="ok-earth"></span>
-      <svg class="ok-orbits" viewBox="0 0 1000 620" fill="none"
-        ><ellipse cx="500" cy="310" rx="450" ry="180" stroke="#b2b8b3" stroke-opacity=".24"
-        ></ellipse><ellipse
-          cx="500"
-          cy="310"
-          rx="365"
-          ry="136"
-          stroke="#b2b8b3"
-          stroke-opacity=".12"></ellipse><path
-          d="M40 310h40m840 0h40M500 120v30m0 320v30"
-          stroke="#d4d5c9"
-          stroke-opacity=".45"></path></svg
+      <button
+        class="ok-hal-eye"
+        type="button"
+        data-hal-open
+        aria-controls="hal-dialog"
+        aria-expanded="false"
+        aria-label="Talk to HAL"
       >
+        <svg viewBox="0 0 500 500" fill="none" aria-hidden="true">
+          <defs>
+            <radialGradient id="ok-glass" cx=".45" cy=".44"
+              ><stop stop-color="#f7cb65"></stop><stop offset=".06" stop-color="#e37c23"
+              ></stop><stop offset=".18" stop-color="#a42319"></stop><stop
+                offset=".5"
+                stop-color="#420f12"></stop><stop offset=".86" stop-color="#160d11"></stop><stop
+                offset="1"
+                stop-color="#060c10"></stop></radialGradient
+            >
+            <linearGradient id="ok-metal" x2=".8" y2="1"
+              ><stop stop-color="#7a7d7a"></stop><stop offset=".2" stop-color="#252d31"></stop><stop
+                offset=".45"
+                stop-color="#91948f"></stop><stop offset=".52" stop-color="#333b3d"></stop><stop
+                offset="1"
+                stop-color="#0d1418"></stop></linearGradient
+            >
+            <clipPath id="ok-glass-clip"><circle cx="250" cy="250" r="200"></circle></clipPath>
+          </defs>
+          <circle cx="250" cy="250" r="224" fill="url(#ok-metal)"></circle>
+          <circle cx="250" cy="250" r="211" stroke="#a9aaa0" stroke-width="1"></circle>
+          <circle cx="250" cy="250" r="200" fill="#060c10"></circle>
+          <g clip-path="url(#ok-glass-clip)"
+            ><g class="ok-hal-glass" data-hal-glass>
+              <circle cx="250" cy="250" r="224" fill="url(#ok-glass)"></circle>
+            </g></g
+          >
+          <circle cx="250" cy="250" r="190" stroke="#5b2421" stroke-width="1"></circle>
+          <path
+            d="M108 174c33-66 111-98 181-76"
+            stroke="#f0e8d6"
+            stroke-opacity=".13"
+            stroke-width="15"
+            stroke-linecap="round"></path>
+          <path
+            d="M108 174c33-66 111-98 181-76"
+            stroke="#f0e8d6"
+            stroke-opacity=".35"
+            stroke-width="1"
+            stroke-linecap="round"></path>
+        </svg>
+        <span class="ok-hal-invite">Talk to HAL <span aria-hidden="true">↗</span></span>
+      </button>
+      <span class="ok-speaker" aria-hidden="true"></span>
     </div>
-    <p>Beyond<br /><em>the obvious.</em></p>
+    <dialog class="ok-terminal" id="hal-dialog" aria-labelledby="hal-title">
+      <header class="ok-terminal-head">
+        <div>
+          <span class="ok-terminal-led" aria-hidden="true"></span><h2 id="hal-title">
+            Discovery / HAL 9000
+          </h2>
+        </div>
+        <button type="button" data-hal-close aria-label="Close HAL conversation"
+          >Close <kbd>esc</kbd></button
+        >
+      </header>
+      <div
+        class="ok-terminal-log"
+        data-hal-log
+        role="log"
+        aria-label="HAL conversation"
+        aria-live="polite"
+        aria-relevant="additions"
+      >
+      </div>
+      <div class="ok-terminal-suggestions" aria-label="Conversation starters">
+        <button type="button" data-hal-suggest="Ask me a question about films."
+          >Ask me something</button
+        >
+        <button type="button" data-hal-suggest="Give me a short film line and ask me about it."
+          >A film line</button
+        >
+      </div>
+      <form class="ok-terminal-form" data-hal-form>
+        <label for="hal-message">Your transmission</label>
+        <div>
+          <input
+            id="hal-message"
+            name="message"
+            type="text"
+            maxlength="400"
+            autocomplete="off"
+            placeholder="What’s on your mind?"
+            required
+          /><button type="submit">Send <span aria-hidden="true">↗</span></button>
+        </div>
+      </form>
+      <p class="ok-terminal-status" data-hal-status role="status"></p>
+      <div class="ok-terminal-voice">
+        <button type="button" data-hal-voice>Hear HAL</button>
+        <p data-hal-voice-status role="status">Synthetic voice · your device’s speech engine</p>
+      </div>
+      <p class="ok-terminal-quota" data-hal-quota>
+        5 daily turns shared with Playground. AI replies on Send.
+      </p>
+    </dialog>
   </div>
 </div>
+<aside class="hal-companion" data-hal-companion aria-label="HAL shipboard companion" hidden>
+  <div class="hal-companion-top">
+    <span class="hal-companion-eye" data-hal-companion-eye aria-hidden="true"><i></i></span>
+    <span>HAL <b>9000</b></span>
+    <button type="button" data-hal-minimize aria-expanded="true">Minimize</button>
+  </div>
+  <div class="hal-companion-body">
+    <p data-hal-comment aria-live="polite" aria-atomic="true">
+      I will keep an eye on things. Do take your time.
+    </p>
+    <small data-hal-source>Shipboard remark</small>
+  </div>
+  <div class="hal-companion-controls">
+    <button type="button" data-hal-chat aria-controls="hal-dialog">Talk to HAL ↗</button>
+    <button type="button" data-hal-pause aria-pressed="false">Pause remarks</button>
+    <button type="button" data-hal-companion-voice aria-pressed="false">Unmute HAL</button>
+  </div>
+</aside>

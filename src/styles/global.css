@@ -2470,3 +2470,343 @@ a.hash:hover {
 article.repo {
   cursor: default;
 }
+
+:root .a2-launch .a2-launch-body {
+  gap: 12px;
+  padding: 24px;
+}
+.a2-launch-title {
+  margin: 0;
+  color: var(--ink);
+  font: 500 clamp(22px, 3vw, 27px) / 1.25 var(--font-serif);
+  letter-spacing: -0.02em;
+}
+:root[data-reel='odyssey'] .block[data-sec='1']:not(:has(.a2-launch-count)) .od-leds i {
+  background: var(--od-unlit);
+  box-shadow: none;
+  animation: none;
+}
+:root .a2-launch .a2-launch-lede {
+  font-size: 14px;
+  line-height: 1.65;
+}
+:root .a2-launch .a2-launch-row {
+  gap: 12px 18px;
+  margin-top: 4px;
+}
+:root .a2-drawer .a2-panel .a2-panel-bar {
+  min-height: 64px;
+  padding: 8px 20px;
+  gap: 12px;
+}
+.a2-window-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  color: var(--ink);
+  background: var(--paper);
+  font: 12px var(--font-mono);
+  cursor: pointer;
+  transition:
+    background 0.16s,
+    transform 0.16s;
+}
+.a2-window-button:hover {
+  background: var(--paper-2);
+}
+.a2-window-button:active {
+  transform: translateY(1px);
+}
+:root .a2-drawer :is(button, textarea, summary):focus-visible,
+:root .a2-launch button:focus-visible {
+  outline: 2px solid var(--amber-deep);
+  outline-offset: 3px;
+}
+:root .a2-drawer .a2-panel .a2-panel-scroll {
+  padding: 28px 28px 32px;
+  overflow-anchor: none;
+}
+:root .a2-drawer .a2-thread {
+  max-width: 760px;
+  margin-inline: auto;
+  gap: 32px;
+}
+:root .a2-drawer .a2-turn {
+  gap: 16px;
+  scroll-margin-top: 20px;
+}
+:root .a2-drawer .a2-turn + .a2-turn {
+  padding-top: 28px;
+  border-top-style: solid;
+}
+:root .a2-drawer .a2-ask {
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+:root .a2-drawer .a2-text {
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+:root .a2-drawer .a2-heading h3 {
+  line-height: 1.3;
+}
+.a2-welcome {
+  max-width: 620px;
+  margin: 24px auto 8px;
+  font-family: var(--font-sans);
+}
+.a2-welcome-eyebrow {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font: 11px var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.a2-welcome h2 {
+  margin: 0 0 16px;
+  font: 500 clamp(26px, 4vw, 38px) / 1.16 var(--font-serif);
+  color: var(--ink);
+  letter-spacing: -0.025em;
+}
+.a2-welcome > p:last-of-type {
+  max-width: 48ch;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+:root .a2-drawer .a2-actions .a2-action {
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.a2-welcome-questions {
+  display: grid;
+  gap: 0;
+  margin-top: 28px;
+  border-top: 1px solid var(--rule-2);
+}
+:root .a2-drawer .a2-welcome-questions .a2-action {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 48px;
+  padding: 14px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--rule-2);
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+  line-height: 1.5;
+  font-size: 13px;
+}
+:root .a2-drawer .a2-welcome-questions .a2-action::before {
+  display: none;
+}
+:root .a2-drawer .a2-panel.is-empty {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+:root .a2-drawer .a2-panel.is-empty .a2-panel-scroll {
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+}
+:root .a2-drawer .a2-panel .a2-panel-foot {
+  padding: 18px 28px max(18px, env(safe-area-inset-bottom));
+  gap: 10px;
+}
+:root .a2-drawer .a2-panel .a2-composer {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  max-width: 760px;
+  width: 100%;
+  margin-inline: auto;
+}
+:root .a2-drawer .a2-panel .a2-composer::before {
+  position: absolute;
+  top: -4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+.a2-composer-label {
+  padding-right: 44px;
+  color: var(--ink-2);
+  font: 12px var(--font-mono);
+}
+.a2-composer-entry {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  min-width: 0;
+}
+:root .a2-drawer .a2-composer .a2-input {
+  display: block;
+  min-width: 0;
+  width: 100%;
+  min-height: 78px;
+  max-height: 180px;
+  padding: 14px;
+  resize: vertical;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  font: 16px / 1.5 var(--font-sans);
+}
+.a2-composer textarea.a2-input {
+  background: var(--paper-2);
+  color: var(--ink);
+}
+.a2-composer textarea.a2-input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+:root .a2-drawer .a2-composer .a2-send {
+  min-height: 48px;
+  padding: 12px 16px;
+}
+.a2-footnote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+  max-width: 760px;
+  width: 100%;
+  margin-inline: auto;
+}
+.a2-footnote p {
+  margin: 0;
+  font: 10.5px / 1.6 var(--font-mono);
+  color: var(--muted);
+}
+.a2-footnote-actions,
+.a2-failure-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  align-items: center;
+}
+:root .a2-drawer .a2-latest[data-unread] {
+  padding-inline: 10px;
+  background: var(--amber-soft);
+  color: var(--amber-deep);
+  border-radius: var(--radius-control);
+}
+:root .a2-drawer .a2-reset {
+  min-height: 40px;
+  padding: 4px 0;
+  font-size: 11px;
+}
+.a2-waiting,
+.a2-failure {
+  padding: 20px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font: 14px / 1.6 var(--font-sans);
+}
+.a2-waiting > p,
+.a2-failure > p {
+  margin: 0;
+}
+.a2-waiting > p + p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.a2-failure-actions {
+  margin-top: 14px;
+}
+.a2-failure .a2-retry-note {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+:root .a2-drawer .a2-peek > summary {
+  min-height: 40px;
+  font-size: 10.5px;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.a2-reply-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 8px 0 16px;
+  padding: 16px;
+  background: var(--paper-2);
+  font: 11px / 1.5 var(--font-mono);
+}
+.a2-reply-facts dt {
+  color: var(--muted);
+}
+.a2-reply-facts dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.a2-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+:root .a2-drawer .a2-panel .a2-thread .a2-turn .a2-surface > .a2-stack > * {
+  animation: none;
+}
+@media (max-width: 700px) {
+  :root .a2-launch .a2-launch-body {
+    padding: 20px;
+  }
+  :root .a2-drawer .a2-panel .a2-panel-bar {
+    padding: 8px 14px;
+  }
+  :root .a2-drawer .a2-panel .a2-panel-scroll {
+    padding: 20px 16px 24px;
+  }
+  :root .a2-drawer .a2-panel .a2-panel-foot {
+    padding: 14px 16px max(14px, env(safe-area-inset-bottom));
+  }
+  .a2-welcome {
+    margin-block: 12px;
+  }
+  .a2-welcome-questions {
+    margin-top: 20px;
+  }
+  .a2-expand {
+    display: none;
+  }
+  .a2-composer-entry {
+    gap: 8px;
+  }
+  :root .a2-drawer .a2-composer .a2-send {
+    padding-inline: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .a2-drawer,
+  :root .a2-drawer *,
+  :root .a2-drawer::backdrop {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

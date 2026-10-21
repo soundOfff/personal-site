@@ -1,6 +1,6 @@
 ---
-title: 'Graph traversal in TypeScript and Python: three algorithms, one shape'
-description: 'You almost never build a Graph class; a graph is a dict of lists plus a question. BFS, DFS, and Dijkstra cover nearly every traversal question you will meet, and two booleans tell you which one to reach for.'
+title: 'BFS, DFS, and Dijkstra in TypeScript and Python'
+description: 'Choose BFS, DFS, or Dijkstra from the question and edge weights. Adjacency-list examples in Python and TypeScript, with the assumptions each algorithm needs.'
 date: 2026-06-12
 pillar: 'Algorithms & competitive programming'
 tags: ['graphs', 'bfs', 'dfs', 'dijkstra', 'typescript', 'python']
@@ -33,14 +33,14 @@ That is the adjacency list, and it is the right representation for nearly everyt
 
 From there, two booleans select the algorithm:
 
-| Question                           | Unweighted | Weighted            |
-| ---------------------------------- | ---------- | ------------------- |
-| Shortest path                      | BFS        | Dijkstra            |
-| Reachability / components          | BFS or DFS | BFS or DFS          |
-| Cycle detection, topological order | DFS        | DFS                 |
-| Negative edge weights              | n/a        | Bellman-Ford (rare) |
+| Question                           | Unweighted | Weighted                |
+| ---------------------------------- | ---------- | ----------------------- |
+| Shortest path                      | BFS        | Dijkstra if weights ≥ 0 |
+| Reachability / components          | BFS or DFS | BFS or DFS              |
+| Cycle detection, topological order | DFS        | DFS                     |
+| Negative edge weights              | n/a        | Bellman-Ford (rare)     |
 
-Three algorithms cover the table. Each is the previous one with the queue swapped out.
+The three implementations below cover reachability and shortest paths with equal or nonnegative edge weights. They differ mainly in how they manage the frontier. DFS structure questions also need entry and exit state.
 
 ## BFS: the queue visits in distance order
 
@@ -54,7 +54,7 @@ def bfs(graph: dict[int, list[int]], start: int) -> dict[int, int]:
     queue = deque([start])
     while queue:
         node = queue.popleft()
-        for neighbor in graph[node]:
+        for neighbor in graph.get(node, []):
             if neighbor not in dist:
                 dist[neighbor] = dist[node] + 1
                 queue.append(neighbor)
@@ -85,19 +85,19 @@ One detail that separates working BFS from subtly-broken BFS: mark nodes visited
 
 ## DFS: the stack answers structure questions
 
-Swap the queue for a stack and you get DFS. The distance-order guarantee is gone; what you get instead is **completion order** (a node finishes only after everything reachable from it has finished), and that is the property behind every structural question: does this graph have a cycle? What order do these dependencies resolve in? How many islands are there?
+Swap the queue for a stack and you get DFS. The distance-order guarantee is gone; what you get instead is **completion order** in a full DFS implementation, where a node finishes after its DFS descendants, and that is the property behind every structural question: does this graph have a cycle? What order do these dependencies resolve in? How many islands are there?
 
-The recursive version is the one everyone writes, because the call stack _is_ the stack:
+The recursive version uses the call stack. This minimal example records reachability; a structural traversal also needs entry and exit bookkeeping:
 
 ```python
 def dfs(graph: dict[int, list[int]], node: int, visited: set[int]) -> None:
     visited.add(node)
-    for neighbor in graph[node]:
+    for neighbor in graph.get(node, []):
         if neighbor not in visited:
             dfs(graph, neighbor, visited)
 ```
 
-And here is the production gotcha neither language warns you about: **recursion depth is an input-dependent resource.** Python's default limit is 1,000 frames; a path graph with 10,000 nodes crashes correct code with `RecursionError`. JavaScript engines die the same way around a few thousand frames, just with a less helpful `RangeError`. `sys.setrecursionlimit` is a band-aid; the real fix is the iterative version with an explicit stack, which is the same algorithm with the resource limit moved from the runtime to the heap:
+And here is the production gotcha neither language warns you about: **recursion depth is an input-dependent resource.** Python has a configurable recursion limit, commonly around 1,000 frames in CPython; a path graph with 10,000 nodes crashes correct code with `RecursionError`. JavaScript also has an engine-dependent call-stack limit and can throw a `RangeError`. Neither limit is an algorithmic guarantee. `sys.setrecursionlimit` is a band-aid; the real fix is the iterative version with an explicit stack, which is the same algorithm with the resource limit moved from the runtime to the heap:
 
 ```ts
 function dfs(graph: Map<number, number[]>, start: number): Set<number> {
@@ -116,11 +116,11 @@ function dfs(graph: Map<number, number[]>, start: number): Set<number> {
 }
 ```
 
-Run that from every unvisited node and count the runs: that is connected components. Track nodes currently _on_ the recursion path (not just visited) and a revisit means a cycle. Record the order nodes finish and reverse it: topological sort. All the structure questions are DFS plus one extra piece of bookkeeping.
+For an undirected graph, running a reachability traversal from each unvisited node counts connected components. The iterative example above does not record DFS completion order. Topological sorting needs explicit exit frames or a separate algorithm such as Kahn's. For a directed graph, encountering a node currently on the DFS recursion path signals a cycle. In an undirected graph, also distinguish the parent edge from a back edge. On a directed acyclic graph, reversing DFS finishing order gives a topological order. All the structure questions are DFS plus one extra piece of bookkeeping.
 
 ## Dijkstra: BFS where the queue becomes a heap
 
-Make the edges weighted and BFS's invariant breaks: the first time you reach a node is no longer the cheapest. The repair is to always expand the _cheapest known frontier node_ instead of the oldest, which means the queue becomes a min-heap, which means this is the [heap gap](/blog/data-structures-typescript-python) from the field guide all over again: Python has `heapq`, TypeScript has nothing.
+Give edges unequal nonnegative weights and BFS's shortest-path guarantee breaks: the first time you reach a node is no longer the cheapest. The repair is to always expand the _cheapest known frontier node_ instead of the oldest, which means the queue becomes a min-heap, which means this is the [heap gap](/blog/data-structures-typescript-python) from the field guide all over again: Python has `heapq`, TypeScript has nothing.
 
 ```python
 import heapq
@@ -133,7 +133,7 @@ def dijkstra(graph: dict[int, list[tuple[int, int]]], start: int) -> dict[int, i
         cost, node = heapq.heappop(heap)
         if cost > dist.get(node, float("inf")):
             continue                       # stale entry, skip
-        for neighbor, weight in graph[node]:
+        for neighbor, weight in graph.get(node, []):
             new_cost = cost + weight
             if new_cost < dist.get(neighbor, float("inf")):
                 dist[neighbor] = new_cost

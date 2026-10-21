@@ -7,8 +7,9 @@ import br2049 from './br2049/config';
 import budapest from './budapest/config';
 import odyssey from './odyssey/config';
 
-/** Switcher order. House lights is first and is the default. */
 export const REELS: readonly ReelConfig[] = [house, parasite, mood, br2049, budapest, odyssey];
+
+export const SELECTABLE_REELS = REELS.filter((reel) => reel.id !== 'mood');
 
 export const DEFAULT_REEL = 'house';
 
@@ -17,7 +18,7 @@ export const REEL_KEY = 'tb-reel';
 export const SOUND_KEY = 'tb-sound';
 
 export function reelById(id: string | undefined | null): ReelConfig | undefined {
-  return REELS.find((r) => r.id === id);
+  return SELECTABLE_REELS.find((r) => r.id === id);
 }
 
 /** Which act a section plays in for a reel; 0 when the reel has no acts. */

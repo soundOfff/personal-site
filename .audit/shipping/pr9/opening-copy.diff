@@ -1,0 +1,171 @@
+diff --git a/src/reels/openings/BladeRunner.astro b/src/reels/openings/BladeRunner.astro
+index f3b65a6..b84fbca 100644
+--- a/src/reels/openings/BladeRunner.astro
++++ b/src/reels/openings/BladeRunner.astro
+@@ -15,7 +15,24 @@ const fibers = Array.from({ length: 192 }, (_, i) => {
+     <div class="bk-copy">
+       <p class="shot-kicker">03 / Blade Runner 2049</p>
+       <h1><span>LLM routing,</span><em>with evals.</em></h1>
+-      <p class="bk-note">A case study from my work at Dex.</p>
++      <div class="bk-note bk-diagnostic" data-bk-diagnostic>
++        <label for="bk-exposure"
++          >Baseline exposure <output for="bk-exposure" data-bk-level>00</output></label
++        >
++        <input
++          id="bk-exposure"
++          type="range"
++          min="0"
++          max="100"
++          value="0"
++          step="1"
++          aria-describedby="bk-reading"
++        />
++        <p id="bk-reading" data-bk-reading>01 / Classify the noise.</p>
++        <span class="bk-result-slot"
++          ><a href="#work" data-bk-result hidden>Signal acquired. Trace the work →</a></span
++        >
++      </div>
+     </div>
+     <div class="bk-eye" aria-hidden="true">
+       <svg viewBox="0 0 800 800" fill="none">
+@@ -39,7 +56,7 @@ const fibers = Array.from({ length: 192 }, (_, i) => {
+         <circle cx="400" cy="400" r="326" stroke="#7a9a8e" stroke-width="1"></circle>
+         <circle cx="400" cy="400" r="313" stroke="#7a9a8e" stroke-width=".4"></circle>
+         <circle cx="400" cy="400" r="115" fill="url(#bk-pupil)"></circle>
+-        <circle cx="400" cy="400" r="91" fill="#050c10"></circle>
++        <circle class="bk-aperture" cx="400" cy="400" r="91" fill="#050c10"></circle>
+         <path
+           d="M238 243a220 220 0 0 1 190-57"
+           stroke="#dbede0"
+diff --git a/src/reels/openings/Budapest.astro b/src/reels/openings/Budapest.astro
+index dc46a46..b343dd0 100644
+--- a/src/reels/openings/Budapest.astro
++++ b/src/reels/openings/Budapest.astro
+@@ -23,7 +23,13 @@ const windows = Array.from({ length: 28 }, (_, i) => ({
+           <p><span>01</span> Dex</p><p><span>02</span> Mint Mobile</p><p>
+             <span>03</span> Site agent
+           </p>
+-          <i></i><small>Projects<br />and notes.</small>
++          <i></i><small id="gk-concierge" aria-live="polite"
++            ><span data-gk-welcome>Projects<br />and notes.</span><span
++              data-gk-arrival
++              hidden
++              >Room 04. Welcome.<br /><a href="/work/flagship">Your Flagship awaits →</a></span
++            ></small
++          >
+         </div>
+         <svg class="gk-hotel" viewBox="0 0 320 310" fill="none" aria-hidden="true">
+           <g stroke="currentColor" stroke-width=".8">
+@@ -48,24 +54,33 @@ const windows = Array.from({ length: 28 }, (_, i) => ({
+       </div>
+       <p class="gk-register-foot">Tomas Brasca <span>Rosario, Argentina</span></p>
+     </div>
+-    <svg class="gk-key" viewBox="0 0 120 300" aria-hidden="true" fill="none">
+-      <defs
+-        ><linearGradient id="gk-brass" x2="1" y2=".6"
+-          ><stop stop-color="#b38a42"></stop><stop offset=".4" stop-color="#e8cd89"></stop><stop
+-            offset=".6"
+-            stop-color="#c79d50"></stop><stop offset="1" stop-color="#8d6739"
+-          ></stop></linearGradient
+-        ></defs
+-      >
+-      <path
+-        d="M60 27a35 35 0 1 0 0 70 35 35 0 0 0 0-70Zm0 13a22 22 0 1 1 0 44 22 22 0 0 1 0-44Z"
+-        fill="url(#gk-brass)"
+-        fill-rule="evenodd"></path>
+-      <path d="M53 92h14v153h25v15H67v16H53Zm14 125h18v14H67Z" fill="url(#gk-brass)"></path>
+-      <path d="M60 28V0" stroke="#bca176" stroke-width="1"></path>
+-      <path d="m8 106 104 0v74l-52 23-52-23Z" fill="#79394b" stroke="#c5a26a"></path>
+-      <text x="60" y="142" fill="#ead5a4" font-size="27" text-anchor="middle">04</text>
+-      <path d="M29 157h62m-52 8h42" stroke="#c5a26a" stroke-width=".6"></path>
+-    </svg>
++    <button
++      class="gk-key"
++      type="button"
++      aria-label="Register your arrival"
++      aria-pressed="false"
++      aria-controls="gk-concierge"
++      data-gk-arrival-key
++    >
++      <svg viewBox="0 0 120 300" aria-hidden="true" fill="none">
++        <defs
++          ><linearGradient id="gk-brass" x2="1" y2=".6"
++            ><stop stop-color="#b38a42"></stop><stop offset=".4" stop-color="#e8cd89"></stop><stop
++              offset=".6"
++              stop-color="#c79d50"></stop><stop offset="1" stop-color="#8d6739"
++            ></stop></linearGradient
++          ></defs
++        >
++        <path
++          d="M60 27a35 35 0 1 0 0 70 35 35 0 0 0 0-70Zm0 13a22 22 0 1 1 0 44 22 22 0 0 1 0-44Z"
++          fill="url(#gk-brass)"
++          fill-rule="evenodd"></path>
++        <path d="M53 92h14v153h25v15H67v16H53Zm14 125h18v14H67Z" fill="url(#gk-brass)"></path>
++        <path d="M60 28V0" stroke="#bca176" stroke-width="1"></path>
++        <path d="m8 106 104 0v74l-52 23-52-23Z" fill="#79394b" stroke="#c5a26a"></path>
++        <text x="60" y="142" fill="#ead5a4" font-size="27" text-anchor="middle">04</text>
++        <path d="M29 157h62m-52 8h42" stroke="#c5a26a" stroke-width=".6"></path>
++      </svg>
++    </button>
+   </div>
+ </div>
+diff --git a/src/reels/openings/Mood.astro b/src/reels/openings/Mood.astro
+index 960b22d..ba6b5b3 100644
+--- a/src/reels/openings/Mood.astro
++++ b/src/reels/openings/Mood.astro
+@@ -12,7 +12,19 @@
+     <nav aria-label="Mood opening"><a href="#work">Work ↓</a><a href="#now">Contact ↗</a></nav>
+   </div>
+   <span class="mk-native" lang="zh-Hant" aria-hidden="true">花樣年華</span>
+-  <details data-opening-disclosure>
++  <div class="mk-pane" data-mk-pane hidden>
++    <div class="mk-pane-glass">
++      <p class="mk-pane-note" aria-hidden="true">
++        Someone left<br />a letter<br /><em>on the table.</em>
++      </p>
++      <canvas width="360" height="300" data-mk-fog aria-hidden="true"></canvas>
++    </div>
++    <p class="mk-pane-hint" data-mk-pane-hint aria-live="polite">Wipe across the glass.</p>
++    <button type="button" data-mk-clear aria-controls="mood-opening-letter"
++      >Clear the glass ↗</button
++    >
++  </div>
++  <details id="mood-opening-letter" data-opening-disclosure>
+     <summary>
+       <span class="mk-closed-label">A letter left unfinished ↗</span>
+       <span class="mk-open-label">Close the letter ×</span>
+diff --git a/src/reels/openings/Parasite.astro b/src/reels/openings/Parasite.astro
+index eb040c4..f438907 100644
+--- a/src/reels/openings/Parasite.astro
++++ b/src/reels/openings/Parasite.astro
+@@ -18,6 +18,22 @@
+       aria-label="A dark modernist house framing a green garden, with stairs descending at the right"
+     >
+     </div>
++    <div class="ps-circuit" data-ps-circuit hidden>
++      <label for="ps-house-power">
++        <span class="ps-circuit-name">House circuit</span>
++        <span class="ps-circuit-floors" aria-hidden="true"><span>1F</span><span>B1</span></span>
++        <input
++          id="ps-house-power"
++          type="checkbox"
++          aria-label="Switch power to B1"
++          aria-describedby="ps-circuit-status"
++          data-ps-power
++        />
++      </label>
++      <p id="ps-circuit-status" data-ps-circuit-status aria-live="polite">
++        1F · The house is quiet.
++      </p>
++    </div>
+     <details data-opening-disclosure>
+       <summary>
+         <span class="ps-closed-label">There is another floor ↓</span>
+@@ -33,6 +49,7 @@
+             transaction.
+           </p>
+           <a href="/work/mint">See the engineering decision ↗</a>
++          <a class="ps-morse-invitation" href="#now">The Morse key is downstairs ↓</a>
+         </div>
+       </div>
+     </details>

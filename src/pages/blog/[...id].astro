@@ -1,94 +1,88 @@
 ---
 import { getCollection, render } from 'astro:content';
-import { Badge } from 'editorial-ui';
 import type { GetStaticPaths } from 'astro';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/Icon.astro';
-import Footer from '../../components/Footer.astro';
+import BlogLayout from '../../layouts/BlogLayout.astro';
 
 export const getStaticPaths = (async () => {
-  const posts = await getCollection('blog');
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
 }) satisfies GetStaticPaths;
 
 const { post } = Astro.props;
-const { Content } = await render(post);
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+const { Content, headings } = await render(post);
+const sections = headings.filter((heading) => heading.depth === 2);
+const date = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
 ---
 
-<BaseLayout
+<BlogLayout
   title={`${post.data.title} · Tomas Brasca`}
   description={post.data.description}
   type="article"
   publishedTime={post.data.date.toISOString()}
 >
-  <div class="sheet">
-    <div class="topbar">
-      <a class="back" href="/blog"><Icon name="i-arrow-l" size={13} />all writing</a>
-      <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
-        <svg
-          width="15"
-          height="15"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-          aria-hidden="true"
-        >
-          <use href="#i-moon" data-theme-icon></use>
-        </svg>
-      </button>
-    </div>
-
-    <header class="page-head">
-      <p class="eyebrow">// <b>{post.data.pillar}</b></p>
-      <h1>{post.data.title}</h1>
-      <p class="dek">{post.data.description}</p>
-      <div class="meta">
-        <span>{iso(post.data.date)}</span>
-        <span>·</span>
-        <span>{post.data.readingTime}</span>
-        <div class="ptags">
-          {post.data.tags.map((t) => <Badge variant="info">#{t}</Badge>)}
-        </div>
+  <article class="article-column" aria-labelledby="article-title">
+    <a class="article-back" href="/blog">← All writing</a>
+    <header class="article-head">
+      <p class="writing-eyebrow">{post.data.pillar}</p>
+      <h1 id="article-title">{post.data.title}</h1>
+      <p class="article-dek">{post.data.description}</p>
+      <div class="article-meta">
+        <span>Tomas Brasca</span>
+        <time datetime={post.data.date.toISOString()}>{date.format(post.data.date)}</time>
+        <span>{post.data.readingTime} read</span>
       </div>
     </header>
-
-    <article class="prose">
-      <Content />
-    </article>
-
-    <button
-      class="back-to-top"
-      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
-      aria-label="Back to top"
-      type="button"
-    >
-      <Icon name="i-arrow-u" size={14} />
-    </button>
-
-    <script is:inline>
-      (function () {
-        const btn = document.querySelector('.back-to-top');
-        if (btn) {
-          // Check on load in case the user reloads halfway down
-          if (window.scrollY > window.innerHeight) {
-            btn.classList.add('is-visible');
-          }
-          window.addEventListener(
-            'scroll',
-            () => {
-              if (window.scrollY > window.innerHeight) {
-                btn.classList.add('is-visible');
-              } else {
-                btn.classList.remove('is-visible');
-              }
-            },
-            { passive: true },
-          );
-        }
-      })();
-    </script>
-
-    <Footer />
-  </div>
-</BaseLayout>
+    {
+      sections.length > 2 && (
+        <details class="article-contents">
+          <summary>
+            In this article <span>{sections.length} sections</span>
+          </summary>
+          <nav aria-label="Article contents">
+            <ol>
+              {sections.map((heading) => (
+                <li>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </details>
+      )
+    }
+    <div class="prose"><Content /></div>
+    <footer class="article-foot">
+      {
+        post.data.tags.length > 0 && (
+          <nav class="article-tags" aria-label="Article topics">
+            <span>Topics</span>
+            {post.data.tags.map((tag: string) => (
+              <a href={`/blog?tag=${encodeURIComponent(tag)}`}>{tag.replaceAll('-', ' ')}</a>
+            ))}
+          </nav>
+        )
+      }
+      <nav class="reading-end" aria-label="After reading">
+        <a href="/blog">← All writing</a>
+        <a href="mailto:tomibrasca97@gmail.com">Discuss this article ↗</a>
+      </nav>
+    </footer>
+  </article>
+  <script is:inline>
+    document.querySelectorAll('.prose pre, .prose table').forEach((element) => {
+      element.setAttribute('tabindex', '0');
+      if (element.tagName === 'PRE') {
+        element.setAttribute('role', 'region');
+      }
+      element.setAttribute(
+        'aria-label',
+        element.tagName === 'PRE' ? 'Code example' : 'Article table',
+      );
+    });
+  </script>
+</BlogLayout>

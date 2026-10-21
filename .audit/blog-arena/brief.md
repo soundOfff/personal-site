@@ -1,0 +1,11 @@
+# Shared production task
+
+Improve this Astro blog for Tomas Brasca. The user asks, in Spanish, for a single design shared across every film, minimalist and easy to read. Deliver production-ready changes to BOTH /blog and /blog/[id]. Design as a calm, distinctive personal publication. Make reading and browsing noticeably better, without generic cards, promotional copy, decoration, film dressing or feature sprawl.
+
+Scope is exactly src/layouts/BlogLayout.astro, src/pages/blog/index.astro, src/pages/blog/[...id].astro and src/styles/blog.css. Preserve MDX content, URLs, frontmatter, RSS, SEO, light/dark preference, keyboard access, hash links and tag deep links. Do not add dependencies. The layout already composes BaseLayout without ReelHead or film runtime; preserve this boundary and make its neutral identity explicit if useful. Do not alter homepage, HAL or A2UI. Keep the same article content and metadata. Index filters may be simplified but existing ?tag URLs must still work. Technical articles contain wide SVG diagrams, code blocks and tables. Handle them without making the whole page overflow. Include useful print CSS and reduced-motion behavior if applicable.
+
+Read the current four files completely, BaseLayout, representative posts and relevant global prose rules before implementing. You may choose the visual approach independently. Use existing self-hosted fonts. Avoid thin low-contrast metadata. Main text should remain comfortable in long articles. At mobile widths controls and content should fit and remain operable.
+
+Read /Users/User/.codex/plugins/cache/pstack-claude/pstack/0.9.99/skills/poteto-mode/SKILL.md first, and apply the relevant local frontend-design skill. Do not dispatch more agents. Parent coordinates the arena.
+
+Work only in your assigned worktree. node_modules is shared. DO NOT run Astro check/build/dev, change shared dependency caches or call live APIs. Parent handles builds sequentially. You may run Prettier/ESLint on your four owned files. Do not use browser UI, since parent is comparing all outputs. Produce source edits plus candidate-rationale.md naming considered/rejected alternatives and candidate.patch containing ONLY your four source files diff against the shared baseline. No commit required. Return a short report when complete.

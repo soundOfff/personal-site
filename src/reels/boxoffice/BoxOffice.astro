@@ -1,6 +1,6 @@
 ---
 /**
- * The box office: the first visit. Five tickets, one paper stock per film,
+ * The box office: the first visit. Four tickets, one paper stock per film,
  * plus House lights. Tear one: a countdown leader with the 2-pop, then the
  * engine's projector shows that reel's title card and opens on it.
  *
@@ -9,7 +9,7 @@
  * boxoffice.css shows the lobby from the first frame on that attribute, and
  * boxoffice.ts upgrades it to a modal (showModal, Esc, focus).
  */
-import { REELS, DEFAULT_REEL } from '../registry';
+import { SELECTABLE_REELS, DEFAULT_REEL } from '../registry';
 import { profile } from '../../data/site';
 
 /**
@@ -24,23 +24,13 @@ const STOCK: Record<string, { place: string; code?: string; lang?: string }> = {
   odyssey: { place: 'Pod bay', code: 'HAL 9000' },
 };
 
-const house = REELS.find((r) => r.id === DEFAULT_REEL)!;
-const films = REELS.filter((r) => r.id !== DEFAULT_REEL);
+const house = SELECTABLE_REELS.find((r) => r.id === DEFAULT_REEL)!;
+const films = SELECTABLE_REELS.filter((r) => r.id !== DEFAULT_REEL);
 
 // The fan: tickets lean out from the middle one and drop a little.
 const fan = (i: number) => {
   const c = i - (films.length - 1) / 2;
   return `--i:${i};--rot:${(c * 3.5).toFixed(2)}deg;--ty:${Math.round(4 * c * c + 3 * Math.abs(c))}px`;
-};
-
-// Chasing bulbs round the marquee, in three phases.
-const SIDE = 30;
-const END = 5;
-const bulbs = {
-  top: Array.from({ length: SIDE }, (_, i) => i % 3),
-  rgt: Array.from({ length: END }, (_, i) => (SIDE + i) % 3),
-  bot: Array.from({ length: SIDE }, (_, i) => (SIDE + END + (SIDE - 1 - i)) % 3),
-  lft: Array.from({ length: END }, (_, i) => (SIDE * 2 + END + (END - 1 - i)) % 3),
 };
 
 const total = (bands: [string, number][]) => bands.reduce((s, [, w]) => s + w, 0);
@@ -83,20 +73,16 @@ const metaLines = (meta: string) => {
     </header>
 
     <div class="bo-marquee" aria-hidden="true">
-      <div class="bo-bulbs top">{bulbs.top.map((p) => <i class={`bl k${p}`} />)}</div>
-      <div class="bo-bulbs rgt">{bulbs.rgt.map((p) => <i class={`bl k${p}`} />)}</div>
-      <div class="bo-bulbs bot">{bulbs.bot.map((p) => <i class={`bl k${p}`} />)}</div>
-      <div class="bo-bulbs lft">{bulbs.lft.map((p) => <i class={`bl k${p}`} />)}</div>
       <div class="bo-board">
-        <span class="bo-billing">Now showing</span>
+        <span class="bo-billing">The personal picture house</span>
         <span class="bo-feature">{profile.name}</span>
-        <span class="bo-billing">In {films.length} films</span>
+        <span class="bo-billing">Four films · One portfolio · Admit one</span>
       </div>
     </div>
 
     <div class="bo-lead">
       <h2 id="bo-title">Choose your screening.</h2>
-      <p id="bo-lead">Same portfolio. Five ways to see it.</p>
+      <p id="bo-lead">Same portfolio. Four ways to see it.</p>
     </div>
 
     <ul class="bo-tix" aria-label="Tickets">

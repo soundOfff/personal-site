@@ -1,0 +1,1132 @@
+diff --git a/src/layouts/BlogLayout.astro b/src/layouts/BlogLayout.astro
+index cfbdffd..26e1a91 100644
+--- a/src/layouts/BlogLayout.astro
++++ b/src/layouts/BlogLayout.astro
+@@ -13,39 +13,40 @@ const { title, description, type = 'website', publishedTime } = Astro.props;
+ ---
+ 
+ <BaseLayout title={title} description={description} type={type} publishedTime={publishedTime}>
+-  <div class="blog-shell">
++  <div class="blog-shell" data-publication="writing">
+     <a class="reading-skip" href="#reading">Skip to content</a>
+     <header class="writing-nav">
+-      <a class="writing-name" href="/">Tomas Brasca<span>.</span></a>
++      <a class="writing-name" href="/">Tomas Brasca</a>
+       <nav aria-label="Main navigation">
+         <a href="/#work">Work</a>
+-        <a href="/blog" aria-current="page">Writing</a>
+-        <a href="mailto:tomibrasca97@gmail.com">Contact</a>
++        <a href="/blog" aria-current={type === 'website' ? 'page' : undefined}>Writing</a>
+         <button
+           class="reading-theme"
+           data-theme-toggle
+           aria-label="Toggle color theme"
++          title="Toggle color theme"
+           type="button"
+         >
+           <svg
+-            width="15"
+-            height="15"
++            width="18"
++            height="18"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="1.6"
+-            aria-hidden="true"><use href="#i-moon" data-theme-icon></use></svg
++            aria-hidden="true"
+           >
++            <use href="#i-moon" data-theme-icon></use>
++          </svg>
+         </button>
+       </nav>
+     </header>
+     <main id="reading" tabindex="-1"><slot /></main>
+     <footer class="writing-footer">
+-      <a href="/">Tomas Brasca</a>
+-      <span>Rosario, Argentina</span>
++      <div><a href="/">Tomas Brasca</a><span>Rosario, Argentina</span></div>
+       <nav aria-label="Writing footer">
+-        <a href="/rss.xml">RSS</a><a href="https://github.com/soundOfff">GitHub</a><a
+-          href="mailto:tomibrasca97@gmail.com">Email</a
+-        >
++        <a href="/rss.xml">RSS</a>
++        <a href="https://github.com/soundOfff">GitHub</a>
++        <a href="mailto:tomibrasca97@gmail.com">Email</a>
+       </nav>
+     </footer>
+   </div>
+diff --git a/src/pages/blog/[...id].astro b/src/pages/blog/[...id].astro
+index 912fbab..bfcdbe9 100644
+--- a/src/pages/blog/[...id].astro
++++ b/src/pages/blog/[...id].astro
+@@ -27,37 +27,61 @@ const date = new Intl.DateTimeFormat('en-GB', {
+ >
+   <div class="article-column">
+     <a class="article-back" href="/blog">← All writing</a>
+-    <header class="article-head">
+-      <p class="writing-eyebrow">{post.data.pillar}</p>
+-      <h1>{post.data.title}</h1>
+-      <p class="article-dek">{post.data.description}</p>
+-      <div class="article-meta">
+-        <time datetime={post.data.date.toISOString()}>{date.format(post.data.date)}</time><span
+-          >{post.data.readingTime} read</span
+-        ><span>Tomas Brasca</span>
+-      </div>
+-    </header>
+-    {
+-      sections.length > 2 && (
+-        <details class="article-contents">
+-          <>
+-            <summary>In this article</summary>
+-            <ol>
+-              {sections.map((heading) => (
+-                <li>
+-                  <a href={`#${heading.slug}`}>{heading.text}</a>
+-                </li>
++    <article aria-labelledby="article-title">
++      <header class="article-head">
++        <p class="writing-eyebrow">{post.data.pillar}</p>
++        <h1 id="article-title">{post.data.title}</h1>
++        <p class="article-dek">{post.data.description}</p>
++        <div class="article-meta">
++          <span>Tomas Brasca</span>
++          <time datetime={post.data.date.toISOString()}>{date.format(post.data.date)}</time>
++          <span>{post.data.readingTime} read</span>
++        </div>
++      </header>
++      {
++        sections.length > 2 && (
++          <details class="article-contents">
++            <summary>
++              In this article <span>{sections.length} sections</span>
++            </summary>
++            <nav aria-label="Article contents">
++              <ol>
++                {sections.map((heading) => (
++                  <li>
++                    <a href={`#${heading.slug}`}>{heading.text}</a>
++                  </li>
++                ))}
++              </ol>
++            </nav>
++          </details>
++        )
++      }
++      <div class="prose"><Content /></div>
++      <footer class="article-foot">
++        {
++          post.data.tags.length > 0 && (
++            <nav class="article-tags" aria-label="Article topics">
++              <span>Topics</span>
++              {post.data.tags.map((tag: string) => (
++                <a href={`/blog?tag=${encodeURIComponent(tag)}`}>{tag.replaceAll('-', ' ')}</a>
+               ))}
+-            </ol>
+-          </>
+-        </details>
+-      )
+-    }
+-    <article class="prose"><Content /></article>
+-    <nav class="reading-end" aria-label="After reading">
+-      <a href="/blog">← More writing</a><a href="mailto:tomibrasca97@gmail.com"
+-        >Discuss this article ↗</a
+-      >
+-    </nav>
++            </nav>
++          )
++        }
++        <nav class="reading-end" aria-label="After reading">
++          <a href="/blog">← All writing</a>
++          <a href="mailto:tomibrasca97@gmail.com">Discuss this article ↗</a>
++        </nav>
++      </footer>
++    </article>
+   </div>
++  <script is:inline>
++    document.querySelectorAll('.prose pre, .prose table').forEach((element) => {
++      element.setAttribute('tabindex', '0');
++      if (element.tagName === 'PRE') {
++        element.setAttribute('role', 'region');
++        element.setAttribute('aria-label', 'Code example');
++      }
++    });
++  </script>
+ </BlogLayout>
+diff --git a/src/pages/blog/index.astro b/src/pages/blog/index.astro
+index 1cb5969..027e4ac 100644
+--- a/src/pages/blog/index.astro
++++ b/src/pages/blog/index.astro
+@@ -20,63 +20,79 @@ const date = new Intl.DateTimeFormat('en-GB', {
+ >
+   <header class="writing-intro">
+     <p class="writing-eyebrow">Notes &amp; essays</p>
+-    <h1>Writing.</h1>
+-    <p>On building AI products, understanding systems, and learning from the work.</p>
++    <h1>Writing</h1>
++    <p class="writing-description">
++      On building AI products, understanding systems, and learning from the work.
++    </p>
+   </header>
+   <div class="writing-tools">
+-    <p id="writing-count" role="status">{posts.length} articles</p>
++    <p id="writing-count" role="status" aria-atomic="true">{posts.length} articles</p>
+     <label for="writing-topic"
+       >Topic
+-      <select id="writing-topic"
+-        ><option value="">All topics</option>{
+-          tags.map((tag) => <option value={tag}>{tag.replaceAll('-', ' ')}</option>)
+-        }</select
+-      >
++      <select id="writing-topic" aria-controls="writing-list">
++        <option value="">All topics</option>
++        {tags.map((tag) => <option value={tag}>{tag.replaceAll('-', ' ')}</option>)}
++      </select>
+     </label>
+   </div>
+-  <ol class="writing-list">
++  <ol class="writing-list" id="writing-list">
+     {
+       posts.map((post) => (
+-        <li data-writing-tags={post.data.tags.join(',')}>
++        <li data-writing-tags={JSON.stringify(post.data.tags)}>
+           <article class="writing-entry">
+             <time class="writing-date" datetime={post.data.date.toISOString()}>
+               {date.format(post.data.date)}
+             </time>
+-            <div>
++            <div class="writing-entry-text">
+               <h2>
+                 <a href={`/blog/${post.id}`}>{post.data.title}</a>
+               </h2>
+               <p>{post.data.description}</p>
+-              <small>
+-                {post.data.pillar} · {post.data.readingTime} read
+-              </small>
++              <div class="writing-entry-meta">
++                <>
++                  <span>{post.data.pillar}</span>
++                  <span>{post.data.readingTime} read</span>
++                </>
++              </div>
+             </div>
+           </article>
+         </li>
+       ))
+     }
+   </ol>
++  <p class="writing-empty" id="writing-empty" hidden>
++    No articles in this topic. <a href="/blog">View all writing</a>.
++  </p>
+   <script is:inline>
+     (() => {
+       const select = document.getElementById('writing-topic');
+-      const entries = [...document.querySelectorAll('[data-writing-tags]')];
++      const entries = [...document.querySelectorAll('[data-writing-tags]')].map((element) => ({
++        element,
++        tags: JSON.parse(element.dataset.writingTags),
++      }));
+       const count = document.getElementById('writing-count');
++      const empty = document.getElementById('writing-empty');
+       const apply = () => {
+         let visible = 0;
+-        entries.forEach((entry) => {
+-          entry.hidden =
+-            Boolean(select.value) && !entry.dataset.writingTags.split(',').includes(select.value);
+-          if (!entry.hidden) visible++;
++        entries.forEach(({ element, tags }) => {
++          element.hidden = Boolean(select.value) && !tags.includes(select.value);
++          if (!element.hidden) visible++;
+         });
+         count.textContent = `${visible} ${visible === 1 ? 'article' : 'articles'}`;
++        empty.hidden = visible !== 0;
++      };
++      const initial = new URLSearchParams(location.search).get('tag');
++      if (initial && ![...select.options].some((option) => option.value === initial)) {
++        select.add(new Option(initial.replaceAll('-', ' '), initial));
++      }
++      select.value = initial || '';
++      select.addEventListener('change', () => {
++        apply();
+         const url = new URL(location.href);
+         if (select.value) url.searchParams.set('tag', select.value);
+         else url.searchParams.delete('tag');
+         history.replaceState(null, '', url);
+-      };
+-      const initial = new URLSearchParams(location.search).get('tag');
+-      if ([...select.options].some((option) => option.value === initial)) select.value = initial;
+-      select.addEventListener('change', apply);
++      });
+       apply();
+     })();
+   </script>
+diff --git a/src/styles/blog.css b/src/styles/blog.css
+index 6887c89..5f3e0ec 100644
+--- a/src/styles/blog.css
++++ b/src/styles/blog.css
+@@ -1,29 +1,81 @@
++:root:has(.blog-shell) {
++  --page: #faf9f6;
++  --paper: #faf9f6;
++  --paper-2: #f0efe9;
++  --paper-3: #e9e8e1;
++  --ink: #252722;
++  --ink-2: #3d4039;
++  --muted: #62665d;
++  --muted-2: #8c9085;
++  --rule: #d8dad1;
++  --rule-2: #bfc3b6;
++  --amber-deep: #435e41;
++  --amber-soft: #e2e9da;
++  --font-serif: 'Newsreader Variable', 'Newsreader', Georgia, serif;
++  --font-sans: 'Geist Variable', 'Geist', sans-serif;
++  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', monospace;
++  color-scheme: light;
++}
++:root[data-theme='dark']:has(.blog-shell) {
++  --page: #1c1e1b;
++  --paper: #1c1e1b;
++  --paper-2: #252822;
++  --paper-3: #30352c;
++  --ink: #eeeee7;
++  --ink-2: #d7d9cf;
++  --muted: #afb4a7;
++  --muted-2: #828b78;
++  --rule: #3b4235;
++  --rule-2: #5c6653;
++  --amber-deep: #b9c9a5;
++  --amber-soft: #35442e;
++  color-scheme: dark;
++}
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme='light']):has(.blog-shell) {
++    --page: #1c1e1b;
++    --paper: #1c1e1b;
++    --paper-2: #252822;
++    --paper-3: #30352c;
++    --ink: #eeeee7;
++    --ink-2: #d7d9cf;
++    --muted: #afb4a7;
++    --muted-2: #828b78;
++    --rule: #3b4235;
++    --rule-2: #5c6653;
++    --amber-deep: #b9c9a5;
++    --amber-soft: #35442e;
++    color-scheme: dark;
++  }
++}
+ .blog-shell {
+-  width: min(1120px, 100%);
++  width: min(960px, 100%);
+   min-height: 100svh;
+   margin-inline: auto;
+-  padding: 0 clamp(22px, 5vw, 64px);
++  padding-inline: clamp(20px, 5vw, 48px);
+   display: flex;
+   flex-direction: column;
+   color: var(--ink);
++  font: 400 15px/1.6 var(--font-sans);
+ }
+ .blog-shell a {
+-  text-underline-offset: 4px;
++  text-underline-offset: 0.2em;
++  text-decoration-thickness: 1px;
+ }
+-.blog-shell a:focus-visible,
+-.blog-shell button:focus-visible,
+-.blog-shell select:focus-visible,
+-.blog-shell summary:focus-visible {
+-  outline: 2px solid var(--ink);
++.blog-shell :is(a, button, select, summary, [tabindex='0']):focus-visible {
++  outline: 2px solid var(--amber-deep);
+   outline-offset: 5px;
++  box-shadow: none;
++  border-radius: 0;
+ }
+ .reading-skip {
+   position: fixed;
++  z-index: 10;
+   top: 12px;
+   left: 12px;
+-  z-index: 10;
+   padding: 12px 16px;
+   background: var(--paper);
++  color: var(--ink);
+   transform: translateY(-180%);
+ }
+ .reading-skip:focus {
+@@ -33,36 +85,32 @@
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+-  gap: 24px;
+-  padding: 32px 0;
+-  border-bottom: 1px solid var(--rule);
++  gap: 20px;
++  padding-block: 24px;
++  border-bottom: 1px solid var(--ink);
+ }
+ .writing-name {
+   font: 500 19px/1.2 var(--font-sans);
+-  letter-spacing: -0.05em;
+-  color: var(--ink);
+-}
+-.writing-name span {
+-  color: var(--muted);
++  letter-spacing: -0.045em;
+ }
+ .writing-nav nav {
+   display: flex;
+   align-items: center;
+-  gap: 24px;
+-  font: 400 12px/1.4 var(--font-sans);
++  gap: 26px;
++  font-size: 13px;
+ }
+-.writing-nav nav > a {
++.writing-nav a,
++.writing-footer a {
+   display: inline-flex;
+   align-items: center;
+   min-height: 44px;
++}
++.writing-nav nav > a {
+   color: var(--muted);
+-  text-decoration: none;
+ }
+ .writing-nav nav > a:hover,
+ .writing-nav nav > a[aria-current] {
+   color: var(--ink);
+-}
+-.writing-nav nav > a[aria-current] {
+   text-decoration: underline;
+ }
+ .reading-theme {
+@@ -70,213 +118,251 @@
+   place-items: center;
+   width: 44px;
+   height: 44px;
+-  margin-right: -8px;
++  margin-right: -10px;
+   padding: 0;
+-  background: none;
+   border: 0;
+-  color: var(--muted);
++  background: none;
++  color: var(--ink);
+   cursor: pointer;
+ }
++.reading-theme:hover {
++  background: var(--paper-2);
++}
+ .blog-shell #reading {
++  min-width: 0;
+   width: 100%;
+   flex: 1;
+ }
+ .writing-intro {
+-  padding: clamp(50px, 8vw, 96px) 0 46px;
+-  max-width: 660px;
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 8px 48px;
++  align-items: end;
++  padding: 72px 0 64px;
+ }
+ .writing-eyebrow {
+-  margin: 0 0 21px;
++  margin: 0;
+   color: var(--muted);
+-  font: 400 10px/1.5 var(--font-mono);
+-  letter-spacing: 0.14em;
+-  text-transform: uppercase;
++  font: 500 12px/1.5 var(--font-sans);
++  letter-spacing: 0.04em;
++}
++.writing-intro .writing-eyebrow {
++  grid-column: 1 / -1;
+ }
+ .writing-intro h1,
+ .article-head h1 {
+   margin: 0;
+-  font: 400 clamp(42px, 6vw, 72px)/1.06 var(--font-serif);
+-  letter-spacing: -0.035em;
++  font: 400 clamp(48px, 7vw, 80px)/1.03 var(--font-serif);
++  letter-spacing: -0.045em;
+   text-wrap: balance;
++  overflow-wrap: break-word;
+ }
+-.writing-intro > p:last-child {
+-  max-width: 45ch;
+-  margin: 24px 0 0;
+-  font-size: 16px;
+-  line-height: 1.7;
++.writing-description {
++  max-width: 35ch;
++  margin: 0 0 5px;
+   color: var(--ink-2);
++  font-size: 16px;
++  line-height: 1.65;
+ }
+ .writing-tools {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+-  gap: 20px;
+-  padding: 0 0 15px;
+-  border-bottom: 1px solid var(--rule);
++  flex-wrap: wrap;
++  gap: 12px 24px;
++  padding-block: 12px;
++  border-block: 1px solid var(--rule);
++  font-size: 13px;
+ }
+ .writing-tools > p {
+   margin: 0;
+-  font: 400 10px/1.5 var(--font-mono);
+   color: var(--muted);
+ }
+ .writing-tools label {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+-  font-size: 11px;
++  min-width: 0;
+   color: var(--muted);
+ }
+ .writing-tools select {
+-  max-width: 190px;
+-  padding: 8px 25px 8px 8px;
++  min-width: 0;
++  max-width: min(230px, 65vw);
++  min-height: 44px;
++  padding: 8px 28px 8px 10px;
++  border: 1px solid var(--rule);
++  border-radius: 0;
+   background: var(--paper);
+   color: var(--ink);
+-  border: 0;
+-  font: 400 12px/1.4 var(--font-sans);
++  font: 400 14px/1.5 var(--font-sans);
+   cursor: pointer;
+ }
+ .writing-list {
++  list-style: none;
+   margin: 0;
+   padding: 0;
+-  list-style: none;
+ }
+ .writing-list > li {
+   border-bottom: 1px solid var(--rule);
+ }
+-.writing-list > li[hidden] {
+-  display: none;
+-}
+ .writing-entry {
+   display: grid;
+-  grid-template-columns: 120px minmax(0, 1fr);
++  grid-template-columns: 112px minmax(0, 1fr);
+   gap: 30px;
+-  padding: 30px 0 32px;
++  padding-block: 34px 36px;
+ }
+ .writing-date {
+-  font: 400 10px/1.6 var(--font-mono);
++  padding-top: 8px;
+   color: var(--muted);
+-  padding-top: 5px;
++  font-size: 12px;
++  font-variant-numeric: tabular-nums;
+ }
+ .writing-entry h2 {
+-  font: 400 clamp(24px, 3vw, 32px)/1.15 var(--font-serif);
+-  letter-spacing: -0.02em;
++  max-width: 31ch;
+   margin: 0;
+-  max-width: 28ch;
+-}
+-.writing-entry h2 > a {
+-  color: var(--ink);
+-  text-decoration: none;
++  font: 400 clamp(28px, 3.5vw, 36px)/1.16 var(--font-serif);
++  letter-spacing: -0.025em;
++  text-wrap: pretty;
+ }
+-.writing-entry h2 > a:hover {
++.writing-entry h2 a:hover {
+   text-decoration: underline;
+-  text-decoration-thickness: 1px;
+ }
+ .writing-entry p {
++  max-width: 60ch;
++  margin: 12px 0 16px;
+   color: var(--ink-2);
+-  font-size: 14px;
+-  line-height: 1.75;
+-  margin: 12px 0;
+-  max-width: 62ch;
++  font-size: 15px;
++  line-height: 1.7;
+ }
+-.writing-entry small {
+-  font: 400 10px/1.6 var(--font-mono);
++.writing-entry-meta {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 6px 18px;
+   color: var(--muted);
++  font-size: 12px;
++}
++.writing-empty {
++  padding-block: 32px;
++}
++.writing-empty a {
++  text-decoration: underline;
+ }
+ .article-column {
+-  max-width: 700px;
++  max-width: 720px;
++  min-width: 0;
+   margin-inline: auto;
+ }
+ .article-back {
+-  display: inline-block;
+-  margin-top: 40px;
+-  font-size: 12px;
++  display: inline-flex;
++  align-items: center;
++  min-height: 44px;
++  margin-top: 32px;
++  font-size: 13px;
+   color: var(--muted);
+-  text-decoration: none;
+ }
+ .article-back:hover {
+   color: var(--ink);
++  text-decoration: underline;
+ }
+ .article-head {
+-  padding: 42px 0 32px;
+-}
+-.article-head h1 {
+-  font-size: clamp(38px, 5.5vw, 60px);
+-  max-width: 23ch;
++  padding-block: 32px 36px;
+ }
+ .article-head .writing-eyebrow {
+-  font-size: 9px;
+-  letter-spacing: 0.1em;
++  margin-bottom: 20px;
++}
++.article-head h1 {
++  max-width: 24ch;
++  font-size: clamp(40px, 5.6vw, 64px);
++  line-height: 1.07;
+ }
+ .article-dek {
++  max-width: 58ch;
+   margin: 24px 0 0;
+-  font-size: 17px;
+-  line-height: 1.7;
+   color: var(--ink-2);
+-  max-width: 58ch;
++  font: 400 18px/1.65 var(--font-sans);
+ }
+ .article-meta {
+   display: flex;
+-  gap: 18px;
+   flex-wrap: wrap;
+-  margin-top: 25px;
+-  font: 400 10px/1.6 var(--font-mono);
++  gap: 8px 22px;
++  margin-top: 28px;
+   color: var(--muted);
++  font-size: 12px;
+ }
+ .article-contents {
+-  padding: 16px 0;
+-  margin-bottom: 38px;
++  padding-block: 4px;
++  margin-bottom: 40px;
+   border-block: 1px solid var(--rule);
+ }
+ .article-contents summary {
+-  width: fit-content;
+-  font-size: 12px;
+-  color: var(--muted);
++  min-height: 48px;
++  padding-block: 14px;
++  color: var(--ink);
+   cursor: pointer;
++  font-size: 13px;
++}
++.article-contents summary span {
++  margin-left: 12px;
++  color: var(--muted);
++  font-size: 12px;
+ }
+ .article-contents ol {
+-  margin: 16px 0 2px;
+-  padding-left: 20px;
+-  font-size: 13px;
+-  line-height: 1.8;
++  margin: 4px 0 20px;
++  padding-left: 22px;
++  font-size: 14px;
++  line-height: 1.55;
+ }
+-.article-contents li + li {
+-  margin-top: 6px;
++.article-contents li::marker {
++  color: var(--muted);
++  font-size: 12px;
+ }
+ .article-contents a {
++  display: inline-block;
++  padding-block: 6px;
+   color: var(--ink-2);
+-  text-decoration: none;
+ }
+ .article-contents a:hover {
+   text-decoration: underline;
+ }
+ .blog-shell .prose {
+-  color: var(--ink-2);
+-  font: 400 17px/1.85 var(--font-sans);
++  max-width: 660px;
++  min-width: 0;
++  margin-inline: auto;
++  color: var(--ink);
++  font: 400 21px/1.65 var(--font-serif);
+   overflow-wrap: break-word;
+ }
+ .blog-shell .prose > :first-child {
+   margin-top: 0;
+ }
+ .blog-shell .prose > * + * {
+-  margin-top: 1.3em;
++  margin-top: 1.25em;
++}
++.blog-shell .prose p {
++  text-wrap: pretty;
++}
++.blog-shell .prose :is(h2, h3, h4, h5, h6) {
++  scroll-margin-top: 32px;
++  text-wrap: pretty;
+ }
+ .blog-shell .prose h2 {
+   margin-top: 2.2em;
+   margin-bottom: 0.6em;
+-  font: 400 clamp(28px, 4vw, 36px)/1.18 var(--font-serif);
++  font: 500 clamp(29px, 4vw, 36px)/1.2 var(--font-serif);
+   letter-spacing: -0.025em;
+-  scroll-margin-top: 30px;
+ }
+ .blog-shell .prose h3 {
+   margin-top: 1.8em;
+-  font: 500 23px/1.3 var(--font-serif);
+-  scroll-margin-top: 30px;
++  margin-bottom: 0.6em;
++  font: 500 26px/1.25 var(--font-serif);
++  letter-spacing: -0.015em;
+ }
+ .blog-shell .prose :is(h2, h3) + * {
+   margin-top: 0.6em;
+ }
+ .blog-shell .prose a {
+-  color: var(--ink);
++  color: var(--amber-deep);
++  text-decoration: underline;
+   text-decoration-color: var(--muted-2);
+ }
+ .blog-shell .prose a:hover {
+@@ -287,161 +373,310 @@
+ }
+ .blog-shell .prose pre {
+   max-width: 100%;
+-  border-radius: 2px;
+   padding: 22px;
+-  font-size: 12px;
+-  line-height: 1.8;
++  border: 1px solid var(--rule);
++  border-radius: 0;
++  font-size: 13px;
++  line-height: 1.7;
+   overflow-x: auto;
++  overscroll-behavior-inline: contain;
++  tab-size: 2;
+ }
+ .blog-shell .prose :not(pre) > code {
+-  font-size: 0.8em;
++  padding: 2px 4px;
+   border: 0;
+   border-radius: 2px;
+-  padding: 2px 5px;
++  font-size: 0.72em;
++  overflow-wrap: anywhere;
+ }
+ .blog-shell .prose blockquote {
+   margin-inline: 0;
+-  padding: 3px 0 3px 22px;
++  padding: 2px 0 2px 24px;
+   border-color: var(--rule-2);
+-  font-style: normal;
++  color: var(--ink-2);
++  font-style: italic;
+ }
+-.blog-shell .prose blockquote > p {
+-  margin-block: 0;
++.blog-shell .prose blockquote > :first-child {
++  margin-top: 0;
++}
++.blog-shell .prose blockquote > :last-child {
++  margin-bottom: 0;
+ }
+ .blog-shell .prose table {
+   display: block;
+   max-width: 100%;
+   overflow-x: auto;
+-  font-size: 12px;
++  overscroll-behavior-inline: contain;
++  font: 400 14px/1.6 var(--font-sans);
++}
++.blog-shell .prose th {
++  font: 500 12px/1.5 var(--font-sans);
++  letter-spacing: 0;
++  text-transform: none;
++  color: var(--ink);
++}
++.blog-shell .prose :is(th, td) {
++  padding: 12px 18px 12px 0;
++  min-width: 100px;
++  text-align: left;
++  vertical-align: top;
+ }
+ .blog-shell .prose td:first-child {
+   white-space: normal;
+-  min-width: 100px;
++}
++.blog-shell .prose :is(img, svg, video) {
++  max-width: 100%;
++  height: auto;
++}
++.blog-shell .diagram-scroll {
++  max-width: 100%;
++  overflow-x: auto;
++  overscroll-behavior-inline: contain;
+ }
+ .blog-shell .prose figure.diagram {
+-  border-radius: 2px;
++  margin-block: 0;
++  min-width: 600px;
++  padding: 24px 16px;
++  border: 0;
++  border-block: 1px solid var(--rule);
++  border-radius: 0;
+   background: transparent;
+-  padding: 20px 10px;
+ }
+-.blog-shell .prose :is(img, svg) {
+-  max-width: 100%;
++.blog-shell .prose figure.diagram svg {
++  max-width: 600px;
+ }
+-.blog-shell .prose img {
+-  height: auto;
++.blog-shell .prose figure.diagram figcaption {
++  color: var(--muted);
++  font: 400 12px/1.6 var(--font-sans);
+ }
+-.reading-end {
+-  margin-top: 56px;
+-  padding: 25px 0 50px;
++.article-foot {
++  max-width: 660px;
++  margin: 56px auto 0;
+   border-top: 1px solid var(--rule);
++  font-size: 13px;
++}
++.article-tags {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 4px 18px;
++  padding-top: 20px;
++}
++.article-tags > * {
++  display: inline-flex;
++  align-items: center;
++  min-height: 36px;
++}
++.article-tags > span {
++  color: var(--muted);
++}
++.article-tags a,
++.reading-end a {
++  text-decoration: underline;
++}
++.reading-end {
+   display: flex;
+   justify-content: space-between;
+-  gap: 20px;
+-  font-size: 12px;
++  flex-wrap: wrap;
++  gap: 12px 24px;
++  padding-block: 24px 0;
+ }
+ .reading-end a {
+-  color: var(--ink-2);
++  display: inline-flex;
++  align-items: center;
++  min-height: 44px;
+ }
+ .writing-footer {
+   display: flex;
+-  gap: 18px;
++  justify-content: space-between;
+   align-items: center;
+   flex-wrap: wrap;
+-  margin-top: 64px;
+-  padding: 27px 0 35px;
+-  border-top: 1px solid var(--rule);
+-  font-size: 10px;
++  gap: 12px 24px;
++  margin-top: 88px;
++  padding-block: 24px 32px;
++  border-top: 1px solid var(--ink);
++  font-size: 12px;
+   color: var(--muted);
+ }
+-.writing-footer > a {
+-  color: var(--ink-2);
+-  text-decoration: none;
++.writing-footer > div {
++  display: flex;
++  align-items: center;
++  flex-wrap: wrap;
++  gap: 0 18px;
++}
++.writing-footer > div > a {
++  color: var(--ink);
+ }
+ .writing-footer nav {
+-  margin-left: auto;
+   display: flex;
+-  gap: 20px;
++  gap: 24px;
+ }
+-.writing-footer nav > a {
+-  text-decoration: none;
++.writing-footer a:hover {
++  text-decoration: underline;
+ }
+ @media (max-width: 600px) {
+   .writing-nav {
+-    padding-block: 22px;
+-    gap: 12px;
++    padding-block: 16px;
+   }
+   .writing-name {
+-    font-size: 16px;
++    font-size: 17px;
+   }
+   .writing-nav nav {
+     gap: 16px;
+-    font-size: 11px;
+-  }
+-  .writing-nav nav > a:first-child {
+-    display: none;
+-  }
+-  .reading-theme {
+-    width: 36px;
+-    height: 44px;
++    font-size: 12px;
+   }
+   .writing-intro {
+-    padding-top: 50px;
++    grid-template-columns: 1fr;
++    gap: 16px;
++    padding-block: 48px 36px;
+   }
+   .writing-intro h1 {
+-    font-size: 52px;
++    font-size: 64px;
++  }
++  .writing-description {
++    max-width: 38ch;
+   }
+   .writing-entry {
+     grid-template-columns: 1fr;
++    gap: 12px;
++    padding-block: 26px 30px;
++  }
++  .writing-date {
++    padding: 0;
++  }
++  .article-back {
++    margin-top: 20px;
++  }
++  .article-head {
++    padding-block: 24px 28px;
++  }
++  .article-dek {
++    font-size: 17px;
++  }
++  .article-meta {
++    gap: 6px 16px;
++  }
++  .blog-shell .prose {
++    font-size: 20px;
++  }
++  .blog-shell .prose pre {
++    padding: 16px;
++    font-size: 12px;
++  }
++  .blog-shell .diagram-scroll::before {
++    content: 'Scroll to view the full diagram →';
++    display: block;
++    margin-bottom: 12px;
++    color: var(--muted);
++    font: 400 12px/1.5 var(--font-sans);
++  }
++  .writing-footer {
++    margin-top: 64px;
++  }
++}
++@media (max-width: 360px) {
++  .writing-nav nav {
+     gap: 10px;
+-    padding-block: 25px;
+   }
+-  .writing-entry h2 {
+-    font-size: 29px;
++  .writing-name {
++    font-size: 16px;
+   }
+-  .writing-date {
+-    padding-top: 0;
+-    font-size: 9px;
++  .writing-tools label {
++    width: 100%;
++    justify-content: space-between;
++  }
++  .writing-tools select {
++    flex: 1;
++  }
++}
++@media (prefers-reduced-motion: reduce) {
++  :root:has(.blog-shell) {
++    scroll-behavior: auto;
+   }
+-  .writing-entry p {
+-    font-size: 13px;
++}
++@media print {
++  :root:has(.blog-shell),
++  :root[data-theme]:has(.blog-shell) {
++    --page: #fff;
++    --paper: #fff;
++    --paper-2: #f5f5f5;
++    --ink: #111;
++    --ink-2: #222;
++    --muted: #444;
++    --rule: #ccc;
++    --rule-2: #aaa;
++    --amber-deep: #222;
++    --amber-soft: #eee;
++    color-scheme: light;
++  }
++  .blog-shell {
++    width: 100%;
++    min-height: 0;
++    padding: 0;
++  }
++  .reading-skip,
++  .writing-nav nav,
++  .writing-tools,
++  .article-back,
++  .article-contents,
++  .article-foot,
++  .writing-footer {
++    display: none;
++  }
++  .writing-nav {
++    padding-block: 0 12pt;
+   }
++  .writing-intro,
+   .article-head {
+-    padding-top: 32px;
++    padding-block: 24pt;
+   }
+   .article-head h1 {
+-    font-size: 41px;
++    font-size: 32pt;
+   }
+-  .article-dek {
+-    font-size: 15px;
++  .article-column,
++  .blog-shell .prose {
++    max-width: none;
+   }
+   .blog-shell .prose {
+-    font-size: 16px;
+-    line-height: 1.85;
++    font-size: 12pt;
++    line-height: 1.5;
++  }
++  .blog-shell .prose :is(h2, h3, h4) {
++    break-after: avoid;
++  }
++  .blog-shell .prose :is(p, li) {
++    orphans: 3;
++    widows: 3;
+   }
+   .blog-shell .prose pre {
+-    padding: 16px;
+-    font-size: 11px;
++    white-space: pre-wrap;
++    overflow-wrap: anywhere;
++    font-size: 8pt;
+   }
+-  .blog-shell .diagram-scroll {
+-    max-width: 100%;
+-    overflow-x: auto;
++  .blog-shell .prose :is(pre, pre span) {
++    color: #111 !important;
++    background: #f5f5f5 !important;
+   }
+-  .blog-shell .diagram-scroll figure.diagram {
+-    min-width: 600px;
++  .blog-shell .prose table {
++    display: table;
++    table-layout: fixed;
++    font-size: 8pt;
+   }
+-  .blog-shell .diagram-scroll::after {
+-    content: 'Scroll sideways to read the full diagram';
+-    display: block;
+-    margin-top: 10px;
+-    font: 400 10px/1.6 var(--font-sans);
+-    color: var(--muted);
++  .blog-shell .prose :is(th, td) {
++    min-width: 0;
++    padding: 6pt;
++    overflow-wrap: anywhere;
+   }
+-  .article-contents {
+-    margin-bottom: 28px;
++  .blog-shell .diagram-scroll {
++    overflow: visible;
+   }
+-  .writing-footer > span {
++  .blog-shell .diagram-scroll::before {
+     display: none;
+   }
+-  .writing-footer nav {
+-    gap: 16px;
++  .blog-shell .prose figure.diagram {
++    min-width: 0;
++    break-inside: avoid;
++  }
++  .writing-entry {
++    break-inside: avoid;
+   }
+ }

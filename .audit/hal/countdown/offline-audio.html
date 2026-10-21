@@ -1,0 +1,448 @@
+<!doctype html><title>Countdown WebAudio diagnostic</title><h1>Countdown WebAudio diagnostic</h1><p>Real Chromium WebAudio offline output. Measures signal levels, not perceived audibility. Seconds start at numeral 3.</p><pre>Rendering...</pre><script>/**
+ * The shared synthesized sound kit. No audio files: every cue is built with
+ * the Web Audio API, through one limiter so overlapping cues never clip.
+ *
+ * - The AudioContext starts lazily, and only after the visitor has interacted
+ *   with the page (browsers refuse audio before a gesture anyway).
+ * - Muting is one switch, persisted, and every primitive is a no-op while muted.
+ * - Beds (rain, drones, hums) are registered so mute and reel changes can stop them.
+ *
+ * Vocabulary shared by every reel (keep the names stable):
+ *   tick 9ms hover · click 35ms press · pop on · drop off · type one key ·
+ *   chime done · whoosh panel · swipe reveal · wood(i) pitched step ·
+ *   cueTicks the two cue marks · projector(dur) the reel change whirr.
+ */
+const SOUND_KEY = 'countdown-audit';
+class SoundKit {
+    ac = null;
+    master = null;
+    limiter = null;
+    verbs = new Map();
+    beds = new Set();
+    listeners = new Set();
+    _muted = false;
+    gestured = false;
+    constructor() {
+        if (typeof window === 'undefined')
+            return;
+        try {
+            this._muted = localStorage.getItem(SOUND_KEY) === 'off';
+        }
+        catch {
+            /* storage blocked: default on */
+        }
+        const unlock = () => {
+            this.gestured = true;
+            if (this.ac?.state === 'suspended')
+                void this.ac.resume();
+        };
+        for (const ev of ['pointerdown', 'keydown', 'touchstart']) {
+            window.addEventListener(ev, unlock, { capture: true, passive: true });
+        }
+    }
+    get muted() {
+        return this._muted;
+    }
+    setMuted(muted) {
+        if (muted === this._muted)
+            return;
+        if (muted)
+            this.drop();
+        this._muted = muted;
+        try {
+            localStorage.setItem(SOUND_KEY, muted ? 'off' : 'on');
+        }
+        catch {
+            /* ignore */
+        }
+        if (muted)
+            this.stopBeds();
+        if (this.master && this.ac) {
+            const t = this.ac.currentTime;
+            this.master.gain.cancelScheduledValues(t);
+            this.master.gain.setTargetAtTime(muted ? 0 : 0.7, t, 0.05);
+        }
+        this.listeners.forEach((l) => l(muted));
+        if (!muted)
+            this.pop();
+    }
+    onChange(cb) {
+        this.listeners.add(cb);
+        return () => this.listeners.delete(cb);
+    }
+    /** The live context, or null while muted / before the first gesture. */
+    ctx() {
+        if (this._muted || typeof window === 'undefined')
+            return null;
+        const activated = this.gestured ||
+            navigator.userActivation
+                ?.hasBeenActive;
+        if (!this.ac && !activated)
+            return null;
+        try {
+            if (!this.ac) {
+                const Ctor = window.AudioContext ||
+                    window.webkitAudioContext;
+                this.ac = new Ctor();
+            }
+            if (this.ac.state === 'suspended')
+                void this.ac.resume();
+            return this.ac;
+        }
+        catch {
+            return null;
+        }
+    }
+    /** The master input (a gentle limiter). Only call after ctx() returned a context. */
+    out() {
+        const ac = this.ac;
+        if (!this.limiter) {
+            const comp = ac.createDynamicsCompressor();
+            comp.threshold.value = -18;
+            comp.knee.value = 20;
+            comp.ratio.value = 6;
+            comp.attack.value = 0.002;
+            comp.release.value = 0.08;
+            const g = ac.createGain();
+            g.gain.value = 0.7;
+            comp.connect(g);
+            g.connect(ac.destination);
+            this.limiter = comp;
+            this.master = g;
+        }
+        return this.limiter;
+    }
+    /** A shared reverb send of `seconds` length (cached per length). */
+    reverb(seconds = 1.4) {
+        const ac = this.ac;
+        let cv = this.verbs.get(seconds);
+        if (!cv) {
+            const len = Math.floor(ac.sampleRate * seconds);
+            const ir = ac.createBuffer(2, len, ac.sampleRate);
+            for (let ch = 0; ch < 2; ch++) {
+                const d = ir.getChannelData(ch);
+                for (let i = 0; i < len; i++)
+                    d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+            }
+            cv = ac.createConvolver();
+            cv.buffer = ir;
+            cv.connect(this.out());
+            this.verbs.set(seconds, cv);
+        }
+        return cv;
+    }
+    noise(dur) {
+        const ac = this.ac;
+        const n = Math.max(1, Math.floor(ac.sampleRate * dur));
+        const buf = ac.createBuffer(1, n, ac.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < n; i++)
+            d[i] = Math.random() * 2 - 1;
+        const src = ac.createBufferSource();
+        src.buffer = buf;
+        return src;
+    }
+    tone(o) {
+        const ac = this.ctx();
+        if (!ac)
+            return;
+        const t = ac.currentTime + (o.at ?? 0);
+        const dur = o.dur ?? 0.05;
+        const osc = ac.createOscillator();
+        const g = ac.createGain();
+        g.gain.value = 0;
+        osc.type = o.type ?? 'sine';
+        osc.frequency.setValueAtTime(o.f0, t);
+        if (o.f1 && o.f1 !== o.f0)
+            osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.f1), t + dur);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(o.vol ?? 0.2, t + 0.004);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        osc.connect(g);
+        g.connect(o.dest ?? this.out());
+        osc.start(t);
+        osc.stop(t + dur + 0.02);
+    }
+    burst(o) {
+        const ac = this.ctx();
+        if (!ac)
+            return;
+        const t = ac.currentTime + (o.at ?? 0);
+        const n = this.noise(o.dur);
+        const f = ac.createBiquadFilter();
+        f.type = o.kind ?? 'bandpass';
+        f.frequency.value = o.f ?? 2000;
+        f.Q.value = o.q ?? 0.9;
+        const g = ac.createGain();
+        g.gain.value = 0;
+        g.gain.setValueAtTime(o.vol ?? 0.3, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
+        n.connect(f);
+        f.connect(g);
+        g.connect(o.dest ?? this.out());
+        n.start(t);
+    }
+    /** A plucked string (saw + square through a closing lowpass). */
+    pluck(freq, at = 0, vol = 0.07, dest) {
+        const ac = this.ctx();
+        if (!ac)
+            return;
+        const t = ac.currentTime + at;
+        const o1 = ac.createOscillator();
+        o1.type = 'sawtooth';
+        o1.frequency.value = freq;
+        const o2 = ac.createOscillator();
+        o2.type = 'square';
+        o2.frequency.value = freq * 2.003;
+        const g2 = ac.createGain();
+        g2.gain.value = 0.25;
+        const lp = ac.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.Q.value = 2;
+        lp.frequency.setValueAtTime(7000, t);
+        lp.frequency.exponentialRampToValueAtTime(900, t + 0.25);
+        const g = ac.createGain();
+        g.gain.value = 0;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.003);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
+        o1.connect(lp);
+        o2.connect(g2);
+        g2.connect(lp);
+        lp.connect(g);
+        g.connect(dest ?? this.out());
+        o1.start(t);
+        o2.start(t);
+        o1.stop(t + 1);
+        o2.stop(t + 1);
+    }
+    /**
+     * Start a looping bed. `start` builds the graph on the live context and
+     * returns how to stop it. The bed stops on mute, on `signal` abort, or via
+     * the returned handle. Returns null when sound is off.
+     */
+    bed(start, signal) {
+        const ac = this.ctx();
+        if (!ac || signal?.aborted)
+            return null;
+        const inner = start(ac, this.out());
+        const handle = {
+            stop: (fade) => {
+                if (!this.beds.delete(handle))
+                    return;
+                try {
+                    inner.stop(fade);
+                }
+                catch {
+                    /* already stopped */
+                }
+            },
+        };
+        this.beds.add(handle);
+        signal?.addEventListener('abort', () => handle.stop(0.4), { once: true });
+        return handle;
+    }
+    stopBeds(fade = 0.3) {
+        [...this.beds].forEach((b) => b.stop(fade));
+    }
+    /* ---------- the shared vocabulary ---------- */
+    tick() {
+        this.tone({ f0: 1800, f1: 1200, dur: 0.009, vol: 0.05 });
+    }
+    click() {
+        this.burst({ dur: 0.03, f: 2600, vol: 0.25 });
+        this.tone({ f0: 180, f1: 90, dur: 0.045, vol: 0.18 });
+    }
+    pop() {
+        this.tone({ f0: 320, f1: 880, dur: 0.07, vol: 0.14 });
+    }
+    drop() {
+        this.tone({ f0: 620, f1: 160, dur: 0.09, vol: 0.12 });
+    }
+    type() {
+        this.burst({ dur: 0.012, f: 3200 + Math.random() * 1400, q: 1.4, vol: 0.1 });
+    }
+    chime() {
+        [
+            [523.25, 0],
+            [659.25, 0.07],
+            [987.77, 0.14],
+        ].forEach(([f, at]) => this.tone({ type: 'triangle', f0: f, dur: 0.38, vol: 0.09, at }));
+    }
+    wood(i = 0) {
+        const f = 440 * Math.pow(2, (i % 10) / 12);
+        this.tone({ f0: f * 2, f1: f, dur: 0.06, vol: 0.14 });
+        this.tone({ type: 'triangle', f0: f * 4, f1: f * 2.5, dur: 0.03, vol: 0.04 });
+    }
+    cueTicks() {
+        this.tone({ f0: 1500, f1: 1100, dur: 0.012, vol: 0.08 });
+        this.tone({ f0: 1500, f1: 1100, dur: 0.012, vol: 0.08, at: 0.13 });
+    }
+    whoosh() {
+        this.sweep(0.22, 'lowpass', [300, 5000, 400], 0.14);
+    }
+    swipe() {
+        this.sweep(0.16, 'bandpass', [900, 3800], 0.12);
+    }
+    /** The reel-change whirr: 24 fps shutter flutter over band-passed noise, plus a thump. */
+    projector(dur = 1.9) {
+        const ac = this.ctx();
+        if (!ac)
+            return;
+        const t = ac.currentTime;
+        const n = this.noise(dur);
+        const bp = ac.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.value = 1300;
+        bp.Q.value = 0.9;
+        const amp = ac.createGain();
+        amp.gain.value = 0.5;
+        const lfo = ac.createOscillator();
+        lfo.type = 'square';
+        lfo.frequency.value = 24;
+        const lg = ac.createGain();
+        lg.gain.value = 0.45;
+        lfo.connect(lg);
+        lg.connect(amp.gain);
+        const env = ac.createGain();
+        env.gain.value = 0;
+        env.gain.setValueAtTime(0.0001, t);
+        env.gain.exponentialRampToValueAtTime(0.09, t + 0.15);
+        env.gain.setValueAtTime(0.09, t + dur - 0.35);
+        env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        n.connect(bp);
+        bp.connect(amp);
+        amp.connect(env);
+        env.connect(this.out());
+        n.start(t);
+        lfo.start(t);
+        lfo.stop(t + dur + 0.05);
+        this.tone({ f0: 80, f1: 42, dur: 0.14, vol: 0.25 });
+    }
+    sweep(dur, kind, freqs, vol) {
+        const ac = this.ctx();
+        if (!ac)
+            return;
+        const t = ac.currentTime;
+        const n = this.noise(dur);
+        const f = ac.createBiquadFilter();
+        f.type = kind;
+        f.Q.value = kind === 'bandpass' ? 1.1 : 0.7;
+        f.frequency.setValueAtTime(freqs[0], t);
+        freqs.slice(1).forEach((hz, i) => {
+            f.frequency.exponentialRampToValueAtTime(hz, t + (dur * (i + 1)) / freqs.length);
+        });
+        const g = ac.createGain();
+        g.gain.value = 0;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        n.connect(f);
+        f.connect(g);
+        g.connect(this.out());
+        n.start(t);
+    }
+}
+/** The one kit for the page. */
+const sound = new SoundKit();
+const sfx = {
+    /** a fingernail across the ticket edge */
+    flick() {
+        sound.burst({ dur: 0.022, f: 3200, q: 1.2, vol: 0.07 });
+    },
+    /** perforated card stock giving way: a ragged run of tiny bursts */
+    tear() {
+        for (let i = 0; i < 11; i++) {
+            sound.burst({
+                dur: 0.016 + Math.random() * 0.022,
+                f: 1800 + Math.random() * 2800,
+                q: 1.4,
+                vol: 0.1 + Math.random() * 0.14,
+                at: i * 0.026 + Math.random() * 0.012,
+            });
+        }
+        sound.tone({ f0: 240, f1: 120, dur: 0.05, vol: 0.06, at: 0.28 });
+    },
+    /** the auditorium dims: a falling hum under a closing low-pass */
+    lightsDown() {
+        sound.tone({ f0: 110, f1: 55, dur: 0.9, vol: 0.08 });
+        const ac = sound.ctx();
+        if (!ac)
+            return;
+        const t = ac.currentTime;
+        const n = sound.noise(0.9);
+        const lp = ac.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(1400, t);
+        lp.frequency.exponentialRampToValueAtTime(180, t + 0.9);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.06, t + 0.2);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
+        n.connect(lp);
+        lp.connect(g);
+        g.connect(sound.out());
+        n.start(t);
+    },
+    /** a splice clicking through the gate */
+    leaderTick(at = 0) {
+        sound.burst({ dur: 0.01, kind: 'highpass', f: 3000, vol: 0.22, at });
+    },
+    /** the 2-pop: one frame (1/24 s) of a flat 1 kHz tone */
+    twoPop() {
+        const ac = sound.ctx();
+        if (!ac)
+            return;
+        const t = ac.currentTime;
+        const osc = ac.createOscillator();
+        osc.frequency.value = 1000;
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(0.2, t + 0.002);
+        g.gain.setValueAtTime(0.2, t + 0.04);
+        g.gain.linearRampToValueAtTime(0.0001, t + 0.044);
+        osc.connect(g);
+        g.connect(sound.out());
+        osc.start(t);
+        osc.stop(t + 0.06);
+    },
+};
+
+(async () => {
+ const cases = [];
+ for (const kind of ['projector', 'countdown', 'two-pop', 'leader-tick']) {
+  const offline = new OfflineAudioContext(1, 48000 * 5, 48000);
+  let now = 0;
+  const ac = new Proxy(offline, {get(target, name) {
+   if (name === 'currentTime') return now;
+   if (name === 'state') return 'running';
+   const value = Reflect.get(target, name, target);
+   return typeof value === 'function' ? value.bind(target) : value;
+  }});
+  sound.ac = ac;
+  sound.limiter = null;
+  sound.master = null;
+  sound._muted = false;
+  sound.gestured = true;
+  if (kind === 'projector' || kind === 'countdown') sound.projector(4.4);
+  if (kind === 'countdown') {
+   sfx.leaderTick();
+   sfx.leaderTick(0.5);
+   now = 1; sfx.twoPop();
+   now = 2; sfx.leaderTick();
+   now = 3; sfx.leaderTick();
+  }
+  if (kind === 'two-pop') sfx.twoPop();
+  if (kind === 'leader-tick') sfx.leaderTick();
+  const buf = await offline.startRendering();
+  const data = buf.getChannelData(0);
+  const windows = [[0,0.1],[0.3,0.9],[1,1.1],[1.3,1.9],[2,2.1],[2.3,2.9],[3,3.1],[3.3,3.9],[4.1,4.3],[4.6,4.9]].map(([start,end]) => {
+   const slice = data.slice(start*48000,end*48000);
+   const rms = Math.sqrt(slice.reduce((sum,x)=>sum+x*x,0)/slice.length);
+   return {start,end,rms,dbfs:rms > 0 ? 20*Math.log10(rms) : null,peak:Math.max(...slice.map(Math.abs))};
+  });
+  cases.push({kind,windows});
+ }
+ document.querySelector('pre').textContent=JSON.stringify({sources:["/Users/User/.codex/worktrees/parasite-mood-openings/personal-site/src/reels/sound.ts","/Users/User/.codex/worktrees/parasite-mood-openings/personal-site/src/reels/boxoffice/boxoffice.ts"],sampleRate:48000,projectorDuration:4.4,timeOrigin:'numeral 3 appears',cases},null,2);
+ document.title='DONE - Countdown WebAudio diagnostic';
+})().catch(e => {document.querySelector('pre').textContent=e.stack;document.title='ERROR';});</script>

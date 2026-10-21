@@ -1,0 +1,34 @@
+[
+  {
+    "chosen": "parasite",
+    "bg": "rgb(28, 30, 27)",
+    "overflow": false,
+    "reel": null,
+    "reelSheets": 0,
+    "titleFont": "80px / 82.4px \"Newsreader Variable\", Newsreader, Georgia, serif"
+  },
+  {
+    "chosen": "br2049",
+    "bg": "rgb(28, 30, 27)",
+    "overflow": false,
+    "reel": null,
+    "reelSheets": 0,
+    "titleFont": "80px / 82.4px \"Newsreader Variable\", Newsreader, Georgia, serif"
+  },
+  {
+    "chosen": "budapest",
+    "bg": "rgb(28, 30, 27)",
+    "overflow": false,
+    "reel": null,
+    "reelSheets": 0,
+    "titleFont": "80px / 82.4px \"Newsreader Variable\", Newsreader, Georgia, serif"
+  },
+  {
+    "chosen": "odyssey",
+    "bg": "rgb(28, 30, 27)",
+    "overflow": false,
+    "reel": null,
+    "reelSheets": 0,
+    "titleFont": "80px / 82.4px \"Newsreader Variable\", Newsreader, Georgia, serif"
+  }
+]

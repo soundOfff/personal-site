@@ -1,138 +1,98 @@
 ---
 import { getCollection } from 'astro:content';
-import { Badge } from 'editorial-ui';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/Icon.astro';
-import Footer from '../../components/Footer.astro';
+import BlogLayout from '../../layouts/BlogLayout.astro';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
-
-// flat, tag-organized: collect tags for the filter chips below the dek
-const allTags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
-
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+const date = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
 ---
 
-<BaseLayout
+<BlogLayout
   title="Writing · Tomas Brasca"
-  description="Build logs, backend & AI systems, algorithms, and startup-engineering notes."
+  description="Notes on AI systems, algorithms, and the decisions behind the things I build."
 >
-  <div class="sheet">
-    <div class="topbar">
-      <a class="back" href="/"><Icon name="i-arrow-l" size={13} />back to index</a>
-      <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
-        <svg
-          width="15"
-          height="15"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-          aria-hidden="true"
-        >
-          <use href="#i-moon" data-theme-icon></use>
-        </svg>
-      </button>
-    </div>
-
-    <header class="page-head">
-      <p class="eyebrow">// <b>blog</b></p>
-      <h1>Writing</h1>
-      <p class="dek">
-        Four flat, equal pillars: backend &amp; AI systems, algorithms &amp; competitive
-        programming, build logs, and startup engineering. Newest first.
-      </p>
-      {
-        allTags.length > 0 && (
-          <div class="ptags" role="group" aria-label="Filter posts by tag">
-            {allTags.map((t) => (
-              <button class="tagbtn" type="button" data-tag={t} aria-pressed="false">
-                <Badge>#{t}</Badge>
-              </button>
-            ))}
-          </div>
-        )
-      }
-    </header>
-
-    <div class="posts">
-      {
-        posts.map((post) => (
-          <article class="post" data-tags={post.data.tags.join(',')}>
-            <div class="pmeta">
-              <span>{iso(post.data.date)}</span>
-              <span>·</span>
-              <span>{post.data.pillar}</span>
-              <span>·</span>
-              <span>{post.data.readingTime}</span>
-            </div>
-            <h2>
-              <a href={`/blog/${post.id}`}>{post.data.title}</a>
-            </h2>
-            <p class="pdesc">{post.data.description}</p>
-            <div class="ptags">
-              {post.data.tags.map((t) => (
-                <Badge variant="info">#{t}</Badge>
-              ))}
+  <header class="writing-intro">
+    <h1>Writing</h1>
+    <p class="writing-description">
+      On building AI products, understanding systems, and learning from the work.
+    </p>
+  </header>
+  <div class="writing-tools">
+    <p id="writing-count" role="status" aria-atomic="true">{posts.length} articles</p>
+    <label for="writing-topic"
+      >Topic
+      <select id="writing-topic" aria-controls="writing-list">
+        <option value="">All topics</option>
+        {tags.map((tag) => <option value={tag}>{tag.replaceAll('-', ' ')}</option>)}
+      </select>
+    </label>
+  </div>
+  <ol class="writing-list" id="writing-list">
+    {
+      posts.map((post) => (
+        <li data-writing-tags={JSON.stringify(post.data.tags)}>
+          <article class="writing-entry">
+            <time class="writing-date" datetime={post.data.date.toISOString()}>
+              {date.format(post.data.date)}
+            </time>
+            <div class="writing-entry-text">
+              <h2>
+                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+              </h2>
+              <p>{post.data.description}</p>
+              <div class="writing-entry-meta">
+                <>
+                  <span>{post.data.pillar}</span>
+                  <span>{post.data.readingTime} read</span>
+                </>
+              </div>
             </div>
           </article>
-        ))
-      }
-    </div>
-
-    <Footer />
-  </div>
-
-  {
-    /* progressive enhancement: tag chips filter the list (click again to clear);
-      the active tag mirrors into ?tag= so filtered views survive reload/share */
-  }
+        </li>
+      ))
+    }
+  </ol>
+  <p class="writing-empty" id="writing-empty" hidden>
+    No articles in this topic. <a href="/blog">View all writing</a>.
+  </p>
   <script is:inline>
     (() => {
-      const chips = document.querySelectorAll('.page-head .tagbtn');
-      const posts = document.querySelectorAll('.posts .post');
-      let active = null;
+      const select = document.getElementById('writing-topic');
+      const entries = [...document.querySelectorAll('[data-writing-tags]')].map((element) => ({
+        element,
+        tags: JSON.parse(element.dataset.writingTags),
+      }));
+      const count = document.getElementById('writing-count');
+      const empty = document.getElementById('writing-empty');
       const apply = () => {
-        chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.tag === active)));
-        posts.forEach((p) => {
-          const tags = (p.dataset.tags || '').split(',');
-          p.hidden = active !== null && !tags.includes(active);
+        let visible = 0;
+        entries.forEach(({ element, tags }) => {
+          element.hidden = Boolean(select.value) && !tags.includes(select.value);
+          if (!element.hidden) visible++;
         });
-        const url = new URL(location.href);
-        if (active === null) url.searchParams.delete('tag');
-        else url.searchParams.set('tag', active);
-        history.replaceState(null, '', url);
+        count.textContent = `${visible} ${visible === 1 ? 'article' : 'articles'}`;
+        empty.hidden = visible !== 0;
       };
-      chips.forEach((chip) => {
-        chip.addEventListener('click', () => {
-          active = active === chip.dataset.tag ? null : chip.dataset.tag;
-          apply();
-        });
-      });
       const initial = new URLSearchParams(location.search).get('tag');
-      if (initial && [...chips].some((c) => c.dataset.tag === initial)) {
-        active = initial;
-        apply();
+      if (initial && ![...select.options].some((option) => option.value === initial)) {
+        select.add(new Option(initial.replaceAll('-', ' '), initial));
       }
+      select.value = initial || '';
+      select.addEventListener('change', () => {
+        apply();
+        const url = new URL(location.href);
+        if (select.value) url.searchParams.set('tag', select.value);
+        else url.searchParams.delete('tag');
+        history.replaceState(null, '', url);
+      });
+      apply();
     })();
   </script>
-</BaseLayout>
-
-<style>
-  .tagbtn {
-    border: 0;
-    padding: 0;
-    background: none;
-    cursor: pointer;
-    font: inherit;
-  }
-  .tagbtn[aria-pressed='false'] :global(*) {
-    opacity: 0.9;
-  }
-  .tagbtn[aria-pressed='true'] {
-    outline: 1px solid currentColor;
-    outline-offset: 2px;
-    border-radius: 999px;
-  }
-</style>
+</BlogLayout>

@@ -4,12 +4,12 @@
  * visitor's film is on screen from frame one) and the CSS generated from the
  * reel configs.
  */
-import { REELS, REEL_KEY, DEFAULT_REEL } from './registry';
+import { SELECTABLE_REELS, REEL_KEY, DEFAULT_REEL } from './registry';
 import { reelCss } from './css';
 import { REEL_CSS, CAMERA_CSS } from './stylesheets';
 
-const ids = REELS.map((r) => r.id);
-const css = reelCss(REELS);
+const ids = SELECTABLE_REELS.map((r) => r.id);
+const css = reelCss(SELECTABLE_REELS);
 ---
 
 <script

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tomas Brasca · Tres planos</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body data-shot="facade">
+  <a class="skip" href="#work">Saltar a proyectos</a>
+  <aside class="workbench" aria-label="Comparador de direcciones">
+    <span class="bench-title">PRUEBAS DE CÁMARA <i>20.10.26</i></span>
+    <div class="switcher" role="group" aria-label="Elegir variante">
+      <button data-shot="facade" aria-pressed="true">01 <span>Fachada</span></button>
+      <button data-shot="corridor" aria-pressed="false">02 <span>Pasillo</span></button>
+      <button data-shot="desk" aria-pressed="false">03 <span>Correspondencia</span></button>
+    </div>
+    <span class="bench-note">Estudio visual · no publicado</span>
+  </aside>
+
+  <header class="site-header">
+    <a class="wordmark" href="#top" aria-label="Tomas Brasca, inicio">TB<span class="wordmark-dot">.</span></a>
+    <p>SOFTWARE ENGINEER<br><span>Rosario, Argentina · UTC−3</span></p>
+    <nav aria-label="Navegación principal">
+      <a href="#work">Work</a>
+      <a href="http://127.0.0.1:4322/blog/">Writing</a>
+      <a class="contact" href="mailto:tomibrasca97@gmail.com">Get in touch <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow" id="eyebrow">A PORTFOLIO IN THREE ACTS</p>
+        <h1 id="hero-title">Tomas <em>Brasca</em></h1>
+        <div class="hero-intro">
+          <span class="edition" id="edition">VOL. 01 / THE GRAND EXTERIOR</span>
+          <p>I build AI products, and the systems behind them.</p>
+          <a href="#work">Selected work <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+
+      <div class="scene-shell">
+        <div class="scene" id="scene" role="group" aria-label="Escena de hotel con objetos para explorar">
+          <div class="scene-art" role="img" id="scene-art" aria-label="Hotel alpino rosa visto de frente, con montañas nevadas"></div>
+          <div class="film-edge" aria-hidden="true"><span>TB / 001</span><span id="shot-label">EXT. HOTEL · AFTERNOON</span><span>1932</span></div>
+          <div class="props facade-props">
+            <button class="window" data-discover="key" aria-label="Explorar la ventana encendida"><span class="window-light"></span><span class="prop-label">One light left on</span></button>
+            <a class="hotel-entry" href="#work">Enter the portfolio <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="props corridor-props" hidden>
+            <button class="door door-one" data-project="dex"><span>01</span><b>Dex</b><small>AI systems</small></button>
+            <button class="door door-two" data-project="mint"><span>02</span><b>Mint Mobile</b><small>Systems at scale</small></button>
+            <button class="door door-three" data-project="flagship"><span>03</span><b>Flagship</b><small>Interfaces that answer</small></button>
+            <button class="service-key" data-discover="key">A key was left behind ↗</button>
+          </div>
+          <div class="props desk-props" hidden>
+            <button class="desk-register" data-project="dex"><span>THE GUEST REGISTER</span><b>Selected<br><em>work.</em></b><small>Open the register ↗</small></button>
+            <button class="desk-envelope" data-discover="key"><span>PERSONAL<br>CORRESPONDENCE</span><b>TB</b><small>Turn it over ↗</small></button>
+          </div>
+        </div>
+        <div class="caption"><p id="caption">A quiet exterior. A window with something to say.</p><button class="explore" data-discover="key">Look a little closer <span aria-hidden="true">↗</span></button></div>
+      </div>
+      <div class="credentials"><span>Previously at <b>Dex</b> &amp; <b>Mint Mobile</b></span><span>ICPC South America finalist</span><span>5+ years building products</span></div>
+    </section>
+
+    <section class="work-section" id="work" aria-labelledby="work-title">
+      <div class="section-heading"><div><p class="eyebrow">I / THE WORK</p><h2 id="work-title">A few things<br>I've <em>built.</em></h2></div><p>AI routing. High-traffic backends.<br>Interfaces that do more than talk.</p></div>
+      <article class="project" id="dex"><span class="project-no">01</span><div class="project-body"><span class="project-category">DEX · AI SYSTEMS · 2025</span><h3><a href="http://127.0.0.1:4322/work/dex">The smallest model<br>that clears the bar. <span aria-hidden="true">↗</span></a></h3><p>Classify the request. Route it to the cheapest model that passes its evals. Escalate when the task needs more.</p><div class="project-meta"><span>Routing / Evals / Three providers</span><span>Employer work · written case study</span></div></div><button class="stamp" data-discover="evidence" aria-label="Leer la nota detrás del sello de Dex"><span>EXAMINED</span><b>E</b><span>EVAL CONTRACT</span></button></article>
+      <article class="project"><span class="project-no">02</span><div class="project-body"><span class="project-category">MINT MOBILE · BACKEND · 2024</span><h3><a href="http://127.0.0.1:4322/work/mint">Correctness,<br>under real load. <span aria-hidden="true">↗</span></a></h3><p>E-commerce APIs serving 2–3M subscribers. Cached reads, transactional inventory and idempotent checkout.</p><div class="project-meta"><span>Postgres / Microservices / Queues</span><span>Employer work · written case study</span></div></div><span class="project-figure">2–3<span>M</span><small>SUBSCRIBERS</small></span></article>
+      <article class="project"><span class="project-no">03</span><div class="project-body"><span class="project-category">FLAGSHIP · PERSONAL PROJECT · 2026</span><h3><a href="http://127.0.0.1:4322/work/flagship">An answer you<br>can interact with. <span aria-hidden="true">↗</span></a></h3><p>A conversational portfolio that answers with project cards, comparisons and timelines, composed through A2UI.</p><div class="project-meta"><span>A2UI / Astro / Cloudflare</span><a href="https://github.com/soundOfff/personal-site">Public source ↗</a></div></div><span class="project-figure code-figure">{<i>ui</i>}</span></article>
+    </section>
+
+    <section class="note-section" aria-labelledby="note-title"><p class="eyebrow">II / MARGIN NOTES</p><div class="note-grid"><h2 id="note-title">The part behind<br>the <em>picture.</em></h2><div><p>I care about the decisions that hold a product together. Which request needs a bigger model. Which write must never happen twice. Which limit belongs in the system.</p><a href="http://127.0.0.1:4322/blog/">Read the notes ↗</a></div></div></section>
+    <footer><p class="eyebrow">III / CORRESPONDENCE</p><h2>Have something<br>in <em>mind?</em></h2><a class="email" href="mailto:tomibrasca97@gmail.com">tomibrasca97@gmail.com ↗</a><div class="footer-bottom"><span>Tomas Brasca · Rosario, Argentina</span><a href="http://127.0.0.1:4322/cv.pdf">Resume ↗</a><a href="https://github.com/soundOfff">GitHub ↗</a><span>Independent study inspired by The Grand Budapest Hotel.</span></div></footer>
+  </main>
+
+  <dialog aria-labelledby="discovery-title" id="discovery"><button class="close" aria-label="Cerrar nota">Close ×</button><p class="eyebrow" id="discovery-kicker"></p><h2 id="discovery-title"></h2><p id="discovery-body"></p><a id="discovery-link" href="#dex"></a><span class="discovery-foot" id="discovery-foot"></span></dialog>
+  <p class="sr-only" role="status" id="status"></p>
+</body>
+</html>

@@ -2184,3 +2184,199 @@ html:root[data-reel='parasite'] {
     transition: none;
   }
 }
+
+html:root[data-reel='parasite'] .content {
+  .cinema-opening[data-camera] {
+    height: auto;
+    background: #e9e8de;
+  }
+  .camera-pin,
+  .camera-frame {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .camera-scroll,
+  .camera-progress {
+    display: none;
+  }
+  .opening-parasite[data-opening-mode='flow'] {
+    position: relative;
+    inset: auto;
+    overflow: visible;
+    padding: 36px 5% 0;
+    color: #263128;
+    background: #e9e8de;
+  }
+  .ps-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 30px;
+    padding-bottom: 28px;
+  }
+  .ps-heading .shot-kicker {
+    margin-bottom: 20px;
+  }
+  .ps-heading h1 {
+    font: 500 clamp(38px, 4.8vw, 76px)/1.08 var(--font-display);
+    letter-spacing: -0.055em;
+  }
+  .ps-heading h1 em {
+    font-style: normal;
+    font-weight: 350;
+  }
+  .ps-intro {
+    flex-shrink: 0;
+    font: 400 13px/1.7 var(--font-sans);
+    color: #586152;
+  }
+  .opening-parasite nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    margin-top: 12px;
+  }
+  .opening-parasite a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+  .opening-parasite :is(a, summary):focus-visible {
+    outline: 3px solid #a3572e;
+    outline-offset: 5px;
+  }
+  .ps-frame {
+    display: grid;
+    position: relative;
+    isolation: isolate;
+    min-height: clamp(320px, 38vw, 580px);
+    background: #14251f;
+  }
+  .ps-photo {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: url('../../assets/openings/parasite.avif') 60% center / cover;
+  }
+  .ps-frame details {
+    align-self: end;
+    justify-self: end;
+    margin: 24px 30px;
+    max-width: calc(100% - 60px);
+  }
+  .ps-frame summary {
+    min-height: 44px;
+    padding: 13px 20px;
+    list-style: none;
+    cursor: pointer;
+    color: #263128;
+    background: #e9e8da;
+    font: 400 12px/1.5 var(--font-sans);
+  }
+  .ps-frame summary::-webkit-details-marker {
+    display: none;
+  }
+  .ps-open-label,
+  details[open] .ps-closed-label {
+    display: none;
+  }
+  details[open] .ps-open-label {
+    display: inline;
+  }
+  .ps-frame details[open] {
+    align-self: stretch;
+    justify-self: stretch;
+    max-width: none;
+    margin: 0;
+    color: #e5e6d4;
+    background: #14251f;
+  }
+  .ps-frame details[open] summary {
+    text-align: right;
+    color: inherit;
+    background: transparent;
+  }
+  .ps-under {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 8%;
+    padding: 20px 10% 60px;
+  }
+  .ps-level {
+    font: 350 clamp(52px, 8vw, 100px)/1 var(--font-display);
+    color: #a1b293;
+  }
+  .ps-under .shot-kicker {
+    margin-bottom: 18px;
+  }
+  .ps-under h2 {
+    margin: 0 0 18px;
+    font: 500 clamp(32px, 4vw, 60px)/1.08 var(--font-display);
+    letter-spacing: -0.045em;
+    color: inherit;
+  }
+  .ps-under h2 em {
+    font-style: normal;
+    font-weight: 350;
+  }
+  .ps-under p:not(.shot-kicker) {
+    font: 400 14px/1.7 var(--font-sans);
+  }
+  .ps-under a {
+    margin-top: 12px;
+    font: 400 12px/1.5 var(--font-sans);
+  }
+  @media (max-width: 1000px) {
+    .ps-heading {
+      display: block;
+    }
+    .ps-intro {
+      margin-top: 24px;
+    }
+  }
+  @media (max-width: 650px) {
+    .opening-parasite[data-opening-mode='flow'] {
+      padding-top: 30px;
+    }
+    .ps-heading h1 {
+      font-size: clamp(34px, 9vw, 48px);
+    }
+    .ps-frame {
+      min-height: 340px;
+    }
+    .ps-frame details {
+      margin: 18px;
+      max-width: calc(100% - 36px);
+    }
+    .ps-under {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+      padding: 20px 25px 36px;
+    }
+    .ps-level {
+      font-size: 42px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ps-frame details[open] .ps-under {
+      animation: parasite-opening-descend 0.5s ease both;
+    }
+  }
+}
+@keyframes parasite-opening-descend {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

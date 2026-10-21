@@ -1,0 +1,29 @@
+{
+  "destination": "soundOfff/personal-site main",
+  "prs": [
+    {
+      "number": 7,
+      "state": "MERGED",
+      "base": "main",
+      "verifiedHead": "aa695c909c46e79b3d7dcd91c4eddb3f73d2c4fd",
+      "mergeCommit": "a7ca0aa1ea301300e728a8aaf7dce536c60fc26b",
+      "verdict": "PASS+NOTES",
+      "verifier": "ship_verify_7"
+    },
+    {
+      "number": 9,
+      "state": "MERGED",
+      "base": "main",
+      "verifiedHead": "c29ee30cdc64e890d813f46caf3d2f9c4ba42a95",
+      "mergeCommit": "50689418ca9e9444d819ab00cf9073de91c55f4d",
+      "verdict": "PASS+NOTES",
+      "verifier": "ship_verify_9"
+    }
+  ],
+  "originMain": "50689418ca9e9444d819ab00cf9073de91c55f4d",
+  "bothMergeCommitsAreAncestors": true,
+  "finalSourceTreeMatchesVerifiedHead": true,
+  "pendingRequestsAbsentBeforeBothGuardedMerges": true,
+  "unrelatedDirtyMainPreserved": true,
+  "ceiling": 9
+}

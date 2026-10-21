@@ -20,6 +20,7 @@
  *     it's done, a deceptive cadence on error,
  *   - the bunker's Morse key: tap for a dot, hold for a dash, decoded live.
  */
+import { mountOpeningDisclosure } from '../openings/disclosure';
 import type { Cue, ReelContext, ReelModule } from '../types';
 import { SECTION_IDS } from '../types';
 import type { Bed } from '../sound';
@@ -105,6 +106,10 @@ const clampSec = (i: number) => Math.max(0, Math.min(LAST, i));
 const reel: ReelModule = {
   mount(ctx) {
     const { root, signal } = ctx;
+    const stopOpening = mountOpeningDisclosure(
+      document.querySelector('[data-opening="parasite"]'),
+      signal,
+    );
     const s = ctx.sound;
     const timers = new Set<number>();
     const later = (fn: () => void, ms: number): number => {
@@ -333,6 +338,7 @@ const reel: ReelModule = {
     const stopMorse = morse(ctx, later, cancel);
 
     return () => {
+      stopOpening();
       timers.forEach((id) => window.clearTimeout(id));
       timers.clear();
       stopMorse();

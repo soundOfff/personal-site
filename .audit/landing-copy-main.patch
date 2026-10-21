@@ -1,0 +1,528 @@
+diff --git a/src/content/work/dex.mdx b/src/content/work/dex.mdx
+index c928992..b7b6b3c 100644
+--- a/src/content/work/dex.mdx
++++ b/src/content/work/dex.mdx
+@@ -1,7 +1,7 @@
+ ---
+ n: '01'
+ title: 'Dex: multi-LLM routing'
+-description: 'Classify-then-dispatch in front of OpenAI, Groq and OpenRouter, balancing latency, cost and quality.'
++description: 'I helped build routing across OpenAI, Groq and OpenRouter, with evals to check which model could handle each task.'
+ stack: 'Routing · evals'
+ year: '2025'
+ code: false
+diff --git a/src/content/work/flagship.mdx b/src/content/work/flagship.mdx
+index a92a8ac..abe6ec2 100644
+--- a/src/content/work/flagship.mdx
++++ b/src/content/work/flagship.mdx
+@@ -1,7 +1,7 @@
+ ---
+ n: '03'
+-title: 'Flagship: conversational portfolio'
+-description: 'How the agent on this page works: the A2UI protocol, a custom renderer and a Cloudflare Worker backend. The source is public.'
++title: 'The agent on this site'
++description: 'A project I built so you can ask about my work and get cards, tables or diagrams in reply. The case study covers the A2UI renderer and Cloudflare backend, with public source code.'
+ stack: 'A2UI · Astro · TS · serverless'
+ year: '2026'
+ code: true
+diff --git a/src/content/work/mint.mdx b/src/content/work/mint.mdx
+index f0a0131..6480419 100644
+--- a/src/content/work/mint.mdx
++++ b/src/content/work/mint.mdx
+@@ -1,7 +1,7 @@
+ ---
+ n: '02'
+-title: 'Mint: 2–3M-user scale'
+-description: 'High-traffic e-commerce APIs serving 2–3M users: the backend that stayed correct and fast under real load.'
++title: 'Mint Mobile: e-commerce APIs'
++description: 'Backend work on an e-commerce platform for 2 to 3 million subscribers, including inventory, checkout and services around a WordPress order system.'
+ stack: 'Microservices · WordPress · React · Postgres'
+ year: '2024'
+ code: false
+diff --git a/src/data/repos.ts b/src/data/repos.ts
+index 8423c86..61123b1 100644
+--- a/src/data/repos.ts
++++ b/src/data/repos.ts
+@@ -15,7 +15,7 @@ export const repos: Repo[] = [
+     name: 'Sift',
+     href: 'https://github.com/soundOfff/sift',
+     description:
+-      'A Chrome companion that turns the YouTube video you watch into a local notebook, with concept notes, timestamped frames and diagrams.',
++      "A Chrome extension I'm building for taking notes from YouTube videos. It saves concepts, timestamped frames and diagrams to a local notebook.",
+     language: 'TypeScript',
+     color: '#3178c6',
+     private: true,
+@@ -25,7 +25,7 @@ export const repos: Repo[] = [
+     name: 'Second Brain',
+     href: 'https://github.com/soundOfff/second-brain',
+     description:
+-      'An agent-maintained wiki with linked concepts, source citations and contradiction checks. A keyboard-driven web app handles reading and triage.',
++      'Agents organise a wiki of reading notes, with linked ideas, citations and checks for conflicting claims. A keyboard-driven web app handles the reading queue.',
+     language: 'Python',
+     color: '#658367',
+   },
+@@ -34,7 +34,7 @@ export const repos: Repo[] = [
+     name: 'On-Call',
+     href: 'https://github.com/soundOfff/pagerduty-app',
+     description:
+-      'An incident response workspace: monitoring events, incident timelines, escalation policies and on-call rotations. React, Django and MongoDB.',
++      'An app for tracking monitoring events and incidents, with timelines, escalation policies and on-call rotations. Built with React, Django and MongoDB.',
+     language: 'JavaScript · Python',
+     color: '#b49845',
+     private: true,
+@@ -44,7 +44,7 @@ export const repos: Repo[] = [
+     name: 'Curation Archive',
+     href: 'https://github.com/soundOfff/not-archillect',
+     description:
+-      'A visual archive curated by a taste model trained on my own labels, with source adapters, image deduplication and a rotating single-image homepage.',
++      'An image archive ranked by a model trained on my own labels. It tracks sources, removes duplicates and shows one image at a time on the homepage.',
+     language: 'TypeScript · Python',
+     color: '#927088',
+     private: true,
+diff --git a/src/data/site.ts b/src/data/site.ts
+index 975a5a7..363e9d7 100644
+--- a/src/data/site.ts
++++ b/src/data/site.ts
+@@ -9,10 +9,10 @@ export const profile = {
+   name: 'Tomas Brasca',
+   monogram: 'TB',
+   // mono uppercase role under the name in the rail
+-  role: 'Full-stack · AI systems',
++  role: 'Full-stack engineer',
+   // hero lede: the phrase wrapped in <em></em> renders italic + amber
+-  lede: "Most LLM calls don't need the biggest model. They need a router that knows which one will <em>clear the bar</em>.",
+-  sub: 'I build AI products end to end, from web and mobile to the systems behind them. At Dex, I shipped multi-LLM routing and CRM features. At Mint Mobile, I built e-commerce APIs serving 2–3M subscribers.',
++  lede: 'I build web and mobile apps, <em>and their APIs.</em>',
++  sub: "I'm Tomas, a software engineer based in Rosario, Argentina. I've worked on CRM features and LLM routing at Dex, and e-commerce APIs for Mint Mobile.",
+ } as const;
+ 
+ export const contact = [
+@@ -30,14 +30,14 @@ export const contact = [
+ 
+ // In-page rail nav. Indices render as 00–08.
+ export const nav = [
+-  { id: 'readme', label: 'readme' },
++  { id: 'readme', label: 'about' },
+   { id: 'playground', label: 'playground' },
+-  { id: 'work', label: 'work index' },
++  { id: 'work', label: 'work' },
+   { id: 'oss', label: 'projects' },
+   { id: 'log', label: 'log' },
+   { id: 'writing', label: 'blog' },
+-  { id: 'principles', label: 'principles' },
+-  { id: 'stack', label: 'stack' },
++  { id: 'principles', label: 'how I work' },
++  { id: 'stack', label: 'tools' },
+   { id: 'now', label: 'now' },
+ ] as const;
+ 
+@@ -53,23 +53,23 @@ export const proofs: { value: string; key: string; accent?: boolean }[] = [
+   { value: '5+', key: 'years full-stack' },
+ ];
+ 
+-// 06 · principles: kept from the design; they map exactly to the router work.
++// 06 · how I work
+ export const tenets = [
+   {
+-    title: 'Smallest model that passes',
+-    body: 'Start with the cheapest model and move up only when an eval fails on it.',
++    title: 'Test before changing models',
++    body: 'I use evals to check whether a cheaper model can handle a task before routing traffic to it.',
+   },
+   {
+-    title: 'Cache before you call',
+-    body: 'Check the cache before calling a model, and treat the call as the slow path.',
++    title: 'Cache repeated work',
++    body: 'A cached result can save an API call. The decision is what can be reused and how long it can stay valid.',
+   },
+   {
+-    title: 'Cap the blast radius',
+-    body: 'Every public endpoint gets a rate limit and a kill switch before launch. The agent on this page has both: five questions a day per visitor, and a shared daily ceiling that turns it off.',
++    title: 'Set limits before launch',
++    body: 'Public demos need request limits. This agent allows five questions per IP each day and checks a shared daily quota.',
+   },
+   {
+-    title: 'Evals are contracts',
+-    body: "Write down what a behaviour must do as an eval you can run. If there is no eval, it doesn't ship.",
++    title: 'Turn failures into test cases',
++    body: 'A missed extraction or a bad routing decision belongs in the eval set, so it can be checked when the prompt or model changes.',
+   },
+ ] as const;
+ 
+@@ -99,51 +99,51 @@ export const log: {
+   {
+     date: '15 oct 2026',
+     tag: 'build',
+-    msg: 'Build Sift: a YouTube companion that saves concept notes, source frames and diagrams to a local notebook. The Chrome extension MVP is implemented',
++    msg: 'Built the first version of Sift, a Chrome extension for saving notes, frames and diagrams from YouTube videos to a local notebook',
+   },
+   {
+     date: '11 oct 2026',
+     tag: 'build',
+-    msg: 'Keep developing Second Brain, an agent-maintained wiki with a reading queue, feed triage and linked, cited pages',
++    msg: 'Working on Second Brain, a wiki and reading queue with agent-assisted notes, feed triage and source citations',
+     link: { label: 'source', href: 'https://github.com/soundOfff/second-brain' },
+   },
+   {
+     date: '21 sep 2026',
+     tag: 'build',
+-    msg: 'Build On-Call: monitoring events become incidents with timelines, escalation policies and responder rotations',
++    msg: 'Built On-Call to group monitoring events into incidents, with timelines, escalation policies and on-call rotations',
+   },
+   {
+     date: '01 sep 2026',
+     tag: 'build',
+-    msg: 'Develop Curation Archive, a visual archive scored by a personal taste model with image deduplication and source provenance',
++    msg: 'Working on Curation Archive, an image collection ranked by a model trained on my own labels, with duplicate detection and source tracking',
+   },
+   {
+     hash: '0ade814',
+     date: 'jul 2026',
+     tag: 'site',
+-    msg: 'Replace the router demo with a conversational portfolio, where a Claude agent answers in A2UI and a custom renderer draws the answer',
++    msg: "Replaced this site's router demo with an agent that answers questions about my work using cards, tables and diagrams",
+   },
+   {
+     date: 'jun 2026',
+     tag: 'blog',
+-    msg: 'Publish "The unglamorous middle", about joining my first startup three and a half years into my career and finding out the real job was the part nobody demos',
++    msg: 'Wrote "The unglamorous middle" about joining my first startup three and a half years into my career',
+     link: { label: 'read it', href: '/blog/the-unglamorous-middle' },
+   },
+   {
+     date: 'jun 2026',
+     tag: 'oss',
+-    msg: 'Publish editorial-ui v0.1.0, the design system this site is built on',
++    msg: 'Published editorial-ui v0.1.0, the component library used on this site',
+   },
+   {
+     hash: 'ead2d68',
+     date: 'jun 2026',
+     tag: 'site',
+-    msg: 'Ship this site: an Astro shell on editorial-ui, the router demo as an island, deployed as a Cloudflare Worker',
++    msg: 'Built this site with Astro and editorial-ui, added a router demo, and deployed it on Cloudflare Workers',
+   },
+   {
+     date: 'may 2026',
+     tag: 'launch',
+-    msg: 'Launch Dana, AI meeting prep that pulls context from your calendar, email and Slack so you walk into the meeting already briefed',
++    msg: 'Launched Dana, a meeting-prep tool that gathers context from calendar events, email and Slack',
+     link: { label: 'danahq.com', href: 'https://danahq.com/' },
+   },
+ ];
+@@ -151,11 +151,11 @@ export const log: {
+ // 08 · now: spec sheet.
+ export const now = [
+   { dt: 'Location', dd: 'Rosario, Argentina. Remote, UTC−3' },
+-  { dt: 'Status', dd: 'Open to senior full-stack and AI-product roles, and select contract work' },
++  { dt: 'Status', dd: 'Open to senior full-stack and AI roles, plus contract work' },
+   { dt: 'Email', dd: 'tomibrasca97@gmail.com' },
+   {
+     dt: 'Focus',
+-    dd: 'AI features end to end: LLM routing, evals, cost control and high-traffic backends',
++    dd: 'Web and mobile apps, LLM routing, evals and backend APIs',
+   },
+   { dt: 'Reading', dd: 'AI Engineer' },
+   { dt: 'Built with', dd: 'Astro · React island · A2UI · editorial-ui · Cloudflare' },
+diff --git a/src/islands/A2UIPlayground.tsx b/src/islands/A2UIPlayground.tsx
+index 9b8be46..febc8b1 100644
+--- a/src/islands/A2UIPlayground.tsx
++++ b/src/islands/A2UIPlayground.tsx
+@@ -188,7 +188,7 @@ export default function A2UIPlayground() {
+           if (isDailyCap(retryAfter)) {
+             setQuota({ remaining: 0, limit: DAILY_LIMIT });
+             setError(
+-              `That was your ${DAILY_LIMIT} questions for today. The cap resets at 00:00 UTC, about ${formatRetry(retryAfter)} from now. Everything the agent knows is also on the page below.`,
++              `You've reached today's limit of ${DAILY_LIMIT} questions. It resets at 00:00 UTC, about ${formatRetry(retryAfter)} from now. You can still browse the work and blog below.`,
+             );
+             return;
+           }
+@@ -199,13 +199,13 @@ export default function A2UIPlayground() {
+         if (res.status === 503) {
+           setError(
+             body.error === 'daily-budget-exhausted'
+-              ? 'The shared daily budget for live turns is spent, and it resets at 00:00 UTC. That cap is what keeps this endpoint open to everyone without a login.'
+-              : "The agent isn't configured on this deploy. No API key is set on the server, so there is nothing to ask.",
++              ? 'The agent has reached its daily limit. Try again after 00:00 UTC, or browse the work and blog below.'
++              : 'The agent is unavailable right now. You can still browse the work and blog below.',
+           );
+           return;
+         }
+ 
+-        setError('The agent failed to compose a surface. Try rephrasing the question.');
++        setError("The agent couldn't put a reply together. Try rephrasing the question.");
+       } catch {
+         setPending(null);
+         cue('error');
+@@ -329,29 +329,28 @@ export default function A2UIPlayground() {
+ 
+         <div className="console-body a2-launch-body">
+           <p className="a2-launch-lede">
+-            Ask about the work and the agent answers with an interface built for the question:
+-            project cards, a chart, a timeline or a diagram.
++            Ask about my projects or experience. The agent uses the content on this site and can
++            show cards, tables or diagrams in its reply.
+           </p>
+ 
+           <div className="a2-launch-row">
+             <Button variant="amber" onClick={() => launch()}>
+               <GlyphIcon id={started ? 'i-arrow-r' : 'i-play'} />
+-              <span>{started ? 'Reopen the playground' : 'Open the playground'}</span>
++              <span>{started ? 'Continue the conversation' : 'Ask about my work'}</span>
+             </Button>
+             {started ? (
+               <button type="button" className="a2-reset" onClick={reset}>
+                 clear thread
+               </button>
+             ) : (
+-              <span className="a2-launch-hint">or start with a question:</span>
++              <span className="a2-launch-hint">or choose a question below</span>
+             )}
+           </div>
+ 
+           {!started && <StarterMenu onPick={launch} />}
+ 
+           <Alert variant="info" compact className="live-note">
+-            Each visitor gets {DAILY_LIMIT} questions a day, and each one is a live call to the
+-            model.
++            Up to {DAILY_LIMIT} live questions a day per IP address.
+           </Alert>
+         </div>
+       </div>
+@@ -485,12 +484,12 @@ export default function A2UIPlayground() {
+                       </span>
+                       <span>{pending}</span>
+                     </p>
+-                    <div className="a2-skeleton" aria-label="Composing the surface">
++                    <div className="a2-skeleton" aria-label="Preparing a reply">
+                       <span className="a2-sk-line is-w70"></span>
+                       <span className="a2-sk-line is-w90"></span>
+                       <span className="a2-sk-block"></span>
+                     </div>
+-                    <p className="a2-composing">composing surface…</p>
++                    <p className="a2-composing">Preparing a reply…</p>
+                   </article>
+                 )}
+               </div>
+diff --git a/src/islands/a2ui/welcome.ts b/src/islands/a2ui/welcome.ts
+index a1c57b2..b2508ce 100644
+--- a/src/islands/a2ui/welcome.ts
++++ b/src/islands/a2ui/welcome.ts
+@@ -58,7 +58,7 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
+       id: 'intro',
+       type: 'Text',
+       props: {
+-        text: 'Ask about the work, the blog or the background.',
++        text: "Ask about Tomas's work, background or blog. You can start with a question below.",
+       },
+     },
+     {
+@@ -67,14 +67,14 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
+       data: {
+         steps: [
+           { label: 'question' },
+-          { label: 'retrieve', note: 'ranked context' },
++          { label: 'retrieve', note: 'site content' },
+           { label: 'agent', note: 'one tool call' },
+           { label: 'A2UI', note: 'components' },
+           { label: 'this panel' },
+         ],
+       },
+       props: {
+-        caption: 'What each turn does. Tomas wrote this first surface by hand, in the same format.',
++        caption: 'The agent reads the site content and returns the components shown in this panel.',
+       },
+     },
+     {
+@@ -82,7 +82,7 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
+       type: 'Callout',
+       props: {
+         tone: 'info',
+-        text: 'Under every answer, one line reports what that turn cost: the model, latency, tokens and dollars.',
++        text: 'Each live reply shows the model, response time, token use and estimated cost.',
+       },
+     },
+     {
+@@ -110,7 +110,11 @@ export const WELCOME: { summary: string; messages: A2uiMessage[] } = {
+ export const STARTER_GROUPS: { label: string; prompts: string[] }[] = [
+   {
+     label: 'work',
+-    prompts: ['What has he shipped?', 'What did he build at Dex?', 'What happened at Mint?'],
++    prompts: [
++      'What has he built?',
++      'What did he build at Dex?',
++      'What did he work on at Mint Mobile?',
++    ],
+   },
+   {
+     label: 'ai systems',
+@@ -126,7 +130,11 @@ export const STARTER_GROUPS: { label: string; prompts: string[] }[] = [
+   },
+   {
+     label: 'background',
+-    prompts: ['What does ICPC say about him?', 'What is his stack?', 'What is he working on now?'],
++    prompts: [
++      'What is his competitive programming background?',
++      'Which tools does he use?',
++      'What is he working on now?',
++    ],
+   },
+ ];
+ 
+diff --git a/src/pages/index.astro b/src/pages/index.astro
+index f9b650d..3f84910 100644
+--- a/src/pages/index.astro
++++ b/src/pages/index.astro
+@@ -35,7 +35,9 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
+ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
+ ---
+ 
+-<BaseLayout>
++<BaseLayout
++  description="Tomas Brasca, a software engineer in Rosario, Argentina. Web and mobile apps, LLM routing at Dex, and e-commerce APIs for Mint Mobile."
++>
+   <ReelHead slot="head" />
+   <Stages at="backdrop" />
+   <div class="shell">
+@@ -45,7 +47,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
+       {/* 00 · readme */}
+       <section class="block" id="readme" data-sec="0">
+         <Opening />
+-        <Keybar sec="readme" label="readme" />
++        <Keybar sec="readme" label="about" />
+         <p class="lede" set:html={profile.lede} />
+         <p class="sub">{profile.sub}</p>
+         <div class="metrics">
+@@ -63,7 +65,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
+       {/* 01 · playground (the one interactive island) */}
+       <section class="block" id="playground" data-sec="1">
+         <Stages at="in:playground" />
+-        <Keybar sec="playground" label="playground">a2ui portfolio agent</Keybar>
++        <Keybar sec="playground" label="playground">ask about my work</Keybar>
+         <A2UIPlayground client:visible />
+       </section>
+       <Stages at="after:playground" />
+@@ -200,7 +202,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
+       {/* 06 · principles · how I build */}
+       <section class="block" id="principles" data-sec="6">
+         <Stages at="in:principles" />
+-        <Keybar sec="principles" label="principles" />
++        <Keybar sec="principles" label="how I work" />
+         <div class="tenets">
+           {
+             tenets.map((t, i) => (
+@@ -218,7 +220,7 @@ const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
+       {/* 07 · stack · toolbox */}
+       <section class="block" id="stack" data-sec="7">
+         <Stages at="in:stack" />
+-        <Keybar sec="stack" label="stack" />
++        <Keybar sec="stack" label="tools" />
+         <div class="toolbox">
+           {
+             toolbox.map((col) => (
+diff --git a/src/reels/openings/BladeRunner.astro b/src/reels/openings/BladeRunner.astro
+index e044d34..f3b65a6 100644
+--- a/src/reels/openings/BladeRunner.astro
++++ b/src/reels/openings/BladeRunner.astro
+@@ -14,8 +14,8 @@ const fibers = Array.from({ length: 192 }, (_, i) => {
+   <div class="bk-macro">
+     <div class="bk-copy">
+       <p class="shot-kicker">03 / Blade Runner 2049</p>
+-      <h1><span>Less model.</span><em>More signal.</em></h1>
+-      <p class="bk-note">Classify. Dispatch. Evaluate.</p>
++      <h1><span>LLM routing,</span><em>with evals.</em></h1>
++      <p class="bk-note">A case study from my work at Dex.</p>
+     </div>
+     <div class="bk-eye" aria-hidden="true">
+       <svg viewBox="0 0 800 800" fill="none">
+@@ -63,7 +63,7 @@ const fibers = Array.from({ length: 192 }, (_, i) => {
+   </div>
+   <div class="bk-cut" aria-hidden="true">
+     <span class="bk-solar"></span>
+-    <p>The smallest<br />that <em>passes.</em></p>
++    <p>Routing a request<br /><em>at Dex.</em></p>
+     <span class="bk-providers">OpenAI / Groq / OpenRouter</span>
+   </div>
+ </div>
+diff --git a/src/reels/openings/Budapest.astro b/src/reels/openings/Budapest.astro
+index ec095a0..dc46a46 100644
+--- a/src/reels/openings/Budapest.astro
++++ b/src/reels/openings/Budapest.astro
+@@ -8,7 +8,7 @@ const windows = Array.from({ length: 28 }, (_, i) => ({
+ <div class="opening-scene opening-budapest" data-opening="budapest">
+   <div class="gk-heading">
+     <p class="shot-kicker">04 / The Grand Budapest Hotel</p>
+-    <h1>Order, with<br /><em>character.</em></h1>
++    <h1>A few things<br /><em>I've built.</em></h1>
+   </div>
+   <div class="gk-desk">
+     <div class="gk-envelope" aria-hidden="true">
+@@ -21,9 +21,9 @@ const windows = Array.from({ length: 28 }, (_, i) => ({
+         <div class="gk-index">
+           <span class="gk-index-kicker">Selected work</span>
+           <p><span>01</span> Dex</p><p><span>02</span> Mint Mobile</p><p>
+-            <span>03</span> Flagship
++            <span>03</span> Site agent
+           </p>
+-          <i></i><small>Every detail<br />has its place.</small>
++          <i></i><small>Projects<br />and notes.</small>
+         </div>
+         <svg class="gk-hotel" viewBox="0 0 320 310" fill="none" aria-hidden="true">
+           <g stroke="currentColor" stroke-width=".8">
+diff --git a/src/reels/openings/Mood.astro b/src/reels/openings/Mood.astro
+index 89da85f..64a9801 100644
+--- a/src/reels/openings/Mood.astro
++++ b/src/reels/openings/Mood.astro
+@@ -29,10 +29,10 @@ const rain = Array.from({ length: 52 }, (_, i) => ({
+   </div>
+   <div class="mk-copy">
+     <p class="shot-kicker">02 / In the Mood for Love</p>
+-    <h1>Care is in<br />the <em>details.</em></h1>
+-    <p class="mk-note">Some things deserve<br />a second look.</p>
++    <h1>Work<br />and <em>notes.</em></h1>
++    <p class="mk-note">Web and mobile apps,<br />with a lot of backend work.</p>
+   </div>
+   <div class="mk-screen" aria-hidden="true"><span></span><span></span><span></span></div>
+-  <p class="mk-after" aria-hidden="true">And in the spaces<br /><em>between them.</em></p>
++  <p class="mk-after" aria-hidden="true">Projects<br /><em>and notes.</em></p>
+   <span class="mk-rule" aria-hidden="true"></span>
+ </div>
+diff --git a/src/reels/openings/Odyssey.astro b/src/reels/openings/Odyssey.astro
+index cd5733b..aaa7eec 100644
+--- a/src/reels/openings/Odyssey.astro
++++ b/src/reels/openings/Odyssey.astro
+@@ -10,7 +10,7 @@ const stars = Array.from({ length: 48 }, (_, i) => ({
+   <div class="ok-first">
+     <div class="ok-copy">
+       <p class="shot-kicker">05 / 2001: A Space Odyssey</p>
+-      <h1><span>Always a little</span> <em>further.</em></h1>
++      <h1><span>Some of</span> <em>my work.</em></h1>
+     </div>
+     <div class="ok-hal" aria-hidden="true">
+       <div class="ok-hal-label">HAL <span>9000</span></div>
+@@ -72,6 +72,6 @@ const stars = Array.from({ length: 48 }, (_, i) => ({
+           stroke-opacity=".45"></path></svg
+       >
+     </div>
+-    <p>Beyond<br /><em>the obvious.</em></p>
++    <p>Projects<br /><em>and notes.</em></p>
+   </div>
+ </div>
+diff --git a/src/reels/openings/Parasite.astro b/src/reels/openings/Parasite.astro
+index fa5f4f8..1d5ac2c 100644
+--- a/src/reels/openings/Parasite.astro
++++ b/src/reels/openings/Parasite.astro
+@@ -6,10 +6,10 @@ const steps = Array.from({ length: 14 }, (_, i) => `M${365 + i * 14} ${468 + i *
+   <div class="ps-underground" aria-hidden="true"></div>
+   <div class="ps-copy">
+     <p class="shot-kicker">01 / Parasite</p>
+-    <h1>Look<br /><em>beneath.</em></h1>
+-    <p class="ps-note">Interfaces above.<br />Systems underneath.</p>
++    <h1>Apps<br /><em>and APIs.</em></h1>
++    <p class="ps-note">Work at Dex<br />and Mint Mobile.</p>
+   </div>
+-  <p class="ps-below" aria-hidden="true">The work<br />behind the work.</p>
++  <p class="ps-below" aria-hidden="true">Inventory<br />and checkout.</p>
+   <div class="ps-drawing" aria-hidden="true">
+     <svg viewBox="0 0 800 1100" fill="none">
+       <defs>

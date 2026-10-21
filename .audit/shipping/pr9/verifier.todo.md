@@ -1,0 +1,17 @@
+- [x] Resolve the forge, then verify each PR independently before it lands.
+  - GitHub CLI fallback. Origin is unavailable. Independent verifier did not author the change.
+  - Assigned PR9 only. No push, merge, rebase, or retarget operation is authorized for this verifier.
+- [x] Drive parent against head with the actual browser.
+- [x] Save verdict with head SHA, base SHA, base branch, and stable git patch-id.
+- [x] Post verdict on PR9 and read it back.
+- [x] Reset viewport and release browser and servers.
+- [ ] Land only the contiguous verified run rooted at the bottom.
+  - skip: Root shipping coordinator owns landing decisions and operations.
+- [ ] Re-check that the verdicts still describe the code.
+  - skip: Root coordinator repeats this immediately before landing.
+- [ ] Land bottom-up, one PR at a time.
+  - skip: No landing authority delegated to this verifier.
+- [ ] Leave the stack alone while it lands.
+  - skip: No topology mutation by this verifier.
+- [ ] Stop at the ceiling.
+  - skip: This verifier is scoped only to PR9.

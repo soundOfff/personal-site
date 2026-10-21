@@ -1,33 +1,8 @@
-/**
- * The Playground: a conversational portfolio.
- *
- * A visitor asks a question about the work; an agent answers by generating a
- * user interface, and this island renders it. The island itself is deliberately
- * thin — it owns the transcript and the network call, and nothing about what an
- * answer looks like. That all lives in the surfaces the agent sends and in
- * `a2ui/`, which is the point of the protocol.
- *
- * There is one path: every question posts to the Worker, which holds the key
- * and the caps, and every surface on screen was composed by the model for that
- * question. Nothing is pre-recorded, so a failure shows as a failure rather
- * than as a canned answer wearing the agent's voice.
- *
- * The console reports what each turn actually cost — model, latency, tokens,
- * cache hits, dollars — and every turn will show you the raw A2UI messages
- * behind it. Both are there because the audience for this page opens dev tools
- * out of habit, and a demo that can't be checked isn't evidence.
- *
- * The surfaces need room the 600px content column doesn't have, so the console
- * lives in a right-hand slideover and the page keeps only a launcher. The
- * transcript is state in this island, not in the dialog, so closing the panel
- * parks the thread rather than throwing it away.
- */
-
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Button, Input } from 'editorial-ui';
+import { Button } from 'editorial-ui';
 import { Renderer } from './a2ui/Renderer';
 import { AskContext } from './a2ui/components';
-import { QUICK_STARTERS, STARTER_GROUPS, WELCOME } from './a2ui/welcome';
+import { QUICK_STARTERS } from './a2ui/welcome';
 import { stateFrom, type A2uiState } from './a2ui/model';
 import type {
   A2uiError,
@@ -37,63 +12,45 @@ import type {
   TurnMeta,
 } from '../lib/a2ui/types';
 
-/** How many prior turns travel with a request. Matches the server's cap. */
 const MAX_HISTORY = 6;
+const DAILY_LIMIT = 5;
 
 interface Turn {
   key: number;
-  /** null for the welcome surface, which answers a question nobody asked. */
-  question: string | null;
+  question: string;
   summary: string;
   messages: A2uiMessage[];
   state: A2uiState;
-  meta?: TurnMeta;
+  meta: TurnMeta;
 }
 
-/** Seconds → a human retry hint; daily caps reset hours out, not seconds. */
+type RequestState =
+  | { kind: 'idle' }
+  | { kind: 'pending'; key: number; question: string }
+  | { kind: 'failed'; key: number; question: string; message: string; retryable: boolean };
+
+interface ActiveRequest {
+  key: number;
+  controller: AbortController;
+}
+
 function formatRetry(seconds: number): string {
   if (seconds < 90) return `${seconds}s`;
   if (seconds < 5400) return `${Math.round(seconds / 60)} min`;
   return `${Math.round(seconds / 3600)} h`;
 }
 
-/** The daily allowance, mirrored from the server so the copy has a number. */
-const DAILY_LIMIT = 5;
-
-/**
- * The burst window is a minute, so anything longer than that came from the
- * daily cap — which means the visitor is out of questions, not just early.
- */
-const isDailyCap = (retryAfter: number) => retryAfter > 60;
-
-interface Quota {
-  remaining: number;
-  limit: number;
+function historyFrom(turns: Turn[]): HistoryTurn[] {
+  return turns
+    .flatMap((turn): HistoryTurn[] => [
+      { role: 'user', text: turn.question },
+      { role: 'agent', text: turn.summary },
+    ])
+    .slice(-MAX_HISTORY);
 }
 
-/** The grouped menu of starting questions. Rendered wherever there is room. */
-function StarterMenu({ onPick }: { onPick: (prompt: string) => void }) {
-  return (
-    <div className="a2-starter-menu">
-      {STARTER_GROUPS.map((group) => (
-        <div className="a2-starter-group" key={group.label}>
-          <span className="a2-starter-lbl">{group.label}</span>
-          <div className="a2-starters">
-            {group.prompts.map((prompt) => (
-              <button
-                type="button"
-                className="a2-action"
-                key={prompt}
-                onClick={() => onPick(prompt)}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+function cue(name: 'ask' | 'surface' | 'error' | 'open' | 'close', count?: number) {
+  document.dispatchEvent(new CustomEvent('reel:cue', { detail: { name, count } }));
 }
 
 function GlyphIcon({ id }: { id: string }) {
@@ -111,144 +68,143 @@ function GlyphIcon({ id }: { id: string }) {
   );
 }
 
-const WELCOME_TURN: Turn = {
-  key: 0,
-  question: null,
-  summary: WELCOME.summary,
-  messages: WELCOME.messages,
-  state: stateFrom(WELCOME.messages),
-};
-
-/**
- * Tell the page what the agent is doing, so a film reel can score it
- * (src/reels: the engine relays these to whichever reel is screening).
- */
-function cue(name: 'ask' | 'surface' | 'error' | 'open' | 'close', count?: number) {
-  document.dispatchEvent(new CustomEvent('reel:cue', { detail: { name, count } }));
-}
-
 export default function A2UIPlayground() {
-  const [turns, setTurns] = useState<Turn[]>([WELCOME_TURN]);
+  const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState('');
-  const [pending, setPending] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [request, setRequest] = useState<RequestState>({ kind: 'idle' });
   const [open, setOpen] = useState(false);
   const [maxed, setMaxed] = useState(false);
-  /** null until the first turn answers; the server owns the real count. */
-  const [quota, setQuota] = useState<Quota | null>(null);
+  const [unreadReply, setUnreadReply] = useState(false);
+  const [quota, setQuota] = useState<A2uiResponse['quota'] | null>(null);
+  const activeRequest = useRef<ActiveRequest | null>(null);
   const nextKey = useRef(1);
+  const pendingScrollTop = useRef<number | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const latestRef = useRef<HTMLElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
+  const started = turns.length > 0 || request.kind !== 'idle';
+  const pending = request.kind === 'pending';
+  const spent = quota !== null && quota.remaining <= 0;
+  const latestKey = request.kind === 'idle' ? turns.at(-1)?.key : request.key;
 
-  const append = useCallback((turn: Omit<Turn, 'key'>) => {
-    setTurns((prior) => [...prior, { ...turn, key: nextKey.current++ }]);
-    setPending(null);
-  }, []);
+  const ask = useCallback(
+    async (raw: string) => {
+      const question = raw.trim();
+      if (!question || question.length > 400 || activeRequest.current || spent) return;
 
-  /** Replay the thread as text. Agent turns travel as their summary line. */
-  const historyFrom = useCallback((prior: Turn[]): HistoryTurn[] => {
-    const history: HistoryTurn[] = [];
-    for (const turn of prior) {
-      if (!turn.question) continue;
-      history.push({ role: 'user', text: turn.question });
-      history.push({ role: 'agent', text: turn.summary });
-    }
-    return history.slice(-MAX_HISTORY);
-  }, []);
+      const active: ActiveRequest = { key: nextKey.current++, controller: new AbortController() };
+      activeRequest.current = active;
+      setUnreadReply(false);
+      setRequest({ kind: 'pending', key: active.key, question });
+      cue('ask');
 
-  const askAgent = useCallback(
-    async (question: string, prior: Turn[]) => {
+      const fail = (message: string, retryable: boolean) => {
+        setRequest({ kind: 'failed', key: active.key, question, message, retryable });
+        setQuota((current) => (current?.remaining === 0 ? current : null));
+        setDraft((current) => (current.trim() ? current : question));
+        cue('error');
+      };
+
       try {
         const res = await fetch('/api/a2ui', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ message: question, history: historyFrom(prior) }),
+          body: JSON.stringify({ message: question, history: historyFrom(turns) }),
+          signal: active.controller.signal,
         });
 
         if (res.ok) {
           const body = (await res.json()) as A2uiResponse;
+          if (activeRequest.current !== active) return;
+          const state = stateFrom(body.messages);
           if (body.quota) setQuota(body.quota);
+          setTurns((prior) => [
+            ...prior,
+            {
+              key: active.key,
+              question,
+              summary: body.summary,
+              messages: body.messages,
+              state,
+              meta: body.meta,
+            },
+          ]);
+          setRequest({ kind: 'idle' });
+          setDraft((current) => (current.trim() === question ? '' : current));
           cue('surface', body.messages.length);
-          append({
-            question,
-            summary: body.summary,
-            messages: body.messages,
-            state: stateFrom(body.messages),
-            meta: body.meta,
-          });
           return;
         }
 
         const body = (await res.json().catch(() => ({}))) as A2uiError;
-        setPending(null);
-        cue('error');
-
+        if (activeRequest.current !== active) return;
         if (res.status === 429) {
           const retryAfter = body.retryAfter ?? 60;
-          if (isDailyCap(retryAfter)) {
+          if (retryAfter > 60) {
             setQuota({ remaining: 0, limit: DAILY_LIMIT });
-            setError(
-              `That was your ${DAILY_LIMIT} questions for today. The cap resets at 00:00 UTC, about ${formatRetry(retryAfter)} from now. Everything the agent knows is also on the page below.`,
+            fail(
+              `Today's ${DAILY_LIMIT} questions have been used. The allowance resets at 00:00 UTC, about ${formatRetry(retryAfter)} from now. You can still explore the work and blog.`,
+              false,
             );
-            return;
+          } else {
+            fail(
+              `A few questions arrived too quickly. Please wait ${formatRetry(retryAfter)} before asking again.`,
+              false,
+            );
           }
-          setError(`That's the per-minute limit. Try again in ${formatRetry(retryAfter)}.`);
           return;
         }
-
         if (res.status === 503) {
-          setError(
+          fail(
             body.error === 'daily-budget-exhausted'
-              ? 'The shared daily budget for live turns is spent, and it resets at 00:00 UTC. That cap is what keeps this endpoint open to everyone without a login.'
-              : "The agent isn't configured on this deploy. No API key is set on the server, so there is nothing to ask.",
+              ? 'The agent has reached its daily limit. Please return after 00:00 UTC, or explore the work and blog.'
+              : 'The agent is unavailable right now. You can keep this conversation open and try later.',
+            false,
           );
           return;
         }
-
-        setError('The agent failed to compose a surface. Try rephrasing the question.');
+        fail(
+          "The agent couldn't finish this reply. You can retry this question or edit it below.",
+          true,
+        );
       } catch {
-        setPending(null);
-        cue('error');
-        setError('Network error reaching the agent. Check the connection and ask again.');
+        if (activeRequest.current !== active) return;
+        fail(
+          'The reply could not be reached. Check your connection, then retry your question.',
+          true,
+        );
+      } finally {
+        if (activeRequest.current === active) activeRequest.current = null;
       }
     },
-    [append, historyFrom],
-  );
-
-  const spent = quota !== null && quota.remaining <= 0;
-
-  const ask = useCallback(
-    (raw: string) => {
-      const question = raw.trim();
-      if (!question || pending || spent) return;
-
-      setDraft('');
-      setError(null);
-      setPending(question);
-      cue('ask');
-      void askAgent(question, turns);
-    },
-    [askAgent, pending, spent, turns],
+    [spent, turns],
   );
 
   const reset = useCallback(() => {
-    setTurns([WELCOME_TURN]);
-    setPending(null);
-    setError(null);
+    const active = activeRequest.current;
+    activeRequest.current = null;
+    active?.controller.abort();
+    if (active) {
+      setQuota((current) => (current?.remaining === 0 ? current : null));
+      cue('error');
+    }
+    setTurns([]);
+    setRequest({ kind: 'idle' });
     setDraft('');
+    setUnreadReply(false);
+    pendingScrollTop.current = null;
+    composerRef.current?.focus({ preventScroll: true });
   }, []);
 
-  /** Open the panel, optionally with a question already in flight. */
-  const launch = useCallback(
-    (prompt?: string) => {
-      setOpen(true);
-      if (prompt) ask(prompt);
+  useEffect(
+    () => () => {
+      const active = activeRequest.current;
+      activeRequest.current = null;
+      active?.controller.abort();
     },
-    [ask],
+    [],
   );
 
-  /* The hero button asks for the panel with an event. A click
-     that landed before this island hydrated left a flag instead. */
   useEffect(() => {
     const root = document.documentElement;
     const take = () => {
@@ -264,26 +220,20 @@ export default function A2UIPlayground() {
     };
   }, []);
 
-  /* The dialog is native, so Esc, the backdrop and focus containment are the
-     platform's job; React only keeps `open` in step with the element. */
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-
     if (open && !dialog.open) {
       dialog.showModal();
       cue('open');
-      // The composer is the point of the panel — but not at the cost of
-      // throwing up a keyboard over a phone screen the moment it opens.
       if (window.matchMedia('(min-width: 700px)').matches) {
-        dialog.querySelector<HTMLInputElement>('input')?.focus();
+        composerRef.current?.focus({ preventScroll: true });
       }
     } else if (!open && dialog.open) {
       dialog.close();
     }
   }, [open]);
 
-  /* showModal() makes the page inert but not unscrollable. */
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
@@ -294,20 +244,48 @@ export default function A2UIPlayground() {
     };
   }, [open]);
 
-  /* Follow the transcript: a new turn or a pending one should be in view. */
-  useEffect(() => {
-    if (!open) return;
+  const readLatest = useCallback(() => {
     const scroller = scrollRef.current;
-    if (!scroller) return;
-    scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' });
-  }, [open, turns, pending]);
+    const article = latestRef.current;
+    if (!dialogRef.current?.open || !scroller || !article) return;
+    setUnreadReply(false);
+    const top =
+      article.getBoundingClientRect().top -
+      scroller.getBoundingClientRect().top +
+      scroller.scrollTop -
+      20;
+    scroller.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+  }, []);
 
-  const started = turns.length > 1;
-  const asked = turns.length - 1;
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    if (request.kind === 'pending') {
+      readLatest();
+      pendingScrollTop.current = scroller?.scrollTop ?? null;
+      return;
+    }
+    if (scroller && pendingScrollTop.current !== null) {
+      if (dialogRef.current?.open && Math.abs(scroller.scrollTop - pendingScrollTop.current) < 48) {
+        readLatest();
+      } else if (request.kind === 'idle') {
+        setUnreadReply(true);
+      }
+    }
+    pendingScrollTop.current = null;
+  }, [latestKey, request.kind, readLatest]);
+
+  useEffect(() => {
+    if (
+      open &&
+      started &&
+      (document.activeElement === document.body || document.activeElement === dialogRef.current)
+    ) {
+      latestRef.current?.focus({ preventScroll: true });
+    }
+  }, [open, started, latestKey, request.kind]);
 
   return (
     <>
-      {/* The page keeps a door, not the room. */}
       <div className="console a2-launch">
         <div className="console-bar">
           <span className="who">
@@ -318,179 +296,184 @@ export default function A2UIPlayground() {
             </span>
             portfolio agent
           </span>
-          {quota ? (
+          {quota && (
             <span className="a2-launch-count">
               {quota.remaining} of {quota.limit} left today
             </span>
-          ) : (
-            started && <span className="a2-launch-count">{asked} asked</span>
           )}
         </div>
-
         <div className="console-body a2-launch-body">
-          <p className="a2-launch-lede">
-            Ask about the work and the agent answers with an interface built for the question:
-            project cards, a chart, a timeline or a diagram.
-          </p>
-
+          <p className="a2-launch-title">Explore the work.</p>
+          <p className="a2-launch-lede">Ask about my projects, experience and writing.</p>
           <div className="a2-launch-row">
-            <Button variant="amber" onClick={() => launch()}>
+            <Button variant="amber" onClick={() => setOpen(true)}>
               <GlyphIcon id={started ? 'i-arrow-r' : 'i-play'} />
-              <span>{started ? 'Reopen the playground' : 'Open the playground'}</span>
+              <span>{started ? 'Continue our conversation' : 'Ask about my work'}</span>
             </Button>
-            {started ? (
-              <button type="button" className="a2-reset" onClick={reset}>
-                clear thread
-              </button>
-            ) : (
-              <span className="a2-launch-hint">or start with a question:</span>
-            )}
+            <span className="a2-launch-hint">{DAILY_LIMIT} live questions a day per IP</span>
           </div>
-
-          {!started && <StarterMenu onPick={launch} />}
-
-          <Alert variant="info" compact className="live-note">
-            Each visitor gets {DAILY_LIMIT} questions a day, and each one is a live call to the
-            model.
-          </Alert>
         </div>
       </div>
 
       <dialog
         className={maxed ? 'a2-drawer is-max' : 'a2-drawer'}
         ref={dialogRef}
-        aria-label="Portfolio agent playground"
+        aria-labelledby="a2-dialog-title"
         onClose={() => {
-          // every way out (Esc, the backdrop, the buttons) ends in the native close event
           setOpen(false);
           cue('close');
         }}
         onClick={(event) => {
-          // Clicks that land on the dialog itself are backdrop clicks; the
-          // panel fills the dialog, so anything inside stops here.
           if (event.target === dialogRef.current) setOpen(false);
         }}
       >
-        <div className="a2-panel">
+        <div className={started ? 'a2-panel' : 'a2-panel is-empty'}>
           <div className="console-bar a2-panel-bar">
-            <span className="who">
-              {/* The console's decorative traffic lights, made real: the panel
-                  is a window, so the dots are where you'd reach for first. */}
-              <span className="a2-lights" role="group" aria-label="Panel controls">
-                <button
-                  type="button"
-                  className="a2-lamp is-close"
-                  onClick={() => setOpen(false)}
-                  title="Close"
-                  aria-label="Close the panel"
-                >
-                  <span aria-hidden="true">×</span>
-                </button>
-                <button
-                  type="button"
-                  className="a2-lamp is-min"
-                  onClick={() => setOpen(false)}
-                  title="Minimize"
-                  aria-label="Minimize the panel. The thread is kept."
-                >
-                  <span aria-hidden="true">–</span>
-                </button>
-                <button
-                  type="button"
-                  className="a2-lamp is-max"
-                  onClick={() => setMaxed((prior) => !prior)}
-                  title={maxed ? 'Restore' : 'Maximize'}
-                  aria-label={maxed ? 'Restore the panel width' : 'Maximize the panel'}
-                  aria-pressed={maxed}
-                >
-                  {/* the panel grows leftward, so the arrow points that way */}
-                  <span aria-hidden="true">{maxed ? '»' : '«'}</span>
-                </button>
-              </span>
+            <span className="who" id="a2-dialog-title">
               portfolio agent
             </span>
             <div className="a2-bar-right">
-              {quota && (
-                <span className={spent ? 'a2-quota is-spent' : 'a2-quota'}>
-                  {quota.remaining}/{quota.limit} today
-                </span>
-              )}
-              {started && (
-                <button type="button" className="a2-reset" onClick={reset}>
-                  clear
-                </button>
-              )}
+              <button
+                type="button"
+                className="a2-window-button a2-expand"
+                onClick={() => setMaxed((prior) => !prior)}
+                aria-pressed={maxed}
+              >
+                {maxed ? 'Restore' : 'Expand'}
+              </button>
+              <button type="button" className="a2-window-button" onClick={() => setOpen(false)}>
+                <span aria-hidden="true">×</span> Close
+              </button>
             </div>
           </div>
 
           <div className="a2-panel-scroll" ref={scrollRef}>
-            <AskContext.Provider value={ask}>
+            {!started && (
+              <div className="a2-welcome">
+                <p className="a2-welcome-eyebrow">The work, in conversation</p>
+                <h2>What would you like to know?</h2>
+                <p>
+                  Ask about Tomas’s projects, experience or ideas. Replies draw from this site, with
+                  cards and diagrams when they help.
+                </p>
+                <div className="a2-welcome-questions" aria-label="Questions to start with">
+                  {QUICK_STARTERS.map((prompt) => (
+                    <button
+                      type="button"
+                      className="a2-action"
+                      key={prompt}
+                      disabled={spent}
+                      onClick={() => void ask(prompt)}
+                    >
+                      <span>{prompt}</span>
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <AskContext.Provider value={(prompt) => void ask(prompt)}>
               <div className="a2-thread">
                 {turns.map((turn) => (
-                  <article className="a2-turn" key={turn.key}>
-                    {turn.question && (
-                      <p className="a2-ask">
-                        <span className="car" aria-hidden="true">
-                          ❯
-                        </span>
-                        <span>{turn.question}</span>
-                      </p>
-                    )}
-
-                    <Renderer state={turn.state} />
-
-                    {turn.meta && (
-                      <div className="statusline a2-status">
-                        <span className="seg ok">● rendered</span>
-                        <span className="sep">·</span>
-                        <span className="seg">
-                          <b>{turn.meta.model}</b>
-                        </span>
-                        <span className="sep">·</span>
-                        <span className="seg">
-                          <b>{turn.meta.latency}</b>
-                        </span>
-                        <span className="sep">·</span>
-                        <span className="seg">
-                          {turn.meta.inputTokens} in / {turn.meta.outputTokens} out
-                        </span>
-                        {turn.meta.cachedTokens > 0 && (
-                          <>
-                            <span className="sep">·</span>
-                            <span className="seg">{turn.meta.cachedTokens} cached</span>
-                          </>
-                        )}
-                        <span className="sep">·</span>
-                        <span className="seg">
-                          cost <b>{turn.meta.cost}</b>
-                        </span>
-                        <span className="sep">·</span>
-                        <span className="seg">{turn.meta.components} components</span>
-                      </div>
-                    )}
-
-                    {/* The protocol, on demand. `details` keeps it free until opened. */}
-                    <details className="a2-peek">
-                      <summary>view the A2UI messages</summary>
-                      <pre>{JSON.stringify(turn.messages, null, 2)}</pre>
-                    </details>
-                  </article>
-                ))}
-
-                {pending && (
-                  <article className="a2-turn is-pending" aria-live="polite">
+                  <article
+                    className="a2-turn"
+                    tabIndex={-1}
+                    key={turn.key}
+                    ref={turn.key === latestKey ? latestRef : undefined}
+                  >
                     <p className="a2-ask">
                       <span className="car" aria-hidden="true">
                         ❯
                       </span>
-                      <span>{pending}</span>
+                      <span>{turn.question}</span>
                     </p>
-                    <div className="a2-skeleton" aria-label="Composing the surface">
-                      <span className="a2-sk-line is-w70"></span>
-                      <span className="a2-sk-line is-w90"></span>
-                      <span className="a2-sk-block"></span>
-                    </div>
-                    <p className="a2-composing">composing surface…</p>
+                    <Renderer state={turn.state} />
+                    <details className="a2-peek a2-reply-details">
+                      <summary>About this reply</summary>
+                      <dl className="a2-reply-facts">
+                        <div>
+                          <dt>Model</dt>
+                          <dd>{turn.meta.model}</dd>
+                        </div>
+                        <div>
+                          <dt>Response time</dt>
+                          <dd>{turn.meta.latency}</dd>
+                        </div>
+                        <div>
+                          <dt>Tokens</dt>
+                          <dd>
+                            {turn.meta.inputTokens} in / {turn.meta.outputTokens} out
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Cached tokens</dt>
+                          <dd>{turn.meta.cachedTokens}</dd>
+                        </div>
+                        <div>
+                          <dt>Estimated cost</dt>
+                          <dd>{turn.meta.cost}</dd>
+                        </div>
+                        <div>
+                          <dt>Components</dt>
+                          <dd>{turn.meta.components}</dd>
+                        </div>
+                      </dl>
+                      <details className="a2-peek">
+                        <summary>A2UI messages</summary>
+                        <pre>{JSON.stringify(turn.messages, null, 2)}</pre>
+                      </details>
+                    </details>
+                  </article>
+                ))}
+                {request.kind !== 'idle' && (
+                  <article
+                    className={`a2-turn is-${request.kind}`}
+                    tabIndex={-1}
+                    key={request.key}
+                    ref={latestRef}
+                  >
+                    <p className="a2-ask">
+                      <span className="car" aria-hidden="true">
+                        ❯
+                      </span>
+                      <span>{request.question}</span>
+                    </p>
+                    {request.kind === 'pending' ? (
+                      <div className="a2-waiting">
+                        <p className="a2-composing">Preparing your reply…</p>
+                        <p>You can keep reading while the agent works.</p>
+                      </div>
+                    ) : (
+                      <div className="a2-failure">
+                        <p role="alert">{request.message}</p>
+                        {request.retryable && (
+                          <p className="a2-retry-note">A retry may use another daily question.</p>
+                        )}
+                        <div className="a2-failure-actions">
+                          {request.retryable && !spent && (
+                            <button
+                              type="button"
+                              className="a2-window-button"
+                              onClick={() => void ask(request.question)}
+                            >
+                              Retry question <span aria-hidden="true">↗</span>
+                            </button>
+                          )}
+                          {!spent && (
+                            <button
+                              type="button"
+                              className="a2-reset"
+                              onClick={() => {
+                                setDraft(request.question);
+                                composerRef.current?.focus({ preventScroll: true });
+                              }}
+                            >
+                              Edit question
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </article>
                 )}
               </div>
@@ -498,58 +481,86 @@ export default function A2UIPlayground() {
           </div>
 
           <div className="a2-panel-foot">
-            {error && (
-              <p className="console-error">
-                <GlyphIcon id="i-info" />
-                <span>{error}</span>
-              </p>
-            )}
-
             <form
               className="a2-composer"
               onSubmit={(event) => {
                 event.preventDefault();
-                ask(draft);
+                void ask(draft);
               }}
             >
-              <Input
-                className="a2-input"
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                placeholder={
-                  spent
-                    ? `Out of questions until 00:00 UTC. Each visitor gets ${DAILY_LIMIT} a day.`
-                    : 'Ask a question…'
-                }
-                maxLength={400}
-                disabled={pending !== null || spent}
-                aria-label="Ask the portfolio agent"
-              />
-              <Button
-                variant="amber"
-                type="submit"
-                className="a2-send"
-                disabled={pending !== null || spent}
-              >
-                <span>{pending ? 'Asking…' : 'Ask'}</span>
-                <GlyphIcon id="i-send" />
-              </Button>
+              <label className="a2-composer-label" htmlFor="a2-question">
+                {started ? 'Keep the conversation going' : 'Your question'}
+              </label>
+              <div className="a2-composer-entry">
+                <textarea
+                  id="a2-question"
+                  ref={composerRef}
+                  className="a2-input"
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key === 'Enter' &&
+                      !event.shiftKey &&
+                      !event.nativeEvent.isComposing
+                    ) {
+                      event.preventDefault();
+                      void ask(draft);
+                    }
+                  }}
+                  placeholder={
+                    spent ? 'Questions reset at 00:00 UTC' : 'Ask anything about the work…'
+                  }
+                  maxLength={400}
+                  rows={2}
+                  disabled={spent}
+                  aria-describedby="a2-allowance"
+                />
+                <Button
+                  variant="amber"
+                  type="submit"
+                  className="a2-send"
+                  disabled={pending || spent || !draft.trim()}
+                >
+                  <span>{pending ? 'Asking…' : 'Ask'}</span>
+                  <GlyphIcon id="i-send" />
+                </Button>
+              </div>
             </form>
-
-            {!started && !pending && (
-              <div className="a2-starters">
-                {QUICK_STARTERS.map((prompt) => (
+            <div className="a2-footnote">
+              <p id="a2-allowance">
+                {quota
+                  ? `${quota.remaining} of ${quota.limit} questions left today`
+                  : `${DAILY_LIMIT} questions a day per IP`}{' '}
+                · Resets 00:00 UTC
+              </p>
+              {started && (
+                <div className="a2-footnote-actions">
                   <button
                     type="button"
-                    className="a2-action"
-                    key={prompt}
-                    onClick={() => ask(prompt)}
+                    className="a2-reset a2-latest"
+                    data-unread={unreadReply || undefined}
+                    onClick={readLatest}
                   >
-                    {prompt}
+                    {unreadReply
+                      ? 'New reply ready ↑'
+                      : `Latest ${request.kind === 'idle' ? 'reply' : 'question'} ↑`}
                   </button>
-                ))}
-              </div>
-            )}
+                  <button type="button" className="a2-reset" onClick={reset}>
+                    Start over
+                  </button>
+                </div>
+              )}
+            </div>
+            <p className="a2-sr-only" role="status">
+              {pending
+                ? 'Preparing your reply.'
+                : request.kind === 'failed'
+                  ? 'Your question needs attention.'
+                  : turns.length
+                    ? 'Reply ready. Use Latest reply to return to its beginning.'
+                    : ''}
+            </p>
           </div>
         </div>
       </dialog>

@@ -1,0 +1,8 @@
+HAL
+Good evening. What film has stayed with you lately?
+
+YOU
+Me gustan las películas que dejan preguntas. ¿Qué me preguntarías?
+
+HAL
+Las películas que invitan a la reflexión son fascinantes. Me pregunto qué tipo de preguntas te interesan más. ¿Prefieres las que exploran la naturaleza humana o las que cuestionan la realidad?

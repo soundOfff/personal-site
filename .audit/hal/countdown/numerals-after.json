@@ -1,0 +1,65 @@
+{
+  "pass": true,
+  "numerals": [
+    {
+      "numeral": "3",
+      "at": 0
+    },
+    {
+      "numeral": "2",
+      "at": 1
+    },
+    {
+      "numeral": "1",
+      "at": 2
+    },
+    {
+      "numeral": "0",
+      "at": 3
+    }
+  ],
+  "tones": [
+    {
+      "at": 0,
+      "frequency": 1000
+    },
+    {
+      "at": 1,
+      "frequency": 1000
+    },
+    {
+      "at": 2,
+      "frequency": 1000
+    },
+    {
+      "at": 3,
+      "frequency": 1000
+    }
+  ],
+  "levels": [
+    {
+      "numeral": "3",
+      "at": 0,
+      "rms": 0.05166205810880268
+    },
+    {
+      "numeral": "2",
+      "at": 1,
+      "rms": 0.09272271506619494
+    },
+    {
+      "numeral": "1",
+      "at": 2,
+      "rms": 0.09317686995412694
+    },
+    {
+      "numeral": "0",
+      "at": 3,
+      "rms": 0.09353163205056504
+    }
+  ],
+  "sources": [
+    "/Users/User/.codex/worktrees/countdown-bips/personal-site/src/reels/sound.ts",
+    "/Users/User/.codex/worktrees/countdown-bips/personal-site/src/reels/boxoffice/boxoffice.ts"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  ".camera-pin": {
+    "display": "block",
+    "font": "16px / 25.6px \"Jost Variable\", system-ui, sans-serif",
+    "height": 584,
+    "width": 1265,
+    "x": 0,
+    "y": 84
+  },
+  ".cinema-opening": {
+    "display": "block",
+    "font": "16px / 25.6px \"Jost Variable\", system-ui, sans-serif",
+    "height": 1260,
+    "width": 1265,
+    "x": 0,
+    "y": 84
+  },
+  ".gk-key": {
+    "display": "block",
+    "font": "16px / 25.6px \"Jost Variable\", system-ui, sans-serif",
+    "height": 265.5105285644531,
+    "width": 177.09814453125,
+    "x": 903.763427734375,
+    "y": 321.5103454589844
+  },
+  ".gk-register": {
+    "display": "block",
+    "font": "16px / 25.6px \"Jost Variable\", system-ui, sans-serif",
+    "height": 405.446533203125,
+    "width": 633.89013671875,
+    "x": 315.5549011230469,
+    "y": 266.7142333984375
+  },
+  ".opening-budapest": {
+    "display": "block",
+    "font": "16px / 25.6px \"Jost Variable\", system-ui, sans-serif",
+    "height": 584,
+    "width": 1265,
+    "x": 0,
+    "y": 84
+  },
+  ".rail": {
+    "display": "grid",
+    "font": "16px / 25.6px \"Jost Variable\", system-ui, sans-serif",
+    "height": 84,
+    "width": 1265,
+    "x": 0,
+    "y": 0
+  }
+}

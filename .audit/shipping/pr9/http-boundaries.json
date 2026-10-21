@@ -1,0 +1,26 @@
+[
+  {
+    "method": "GET",
+    "bodyBytes": 0,
+    "status": 405,
+    "body": "{\"error\":\"method-not-allowed\"}"
+  },
+  {
+    "method": "POST",
+    "bodyBytes": 8,
+    "status": 400,
+    "body": "{\"error\":\"bad-request\"}"
+  },
+  {
+    "method": "POST",
+    "bodyBytes": 434,
+    "status": 400,
+    "body": "{\"error\":\"bad-request\"}"
+  },
+  {
+    "method": "POST",
+    "bodyBytes": 8193,
+    "status": 413,
+    "body": "{\"error\":\"body-too-large\"}"
+  }
+]

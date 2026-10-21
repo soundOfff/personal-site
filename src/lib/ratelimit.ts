@@ -59,7 +59,7 @@ async function consume(
   if (kvCount >= limit) return { ok: false, remaining: 0, retryAfter };
 
   const count = Math.max(kvCount, memCount) + 1;
-  await kv.put(key, String(count), { expirationTtl: windowSec + 5 });
+  await kv.put(key, String(count), { expirationTtl: Math.max(60, windowSec + 5) });
   return { ok: true, remaining: limit - count, retryAfter };
 }
 
