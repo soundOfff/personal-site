@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tomas Brasca. Darkroom</title>
+<meta name="description" content="Tomas Brasca, full-stack software engineer in Rosario. Prototype B, Darkroom.">
+<link rel="preload" href="fonts/archivo-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#view">Skip to content</a>
+
+<div class="nav-strip" id="nav-strip" aria-hidden="true"></div>
+<header class="nav" id="nav">
+  <a class="nav-logo" href="#/" aria-label="Tomas Brasca, home"><span class="star" aria-hidden="true">✳</span><span class="nav-name">Tomas Brasca</span></a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="#/" data-section="work" data-nav="work"><span class="par" aria-hidden="true">(</span>Work<span class="par" aria-hidden="true">)</span></a>
+    <a href="#/" data-section="index" data-nav="index"><span class="par" aria-hidden="true">(</span>Index<span class="par" aria-hidden="true">)</span></a>
+    <a href="#/blog" data-nav="journal"><span class="par" aria-hidden="true">(</span>Journal<span class="par" aria-hidden="true">)</span></a>
+    <a href="#contact" data-section="contact" data-nav="contact"><span class="par" aria-hidden="true">(</span>Contact<span class="par" aria-hidden="true">)</span></a>
+  </nav>
+  <div class="nav-tools">
+    <button class="nav-btn" type="button" id="search-open" aria-haspopup="dialog" aria-keyshortcuts="/ Meta+K Control+K">Search <kbd>/</kbd></button>
+    <a class="nav-btn nav-cv" href="../shared/media/cv.pdf" target="_blank" rel="noopener">Résumé ↗</a>
+    <button class="nav-btn nav-menu-btn" type="button" id="menu-open" aria-haspopup="dialog" aria-expanded="false">Menu</button>
+  </div>
+</header>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<div id="page">
+<main id="view" tabindex="-1"></main>
+
+<footer class="footer" id="contact">
+  <h2 class="sr-only">Contact</h2>
+  <svg class="fit-word footer-word footer-word-wide" data-fit aria-label="Let's make it useful" role="img"><text x="0" y="0">LET’S MAKE IT USEFUL</text></svg>
+  <svg class="fit-word footer-word footer-word-stack" data-fit aria-hidden="true"><text x="0" y="0">LET’S MAKE</text><text x="0" y="0" data-line="1">IT USEFUL</text></svg>
+  <div class="footer-grid">
+    <div class="footer-mail">
+      <p class="mono footer-label">Write to me</p>
+      <button class="copy-btn" type="button" data-copy="tomibrasca97@gmail.com" data-copy-label="Copy email">
+        <span class="copy-value">tomibrasca97@gmail.com</span>
+        <span class="copy-state mono" aria-hidden="true">Copy</span>
+      </button>
+      <span class="sr-only" aria-live="polite" data-copy-live></span>
+    </div>
+    <ul class="footer-links">
+      <li><a href="mailto:tomibrasca97@gmail.com">Email</a></li>
+      <li><a href="https://github.com/soundOfff" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li><a href="https://www.linkedin.com/in/tomasbrasca" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+      <li><a href="#/blog">Journal</a></li>
+      <li><a href="https://tomasbrasca.xyz/rss.xml" target="_blank" rel="noopener">RSS ↗</a></li>
+    </ul>
+  </div>
+  <div class="footer-meta mono">
+    <span>© <span id="year">2026</span> Tomas Brasca</span>
+    <span>Rosario · UTC−3</span>
+    <button class="totop" type="button" id="totop">Back to top ↑</button>
+  </div>
+</footer>
+</div>
+
+<div class="search" id="search" role="dialog" aria-modal="true" aria-label="Search projects and writing" hidden>
+  <div class="search-inner">
+    <div class="search-head">
+      <p class="mono search-hint">Search projects and writing <span class="search-keys">↑ ↓ to move · Enter to open · Tab to complete · Esc to close</span></p>
+      <button class="search-close" type="button" id="search-close">Close <kbd>Esc</kbd></button>
+    </div>
+    <div class="search-field">
+      <span class="search-ghost" id="search-ghost" aria-hidden="true"></span>
+      <input id="search-input" type="text" autocomplete="off" spellcheck="false" placeholder="Type to search" role="combobox" aria-expanded="true" aria-controls="search-results" aria-autocomplete="both" aria-label="Search">
+    </div>
+    <p class="search-count mono" id="search-count" aria-live="polite"></p>
+    <ul class="search-results" id="search-results" role="listbox" aria-label="Results"></ul>
+  </div>
+</div>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <div class="menu-head">
+    <span class="mono">✳ Menu</span>
+    <button class="nav-btn" type="button" id="menu-close">Close</button>
+  </div>
+  <ul class="menu-links">
+    <li><a href="#/" data-section="work">Work</a></li>
+    <li><a href="#/" data-section="index">Index</a></li>
+    <li><a href="#/blog">Journal</a></li>
+    <li><a href="#contact" data-section="contact">Contact</a></li>
+    <li><a href="../shared/media/cv.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+  </ul>
+</div>
+
+<script src="../shared/content.js"></script>
+<script src="pixel.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

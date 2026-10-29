@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference mix</title>
+<style>
+  :root { --bar: 48px; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #111; color: #eee; font: 500 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .bar { height: var(--bar); display: flex; align-items: center; gap: 4px; padding: 0 8px; overflow-x: auto; }
+  button { all: unset; cursor: pointer; white-space: nowrap; padding: 9px 12px; border-radius: 999px; color: #9a9a9a; transition: background-color .15s, color .15s; }
+  button:hover { color: #eee; }
+  button[aria-pressed="true"] { background: #eee; color: #111; }
+  button:focus-visible, a:focus-visible { outline: 2px solid #7d8cff; outline-offset: 2px; }
+  .spacer { flex: 1; }
+  a { color: #9a9a9a; white-space: nowrap; padding: 9px 6px; }
+  iframe { display: block; width: 100%; height: calc(100% - var(--bar)); border: 0; background: #fff; }
+</style>
+</head>
+<body>
+<div class="bar" role="toolbar" aria-label="Choose a prototype">
+  <button type="button" data-p="a">1 · A Flood fill</button>
+  <button type="button" data-p="b">2 · B Darkroom</button>
+  <button type="button" data-p="c">3 · C Typeset</button>
+  <span class="spacer"></span>
+  <a id="solo" href="a/index.html" target="_blank" rel="noopener">Open alone ↗</a>
+</div>
+<iframe id="frame" title="Prototype"></iframe>
+<script>
+  const frame = document.getElementById('frame');
+  const solo = document.getElementById('solo');
+  const buttons = [...document.querySelectorAll('[data-p]')];
+  function pick(p) {
+    buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.p === p)));
+    frame.src = p + '/index.html';
+    solo.href = p + '/index.html';
+    history.replaceState(null, '', '?p=' + p);
+    try { localStorage.setItem('reference-mix', p); } catch {}
+  }
+  buttons.forEach(b => b.addEventListener('click', () => pick(b.dataset.p)));
+  addEventListener('keydown', e => {
+    const p = { 1: 'a', 2: 'b', 3: 'c' }[e.key];
+    if (p && !e.metaKey && !e.ctrlKey && !e.altKey) pick(p);
+  });
+  let start = new URLSearchParams(location.search).get('p');
+  try { start = start || localStorage.getItem('reference-mix'); } catch {}
+  pick(['a', 'b', 'c'].includes(start) ? start : 'a');
+</script>
+</body>
+</html>

@@ -44,3 +44,9 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 Thumbs.db
+
+# prototype review screenshots and capture scratch
+.prototypes/**/shots/
+.prototypes/**/review/
+__pycache__/
+*.pyc

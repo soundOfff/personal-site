@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f3e9">
+  <meta name="description" content="Tomas Brasca. Full-stack engineer in Rosario. Thoughtful products, reliable systems, and notes from the work.">
+  <script>
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('pixel-pending');
+      setTimeout(() => document.documentElement.classList.remove('pixel-pending'), 1200);
+    }
+  </script>
+  <title>Tomas Brasca — Ideas made useful.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Ctext y='49' font-size='55' fill='%230024cc'%3E✳%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script src="../shared/content.js" defer></script>
+  <script src="pixels.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main" data-heading="main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="#/" aria-label="Tomas Brasca, home">Tomas Brasca <span aria-hidden="true">✳</span></a>
+    <nav aria-label="Main navigation">
+      <a href="#/?section=work" data-nav="work"><span>(</span> Work <span>)</span></a>
+      <a href="#/?section=index" data-nav="index"><span>(</span> Index <span>)</span></a>
+      <a href="#/blog" data-nav="blog"><span>(</span> Journal <span>)</span></a>
+      <a href="#/?section=contact" data-nav="contact"><span>(</span> Contact <span>)</span></a>
+    </nav>
+    <a class="resume text-link" href="../shared/media/cv.pdf" target="_blank" rel="noopener">Résumé <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" aria-haspopup="dialog" aria-controls="menu">Menu <span aria-hidden="true">+</span></button>
+  </header>
+  <dialog id="menu" aria-label="Navigation">
+    <div class="menu-top"><span>Tomas Brasca ✳</span><button data-close-menu aria-label="Close menu">Close ×</button></div>
+    <nav aria-label="Mobile navigation"><a href="#/?section=work" data-nav="work">Work</a><a href="#/?section=index" data-nav="index">Index</a><a href="#/blog" data-nav="blog">Journal</a><a href="#/?section=contact" data-nav="contact">Contact</a><a href="../shared/media/cv.pdf" target="_blank" rel="noopener">Résumé ↗</a></nav>
+  </dialog>
+  <main id="main" tabindex="-1"></main>
+  <footer id="contact"></footer>
+  <div id="project-preview" aria-hidden="true"></div>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+</body>
+</html>

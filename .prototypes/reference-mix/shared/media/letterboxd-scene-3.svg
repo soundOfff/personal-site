@@ -1,0 +1,59 @@
+<svg viewBox="0 0 1200 900" width="1200" height="900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sky-2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F3A5F"/><stop offset="1" stop-color="#6B3F5C"/></linearGradient><linearGradient id="accentGrad-2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8A23D"/><stop offset="1" stop-color="#C1443B"/></linearGradient><radialGradient id="horizonGlow-2" cx="0.5" cy="0.72" r="0.6"><stop offset="0" stop-color="#F4D35E" stop-opacity="1"/><stop offset="1" stop-color="#F4D35E" stop-opacity="0"/></radialGradient><radialGradient id="__vignette-2" cx="0.5" cy="0.44" r="0.75"><stop offset="0.55" stop-color="#1B1B22" stop-opacity="0"/><stop offset="1" stop-color="#1B1B22" stop-opacity="1"/></radialGradient><pattern id="__grain-2" width="90" height="90" patternUnits="userSpaceOnUse"><circle cx="50.699" cy="36.888" r="0.867" fill="#1B1B22" opacity="0.292"/><circle cx="46.068" cy="60.618" r="1.217" fill="#F4D35E" opacity="0.56"/><circle cx="58.189" cy="58.523" r="1.116" fill="#F4D35E" opacity="0.414"/><circle cx="56.944" cy="29.057" r="0.937" fill="#F4D35E" opacity="0.605"/><circle cx="55.468" cy="0.943" r="1.109" fill="#1B1B22" opacity="0.65"/><circle cx="50.466" cy="16.614" r="0.695" fill="#1B1B22" opacity="0.28"/><circle cx="65.318" cy="65.959" r="1.384" fill="#F4D35E" opacity="0.517"/><circle cx="45.508" cy="20.635" r="1.045" fill="#1B1B22" opacity="0.448"/><circle cx="53.394" cy="26.554" r="1.379" fill="#1B1B22" opacity="0.3"/><circle cx="35.827" cy="30.97" r="1.152" fill="#F4D35E" opacity="0.467"/><circle cx="38.798" cy="10.687" r="0.963" fill="#1B1B22" opacity="0.647"/><circle cx="49.341" cy="60.977" r="0.848" fill="#F4D35E" opacity="0.555"/><circle cx="58.707" cy="44.7" r="0.74" fill="#F4D35E" opacity="0.403"/><circle cx="21.134" cy="64.083" r="0.844" fill="#F4D35E" opacity="0.297"/><circle cx="74.126" cy="44.91" r="0.815" fill="#F4D35E" opacity="0.429"/><circle cx="32.833" cy="65.287" r="0.976" fill="#1B1B22" opacity="0.574"/><circle cx="81.633" cy="40.063" r="0.905" fill="#1B1B22" opacity="0.4"/><circle cx="83.025" cy="67.423" r="0.743" fill="#1B1B22" opacity="0.334"/><circle cx="15.509" cy="54.396" r="1.084" fill="#F4D35E" opacity="0.571"/><circle cx="29.021" cy="73.427" r="0.705" fill="#1B1B22" opacity="0.611"/><circle cx="59.773" cy="89.863" r="0.549" fill="#1B1B22" opacity="0.357"/><circle cx="89.819" cy="25.091" r="0.827" fill="#1B1B22" opacity="0.36"/><circle cx="29.77" cy="22.779" r="0.731" fill="#1B1B22" opacity="0.512"/><circle cx="25.571" cy="19.883" r="0.594" fill="#F4D35E" opacity="0.579"/><circle cx="78.761" cy="8.469" r="0.776" fill="#1B1B22" opacity="0.45"/><circle cx="88.978" cy="68.835" r="0.856" fill="#1B1B22" opacity="0.617"/><circle cx="56.373" cy="75.51" r="1.036" fill="#1B1B22" opacity="0.588"/><circle cx="33.202" cy="10.721" r="0.669" fill="#F4D35E" opacity="0.47"/><circle cx="51.946" cy="31.209" r="0.932" fill="#1B1B22" opacity="0.578"/><circle cx="77.262" cy="47.513" r="1.093" fill="#F4D35E" opacity="0.524"/><circle cx="60.16" cy="22.4" r="1.069" fill="#1B1B22" opacity="0.527"/><circle cx="68.624" cy="79.157" r="0.663" fill="#1B1B22" opacity="0.335"/><circle cx="35.383" cy="20.252" r="0.507" fill="#1B1B22" opacity="0.282"/><circle cx="2.192" cy="51.246" r="0.915" fill="#1B1B22" opacity="0.514"/><circle cx="40.344" cy="77.389" r="1.228" fill="#1B1B22" opacity="0.516"/><circle cx="4.938" cy="65.07" r="1.387" fill="#F4D35E" opacity="0.578"/><circle cx="60.931" cy="54.213" r="1.315" fill="#F4D35E" opacity="0.353"/><circle cx="1.314" cy="47.685" r="1.003" fill="#1B1B22" opacity="0.405"/><circle cx="43.667" cy="52.446" r="0.916" fill="#F4D35E" opacity="0.284"/><circle cx="52.058" cy="14.243" r="1.268" fill="#F4D35E" opacity="0.398"/><circle cx="72.859" cy="74.962" r="0.712" fill="#F4D35E" opacity="0.329"/><circle cx="7.149" cy="68.737" r="0.714" fill="#1B1B22" opacity="0.359"/><circle cx="45.953" cy="61.734" r="1.326" fill="#F4D35E" opacity="0.443"/><circle cx="0.788" cy="62.292" r="0.551" fill="#F4D35E" opacity="0.281"/><circle cx="88.125" cy="69.767" r="0.538" fill="#F4D35E" opacity="0.317"/><circle cx="37.703" cy="36.848" r="1.187" fill="#F4D35E" opacity="0.435"/><circle cx="79.102" cy="45.291" r="0.7" fill="#F4D35E" opacity="0.498"/><circle cx="78.596" cy="7.052" r="0.751" fill="#F4D35E" opacity="0.326"/><circle cx="38.434" cy="1.993" r="1.394" fill="#F4D35E" opacity="0.291"/><circle cx="23.569" cy="31.533" r="1.022" fill="#F4D35E" opacity="0.49"/><circle cx="35.842" cy="48.935" r="0.585" fill="#1B1B22" opacity="0.412"/><circle cx="87.883" cy="67.118" r="1.394" fill="#F4D35E" opacity="0.402"/><circle cx="48.115" cy="48.819" r="1.308" fill="#F4D35E" opacity="0.443"/><circle cx="28.342" cy="10.235" r="0.76" fill="#F4D35E" opacity="0.575"/><circle cx="15.396" cy="79.133" r="1.136" fill="#1B1B22" opacity="0.591"/><circle cx="3.942" cy="69.647" r="1.219" fill="#F4D35E" opacity="0.493"/><circle cx="14.683" cy="75.716" r="1.122" fill="#F4D35E" opacity="0.525"/><circle cx="55.719" cy="82.578" r="1.353" fill="#1B1B22" opacity="0.442"/><circle cx="47.774" cy="9.189" r="1.391" fill="#F4D35E" opacity="0.423"/><circle cx="79.208" cy="19.803" r="0.854" fill="#1B1B22" opacity="0.431"/><circle cx="19.646" cy="86.713" r="0.807" fill="#F4D35E" opacity="0.465"/><circle cx="84.045" cy="24.402" r="1.118" fill="#1B1B22" opacity="0.368"/><circle cx="76.626" cy="34.132" r="1.386" fill="#1B1B22" opacity="0.423"/><circle cx="3.61" cy="54.695" r="1.082" fill="#1B1B22" opacity="0.458"/><circle cx="84.422" cy="33.938" r="0.538" fill="#F4D35E" opacity="0.258"/><circle cx="45.104" cy="18.618" r="0.701" fill="#1B1B22" opacity="0.395"/><circle cx="82.261" cy="12.346" r="1.293" fill="#F4D35E" opacity="0.389"/><circle cx="20.138" cy="33.187" r="0.529" fill="#1B1B22" opacity="0.405"/><circle cx="79.672" cy="23.333" r="1.369" fill="#1B1B22" opacity="0.369"/><circle cx="24.081" cy="50.59" r="0.886" fill="#1B1B22" opacity="0.388"/></pattern><symbol id="figure-2" viewBox="0 0 100 200" overflow="visible"><g fill="#2B2438"><path d="M35,54 C36,46 42,42 50,42 C58,42 64,46 65,54 L70,150 L30,150 Z"/><path d="M38,150 L49,150 L54,196 L46,196 Z"/><path d="M52,150 L63,150 L58,196 L50,196 Z"/><circle cx="50" cy="30" r="14"/><ellipse cx="50" cy="19" rx="24" ry="5"/><path d="M38,19 C38,8 44,4 50,4 C56,4 62,8 62,19 Z"/></g></symbol></defs><rect width="1200" height="900" fill="#EFE6D4"/><g><!-- sky and ground -->
+<rect x="0" y="0" width="1200" height="560" fill="url(#sky-2)"/>
+<rect x="0" y="560" width="1200" height="340" fill="#6B3F5C"/>
+<rect x="0" y="556" width="1200" height="8" fill="#2B2438" opacity="0.3"/>
+
+<!-- warm rising sun glow -->
+<circle cx="960" cy="130" r="95" fill="#F4D35E" opacity="0.45"/>
+<circle cx="960" cy="130" r="45" fill="#F4D35E" opacity="0.6"/>
+
+<!-- faint rising diagonal tracking the average -->
+<line x1="90" y1="820" x2="1120" y2="90" stroke="#E8A23D" stroke-width="4" stroke-dasharray="10 12" opacity="0.5"/>
+<circle cx="260" cy="700" r="6" fill="#E8A23D" opacity="0.6"/>
+<circle cx="560" cy="480" r="6" fill="#E8A23D" opacity="0.6"/>
+<circle cx="860" cy="280" r="6" fill="#E8A23D" opacity="0.6"/>
+
+<!-- NAGI NOTES : rooftop row -->
+<g>
+  <rect x="190" y="180" width="230" height="10" fill="#1B1B22"/>
+  <rect x="200" y="150" width="30" height="30" fill="#1B1B22"/>
+  <polygon points="195,150 215,120 235,150" fill="#C1443B"/>
+  <rect x="240" y="140" width="36" height="40" fill="#1B1B22"/>
+  <polygon points="234,140 258,110 282,140" fill="#C1443B"/>
+  <rect x="286" y="158" width="26" height="22" fill="#1B1B22"/>
+  <polygon points="281,158 299,138 317,158" fill="#C1443B"/>
+  <rect x="322" y="130" width="40" height="50" fill="#1B1B22"/>
+  <polygon points="316,130 342,95 368,130" fill="#C1443B"/>
+  <rect x="150" y="90" width="150" height="34" rx="6" fill="#EFE6D4" stroke="#1B1B22" stroke-width="2"/>
+  <text x="225" y="112" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="#1B1B22">NAGI NOTES</text>
+  <line x1="225" y1="124" x2="225" y2="140" stroke="#1B1B22" stroke-width="2"/>
+</g>
+
+<!-- BUTTERFLY JAM : jagged butterfly -->
+<g>
+  <line x1="600" y1="150" x2="592" y2="128" stroke="#1B1B22" stroke-width="2"/>
+  <line x1="600" y1="150" x2="608" y2="128" stroke="#1B1B22" stroke-width="2"/>
+  <polygon points="600,150 566,108 540,128 522,158 548,182 578,166" fill="#E8A23D" stroke="#1B1B22" stroke-width="2"/>
+  <polygon points="600,150 634,108 660,128 678,158 652,182 622,166" fill="#E8A23D" stroke="#1B1B22" stroke-width="2"/>
+  <circle cx="600" cy="150" r="6" fill="#1B1B22"/>
+  <rect x="520" y="196" width="160" height="34" rx="6" fill="#EFE6D4" stroke="#1B1B22" stroke-width="2"/>
+  <text x="600" y="219" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#1B1B22">BUTTERFLY JAM</text>
+  <line x1="600" y1="182" x2="600" y2="196" stroke="#1B1B22" stroke-width="2"/>
+</g>
+
+<!-- THE MELTDOWN : cracked mountain -->
+<g>
+  <polygon points="860,270 940,140 995,195 1050,150 1100,270" fill="#1B1B22"/>
+  <polygon points="925,150 940,140 958,152 942,168" fill="#EFE6D4" opacity="0.85"/>
+  <polyline points="940,140 950,170 928,192 955,214 933,236" fill="none" stroke="#F4D35E" stroke-width="3"/>
+  <rect x="900" y="286" width="180" height="34" rx="6" fill="#EFE6D4" stroke="#1B1B22" stroke-width="2"/>
+  <text x="990" y="309" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#1B1B22">THE MELTDOWN</text>
+  <line x1="990" y1="270" x2="990" y2="286" stroke="#1B1B22" stroke-width="2"/>
+</g>
+
+<!-- the critic, upright, looking up -->
+<ellipse cx="605" cy="800" rx="72" ry="14" fill="#1B1B22" opacity="0.25"/>
+<use href="#figure-2" x="560" y="610" width="90" height="180" transform="rotate(-6 605 700)"/>
+
+<!-- foreground haze strip -->
+<rect x="0" y="860" width="1200" height="40" fill="#9CA9B7" opacity="0.2"/></g><rect width="1200" height="900" fill="#9CA9B7" opacity="0.064"/><rect width="1200" height="900" fill="#F4D35E" opacity="0.117"/><rect width="1200" height="900" fill="url(#horizonGlow-2)" opacity="0.325"/><rect width="1200" height="900" fill="url(#__vignette-2)" opacity="0.36"/><rect width="1200" height="900" fill="url(#__grain-2)" opacity="0.5"/></svg>
