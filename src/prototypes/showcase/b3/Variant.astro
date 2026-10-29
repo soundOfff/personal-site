@@ -1,0 +1,22 @@
+---
+// Placeholder. The candidate that owns this folder replaces this file.
+import WorkCard from '../../../components/WorkCard.astro';
+import PixelSigil from '../../../components/PixelSigil.astro';
+import { selected } from '../content/showcase';
+---
+
+<div data-proto="b3">
+  <section class="section shell" id="work" aria-labelledby="work-title">
+    <div class="work-intro">
+      <PixelSigil star />
+      <p>Placeholder for variant b3.</p>
+    </div>
+    <div class="section-heading">
+      <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
+      <p>Variant b3 has not been built yet.</p>
+    </div>
+    <div class="bento">
+      {selected.map((p) => <WorkCard project={p.project} selected />)}
+    </div>
+  </section>
+</div>

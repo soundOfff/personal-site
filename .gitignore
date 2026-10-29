@@ -50,3 +50,7 @@ Thumbs.db
 .prototypes/**/review/
 __pycache__/
 *.pyc
+
+# showcase prototype gate output
+src/prototypes/**/shots/
+src/prototypes/**/review/

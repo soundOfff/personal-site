@@ -24,7 +24,7 @@ function initHeader() {
     .map((id) => document.getElementById(id))
     .filter((el): el is HTMLElement => !!el);
   const sectionLinks = [...header.querySelectorAll<HTMLAnchorElement>('[data-section]')];
-  const home = location.pathname === '/';
+  const home = location.pathname === '/' || location.pathname.startsWith('/prototype/');
   let previous = window.scrollY;
 
   header.addEventListener('focusin', () => header.classList.remove('hidden'));

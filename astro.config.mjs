@@ -15,6 +15,9 @@ export default defineConfig({
   // opts into on-demand rendering via `export const prerender = false`.
   output: 'static',
 
+  // proto/showcase: the dev toolbar sits where the prototype switcher lives.
+  devToolbar: { enabled: false },
+
   // /work has no index page — case studies live at /work/<id> and the index is
   // the #work section on the homepage. Catch the guessable bare URL.
   redirects: {
@@ -58,5 +61,7 @@ export default defineConfig({
       // editorial-ui ships ESM React components; let Vite bundle it for SSR.
       noExternal: ['editorial-ui'],
     },
+    // proto/showcase: this worktree symlinks node_modules from the main checkout.
+    server: { fs: { allow: ['.', '/Users/User/Tomi/personal-site/node_modules'] } },
   },
 });

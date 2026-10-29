@@ -1,0 +1,5 @@
+{
+  "sift": { "mp4": "/demos/sift/loop.mp4", "webm": "/demos/sift/loop.webm", "poster": "/demos/sift/poster.webp", "duration": 0, "chapters": [], "walkthrough": null },
+  "focus-quote": { "mp4": "/demos/focus-quote/loop.mp4", "webm": "/demos/focus-quote/loop.webm", "poster": "/demos/focus-quote/poster.webp", "duration": 0, "chapters": [], "walkthrough": null },
+  "catcher": { "mp4": "/demos/catcher/loop.mp4", "webm": "/demos/catcher/loop.webm", "poster": "/demos/catcher/poster.webp", "duration": 0, "chapters": [], "walkthrough": null }
+}

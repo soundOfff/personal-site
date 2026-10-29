@@ -2,7 +2,8 @@
 import PixelSigil from './PixelSigil.astro';
 
 const path = Astro.url.pathname;
-const home = path === '/';
+// proto/showcase: the prototype route behaves like home.
+const home = path === '/' || path.startsWith('/prototype/');
 // On the homepage the active section follows the scroll position instead.
 const links = [
   { label: 'Work', href: '/#work', section: 'work' },

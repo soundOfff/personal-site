@@ -1,0 +1,136 @@
+---
+// Floating prototype switcher. Dev only, so a stray merge can never show it to visitors.
+import { variants } from './registry';
+
+interface Props {
+  current: string;
+}
+
+const { current } = Astro.props;
+const ids = variants.map((v) => v.id);
+const index = ids.indexOf(current as (typeof ids)[number]);
+const label = variants[index]?.label ?? current;
+---
+
+{
+  import.meta.env.DEV && (
+    <div class="proto-switcher" role="toolbar" aria-label="Prototype switcher" data-ids={ids.join(',')} data-current={current}>
+      <button type="button" data-step="-1" aria-label="Previous variant">←</button>
+      <details>
+        <summary>{label}</summary>
+        <ul>
+          {variants.map((v) => (
+            <li>
+              <a href={`?variant=${v.id}`} data-variant-link={v.id} aria-current={v.id === current ? 'true' : undefined}>
+                {v.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+      <button type="button" data-step="1" aria-label="Next variant">→</button>
+    </div>
+  )
+}
+
+<style is:global>
+  .proto-switcher {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    z-index: 2147483000;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: #111;
+    color: #f2f2f2;
+    font: 500 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    box-shadow: 0 6px 24px rgb(0 0 0 / 0.35);
+  }
+  .proto-switcher button,
+  .proto-switcher summary {
+    all: unset;
+    cursor: pointer;
+    padding: 9px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .proto-switcher button:hover,
+  .proto-switcher summary:hover {
+    background: #2a2a2a;
+  }
+  .proto-switcher :focus-visible {
+    outline: 2px solid #ff3d7f;
+    outline-offset: 2px;
+  }
+  .proto-switcher details {
+    position: relative;
+  }
+  .proto-switcher ul {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: #111;
+    border-radius: 12px;
+    min-width: 260px;
+  }
+  .proto-switcher li a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #cfcfcf;
+    text-decoration: none;
+  }
+  .proto-switcher li a:hover,
+  .proto-switcher li a[aria-current] {
+    background: #2a2a2a;
+    color: #fff;
+  }
+</style>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('.proto-switcher');
+  if (bar) {
+    const ids = bar.dataset.ids!.split(',');
+    const current = ids.indexOf(bar.dataset.current!);
+
+    // Keep the visitor on the same section when flipping, so comparing projects
+    // doesn't mean scrolling past the cover every time.
+    const sectionHash = () => {
+      const sections = [...document.querySelectorAll<HTMLElement>('main section[id]')];
+      const here = sections.filter((s) => s.getBoundingClientRect().top <= innerHeight * 0.5).pop();
+      return here && scrollY > innerHeight ? `#${here.id}` : '';
+    };
+    const go = (id: string) => {
+      location.href = `${location.pathname}?variant=${id}${sectionHash()}`;
+    };
+    const step = (delta: number) => go(ids[(current + delta + ids.length) % ids.length]);
+
+    bar.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((button) =>
+      button.addEventListener('click', () => step(Number(button.dataset.step))),
+    );
+    bar.querySelectorAll<HTMLAnchorElement>('[data-variant-link]').forEach((link) =>
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        go(link.dataset.variantLink!);
+      }),
+    );
+    // Bubbling listener on window: a variant that handles arrow keys itself calls
+    // preventDefault, and the switcher then leaves the key alone.
+    addEventListener('keydown', (event) => {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement;
+      if (target.closest('input, textarea, select, [contenteditable]')) return;
+      if (event.key === 'ArrowLeft') step(-1);
+      if (event.key === 'ArrowRight') step(1);
+    });
+  }
+</script>
