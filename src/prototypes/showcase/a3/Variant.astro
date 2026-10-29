@@ -1,22 +1,686 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
 import PixelSigil from '../../../components/PixelSigil.astro';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import { cells, type SpriteId } from './sprites';
+
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+const nn = (i: number) => String(i + 1).padStart(2, '0');
+
+const demos = selected.map((p) => {
+  const ch = p.demo.chapters;
+  const chapters = ch.map((c, j) => ({ t: c.t, end: ch[j + 1]?.t ?? p.demo.duration, label: c.label }));
+  return {
+    ...p,
+    chapters,
+    aria: `${p.project.name} demo, silent: ${ch.map((c) => c.label).join(', ')}.`,
+  };
+});
+
+const castOf: Record<string, SpriteId[]> = {
+  frame: ['tomas'],
+  design: ['claude', 'codex'],
+  build: ['claude', 'codex'],
+  verify: ['claude', 'codex'],
+  decide: ['tomas'],
+};
+const ownerOf = (id: string) => (castOf[id][0] === 'tomas' ? 'Tomas' : 'Claude Code + Codex');
+const [claude, codex] = workflow.agents;
+const people: { id: SpriteId; name: string; model: string; role: string }[] = [
+  { id: 'tomas', name: 'Tomas', model: 'Owner', role: 'Frames the problem and makes the final call.' },
+  { id: 'claude', name: claude.name, model: claude.model, role: claude.role },
+  { id: 'codex', name: codex.name, model: codex.model, role: codex.role },
+];
+const play = ['X....', 'XX...', 'XXX..', 'XXXX.', 'XXX..', 'XX...', 'X....'].flatMap((row, y) =>
+  [...row].flatMap((c, x) => (c === 'X' ? [[x, y]] : [])),
+);
 ---
 
 <div data-proto="a3">
   <section class="section shell" id="work" aria-labelledby="work-title">
     <div class="work-intro">
       <PixelSigil star />
-      <p>Placeholder for variant a3.</p>
+      <p>Thoughtful interfaces.<br />Useful systems. All the way through.</p>
     </div>
     <div class="section-heading">
       <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant a3 has not been built yet.</p>
+      <p>Independent tools for learning,<br />reading, and making.</p>
     </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+
+    <ol class="rows">
+      {
+        demos.map((d, i) => (
+          <li class="row" data-demo data-chapters={JSON.stringify(d.chapters)}>
+            <figure class="media">
+              <div class="frame">
+                <div class="a3-screen" style={`background-image:url(${d.demo.poster})`}>
+                  <video
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    poster={d.demo.poster}
+                    width="1600"
+                    height="1000"
+                    aria-label={d.aria}
+                  >
+                    <source src={d.demo.webm} type="video/webm" />
+                    <source src={d.demo.mp4} type="video/mp4" />
+                  </video>
+                  <button class="play" type="button" data-play>
+                    <svg viewBox="0 0 5 7" aria-hidden="true" shape-rendering="crispEdges">
+                      {play.map(([x, y]) => <rect x={x} y={y} width="1" height="1" />)}
+                    </svg>
+                    <span>Play the {d.project.name} demo</span>
+                    <span class="play-time">{clock(d.demo.duration)}</span>
+                  </button>
+                </div>
+                <div class="track" role="group" aria-label={`${d.project.name} demo chapters`}>
+                  {d.chapters.map((c) => (
+                    <button
+                      type="button"
+                      data-seek
+                      style={`flex-grow:${(c.end - c.t).toFixed(2)}`}
+                      aria-label={`Jump to ${c.label}`}
+                    >
+                      <i />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <figcaption class="caption">
+                <span class="count" data-chapter-count>
+                  01/{String(d.chapters.length).padStart(2, '0')}
+                </span>
+                <span class="label" data-chapter-label>
+                  {d.chapters[0].label}
+                </span>
+                <button class="toggle" type="button" data-toggle>
+                  Pause
+                </button>
+              </figcaption>
+            </figure>
+            <div class="copy">
+              <p class="kicker">
+                <span>{nn(i)}</span>
+                <span>{d.project.category}</span>
+              </p>
+              <h3>
+                <a href={d.href}>{d.project.name}</a>
+              </h3>
+              <p class="desc">{d.project.description}</p>
+              <p class="meta stack">{d.project.stack.split(' · ').join(' / ')}</p>
+              <p class="links">
+                <a class="small-link" href={d.href}>
+                  Project details <span aria-hidden="true">→</span>
+                </a>
+                {d.project.source && (
+                  <a class="small-link" href={d.project.source}>
+                    Source
+                  </a>
+                )}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="section shell wf" id="workflow" aria-labelledby="workflow-title">
+    <div class="section-heading">
+      <h2 id="workflow-title">My AI <span class="ghost">workflow.</span></h2>
+      <p>{workflow.introduction}</p>
     </div>
+
+    <div class="a3-board">
+      <canvas aria-hidden="true"></canvas>
+      <ol class="stages">
+        {
+          workflow.stages.map((s, i) => {
+            const tools = workflow.tools[s.id];
+            return (
+              <li class="stage" data-stage={s.id}>
+                <div class="node" data-node data-cast={castOf[s.id].join(',')} />
+                <div class="stage-text">
+                  <p class="stage-meta">
+                    {nn(i)} / {ownerOf(s.id)}
+                  </p>
+                  <h3>{s.label}</h3>
+                  <p class="hint">{s.hint}</p>
+                  {tools.length ? (
+                    <ul class="tools" aria-label={`Tools for ${s.label}`}>
+                      {tools.map((t) => (
+                        <li>
+                          <span>{t.name}</span>
+                          {t.source && <em>{t.source}</em>}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p class="decide">
+                      <q>{s.humanDecision}</q>
+                      <span>{s.output}</span>
+                    </p>
+                  )}
+                </div>
+              </li>
+            );
+          })
+        }
+      </ol>
+      <p class="loop-label" data-loop>
+        Failed checks <span aria-hidden="true">→</span><span class="sr-only">return to</span> Build
+      </p>
+      <p class="loop-label" data-loop>
+        Wrong approach <span aria-hidden="true">→</span><span class="sr-only">returns to</span> Design
+      </p>
+    </div>
+
+    <ul class="cast" aria-label="Who does the work">
+      {
+        people.map((p) => (
+          <li>
+            <svg viewBox="0 0 8 8" aria-hidden="true" shape-rendering="crispEdges">
+              {cells(p.id).map(([x, y]) => (
+                <rect x={x} y={y} width="1" height="1" />
+              ))}
+            </svg>
+            <div>
+              <p class="cast-name">
+                {p.name} <span>{p.model}</span>
+              </p>
+              <p class="cast-role">{p.role}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="sources meta">
+      <span>Skills from</span>
+      {workflow.sources.map((s) => <a class="small-link" href={s.href}>{s.label}</a>)}
+    </p>
   </section>
 </div>
+
+<script>
+  import { initDemos } from './demos';
+  import { initWorkflow } from './workflow';
+
+  const root = document.querySelector<HTMLElement>('[data-proto="a3"]');
+  if (root) {
+    initDemos(root);
+    initWorkflow(root);
+  }
+</script>
+
+<style is:global>
+  /* Native proximity snapping on section starts. The cover gets one point at its top, none inside. */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='a3']) {
+      scroll-snap-type: y proximity;
+      scroll-padding-top: 0;
+    }
+    html:has([data-proto='a3']) main > :is(.cover, .experience, #index, #readme, .writing, #playground),
+    html:has([data-proto='a3']) [data-proto='a3'] > section,
+    html:has([data-proto='a3']) #contact {
+      scroll-snap-align: start;
+    }
+    html:has([data-proto='a3']) main > .experience {
+      scroll-margin-top: 20px;
+    }
+    html:has([data-proto='a3']) [data-proto='a3'] .row {
+      scroll-snap-align: center;
+    }
+  }
+</style>
+
+<style>
+  [data-proto='a3'] {
+    display: contents;
+  }
+
+  /* Products */
+
+  .rows {
+    display: grid;
+    gap: 120px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    gap: 48px;
+    align-items: end;
+  }
+  .row:nth-child(even) {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  }
+  .row:nth-child(even) .media {
+    order: 2;
+  }
+  .media {
+    margin: 0;
+    min-width: 0;
+  }
+  .frame {
+    --cell: 20px;
+    --c: var(--cell);
+    padding: var(--c) var(--c) 0;
+    background: repeating-conic-gradient(var(--light) 0 25%, var(--paper) 0 50%) 0 0 / 4px 4px;
+    clip-path: polygon(
+      var(--c) 0,
+      calc(100% - var(--c)) 0,
+      calc(100% - var(--c)) var(--c),
+      100% var(--c),
+      100% calc(100% - var(--c)),
+      calc(100% - var(--c)) calc(100% - var(--c)),
+      calc(100% - var(--c)) 100%,
+      var(--c) 100%,
+      var(--c) calc(100% - var(--c)),
+      0 calc(100% - var(--c)),
+      0 var(--c),
+      var(--c) var(--c)
+    );
+  }
+  .a3-screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #e7e6e0 center / cover no-repeat;
+  }
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .track {
+    display: flex;
+    gap: 4px;
+    height: var(--c);
+    background: var(--paper);
+  }
+  .track button {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: var(--light);
+    cursor: pointer;
+  }
+  .track button:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: -3px;
+  }
+  .track i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    background: var(--blue);
+  }
+  .play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 18px;
+    transform: translate(-50%, -50%);
+    border: 0;
+    border-radius: 2px;
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 12px/1 var(--mono);
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 0 0 1px #1821261f;
+  }
+  .play svg {
+    width: 10px;
+    height: 14px;
+    fill: var(--blue);
+  }
+  .play-time {
+    color: var(--muted-2);
+  }
+  [data-state='stopped'] .play {
+    display: inline-flex;
+  }
+  .caption {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    min-height: 40px;
+    padding-top: 12px;
+  }
+  .count {
+    font: 400 11px/1 var(--mono);
+    color: var(--muted-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .label {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--ink-2);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .label[data-preview] {
+    color: var(--blue);
+  }
+  .toggle {
+    margin-left: auto;
+    padding: 6px 0 6px 12px;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: 400 11px/1 var(--mono);
+    cursor: pointer;
+  }
+  .copy {
+    min-width: 0;
+    padding-bottom: 48px;
+  }
+  .kicker {
+    display: flex;
+    gap: 14px;
+    font: 400 11px/1.5 var(--mono);
+    color: var(--muted-2);
+  }
+  .copy h3 {
+    margin-top: 14px;
+    font-size: clamp(32px, 3vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+  }
+  .copy h3 a {
+    transition: color 0.2s;
+  }
+  .desc {
+    max-width: 400px;
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .stack {
+    margin-top: 16px;
+    color: var(--muted-2);
+  }
+  .links {
+    display: flex;
+    gap: 22px;
+    margin-top: 26px;
+  }
+
+  /* Workflow */
+
+  .wf {
+    padding-block: 80px 60px;
+  }
+  .wf .section-heading p {
+    max-width: 440px;
+  }
+  .a3-board {
+    position: relative;
+    padding-top: 120px;
+  }
+  .a3-board canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .stages {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .node {
+    width: 140px;
+    height: 100px;
+  }
+  .stage-text {
+    padding-top: 22px;
+  }
+  .stage-meta {
+    font: 400 11px/1.5 var(--mono);
+    color: var(--muted-2);
+  }
+  .stage h3 {
+    margin-top: 6px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    transition: color 0.3s;
+  }
+  .stage[data-active] h3 {
+    color: var(--blue);
+  }
+  .hint {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .tools {
+    display: grid;
+    gap: 7px;
+    margin: 14px 0 0;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .tools li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 8px;
+    font: 400 12px/1.35 var(--mono);
+  }
+  .tools em {
+    font-style: normal;
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+  .decide {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .decide q {
+    display: block;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 21px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .decide span {
+    display: block;
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .loop-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 2px 8px;
+    transform: translate(-50%, -50%);
+    background: var(--paper);
+    font: 400 11px/1.4 var(--mono);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .cast {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 44px 0 0;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .cast li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .cast svg {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    fill: var(--blue);
+  }
+  .cast-name {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .cast-name span {
+    margin-left: 6px;
+    font: 400 11px var(--mono);
+    color: var(--muted-2);
+  }
+  .cast-role {
+    max-width: 330px;
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    align-items: baseline;
+    margin-top: 24px;
+    color: var(--muted-2);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .copy h3 a:hover {
+      color: var(--blue);
+    }
+    .track button:hover {
+      background: repeating-conic-gradient(var(--blue) 0 25%, var(--light) 0 50%) 0 0 / 4px 4px;
+    }
+    .toggle:hover {
+      color: var(--blue);
+    }
+    video {
+      cursor: pointer;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .node {
+      width: 120px;
+      height: 80px;
+    }
+    .stage h3 {
+      font-size: 28px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .rows {
+      gap: 80px;
+    }
+    .row,
+    .row:nth-child(even) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    .row:nth-child(even) .media {
+      order: 0;
+    }
+    .copy {
+      padding: 10px 0 0;
+    }
+    .copy h3 {
+      margin-top: 10px;
+    }
+    .a3-board {
+      padding: 0 0 0 50px;
+    }
+    .stages {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+    }
+    .stage {
+      display: grid;
+      grid-template-columns: 80px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .node {
+      width: 80px;
+      height: 80px;
+    }
+    .stage-text {
+      padding-top: 0;
+    }
+    .loop-label {
+      position: static;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: max-content;
+      margin: 0;
+      padding: 0;
+      transform: none !important;
+    }
+    .loop-label::before {
+      content: '';
+      width: 22px;
+      height: 6px;
+      background: repeating-linear-gradient(90deg, var(--light) 0 6px, transparent 0 14px);
+    }
+    .a3-board .loop-label:first-of-type {
+      margin-top: 32px;
+    }
+    .cast {
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: 40px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .frame {
+      --c: 12px;
+    }
+    .copy h3 {
+      font-size: 30px;
+    }
+    .a3-board {
+      padding-left: 46px;
+      margin-left: -6px;
+    }
+    .stage {
+      grid-template-columns: 80px minmax(0, 1fr);
+      gap: 16px;
+    }
+    .stage h3 {
+      font-size: 26px;
+    }
+    .tools li {
+      font-size: 11px;
+    }
+  }
+</style>

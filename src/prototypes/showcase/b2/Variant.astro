@@ -1,22 +1,865 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
-import PixelSigil from '../../../components/PixelSigil.astro';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import { GLYPH } from '../../../lib/flood/pixels';
+import { CLAUDE, CODEX, cells } from './sprites';
+
+const two = (i: number) => String(i + 1).padStart(2, '0');
+const chapters = selected.map((p) => p.demo.chapters.map(({ t, label }) => ({ t, label })));
+const sentence = (labels: string[]) =>
+  labels.map((l, i) => (i ? l.charAt(0).toLowerCase() + l.slice(1) : l)).join(', ');
+
+const glyph = cells(GLYPH.map((r) => r.replaceAll('1', 'b').replaceAll('0', '.')));
+const [claude, codex] = workflow.agents;
+const cast = [
+  { mark: glyph, name: 'Me', meta: 'Frame and Decide. I own the call.' },
+  { mark: cells(CLAUDE[0]), name: claude.name, meta: `${claude.model}. Plans, builds and reviews.` },
+  { mark: cells(CODEX[0]), name: codex.name, meta: `${codex.model}. Second opinion, build lanes.` },
+];
+const stages = workflow.stages.map((stage) => ({ ...stage, tools: workflow.tools[stage.id] }));
+const [loopBuild, loopDesign] = ['failed checks', 'wrong approach'];
+const sourceLabel = (t: (typeof stages)[number]['tools'][number]) =>
+  t.source ?? (t.kind === 'agent' ? 'agents' : t.kind === 'check' ? 'checks' : 'orchestration');
 ---
 
-<div data-proto="b2">
-  <section class="section shell" id="work" aria-labelledby="work-title">
-    <div class="work-intro">
-      <PixelSigil star />
-      <p>Placeholder for variant b2.</p>
+<div data-proto="b2" class="b2">
+  <section
+    id="work"
+    class="b2-work"
+    aria-labelledby="b2-work-title"
+    data-chapters={JSON.stringify(chapters)}
+    style={`--steps:${selected.length}`}
+  >
+    {selected.map((_, i) => <span class="b2-step" style={`--i:${i}`} aria-hidden="true" />)}
+    <div class="b2-pin">
+      <div class="b2-grid shell">
+        <h2 class="eyebrow b2-eyebrow" id="b2-work-title">
+          Selected work
+          <span class="b2-count" aria-hidden="true"><span data-count>01</span> / {two(selected.length - 1)}</span>
+        </h2>
+        <div class="b2-tabs" role="tablist" aria-label="Featured products">
+          {
+            selected.map((p, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`b2-tab-${i}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                aria-controls="b2-panel"
+                tabindex={i === 0 ? 0 : -1}
+                data-name={p.project.name}
+              >
+                <span class="b2-tab-i" aria-hidden="true">{two(i)}</span>
+                <span class="b2-tab-name">{p.project.name}</span>
+              </button>
+            ))
+          }
+        </div>
+        <div class="b2-copies">
+          {
+            selected.map((p, i) => (
+              <div class="b2-copy" data-copy={i} hidden={i !== 0}>
+                <p class="b2-desc">{p.project.description}</p>
+                <p class="b2-meta">{p.project.stack.split(' · ').join(' / ')}<br />{p.status}</p>
+                <div class="b2-links">
+                  <a class="b2-open" href={p.href}>
+                    {p.project.name} case study <span aria-hidden="true">→</span>
+                  </a>
+                  {p.demo.walkthrough && (
+                    <a class="b2-walk" href={p.demo.walkthrough} target="_blank" rel="noopener">
+                      Narrated walkthrough
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+        <div class="b2-stage" id="b2-panel" role="tabpanel" aria-labelledby="b2-tab-0">
+          <div class="b2-screen">
+            {
+              selected.map((p, i) => (
+                <video
+                  class:list={[i === 0 && 'is-active']}
+                  data-video={i}
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={p.demo.poster}
+                  aria-label={`${p.project.name} demo: ${sentence(p.demo.chapters.map((c) => c.label))}.`}
+                >
+                  <source src={p.demo.webm} type="video/webm" />
+                  <source src={p.demo.mp4} type="video/mp4" />
+                </video>
+              ))
+            }
+            <canvas class="b2-wipe" aria-hidden="true" hidden></canvas>
+            <button class="b2-play" type="button" hidden aria-label="Play the demo">
+              <svg viewBox="0 0 7 9" aria-hidden="true" shape-rendering="crispEdges">
+                <rect x="0" y="0" width="2" height="9" /><rect x="2" y="1" width="2" height="7" /><rect
+                  x="4"
+                  y="2"
+                  width="2"
+                  height="5"
+                /><rect x="6" y="3" width="1" height="3" />
+              </svg>
+            </button>
+            <button class="b2-toggle" type="button">Pause</button>
+          </div>
+          {
+            selected.map((p, i) => (
+              <ol class="b2-rail" data-rail={i} hidden={i !== 0} aria-label={`${p.project.name} chapters`}>
+                {p.demo.chapters.map((c, j) => (
+                  <li>
+                    <button type="button" data-seek={c.t}>
+                      <span class="b2-seg">
+                        <span class="b2-fill" />
+                      </span>
+                      <span class="b2-beat">
+                        <span class="b2-beat-n">{two(j)}</span>
+                        <span>{c.label}</span>
+                      </span>
+                      <span class="sr-only">Jump to {c.label}</span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            ))
+          }
+          <p class="b2-now" data-now aria-hidden="true"></p>
+        </div>
+      </div>
     </div>
-    <div class="section-heading">
-      <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant b2 has not been built yet.</p>
-    </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+  </section>
+
+  <section id="workflow" class="section b2-flow" aria-labelledby="b2-flow-title">
+    <div class="shell">
+      <div class="section-heading b2-flow-head">
+        <h2 id="b2-flow-title">My AI <span class="ghost">workflow.</span></h2>
+        <p>
+          Claude Code and Codex explore, build and challenge the work. I own the direction and the
+          final call.
+        </p>
+      </div>
+      <ul class="b2-cast">
+        {
+          cast.map(({ mark, name, meta }) => (
+            <li>
+              <svg
+                viewBox={`0 0 ${mark.w} ${mark.h}`}
+                style={`--w:${mark.w}`}
+                aria-hidden="true"
+                shape-rendering="crispEdges"
+              >
+                {mark.cells.map(({ x, y, fill }) => (
+                  <rect x={x} y={y} width="1" height="1" fill={fill} />
+                ))}
+              </svg>
+              <span>
+                <strong>{name}</strong>
+                <span class="b2-cast-meta">{meta}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="b2-scene" data-build={loopBuild} data-design={loopDesign}>
+        <div class="b2-stations" role="tablist" aria-label="Workflow stations">
+          {
+            stages.map((s, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`b2-st-${s.id}`}
+                data-station={i}
+                aria-controls={`b2-sp-${s.id}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+              >
+                <span class="b2-st-n">{two(i)}</span>
+                <span class="b2-st-label">{s.label}</span>
+                <span class="b2-st-hint">{s.hint}</span>
+              </button>
+            ))
+          }
+        </div>
+        <canvas
+          class="b2-line"
+          role="img"
+          aria-label="An assembly line with five stations. I stamp a ticket at Frame. Claude Code and Codex carry it through Design, Build and Review. Failed checks loop it back to Build, a wrong approach loops it back to Design. I stamp it again at Decide."
+        ></canvas>
+      </div>
+      <p class="b2-caption" aria-hidden="true">
+        <span class="b2-ticket-key"></span><span data-caption>
+          Failed checks return to Build. A wrong approach returns to Design.
+        </span>
+      </p>
+      <div class="b2-panels">
+        {
+          stages.map((s, i) => (
+            <div
+              class="b2-panel"
+              id={`b2-sp-${s.id}`}
+              role="tabpanel"
+              aria-labelledby={`b2-st-${s.id}`}
+              data-panel={i}
+              hidden={i !== 0}
+            >
+              <div class="b2-panel-copy">
+                <p class="b2-panel-meta">
+                  {two(i)} {s.label} / {s.owner}
+                </p>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+                <p class="b2-call">
+                  <span>My call</span>
+                  {s.humanDecision}
+                </p>
+              </div>
+              {s.tools.length ? (
+                <ul class="b2-tools" aria-label={`Tools at ${s.label}`}>
+                  {s.tools.map((t) => (
+                    <li>
+                      <span class="b2-tool-name">{t.name}</span>
+                      <span class="b2-tool-src">{sourceLabel(t)}</span>
+                      <span class="b2-tool-purpose">{t.purpose}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="b2-notools">No agents at this station. {s.action}</p>
+              )}
+            </div>
+          ))
+        }
+      </div>
+      <p class="b2-sources">
+        Skills from {workflow.sources.map((s, i) => (<>{i > 0 && (i === workflow.sources.length - 1 ? ' and ' : ', ')}<a href={s.href} target="_blank" rel="noopener">{s.label}</a></>))}. Orca coordinates the workers.
+      </p>
     </div>
   </section>
 </div>
+
+<script>
+  import { initStage } from './stage';
+  import { initLine } from './line';
+
+  const root = document.querySelector<HTMLElement>('[data-proto="b2"]');
+  if (root) {
+    initStage(root);
+    initLine(root);
+  }
+</script>
+
+<style is:global>
+  html:has([data-proto='b2']) {
+    scroll-padding-top: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='b2']) {
+      scroll-snap-type: y proximity;
+    }
+    html:has([data-proto='b2']) [data-proto='b2'] .b2-step,
+    html:has([data-proto='b2']) [data-proto='b2'] #workflow,
+    html:has([data-proto='b2']) main > .experience,
+    html:has([data-proto='b2']) main > #index,
+    html:has([data-proto='b2']) main > #readme,
+    html:has([data-proto='b2']) main > .writing,
+    html:has([data-proto='b2']) main > #playground {
+      scroll-snap-align: start;
+    }
+    html:has([data-proto='b2']) main > .experience {
+      scroll-margin-top: 20px;
+    }
+  }
+</style>
+
+<style>
+  .b2-work {
+    --step: 75svh;
+    position: relative;
+    height: calc(100svh + (var(--steps) - 1) * var(--step));
+  }
+  .b2-step {
+    position: absolute;
+    top: calc(var(--i) * var(--step));
+    left: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+  .b2-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    align-items: center;
+  }
+  .b2-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) minmax(0, 2.5fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      'head stage'
+      'tabs stage'
+      'copy stage';
+    column-gap: clamp(32px, 4vw, 64px);
+    align-items: start;
+    padding-top: 92px;
+    padding-bottom: 72px;
+  }
+  .b2-eyebrow {
+    grid-area: head;
+    margin-bottom: 26px;
+  }
+  .b2-count {
+    margin-left: auto;
+    padding-left: 18px;
+    color: var(--muted-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .b2-tabs {
+    grid-area: tabs;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .b2-tabs button,
+  .b2-rail button,
+  .b2-stations button,
+  .b2-toggle,
+  .b2-play {
+    cursor: pointer;
+  }
+  .b2-tabs button {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 2px 0;
+    color: #949c99;
+    transition: color 0.25s;
+  }
+  .b2-tab-i {
+    padding-top: 0.9em;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .b2-tab-name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(46px, 4.7vw, 76px);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    padding-right: 0.08em;
+  }
+  .b2-tabs [aria-selected='true'] {
+    color: var(--ink);
+  }
+  .b2-tabs [aria-selected='true'] .b2-tab-i {
+    color: var(--blue);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .b2-tabs button:hover {
+      color: var(--ink-2);
+    }
+  }
+  .b2-tabs :focus-visible {
+    outline-offset: 2px;
+  }
+  .b2-copies {
+    grid-area: copy;
+    margin-top: 28px;
+    max-width: 400px;
+  }
+  .b2-desc {
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+  .b2-meta {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--muted-2);
+  }
+  .b2-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 22px;
+    margin-top: 22px;
+  }
+  .b2-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 10px 18px;
+    background: var(--blue);
+    color: var(--paper);
+    border-radius: 2px;
+    font-size: 14px;
+  }
+  .b2-walk {
+    padding-bottom: 3px;
+    border-bottom: 1px solid;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .b2-stage {
+    grid-area: stage;
+    align-self: center;
+    justify-self: end;
+    width: min(100%, calc((100svh - 260px) * 1.6));
+  }
+  .b2-screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #e7e6e0;
+    border: 1px solid #bbbdb2;
+    border-radius: 2px;
+  }
+  .b2-screen video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    visibility: hidden;
+  }
+  .b2-screen video.is-active {
+    visibility: visible;
+  }
+  .b2-wipe {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .b2-play {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    translate: -50% -50%;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    color: var(--blue);
+  }
+  .b2-play svg {
+    width: 21px;
+    height: 27px;
+    fill: currentColor;
+    margin-left: 4px;
+  }
+  .b2-toggle {
+    position: absolute;
+    z-index: 3;
+    right: 0;
+    top: 0;
+    min-width: 64px;
+    padding: 8px 12px;
+    background: var(--paper);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .b2-toggle::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 8px;
+    background: var(--blue);
+    vertical-align: 0;
+  }
+  .b2-toggle[data-state='paused']::before {
+    background: var(--line);
+  }
+  .b2-rail {
+    display: grid;
+    grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr));
+    gap: 10px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .b2-rail button {
+    display: block;
+    width: 100%;
+    padding: 6px 0 4px;
+    text-align: left;
+  }
+  .b2-seg {
+    position: relative;
+    display: block;
+    height: 6px;
+    background: #dcd8c8;
+    -webkit-mask: repeating-linear-gradient(90deg, #000 0 4px, transparent 4px 6px);
+    mask: repeating-linear-gradient(90deg, #000 0 4px, transparent 4px 6px);
+  }
+  .b2-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--blue);
+    transform: scaleX(var(--p, 0));
+    transform-origin: left;
+  }
+  .b2-beat {
+    display: flex;
+    gap: 8px;
+    min-height: calc(2 * 1.35em);
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--muted-2);
+    transition: color 0.2s;
+  }
+  .b2-beat-n {
+    padding-top: 2px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .b2-rail .is-now .b2-beat {
+    color: var(--ink);
+  }
+  .b2-rail .is-now .b2-beat-n {
+    color: var(--blue);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .b2-rail button:hover .b2-beat {
+      color: var(--ink);
+    }
+    .b2-rail button:hover .b2-seg {
+      background: #c9c5b2;
+    }
+  }
+  .b2-rail :focus-visible {
+    outline-offset: 2px;
+  }
+  .b2-now {
+    display: none;
+  }
+
+  /* Workflow */
+
+  .b2-flow {
+    padding-top: 110px;
+  }
+  .b2-flow-head {
+    margin-bottom: 30px;
+  }
+  .b2-flow-head p {
+    max-width: 360px;
+  }
+  .b2-cast {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 44px;
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+  }
+  .b2-cast li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .b2-cast svg {
+    width: calc(var(--w) * 3px);
+    height: auto;
+  }
+  .b2-cast strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .b2-cast-meta {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  .b2-scene {
+    position: relative;
+    padding-top: 84px;
+    border-top: 1px solid var(--line);
+  }
+  .b2-line {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .b2-stations {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .b2-stations button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding-top: 14px;
+    text-align: center;
+    transition: background 0.2s;
+  }
+  .b2-stations button[aria-selected='true'] {
+    background: #efe9d8;
+  }
+  .b2-stations :focus-visible {
+    outline-offset: -3px;
+  }
+  .b2-st-n {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+  .b2-st-n::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background: var(--amber);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .is-here .b2-st-n::before {
+    opacity: 1;
+  }
+  .b2-st-label {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .b2-st-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+  .b2-stations [aria-selected='true'] .b2-st-label {
+    color: var(--blue);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .b2-stations button:hover {
+      background: #f2ede0;
+    }
+    .b2-stations button[aria-selected='true']:hover {
+      background: #efe9d8;
+    }
+  }
+  .b2-caption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 20px;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .b2-ticket-key {
+    width: 9px;
+    height: 7px;
+    flex-shrink: 0;
+    background: var(--amber);
+    outline: 1px solid var(--ink);
+  }
+  .b2-panels {
+    margin-top: 28px;
+    padding-top: 26px;
+    border-top: 1px solid var(--line);
+  }
+  .b2-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    gap: 24px 64px;
+  }
+  .b2-panel-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  .b2-panel h3 {
+    margin: 8px 0 10px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 36px;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+  .b2-panel-copy > p:not([class]) {
+    max-width: 420px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .b2-call {
+    max-width: 420px;
+    margin-top: 16px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .b2-call span {
+    display: block;
+    margin-bottom: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--blue);
+  }
+  .b2-tools {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .b2-tools li {
+    display: grid;
+    grid-template-columns: minmax(130px, 0.8fr) 100px minmax(0, 2fr);
+    gap: 16px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #e1ddcf;
+  }
+  .b2-tools li:first-child {
+    padding-top: 0;
+  }
+  .b2-tool-name {
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .b2-tool-src {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+  .b2-tool-purpose {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .b2-notools {
+    max-width: 460px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .b2-sources {
+    margin-top: 30px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  .b2-sources a {
+    color: var(--ink);
+    border-bottom: 1px solid;
+  }
+
+  @media (max-width: 860px) {
+    .b2-grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      grid-template-areas: 'head' 'tabs' 'stage' 'copy';
+      padding-top: 84px;
+      padding-bottom: 76px;
+      align-content: center;
+    }
+    .b2-eyebrow {
+      margin-bottom: 10px;
+    }
+    .b2-tabs {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0 14px;
+      margin-bottom: 14px;
+    }
+    .b2-tabs button {
+      gap: 5px;
+    }
+    .b2-tab-i {
+      padding-top: 0.55em;
+      font-size: 9px;
+    }
+    .b2-tab-name {
+      font-size: 27px;
+    }
+    .b2-stage {
+      justify-self: stretch;
+      width: 100%;
+    }
+    .b2-rail {
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .b2-rail button {
+      padding: 8px 0;
+    }
+    .b2-beat {
+      display: none;
+    }
+    .b2-now {
+      display: block;
+      min-height: 17px;
+      margin-top: 2px;
+      font-family: var(--mono);
+      font-size: 11px;
+      white-space: pre;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .b2-copies {
+      margin-top: 14px;
+    }
+    .b2-desc {
+      font-size: 15px;
+    }
+    .b2-meta {
+      display: none;
+    }
+    .b2-links {
+      margin-top: 14px;
+    }
+    .b2-panel {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .b2-tools li {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 2px 12px;
+    }
+    .b2-tool-purpose {
+      grid-column: 1 / -1;
+    }
+    .b2-st-hint {
+      display: none;
+    }
+    .b2-st-label {
+      font-size: 13px;
+    }
+    .b2-scene {
+      padding-top: 52px;
+    }
+    .b2-cast {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+  @media (max-width: 860px) and (max-height: 700px) {
+    .b2-desc {
+      display: none;
+    }
+  }
+</style>

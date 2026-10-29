@@ -1,22 +1,298 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
 import PixelSigil from '../../../components/PixelSigil.astro';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import { CLAUDE, CODEX, ICONS, TICKET, runs } from './sprites';
+import './b3.css';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const stages = workflow.stages;
+const sourceLabel: Record<string, string> = {
+  agent: 'agents',
+  orchestration: 'orchestration',
+  check: 'browser check',
+};
+const sprite = (frames: string[][]) => frames.map((rows) => runs(rows));
+const claude = sprite(CLAUDE);
+const codex = sprite(CODEX);
+const ticket = sprite(TICKET);
+const [claudeAgent, codexAgent] = workflow.agents;
+const [sayChecks, sayApproach] = workflow.feedback.body.split(/(?<=\.)\s+/);
 ---
 
-<div data-proto="b3">
-  <section class="section shell" id="work" aria-labelledby="work-title">
-    <div class="work-intro">
-      <PixelSigil star />
-      <p>Placeholder for variant b3.</p>
+<div data-proto="b3" class="b3">
+  <section id="work" class="b3-work" aria-labelledby="b3-work-title" style={`--n:${selected.length}`}>
+    <div class="b3-stops" aria-hidden="true">
+      {selected.map((_, k) => <span class="b3-stop" style={`--k:${k}`} />)}
     </div>
-    <div class="section-heading">
-      <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant b3 has not been built yet.</p>
+    <div class="b3-stage">
+      <div class="shell b3-grid">
+        <div class="b3-side">
+          <div class="b3-top">
+            <h2 id="b3-work-title" class="eyebrow">Selected work</h2>
+            <p class="b3-count" aria-live="polite">
+              <span data-count>01</span> / {pad(selected.length)}
+            </p>
+          </div>
+          <ol class="b3-names" aria-label="Products">
+            {
+              selected.map((item, k) => (
+                <li>
+                  <button
+                    type="button"
+                    class="b3-name"
+                    data-go={k}
+                    aria-current={k === 0 ? 'true' : undefined}
+                  >
+                    <span class="b3-num">{pad(k + 1)}</span>
+                    <span class="b3-name-text">{item.project.name}</span>
+                  </button>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="b3-panels">
+            {
+              selected.map((item, k) => (
+                <div class={k === 0 ? 'b3-panel is-on' : 'b3-panel'} data-panel={k} inert={k !== 0}>
+                  <p class="b3-desc">{item.project.description}</p>
+                  <p class="meta b3-meta">{item.project.stack.split(' · ').join(' / ')}</p>
+                  <ol class="b3-beats" aria-label={`${item.project.name} demo chapters`}>
+                    {item.demo.chapters.map((c, j) => (
+                      <li>
+                        <button type="button" class="b3-beat" data-seek={c.t} data-j={j}>
+                          <span class="b3-num">{pad(j + 1)}</span>
+                          {c.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ol>
+                  <p class="b3-links">
+                    <a class="b3-more" href={item.href}>
+                      {item.project.name} in detail <span aria-hidden="true">→</span>
+                    </a>
+                    {item.demo.walkthrough && (
+                      <a class="b3-walk" href={item.demo.walkthrough} target="_blank" rel="noopener">
+                        Narrated walkthrough <span aria-hidden="true">↗</span>
+                      </a>
+                    )}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div class="b3-screen">
+          <div class="b3-frame" data-frame>
+            {
+              selected.map((item, k) => (
+                <video
+                  class="b3-video"
+                  data-video={k}
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={item.demo.poster}
+                  aria-label={`${item.project.name} demo: ${item.demo.chapters.map((c) => c.label.toLowerCase()).join(', ')}.`}
+                  data-active={k === 0 ? '' : undefined}
+                >
+                  <source src={item.demo.webm} type="video/webm" />
+                  <source src={item.demo.mp4} type="video/mp4" />
+                </video>
+              ))
+            }
+            <canvas class="b3-wipe" aria-hidden="true"></canvas>
+            <button type="button" class="b3-play" data-play aria-label="Pause the demo">
+              <svg viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges" class="b3-icon-pause">
+                <rect x="1" y="1" width="2" height="5" /><rect x="4" y="1" width="2" height="5" />
+              </svg>
+              <svg viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges" class="b3-icon-play">
+                <rect x="1" y="0" width="1" height="7" /><rect x="2" y="1" width="1" height="5" /><rect x="3" y="1" width="1" height="5" /><rect x="4" y="2" width="1" height="3" /><rect x="5" y="3" width="1" height="1" />
+              </svg>
+              <span data-play-label>Pause</span>
+            </button>
+          </div>
+          <p class="b3-now" aria-hidden="true">
+            <span class="b3-num" data-now-n>01</span> <span data-now>{selected[0].demo.chapters[0].label}</span>
+          </p>
+          {
+            selected.map((item, k) => (
+              <div class="b3-rail" data-rail={k} hidden={k !== 0}>
+                {item.demo.chapters.map((c, j) => {
+                  const end = item.demo.chapters[j + 1]?.t ?? item.demo.duration;
+                  return (
+                    <button
+                      type="button"
+                      class="b3-seg"
+                      style={`flex-grow:${(end - c.t).toFixed(2)}`}
+                      data-seek={c.t}
+                      data-j={j}
+                      tabindex="-1"
+                      aria-label={`Jump to ${c.label}`}
+                    >
+                      <span class="b3-fill" />
+                    </button>
+                  );
+                })}
+              </div>
+            ))
+          }
+          <p class="b3-next-row">
+            <a class="b3-next" href="#workflow" data-next>
+              Next: {selected[1].project.name} <span aria-hidden="true">↓</span>
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+  </section>
+
+  <section id="workflow" class="section b3-flow" aria-labelledby="b3-flow-title">
+    <div class="shell">
+      <div class="section-heading b3-flow-head">
+        <div>
+          <p class="eyebrow">{workflow.title}</p>
+          <h2 id="b3-flow-title">Agents build. <span class="ghost">I&nbsp;decide.</span></h2>
+        </div>
+        <p>{workflow.introduction}</p>
+      </div>
+
+      <div class="b3-scene" data-scene>
+        <ol class="b3-stations">
+          {
+            stages.map((s, k) => (
+              <li>
+                <button
+                  type="button"
+                  class="b3-station"
+                  data-station={k}
+                  data-owner={s.owner === 'Me' ? 'me' : 'agents'}
+                  aria-pressed="false"
+                  aria-controls={`b3-detail-${s.id}`}
+                >
+                  <span class="b3-st-label">
+                    <span class="b3-num">{pad(k + 1)}</span> {s.label}
+                  </span>
+                  <span class="b3-st-hint">{s.hint}</span>
+                  <span class="b3-tile">
+                    <svg viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                      {runs(ICONS[s.id]).map((r) => (
+                        <rect x={r.x} y={r.y} width={r.w} height="1" />
+                      ))}
+                    </svg>
+                  </span>
+                </button>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="b3-run" data-run aria-hidden="true">
+          <div class="b3-belt" data-belt></div>
+          <div class="b3-loop" data-loop="build" data-say={sayChecks}><span><span class="b3-long">Failed </span>checks</span></div>
+          <div class="b3-loop" data-loop="design" data-say={sayApproach}><span><span class="b3-long">Wrong </span>approach</span></div>
+          <div class="b3-bubble" data-bubble></div>
+          <div class="b3-actor" data-actor="claude">
+            <span class="b3-tag">Claude</span>
+            <svg viewBox="0 0 10 12" shape-rendering="crispEdges">
+              {claude.map((f, i) => <g data-f={i}>{f.map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}</g>)}
+            </svg>
+          </div>
+          <div class="b3-actor" data-actor="codex">
+            <span class="b3-tag">Codex</span>
+            <svg viewBox="0 0 10 12" shape-rendering="crispEdges">
+              {codex.map((f, i) => <g data-f={i}>{f.map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}</g>)}
+            </svg>
+          </div>
+          <div class="b3-ticket" data-ticket>
+            <svg viewBox="0 0 9 6" shape-rendering="crispEdges">
+              {ticket.map((f, i) => <g data-f={i}>{f.map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}</g>)}
+            </svg>
+          </div>
+        </div>
+        <div class="b3-caption">
+          <p class="b3-narration" data-narration>01 Frame. Before asking an agent to write code, I make the problem concrete enough to question.</p>
+          <p class="b3-controls">
+            <span class="b3-hint">Hover or tap a station for its tools.</span>
+            <button type="button" class="b3-pause" data-line-pause aria-pressed="false">Pause the line</button>
+          </p>
+        </div>
+      </div>
+
+      <div class="b3-flow-foot">
+        <div class="b3-details">
+          {
+            stages.map((s, k) => {
+              const list = workflow.tools[s.id];
+              return (
+                <div class={k === 0 ? 'b3-detail is-on' : 'b3-detail'} id={`b3-detail-${s.id}`} data-detail={k} inert={k !== 0}>
+                  <p class="meta b3-detail-meta">
+                    {pad(k + 1)} {s.label} / {s.owner === 'Me' ? 'Me' : 'Agents + me'}
+                  </p>
+                  <h3>{s.title}</h3>
+                  <p class="b3-detail-body">{s.body}</p>
+                  {list.length ? (
+                    <ul class="b3-tools">
+                      {list.map((t) => (
+                        <li>
+                          <span class="b3-tool-name">{t.name}</span>
+                          <span class="b3-tool-src">{t.source ?? sourceLabel[t.kind]}</span>
+                          <span class="b3-tool-why">{t.purpose}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p class="b3-solo">No agents at this station. The call is mine.</p>
+                  )}
+                  <p class="b3-ask">
+                    <span class="meta">My call</span>
+                    {s.humanDecision}
+                  </p>
+                </div>
+              );
+            })
+          }
+        </div>
+        <div class="b3-cast">
+          <p class="eyebrow">On the line</p>
+          <ul>
+            <li>
+              <span class="b3-cast-mark b3-cast-me"><PixelSigil star /></span>
+              <span><strong>Me</strong> Frame and Decide. I own the direction and the final call.</span>
+            </li>
+            <li>
+              <span class="b3-cast-mark">
+                <svg viewBox="0 0 10 12" shape-rendering="crispEdges" aria-hidden="true">
+                  {claude[0].map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}
+                </svg>
+              </span>
+              <span><strong>{claudeAgent.name}</strong> on {claudeAgent.model}. {claudeAgent.role}</span>
+            </li>
+            <li>
+              <span class="b3-cast-mark">
+                <svg viewBox="0 0 10 12" shape-rendering="crispEdges" aria-hidden="true">
+                  {codex[0].map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}
+                </svg>
+              </span>
+              <span><strong>{codexAgent.name}</strong> on {codexAgent.model}. {codexAgent.role}</span>
+            </li>
+          </ul>
+          <p class="b3-sources">
+            {workflow.sources.map((s) => <a href={s.href} target="_blank" rel="noopener">{s.label} <span aria-hidden="true">↗</span></a>)}
+          </p>
+        </div>
+      </div>
     </div>
   </section>
 </div>
+
+<script>
+  import { initStage } from './stage';
+  import { initLine } from './line';
+
+  const root = document.querySelector<HTMLElement>('[data-proto="b3"]');
+  if (root) {
+    initStage(root);
+    initLine(root);
+  }
+</script>

@@ -1,0 +1,25 @@
+---
+// Original 9x8 pixel marks for the two agents. Not logos: a square bot and a visored bot.
+interface Props {
+  id: 'claude' | 'codex';
+}
+
+const SPRITES = {
+  claude: ['.#######.', '#########', '##.###.##', '#########', '###...###', '#########', '.#.....#.', '##.....##'],
+  codex: ['..#####..', '.#######.', '##.....##', '#########', '#########', '.#######.', '..#.#.#..', '.##...##.'],
+};
+
+const { id } = Astro.props;
+const cells: { x: number; y: number }[] = [];
+SPRITES[id].forEach((row, y) => [...row].forEach((bit, x) => bit === '#' && cells.push({ x, y })));
+---
+
+<svg
+  class={`sprite sprite-${id}`}
+  viewBox="0 0 9 8"
+  aria-hidden="true"
+  fill="currentColor"
+  shape-rendering="crispEdges"
+>
+  {cells.map(({ x, y }) => <rect x={x} y={y} width="1" height="1" />)}
+</svg>

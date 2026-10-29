@@ -1,22 +1,1239 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
 import PixelSigil from '../../../components/PixelSigil.astro';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import Sprite from './Sprite.astro';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const demos = selected.map((item, index) => {
+  const { chapters, duration } = item.demo;
+  return {
+    ...item,
+    index,
+    spans: chapters.map((c, i) => {
+      const end = chapters[i + 1]?.t ?? duration;
+      return { ...c, end, share: (end - c.t) / duration };
+    }),
+    label: `${item.project.name} demo: ${chapters.map((c) => c.label.toLowerCase()).join(', ')}.`,
+  };
+});
+
+const stages = workflow.stages.map((stage, i) => ({
+  ...stage,
+  n: pad(i + 1),
+  mine: stage.owner === 'Me',
+  tools: workflow.tools[stage.id],
+}));
 ---
 
 <div data-proto="a1">
-  <section class="section shell" id="work" aria-labelledby="work-title">
+  <section class="section shell work" id="work" aria-labelledby="work-title">
     <div class="work-intro">
       <PixelSigil star />
-      <p>Placeholder for variant a1.</p>
+      <p>Thoughtful interfaces.<br />Useful systems. All the way through.</p>
     </div>
     <div class="section-heading">
       <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant a1 has not been built yet.</p>
+      <p>Independent tools for learning,<br />reading, and making. Each one recorded working.</p>
     </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+
+    <div class="demos">
+      {
+        demos.map((d) => (
+          <article class="demo-row" data-demo aria-labelledby={`demo-${d.project.id}`}>
+            <figure class="demo">
+              <div class="window">
+                <video
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={d.demo.poster}
+                  aria-label={d.label}
+                  width="1600"
+                  height="1000"
+                >
+                  <source src={d.demo.webm} type="video/webm" />
+                  <source src={d.demo.mp4} type="video/mp4" />
+                </video>
+                <button class="big-play" type="button" tabindex="-1" aria-hidden="true">
+                  <svg viewBox="0 0 9 9" shape-rendering="crispEdges" aria-hidden="true">
+                    <rect x="3" y="1" width="1" height="7" />
+                    <rect x="4" y="2" width="1" height="5" />
+                    <rect x="5" y="3" width="1" height="3" />
+                    <rect x="6" y="4" width="1" height="1" />
+                  </svg>
+                </button>
+                <div class="track" role="group" aria-label={`${d.project.name} chapters`}>
+                  {d.spans.map((c, i) => (
+                    <button
+                      class="seg"
+                      type="button"
+                      style={`flex-grow:${c.share.toFixed(4)}`}
+                      data-t={c.t}
+                      data-end={c.end}
+                      tabindex={i === 0 ? '0' : '-1'}
+                      aria-label={`Chapter ${i + 1}: ${c.label}`}
+                    >
+                      <span class="seg-fill" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <figcaption class="caption">
+                <button class="toggle" type="button" aria-label={`Play the ${d.project.name} demo`}>
+                  <svg class="i-play" viewBox="0 0 9 9" shape-rendering="crispEdges" aria-hidden="true">
+                    <rect x="3" y="1" width="1" height="7" />
+                    <rect x="4" y="2" width="1" height="5" />
+                    <rect x="5" y="3" width="1" height="3" />
+                    <rect x="6" y="4" width="1" height="1" />
+                  </svg>
+                  <svg class="i-pause" viewBox="0 0 9 9" shape-rendering="crispEdges" aria-hidden="true">
+                    <rect x="2" y="1" width="2" height="7" />
+                    <rect x="5" y="1" width="2" height="7" />
+                  </svg>
+                </button>
+                <span class="step" aria-hidden="true">
+                  <b data-step>01</b> / {pad(d.spans.length)}
+                </span>
+                <span class="beat" aria-hidden="true" data-beat>
+                  {d.spans[0].label}
+                </span>
+                <span class="sr-only">
+                  Chapters: {d.spans.map((c) => c.label).join('. ')}.
+                </span>
+              </figcaption>
+            </figure>
+            <div class="copy">
+              <p class="meta">
+                {pad(d.index + 1)} / {d.status}
+              </p>
+              <h3 id={`demo-${d.project.id}`}>
+                <a href={d.href} tabindex="-1">
+                  {d.project.name}
+                </a>
+              </h3>
+              <p class="desc">{d.project.description}</p>
+              <p class="meta stack">{d.project.stack.split(' · ').join(' / ')}</p>
+              <a class="small-link" href={d.href}>
+                More on {d.project.name} <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </article>
+        ))
+      }
     </div>
   </section>
+
+  <section class="section shell wf" id="workflow" aria-labelledby="workflow-title">
+    <div class="section-heading">
+      <h2 id="workflow-title">My AI <span class="ghost">workflow.</span></h2>
+      <p>
+        Claude Code and Codex explore, build and challenge the work. I own the direction and the
+        final call.
+      </p>
+    </div>
+
+    <ul class="cast" aria-label="Who does the work">
+      <li>
+        <span class="mark me"><PixelSigil star /></span>
+        <span><b>Tomas</b><span class="meta">Frames the problem. Makes the final call.</span></span>
+      </li>
+      {
+        workflow.agents.map((a) => (
+          <li>
+            <span class="mark">
+              <Sprite id={a.id} />
+            </span>
+            <span>
+              <b>
+                {a.name} <span class="model">{a.model}</span>
+              </b>
+              <span class="meta">{a.role}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="diagram" data-wf>
+      <svg class="wires" aria-hidden="true"></svg>
+      <span class="lane-label" data-lane="build" aria-hidden="true">Failed checks</span>
+      <span class="lane-label" data-lane="design" aria-hidden="true">Wrong approach</span>
+      <span class="traveller" aria-hidden="true"></span>
+      <ol class="stages">
+        {
+          stages.map((s) => (
+            <li class:list={['stage', { mine: s.mine }]} data-stage={s.id}>
+              <div class="node">
+                <span class="corner" aria-hidden="true" />
+                <span class="n">{s.n}</span>
+                <h3>{s.label}</h3>
+                <span class="hint">{s.hint}</span>
+                <span class="who">
+                  {s.mine ? (
+                    <>
+                      <PixelSigil star />
+                      <span>Tomas</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sprite id="claude" />
+                      <Sprite id="codex" />
+                      <span class="plus" aria-hidden="true">+</span>
+                      <PixelSigil star />
+                      <span class="sr-only">Claude Code and Codex, with Tomas</span>
+                    </>
+                  )}
+                </span>
+              </div>
+              <div class="detail">
+                <p class="ask">
+                  <PixelSigil star />
+                  <span class="sr-only">My decision: </span>
+                  {s.humanDecision}
+                </p>
+                {s.tools.length ? (
+                  <ul class="tools" aria-label={`Tools in ${s.label}`}>
+                    {s.tools.map((t) => (
+                      <li>
+                        <code>{t.name}</code>
+                        <span>{t.source ?? t.kind}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p class="out">Ship it, revise the slice or rethink the approach.</p>
+                )}
+                {s.id === 'verify' && (
+                  <p class="loop-note">
+                    <span class="sr-only">{workflow.feedback.label}. </span>
+                    {workflow.feedback.body}
+                  </p>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <p class="sources meta">
+      <span>Skills from</span>
+      {workflow.sources.map((s) => <a href={s.href}>{s.label}</a>)}
+    </p>
+  </section>
 </div>
+
+<style is:global>
+  /* Snapping for the whole page. Off for reduced motion and short viewports. */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='a1']) {
+      scroll-snap-type: y proximity;
+    }
+    html:has([data-proto='a1']) .cover,
+    html:has([data-proto='a1']) [data-proto='a1'] > section,
+    html:has([data-proto='a1']) #index,
+    html:has([data-proto='a1']) #readme,
+    html:has([data-proto='a1']) .writing,
+    html:has([data-proto='a1']) #contact {
+      scroll-snap-align: start;
+    }
+    html:has([data-proto='a1']) .experience {
+      scroll-snap-align: start;
+    }
+    html:has([data-proto='a1']) [data-proto='a1'] .demo-row {
+      scroll-snap-align: center;
+    }
+  }
+  /* Sections land with their own top padding under the floating header, not 100px below it. */
+  html:has([data-proto='a1']) [data-proto='a1'] > section,
+  html:has([data-proto='a1']) #index,
+  html:has([data-proto='a1']) #readme,
+  html:has([data-proto='a1']) .writing {
+    scroll-margin-top: -100px;
+  }
+  html:has([data-proto='a1']) .experience {
+    scroll-margin-top: -80px;
+  }
+</style>
+
+<style>
+  /* ---------- Work ---------- */
+
+  .demos {
+    display: grid;
+    gap: 96px;
+  }
+  .demo-row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 24px;
+    align-items: end;
+  }
+  .demo {
+    grid-column: 1 / span 9;
+    margin: 0;
+    min-width: 0;
+  }
+  .copy {
+    grid-column: 10 / span 3;
+    padding-bottom: 52px;
+  }
+  .demo-row:nth-child(2) .demo {
+    grid-column: 4 / span 9;
+    grid-row: 1;
+  }
+  .demo-row:nth-child(2) .copy {
+    grid-column: 1 / span 3;
+    grid-row: 1;
+  }
+
+  /* The frame: one 20px cell of light dither, corners stepped by two 4px pixels. */
+  .window {
+    --band: 20px;
+    position: relative;
+    padding: var(--band) var(--band) 0;
+    background: repeating-conic-gradient(var(--light) 0 25%, var(--paper) 0 50%) 0 0 / 4px 4px;
+    clip-path: polygon(
+      0 8px,
+      4px 8px,
+      4px 4px,
+      8px 4px,
+      8px 0,
+      calc(100% - 8px) 0,
+      calc(100% - 8px) 4px,
+      calc(100% - 4px) 4px,
+      calc(100% - 4px) 8px,
+      100% 8px,
+      100% calc(100% - 8px),
+      calc(100% - 4px) calc(100% - 8px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 8px) calc(100% - 4px),
+      calc(100% - 8px) 100%,
+      8px 100%,
+      8px calc(100% - 4px),
+      4px calc(100% - 4px),
+      4px calc(100% - 8px),
+      0 calc(100% - 8px)
+    );
+  }
+  video {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    background: var(--paper-3);
+    cursor: pointer;
+  }
+
+  /* The bottom band of the frame is the chapter track. */
+  .track {
+    display: flex;
+    gap: 8px;
+    height: var(--band);
+  }
+  .seg {
+    position: relative;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .seg::before,
+  .seg-fill {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, var(--paper) 0 6px, transparent 6px 8px);
+  }
+  .seg::before {
+    right: 0;
+  }
+  .seg-fill {
+    width: var(--fill, 0px);
+    background: repeating-linear-gradient(90deg, var(--blue) 0 6px, transparent 6px 8px);
+  }
+  .seg:focus-visible {
+    outline-offset: -2px;
+    outline-width: 2px;
+  }
+
+  .big-play {
+    position: absolute;
+    left: 50%;
+    top: calc(50% - 10px);
+    width: 64px;
+    height: 64px;
+    padding: 12px;
+    border: 0;
+    background: var(--blue);
+    color: var(--paper);
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .big-play svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+  .demo-row[data-show-play] .big-play {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .caption {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding-top: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .toggle {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .toggle svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+  .toggle .i-pause,
+  .demo-row[data-playing] .toggle .i-play {
+    display: none;
+  }
+  .demo-row[data-playing] .toggle .i-pause {
+    display: block;
+  }
+  .step {
+    color: var(--muted-2);
+    white-space: nowrap;
+  }
+  .step b {
+    font-weight: 400;
+    color: var(--blue);
+  }
+  .beat {
+    display: inline-block;
+    color: var(--ink);
+  }
+  .beat.swap {
+    animation: beat-in 0.32s var(--ease);
+  }
+  @keyframes beat-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .copy .meta {
+    color: var(--muted-2);
+  }
+  .copy h3 {
+    margin-top: 14px;
+    font-size: 30px;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+  .copy h3 a {
+    transition: color 0.2s;
+  }
+  .desc {
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .stack {
+    margin-top: 16px;
+  }
+  .copy .small-link {
+    margin-top: 22px;
+    font-size: 12px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .copy h3 a:hover,
+    .copy .small-link:hover {
+      color: var(--blue);
+    }
+    .toggle:hover {
+      border-color: var(--ink);
+    }
+    .seg:hover::before {
+      background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 8px);
+    }
+  }
+
+  /* ---------- Workflow ---------- */
+
+  .wf {
+    border-top: 1px solid var(--line);
+  }
+  .cast {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 48px;
+    margin: 0 0 28px;
+    padding: 0;
+    list-style: none;
+  }
+  .cast li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 360px;
+  }
+  .cast b {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .cast .model {
+    margin-left: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted-2);
+  }
+  .cast .meta {
+    display: block;
+    color: var(--muted);
+  }
+  .mark {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .mark :global(svg) {
+    width: 24px;
+    height: 24px;
+  }
+  .mark.me {
+    background: var(--blue);
+    border-color: var(--blue);
+  }
+  .mark.me :global(.pixel-sigil) {
+    color: var(--paper);
+  }
+
+  .diagram {
+    position: relative;
+    padding-top: 80px;
+  }
+  /* The 20px grid the diagram is drawn on, shown as 2px dots behind the lanes and nodes. */
+  .diagram::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(5 * round(down, (100% - 240px) / 5, 20px) + 240px);
+    height: 220px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect width='2' height='2' fill='%23c8c6b8'/%3E%3C/svg%3E")
+      -1px -1px / 20px 20px;
+    pointer-events: none;
+  }
+  .wires {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .lane-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0 8px;
+    background: var(--paper);
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 20px;
+    color: var(--blue);
+    white-space: nowrap;
+    visibility: hidden;
+  }
+  .traveller {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    width: 12px;
+    height: 12px;
+    background: var(--amber);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .stages {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, round(down, (100% - 240px) / 5, 20px));
+    gap: 60px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stage {
+    min-width: 0;
+  }
+  .node {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 10px;
+    min-height: 120px;
+    padding: 16px 16px 14px;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    align-content: start;
+  }
+  .stage.mine .node {
+    border-color: var(--blue);
+    background: var(--blue);
+    color: var(--paper);
+  }
+  /* A hard dithered shadow, one 2px checkerboard, like the experience band's edge. */
+  .node::before,
+  .node::after {
+    content: '';
+    position: absolute;
+    background: repeating-conic-gradient(var(--ink) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .node::before {
+    top: 6px;
+    right: -12px;
+    bottom: -12px;
+    width: 10px;
+  }
+  .node::after {
+    left: 6px;
+    right: -2px;
+    bottom: -12px;
+    height: 10px;
+  }
+  .stage.mine .node::before,
+  .stage.mine .node::after {
+    background-image: repeating-conic-gradient(var(--blue) 0 25%, transparent 0 50%);
+    opacity: 1;
+  }
+  .corner {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    background: transparent;
+    transition: background 0.15s;
+  }
+  .stage.here .corner {
+    background: var(--amber);
+  }
+  .n {
+    grid-row: 1 / 3;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 26px;
+    color: var(--muted-2);
+  }
+  .stage.mine .n {
+    color: #c9d0ff;
+  }
+  .node h3 {
+    font-size: 22px;
+    letter-spacing: -0.03em;
+    line-height: 26px;
+  }
+  .hint {
+    grid-column: 2;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .stage.mine .hint {
+    color: #dfe3ff;
+  }
+  .who {
+    grid-column: 1 / 3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .who :global(svg) {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .stage:not(.mine) .who :global(.pixel-sigil) {
+    width: 14px;
+    height: 14px;
+  }
+  .stage.mine .who :global(.pixel-sigil) {
+    color: var(--paper);
+  }
+  .plus {
+    color: var(--muted-2);
+  }
+
+  .detail {
+    padding: 18px 2px 0;
+  }
+  .ask :global(.pixel-sigil) {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: 6px;
+    vertical-align: 1px;
+  }
+  .ask {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .tools {
+    display: grid;
+    gap: 7px;
+    margin: 16px 0 0;
+    padding: 14px 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .tools li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+  }
+  .tools code {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .tools span {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+  .out {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .loop-note {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 36px;
+    color: var(--muted-2);
+  }
+  .sources a {
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sources a:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+    }
+  }
+
+  /* ---------- Narrower screens ---------- */
+
+  @media (max-width: 1100px) {
+    .demo,
+    .demo-row:nth-child(2) .demo {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+    .copy,
+    .demo-row:nth-child(2) .copy {
+      grid-column: 1 / -1;
+      grid-row: auto;
+      padding-bottom: 0;
+      max-width: 560px;
+    }
+    .stages {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      padding-left: 48px;
+    }
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .detail {
+      padding-top: 0;
+    }
+    .diagram {
+      padding-top: 0;
+    }
+    .diagram::before {
+      display: none;
+    }
+    .loop-note {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip-path: none;
+      white-space: normal;
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--blue);
+    }
+    .loop-note::before {
+      content: '';
+      flex-shrink: 0;
+      width: 20px;
+      height: 4px;
+      margin-top: 6px;
+      background: repeating-linear-gradient(90deg, var(--blue) 0 4px, transparent 4px 8px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .demos {
+      gap: 64px;
+    }
+    .demo-row {
+      gap: 14px;
+    }
+    .window {
+      --band: 10px;
+      margin-inline: -24px;
+      clip-path: none;
+    }
+    .track {
+      height: 20px;
+    }
+    .copy h3 {
+      margin-top: 8px;
+      font-size: 27px;
+    }
+    .cast {
+      flex-direction: column;
+    }
+    .stages {
+      padding-left: 44px;
+      gap: 24px;
+    }
+    .stage {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .node {
+      min-height: 0;
+    }
+    .detail {
+      padding: 14px 0 0 40px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beat.swap {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { reducedMotion } from '../../../lib/flood/scroll';
+
+  const root = document.querySelector<HTMLElement>('[data-proto="a1"]');
+  if (root) {
+    initDemos(root);
+    initWorkflow(root);
+  }
+
+  function initDemos(root: HTMLElement) {
+    const hoverable = matchMedia('(hover: hover) and (pointer: fine)');
+
+    root.querySelectorAll<HTMLElement>('[data-demo]').forEach((row) => {
+      const video = row.querySelector('video')!;
+      const segs = [...row.querySelectorAll<HTMLButtonElement>('.seg')];
+      const toggle = row.querySelector<HTMLButtonElement>('.toggle')!;
+      const bigPlay = row.querySelector<HTMLButtonElement>('.big-play')!;
+      const stepEl = row.querySelector<HTMLElement>('[data-step]')!;
+      const beatEl = row.querySelector<HTMLElement>('[data-beat]')!;
+      const name = row.querySelector('h3')!.textContent!.trim();
+      const chapters = segs.map((s) => ({
+        t: Number(s.dataset.t),
+        end: Number(s.dataset.end),
+        label: s.getAttribute('aria-label')!.replace(/^Chapter \d+: /, ''),
+      }));
+
+      let inView = false;
+      let engaged = false;
+      // 'auto' follows the viewport; 'play' and 'pause' are the visitor's own choice and win over it.
+      let intent: 'auto' | 'play' | 'pause' = 'auto';
+      let current = -1;
+
+      const want = () =>
+        intent === 'pause'
+          ? false
+          : (inView || engaged) && (intent === 'play' || !reducedMotion.matches);
+      const sync = () => {
+        if (want()) {
+          if (video.paused) video.play().catch(() => {});
+        } else if (!video.paused) video.pause();
+      };
+      const showPlay = () => {
+        const show = video.paused && (reducedMotion.matches || intent === 'pause');
+        row.toggleAttribute('data-show-play', show);
+        bigPlay.tabIndex = -1;
+      };
+
+      const paint = () => {
+        const t = video.currentTime;
+        let index = chapters.findIndex((c) => t >= c.t && t < c.end);
+        if (index < 0) index = chapters.length - 1;
+        segs.forEach((seg, i) => {
+          const c = chapters[i];
+          const width = seg.clientWidth;
+          const share = i < index ? 1 : i > index ? 0 : (t - c.t) / (c.end - c.t);
+          // Fill whole 8px squares only, so progress moves in pixel steps.
+          seg.style.setProperty('--fill', `${Math.min(width, Math.ceil((share * width) / 8) * 8)}px`);
+          seg.toggleAttribute('aria-current', i === index);
+        });
+        if (index !== current) {
+          const first = current === -1;
+          current = index;
+          stepEl.textContent = String(index + 1).padStart(2, '0');
+          beatEl.textContent = chapters[index].label;
+          if (!first) {
+            beatEl.classList.remove('swap');
+            void beatEl.offsetWidth;
+            beatEl.classList.add('swap');
+          }
+        }
+      };
+
+      video.addEventListener('timeupdate', paint);
+      video.addEventListener('seeked', paint);
+      video.addEventListener('loadedmetadata', paint);
+      video.addEventListener('play', () => {
+        row.setAttribute('data-playing', '');
+        toggle.setAttribute('aria-label', `Pause the ${name} demo`);
+        showPlay();
+      });
+      video.addEventListener('pause', () => {
+        row.removeAttribute('data-playing');
+        toggle.setAttribute('aria-label', `Play the ${name} demo`);
+        showPlay();
+      });
+
+      const play = () => {
+        intent = 'play';
+        video.play().catch(() => {});
+      };
+      const pause = () => {
+        intent = 'pause';
+        video.pause();
+      };
+      const flip = () => (video.paused ? play() : pause());
+      toggle.addEventListener('click', flip);
+      video.addEventListener('click', flip);
+      bigPlay.addEventListener('click', play);
+
+      segs.forEach((seg, i) => {
+        seg.addEventListener('click', () => {
+          video.currentTime = chapters[i].t + 0.01;
+          paint();
+          if (video.paused && intent !== 'pause' && !reducedMotion.matches) play();
+        });
+        seg.addEventListener('keydown', (event) => {
+          const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+          if (!step) return;
+          event.preventDefault();
+          const next = segs[(i + step + segs.length) % segs.length];
+          segs.forEach((s) => (s.tabIndex = s === next ? 0 : -1));
+          next.focus();
+          next.click();
+        });
+      });
+
+      new IntersectionObserver(
+        ([entry]) => {
+          inView = entry.intersectionRatio >= 0.5;
+          sync();
+        },
+        { threshold: [0, 0.5, 1] },
+      ).observe(video);
+
+      row.addEventListener('pointerenter', () => {
+        if (!hoverable.matches) return;
+        engaged = true;
+        sync();
+      });
+      row.addEventListener('pointerleave', () => {
+        if (!hoverable.matches) return;
+        engaged = row.matches(':focus-within');
+        sync();
+      });
+      row.addEventListener('focusin', () => {
+        engaged = true;
+        sync();
+      });
+      row.addEventListener('focusout', (event) => {
+        if (row.contains(event.relatedTarget as Node)) return;
+        engaged = hoverable.matches && row.matches(':hover');
+        sync();
+      });
+      reducedMotion.addEventListener('change', () => {
+        sync();
+        showPlay();
+      });
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) video.pause();
+        else sync();
+      });
+
+      showPlay();
+      paint();
+    });
+  }
+
+  type Pt = [number, number];
+
+  function initWorkflow(root: HTMLElement) {
+    const box = root.querySelector<HTMLElement>('[data-wf]');
+    if (!box) return;
+    const svg = box.querySelector<SVGSVGElement>('.wires')!;
+    const traveller = box.querySelector<HTMLElement>('.traveller')!;
+    const labels = {
+      build: box.querySelector<HTMLElement>('[data-lane="build"]')!,
+      design: box.querySelector<HTMLElement>('[data-lane="design"]')!,
+    };
+    const stages = [...box.querySelectorAll<HTMLElement>('.stage')];
+    const byId = new Map(stages.map((s) => [s.dataset.stage!, s]));
+    const order = stages.map((s) => s.dataset.stage!);
+    // One idea's trip: a failed check returns to Build, then a wrong approach returns to Design.
+    const ROUTE = ['frame', 'design', 'build', 'verify', 'build', 'verify', 'design', 'build', 'verify', 'decide'];
+
+    let paths = new Map<string, Pt[]>();
+    const NS = 'http://www.w3.org/2000/svg';
+    const C = 20;
+
+    function rect(x: number, y: number, w: number, h: number, fill: string) {
+      const r = document.createElementNS(NS, 'rect');
+      r.setAttribute('x', String(Math.round(x)));
+      r.setAttribute('y', String(Math.round(y)));
+      r.setAttribute('width', String(Math.round(w)));
+      r.setAttribute('height', String(Math.round(h)));
+      r.setAttribute('fill', fill);
+      svg.appendChild(r);
+    }
+
+    function solid(points: Pt[], fill: string) {
+      for (let i = 1; i < points.length; i++) {
+        const [x1, y1] = points[i - 1];
+        const [x2, y2] = points[i];
+        rect(Math.min(x1, x2) - 2, Math.min(y1, y2) - 2, Math.abs(x2 - x1) + 4, Math.abs(y2 - y1) + 4, fill);
+      }
+    }
+
+    function dotted(points: Pt[], fill: string) {
+      for (let i = 1; i < points.length; i++) {
+        const [x1, y1] = points[i - 1];
+        const [x2, y2] = points[i];
+        const len = Math.abs(x2 - x1) + Math.abs(y2 - y1);
+        for (let d = 0; d <= len; d += 8) {
+          const k = len ? d / len : 0;
+          rect(x1 + (x2 - x1) * k - 2, y1 + (y2 - y1) * k - 2, 4, 4, fill);
+        }
+      }
+    }
+
+    // A stepped arrowhead pointing along (dx, dy), tip at (x, y): three 5px columns, 4, 12 and 20px tall.
+    function head([x, y]: Pt, dx: number, dy: number, fill: string) {
+      for (let k = 0; k < 3; k++) {
+        const half = 2 + k * 4;
+        const back = k * 5 + 5;
+        if (dx) rect(dx > 0 ? x - back : x + back - 5, y - half, 5, half * 2, fill);
+        else rect(x - half, dy > 0 ? y - back : y + back - 5, half * 2, 5, fill);
+      }
+    }
+
+    function layout() {
+      svg.replaceChildren();
+      paths = new Map();
+      const base = box!.getBoundingClientRect();
+      const r = (id: string) => {
+        const b = byId.get(id)!.querySelector('.node')!.getBoundingClientRect();
+        return { l: b.left - base.left, r: b.right - base.left, t: b.top - base.top, b: b.bottom - base.top, cx: b.left - base.left + b.width / 2, cy: b.top - base.top + b.height / 2 };
+      };
+      svg.setAttribute('viewBox', `0 0 ${base.width} ${base.height}`);
+      const nodes = order.map(r);
+      const row = nodes[1].t < nodes[0].b;
+      const ink = '#182126';
+      const blue = '#0024cc';
+
+      for (let i = 0; i < nodes.length - 1; i++) {
+        const a = nodes[i];
+        const b = nodes[i + 1];
+        const p: Pt[] = row
+          ? [[a.r, a.t + 40], [b.l, a.t + 40]]
+          : [[a.l + C, a.b], [b.l + C, b.t]];
+        solid([p[0], [p[1][0] - (row ? 10 : 0), p[1][1] - (row ? 0 : 10)]], ink);
+        head(p[1], row ? 1 : 0, row ? 0 : 1, ink);
+        paths.set(`${order[i]}>${order[i + 1]}`, p);
+      }
+
+      const v = nodes[3];
+      const lanes: { to: 'build' | 'design'; lane: number }[] = [
+        { to: 'build', lane: 1 },
+        { to: 'design', lane: 2 },
+      ];
+      for (const { to, lane } of lanes) {
+        const t = nodes[order.indexOf(to)];
+        let p: Pt[];
+        let label: Pt;
+        if (row) {
+          const y = v.t - lane * 28 - 6;
+          const fromX = to === 'build' ? v.l + C * 2 : v.l + C * 4;
+          const toX = to === 'build' ? t.r - C * 2 : t.cx;
+          p = [[fromX, v.t], [fromX, y], [toX, y], [toX, t.t]];
+          label = [(fromX + toX) / 2, y];
+        } else {
+          const x = v.l - 14 - lane * 14;
+          p = [[v.l, v.cy], [x, v.cy], [x, t.cy + 6], [t.l, t.cy + 6]];
+          label = [x, (v.cy + t.cy) / 2];
+        }
+        const end = p[p.length - 1];
+        const prev = p[p.length - 2];
+        const dx = Math.sign(end[0] - prev[0]);
+        const dy = Math.sign(end[1] - prev[1]);
+        dotted([...p.slice(0, -1), [end[0] - dx * 14, end[1] - dy * 14]], blue);
+        head(end, dx, dy, blue);
+        paths.set(`verify>${to}`, p);
+        const el = labels[to];
+        el.style.visibility = row ? 'visible' : 'hidden';
+        if (row) el.style.transform = `translate(${label[0] - el.offsetWidth / 2}px, ${label[1] - 10}px)`;
+      }
+    }
+
+    // Traveller: walks the route, stepping one 4px pixel at a time, resting on each stage.
+    const SPEED = 0.22; // px per ms
+    const REST = 900;
+    let leg = 0;
+    let legStart = 0;
+    let raf = 0;
+    let visible = false;
+
+    const here = (id: string | null) => stages.forEach((s) => s.classList.toggle('here', s.dataset.stage === id));
+
+    function along(p: Pt[], dist: number): Pt {
+      for (let i = 1; i < p.length; i++) {
+        const [x1, y1] = p[i - 1];
+        const [x2, y2] = p[i];
+        const len = Math.abs(x2 - x1) + Math.abs(y2 - y1);
+        if (dist <= len) {
+          const k = len ? dist / len : 0;
+          return [x1 + (x2 - x1) * k, y1 + (y2 - y1) * k];
+        }
+        dist -= len;
+      }
+      return p[p.length - 1];
+    }
+    const total = (p: Pt[]) => p.slice(1).reduce((s, q, i) => s + Math.abs(q[0] - p[i][0]) + Math.abs(q[1] - p[i][1]), 0);
+
+    function frame(now: number) {
+      raf = 0;
+      if (!visible || document.hidden || reducedMotion.matches) return;
+      if (!legStart) legStart = now;
+      const from = ROUTE[leg];
+      const to = ROUTE[(leg + 1) % ROUTE.length];
+      const elapsed = now - legStart;
+      const rest = leg === ROUTE.length - 1 ? REST * 2.2 : REST;
+      if (elapsed < rest || to === 'frame') {
+        here(from);
+        traveller.style.opacity = '0';
+        if (elapsed >= rest) {
+          leg = (leg + 1) % ROUTE.length;
+          legStart = now;
+        }
+      } else {
+        here(null);
+        const p = paths.get(`${from}>${to}`)!;
+        const d = (elapsed - rest) * SPEED;
+        if (d >= total(p)) {
+          leg = (leg + 1) % ROUTE.length;
+          legStart = now;
+          traveller.style.opacity = '0';
+        } else {
+          const [x, y] = along(p, Math.floor(d / 4) * 4);
+          traveller.style.opacity = '1';
+          traveller.style.transform = `translate(${Math.round(x - 6)}px, ${Math.round(y - 6)}px)`;
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    const resume = () => {
+      if (!raf && visible && !document.hidden && !reducedMotion.matches) {
+        legStart = 0;
+        raf = requestAnimationFrame(frame);
+      }
+      if (reducedMotion.matches) {
+        here(null);
+        traveller.style.opacity = '0';
+      }
+    };
+
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      resume();
+    }).observe(box);
+    document.addEventListener('visibilitychange', resume);
+    reducedMotion.addEventListener('change', resume);
+    new ResizeObserver(() => layout()).observe(box);
+    void document.fonts.ready.then(layout);
+    layout();
+  }
+</script>

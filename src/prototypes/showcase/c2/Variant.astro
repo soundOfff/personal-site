@@ -1,22 +1,803 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
-import PixelSigil from '../../../components/PixelSigil.astro';
+import { GLYPH } from '../../../lib/flood/pixels';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import { CLAUDE, CODEX, cells } from './sprites';
+
+const sprite = (bitmap: readonly string[]) => ({ side: bitmap.length, cells: cells(bitmap) });
+const party = [
+  {
+    sprite: sprite(CLAUDE[0]),
+    tone: 'blue',
+    name: workflow.agents[0].name,
+    meta: workflow.agents[0].model,
+    role: 'Plans, builds and reviews. Runs the skills.',
+  },
+  {
+    sprite: sprite(CODEX[0]),
+    tone: 'ink',
+    name: workflow.agents[1].name,
+    meta: workflow.agents[1].model,
+    role: 'Research and build lanes. A second opinion.',
+  },
+  {
+    sprite: sprite(GLYPH),
+    tone: 'blue',
+    name: 'Me',
+    meta: '✳ marks my calls',
+    role: 'I own the direction and the final call.',
+  },
+];
+const star = sprite(GLYPH);
+const stageLabel = (id: string) => workflow.stages.find((stage) => stage.id === id)!.label;
+const [toBuild, toDesign] = workflow.feedback.to.map(stageLabel);
+const failed = `Failed checks return to ${toBuild}`;
+const wrong = `A wrong approach returns to ${toDesign}`;
+const time = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const tag = (tool: { kind: string; source?: string }) =>
+  tool.source ?? (tool.kind === 'orchestration' ? 'orchestration' : tool.kind);
 ---
 
-<div data-proto="c2">
-  <section class="section shell" id="work" aria-labelledby="work-title">
-    <div class="work-intro">
-      <PixelSigil star />
-      <p>Placeholder for variant c2.</p>
-    </div>
-    <div class="section-heading">
-      <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant c2 has not been built yet.</p>
-    </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+<div data-proto="c2" class="world">
+  <section class="wf" id="workflow" aria-labelledby="wf-title">
+    <div class="shell">
+      <div class="wf-head">
+        <div>
+          <p class="eyebrow">How I work with AI agents</p>
+          <h2 id="wf-title">My AI <span class="ghost">workflow.</span></h2>
+          <p class="wf-intro">
+            Claude Code and Codex explore, build and challenge the work. Every idea walks the same
+            path to shipping.
+          </p>
+        </div>
+        <ul class="party" aria-label="Who does what">
+          {
+            party.map((member) => (
+              <li>
+                <svg
+                  class:list={['sprite', member.tone]}
+                  viewBox={`0 0 ${member.sprite.side} ${member.sprite.side}`}
+                  aria-hidden="true"
+                  shape-rendering="crispEdges"
+                >
+                  {member.sprite.cells.map(({ x, y }) => (
+                    <rect x={x} y={y} width="1" height="1" />
+                  ))}
+                </svg>
+                <p>
+                  <strong>{member.name}</strong> <span class="meta">{member.meta}</span>
+                  <span class="role">{member.role}</span>
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="wf-map">
+        <canvas
+          role="img"
+          aria-label="A pixel map of five rooms on one corridor: Frame, Design, Build, Review and Decide. Two agents walk it. From Review, one path returns to Build and a longer one returns to Design."
+        ></canvas>
+        <span class="loop-label" data-label="build">↩ {failed}</span>
+        <span class="loop-label" data-label="design">↩ {wrong}</span>
+        <a class="ship-label" data-label="ship" href="#work">Shipped <span aria-hidden="true">↓</span></a>
+      </div>
+
+      <ol class="wf-stages">
+        {
+          workflow.stages.map((stage, i) => (
+            <li class="stage" data-stage={stage.id}>
+              <p class="stage-num">
+                <span>{String(i + 1).padStart(2, '0')}</span>
+                <span>{stage.owner}</span>
+              </p>
+              <h3>
+                {stage.label} <span class="hint">{stage.hint}</span>
+              </h3>
+              {workflow.tools[stage.id].length ? (
+                <ul class="tools" aria-label={`Tools in ${stage.label}`}>
+                  {workflow.tools[stage.id].map((tool) => (
+                    <li title={tool.purpose}>
+                      <span class="tool-name">{tool.name}</span> <span class="tool-src">{tag(tool)}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="stage-out">Ship it, revise the slice or rethink the approach.</p>
+              )}
+              <p class="call">
+                <svg viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                  {star.cells.map(({ x, y }) => (
+                    <rect x={x} y={y} width="1" height="1" />
+                  ))}
+                </svg>
+                <span class="sr-only">My call: </span>
+                {stage.humanDecision}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="wf-foot">
+        <p class="wf-loops">
+          <span>↩ {failed}.</span> <span>↩ {wrong}.</span>
+        </p>
+        <p class="wf-sources">
+          Skills from
+          {
+            workflow.sources.map((source, i) => (
+              <><a href={source.href} target="_blank" rel="noopener">{source.label}</a>{i < workflow.sources.length - 2 ? ', ' : i === workflow.sources.length - 2 ? ' and ' : '.'}</>
+            ))
+          }
+        </p>
+        <button class="wf-toggle" type="button" aria-pressed="false"><span>Pause the walk</span></button>
+      </div>
     </div>
   </section>
+
+  <section id="work" aria-labelledby="work-title">
+    <h2 id="work-title" class="sr-only">Selected work</h2>
+    {
+      selected.map((item, i) => {
+        const { project, demo } = item;
+        const side = i % 2 ? 'right' : 'left';
+        return (
+          <article
+            class="room"
+            id={`room-${project.id}`}
+            data-side={side}
+            data-duration={demo.duration}
+            aria-labelledby={`room-${project.id}-name`}
+          >
+            <div class="room-inner shell">
+              <div class="room-copy">
+                <p class="eyebrow">
+                  Selected work · {String(i + 1).padStart(2, '0')} / {String(selected.length).padStart(2, '0')}
+                </p>
+                <h3 class="room-name" id={`room-${project.id}-name`}>
+                  {project.name}
+                </h3>
+                <p class="room-sub">{item.subtitle}</p>
+                <p class="room-desc">{project.description}</p>
+                <ol class="chapters" aria-label={`${project.name} demo chapters`}>
+                  {demo.chapters.map((chapter, j) => (
+                    <li>
+                      <button type="button" data-t={chapter.t} data-label={chapter.label}>
+                        <span class="ch-cell" aria-hidden="true" />
+                        <span class="ch-label">{chapter.label}</span>
+                        <span class="ch-time">{time(chapter.t)}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+                <p class="room-links">
+                  <a href={item.href}>More on {project.name} →</a>
+                  {demo.walkthrough && (
+                    <a href={demo.walkthrough} target="_blank" rel="noopener">
+                      Narrated walkthrough
+                    </a>
+                  )}
+                  {project.source && (
+                    <a href={project.source} target="_blank" rel="noopener">
+                      Source
+                    </a>
+                  )}
+                </p>
+                <p class="room-meta">
+                  {item.status} · {project.stack.split(' · ').join(' / ')}
+                </p>
+              </div>
+
+              <figure class="room-stage">
+                <div class="screen">
+                  <canvas class="halo" aria-hidden="true" />
+                  <video
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    poster={demo.poster}
+                    aria-label={`${project.name} demo: ${demo.chapters.map((c) => c.label.toLowerCase()).join(', ')}.`}
+                  >
+                    <source src={demo.webm} type="video/webm" />
+                    <source src={demo.mp4} type="video/mp4" />
+                  </video>
+                  <canvas class="wipe" aria-hidden="true" />
+                  <button class="play-big" type="button" hidden>
+                    <svg viewBox="0 0 5 7" aria-hidden="true" shape-rendering="crispEdges">
+                      <rect x="0" y="0" width="1" height="7" />
+                      <rect x="1" y="1" width="1" height="5" />
+                      <rect x="2" y="2" width="1" height="3" />
+                      <rect x="3" y="3" width="1" height="1" />
+                    </svg>
+                    Play the {project.name} demo
+                  </button>
+                </div>
+                <figcaption class="caption">
+                  <span class="cap-now" aria-live="off">01 {demo.chapters[0].label}</span>
+                  <canvas class="track" aria-hidden="true" />
+                  <button class="cap-toggle" type="button" aria-label={`Play or pause the ${project.name} demo`}>
+                    <i aria-hidden="true" />
+                    <span>Play</span>
+                  </button>
+                </figcaption>
+              </figure>
+            </div>
+          </article>
+        );
+      })
+    }
+  </section>
 </div>
+
+<script>
+  import { initWorld } from './world';
+
+  const root = document.querySelector<HTMLElement>('[data-proto="c2"]');
+  if (root) initWorld(root);
+</script>
+
+<style>
+  .world {
+    display: contents;
+  }
+
+  /* Workflow: the cave becomes a map. */
+  .wf {
+    min-height: 100svh;
+    display: grid;
+    align-content: center;
+    padding-block: 104px 40px;
+    box-sizing: border-box;
+  }
+  .wf-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 40px;
+    margin-bottom: 30px;
+  }
+  .wf-head h2 {
+    margin: 14px 0 12px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(48px, 5.3vw, 84px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+  .wf-intro {
+    max-width: 470px;
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .party {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .party li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .party p {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  .party strong {
+    font-weight: 500;
+  }
+  .party .meta {
+    color: var(--muted-2);
+  }
+  .party .role {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .sprite {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    fill: currentColor;
+  }
+  .sprite.blue {
+    color: var(--blue);
+  }
+  .sprite.ink {
+    color: var(--ink);
+  }
+  .party li:last-child .sprite {
+    width: 21px;
+    height: 21px;
+    margin-inline: 4.5px;
+  }
+
+  .wf-map {
+    position: relative;
+  }
+  .wf-map canvas {
+    display: block;
+  }
+  .loop-label,
+  .ship-label {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .loop-label.is-active {
+    color: var(--blue);
+  }
+  .ship-label {
+    right: 0;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--ink);
+  }
+
+  .wf-stages {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stage {
+    padding: 12px 22px 0 0;
+    border-top: 1px solid var(--line);
+    transition: border-color 0.25s;
+  }
+  .stage.is-active {
+    border-top-color: var(--blue);
+    box-shadow: inset 0 1px 0 var(--blue);
+  }
+  .stage-num {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  .stage h3 {
+    margin: 8px 0 10px;
+    font-size: 21px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .stage.is-active h3 {
+    color: var(--blue);
+  }
+  .hint {
+    display: block;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+  .tools {
+    display: grid;
+    gap: 3px;
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .tool-src {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+  .stage-out {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .call {
+    position: relative;
+    padding-left: 18px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--ink-2);
+  }
+  .call svg {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 11px;
+    height: 11px;
+    fill: var(--blue);
+  }
+  .wf-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 26px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  .wf-loops {
+    display: none;
+  }
+  .wf-sources a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+  }
+  .wf-toggle {
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: transparent;
+    font: inherit;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  /* Rooms: one product per room, the demo in a clearing. */
+  .room {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-items: center;
+    padding-block: 96px 48px;
+    box-sizing: border-box;
+    overflow: clip;
+  }
+  .room-inner {
+    display: grid;
+    grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+    gap: 64px;
+    align-items: center;
+  }
+  .room[data-side='right'] .room-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
+  }
+  .room[data-side='right'] .room-copy {
+    order: 2;
+  }
+  .room-copy .eyebrow {
+    color: var(--muted-2);
+  }
+  .room-name {
+    margin: 16px 0 6px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(52px, 5vw, 76px);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+  .room-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.25;
+    color: var(--ink-2);
+  }
+  .room-desc {
+    margin-top: 14px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .chapters {
+    margin: 22px 0 18px;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  .chapters button {
+    display: grid;
+    grid-template-columns: 10px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 34px;
+    padding: 6px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    font: inherit;
+    font-size: 14px;
+    color: var(--muted);
+    text-align: left;
+    cursor: pointer;
+  }
+  .ch-cell {
+    width: 10px;
+    height: 10px;
+    background: repeating-conic-gradient(var(--light) 0 25%, var(--paper) 0 50%) 0 0 / 4px 4px;
+  }
+  .ch-time {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  .chapters button[aria-current] {
+    color: var(--ink);
+  }
+  .chapters button[aria-current] .ch-cell {
+    background: var(--blue);
+  }
+  .room-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-size: 14px;
+  }
+  .room-links a {
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 4px;
+  }
+  .room-links a:first-child {
+    color: var(--blue);
+    text-decoration-color: currentColor;
+  }
+  .room-meta {
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+
+  .room-stage {
+    width: min(100%, calc((100svh - 230px) * 1.6));
+    margin: 0;
+    justify-self: center;
+  }
+  .screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: var(--paper-2);
+  }
+  .halo {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .screen video {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .wipe {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .play-big {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 2px;
+    background: var(--blue);
+    color: var(--paper);
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .play-big svg {
+    width: 10px;
+    height: 14px;
+    fill: currentColor;
+  }
+  .caption {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 19em minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    margin-top: 50px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .cap-now {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .track {
+    width: 100%;
+    height: 14px;
+    cursor: pointer;
+  }
+  .cap-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--paper);
+    font: inherit;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .cap-toggle i {
+    width: 8px;
+    height: 10px;
+    background: linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px, currentColor 5px);
+  }
+  .cap-toggle[data-state='paused'] i {
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    background: currentColor;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .chapters button:hover {
+      color: var(--ink);
+    }
+    .chapters button:hover .ch-cell {
+      background: var(--light);
+    }
+    .wf-toggle:hover,
+    .cap-toggle:hover {
+      border-color: var(--ink);
+    }
+    .room-links a:hover {
+      text-decoration-color: currentColor;
+    }
+    .stage {
+      cursor: default;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wf-toggle {
+      display: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .wf-head {
+      flex-direction: column;
+      align-items: start;
+    }
+    .wf-stages {
+      grid-template-columns: 1fr;
+    }
+    .stage {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      padding: 12px 0 14px;
+    }
+    .stage > * {
+      grid-column: 2;
+    }
+    .stage-num {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      align-self: start;
+      padding-top: 5px;
+    }
+    .stage-num span + span {
+      display: none;
+    }
+    .stage h3 {
+      margin: 0 0 6px;
+      font-size: 19px;
+    }
+    .hint {
+      display: inline;
+      margin-left: 6px;
+    }
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 12px;
+      margin-bottom: 8px;
+    }
+    .call {
+      font-size: 14px;
+    }
+    .loop-label,
+    .ship-label {
+      display: none;
+    }
+    .wf-loops {
+      display: grid;
+      gap: 4px;
+    }
+    .wf-foot {
+      flex-direction: column;
+      align-items: start;
+      gap: 12px;
+    }
+    .room {
+      min-height: 0;
+      padding-block: 72px;
+    }
+    .room-inner,
+    .room[data-side='right'] .room-inner {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    .room-copy,
+    .room[data-side='right'] .room-copy {
+      display: contents;
+    }
+    .room-stage {
+      order: 4;
+      width: 100%;
+      margin-block: 48px 8px;
+    }
+    .room-desc {
+      order: 5;
+    }
+    .chapters {
+      order: 6;
+    }
+    .room-links {
+      order: 7;
+    }
+    .room-meta {
+      order: 8;
+    }
+    .caption {
+      margin-top: 30px;
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .track {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+  @media (max-width: 600px) {
+    .wf {
+      padding-block: 96px 56px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Native proximity snapping across the whole page. No snap points inside the cover. */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='c2']) {
+      scroll-snap-type: y proximity;
+      scroll-padding-top: 0;
+    }
+    html:has([data-proto='c2']) [data-proto='c2'] #workflow,
+    html:has([data-proto='c2']) [data-proto='c2'] .room,
+    html:has([data-proto='c2']) main > section:not(.cover),
+    html:has([data-proto='c2']) #contact {
+      scroll-snap-align: start;
+    }
+    html:has([data-proto='c2']) main > .experience {
+      scroll-margin-top: 20px;
+    }
+  }
+</style>

@@ -1,22 +1,1040 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
-import PixelSigil from '../../../components/PixelSigil.astro';
+// Variant c3. The cave opens into rooms: the workflow is a pixel dungeon the party walks,
+// and every product is a room of the same rock with its demo as the lit window.
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import { sign, spriteCells, type ActorId } from './sprites';
+
+const stages = workflow.stages;
+const tools = workflow.tools;
+const [failed, rethink] = workflow.feedback.body
+  .split('. ')
+  .map((s) => s.replace(/\.?$/, '.'));
+const kind = { agent: 'agents', orchestration: 'orchestration', check: 'check', skill: 'skill' };
+const sprite = (id: ActorId) => spriteCells(id);
+const party: { id: ActorId; name: string; model?: string; role: string }[] = [
+  { id: 'tomas', name: 'Tomas', model: 'me', role: 'I own the direction and the final call.' },
+  { id: 'claude', name: workflow.agents[0].name, model: workflow.agents[0].model, role: 'Plans, reads the codebase, builds and reviews.' },
+  { id: 'codex', name: workflow.agents[1].name, model: workflow.agents[1].model, role: 'Research and build lanes, and a second opinion.' },
+];
+const pad = (n: number) => String(n).padStart(2, '0');
+const clock = (t: number) => `0:${pad(Math.floor(t))}`;
+const icons = {
+  play: ['X......', 'XXX....', 'XXXXX..', 'XXXXXXX', 'XXXXX..', 'XXX....', 'X......'],
+  pause: ['XX.XX', 'XX.XX', 'XX.XX', 'XX.XX', 'XX.XX', 'XX.XX', 'XX.XX'],
+  expand: ['XXX.XXX', 'X.....X', 'X.....X', '.......', 'X.....X', 'X.....X', 'XXX.XXX'],
+};
+const icon = (rows: string[]) =>
+  rows.flatMap((row, y) => [...row].flatMap((b, x) => (b === 'X' ? [{ x, y }] : [])));
 ---
 
-<div data-proto="c3">
-  <section class="section shell" id="work" aria-labelledby="work-title">
-    <div class="work-intro">
-      <PixelSigil star />
-      <p>Placeholder for variant c3.</p>
-    </div>
-    <div class="section-heading">
-      <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant c3 has not been built yet.</p>
-    </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+<div data-proto="c3" class="c3">
+  <section id="workflow" class="wf" aria-labelledby="c3-wf-title">
+    <div class="shell">
+      <div class="section-heading wf-head">
+        <div>
+          <p class="eyebrow">How I work</p>
+          <h2 id="c3-wf-title">My AI <span class="ghost">workflow.</span></h2>
+        </div>
+        <p>
+          Claude Code and Codex explore, build and challenge the work. I own the direction and the
+          final call.
+        </p>
+      </div>
+
+      <div class="wf-grid">
+        <div class="wf-world">
+          <div class="c3-map-bar">
+            <p class="c3-hint">Five rooms, one loop. <span class="c3-fine">Pick a room or use the arrow keys.</span><span class="c3-coarse">Tap a room to read it.</span></p>
+            <button class="c3-tour" type="button" data-tour aria-pressed="true">
+              <svg class="ico ico-pause" viewBox="0 0 5 7" aria-hidden="true" shape-rendering="crispEdges">
+                {icon(icons.pause).map((c) => <rect x={c.x} y={c.y} width="1" height="1" />)}
+              </svg>
+              <svg class="ico ico-play" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                {icon(icons.play).map((c) => <rect x={c.x} y={c.y} width="1" height="1" />)}
+              </svg>
+              <span data-tour-label>Pause the loop</span>
+            </button>
+          </div>
+
+          <div class="c3-map" data-map>
+            <canvas aria-hidden="true"></canvas>
+            {
+              stages.map((s, i) => {
+                const g = sign(s.label);
+                return (
+                  <button
+                    class="c3-room"
+                    type="button"
+                    data-room={s.id}
+                    aria-pressed={i === 0 ? 'true' : 'false'}
+                    aria-controls="c3-panel"
+                  >
+                    <span class="c3-room-top">
+                      <span class="c3-room-no">{pad(i + 1)}</span>
+                      <svg
+                        class="c3-sign"
+                        viewBox={`0 0 ${g.width} ${g.height}`}
+                        style={`--w:${g.width}`}
+                        aria-hidden="true"
+                        shape-rendering="crispEdges"
+                      >
+                        {g.cells.map((c) => (
+                          <rect x={c.x} y={c.y} width="1" height="1" />
+                        ))}
+                      </svg>
+                      <span class="sr-only">{s.label}.</span>
+                    </span>
+                    <span class="c3-room-owner">{s.owner}</span>
+                  </button>
+                );
+              })
+            }
+            <p class="c3-map-label c3-right" data-label="loop>build" hidden>↺ Failed checks<br />back to Build</p>
+            <p class="c3-map-label" data-label="loop>design" hidden>↺ Wrong approach<br />back to Design</p>
+            <a class="c3-map-label c3-exit" data-label="out" href="#work" hidden>Ships to the work ↓</a>
+          </div>
+
+          <div class="c3-legend">
+            <ul class="c3-party" aria-label="The party">
+              {
+                party.map((p) => {
+                  const s = sprite(p.id);
+                  return (
+                    <li>
+                      <svg
+                        class="c3-sprite"
+                        viewBox={`0 0 ${s.width} ${s.height}`}
+                        aria-hidden="true"
+                        shape-rendering="crispEdges"
+                      >
+                        {s.cells.map((c) => (
+                          <rect x={c.x} y={c.y} width="1" height="1" fill={c.fill} />
+                        ))}
+                      </svg>
+                      <p>
+                        <b>{p.name}</b> <span class="c3-model">{p.model}</span>
+                        <br />
+                        {p.role}
+                      </p>
+                    </li>
+                  );
+                })
+              }
+            </ul>
+            <ul class="c3-keys" aria-label="Map key">
+              <li><span class="c3-k c3-k-path"></span>Shortest path to ship</li>
+              <li><span class="c3-k c3-k-loop"></span>Loops back from Review</li>
+              <li>
+                <svg class="c3-k-idea" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                  {sprite('idea').cells.map((c) => <rect x={c.x} y={c.y} width="1" height="1" fill={c.fill} />)}
+                </svg>The idea
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="c3-panel" id="c3-panel">
+          <p class="c3-note" data-note="loop>build" hidden>↺ {failed}</p>
+          <p class="c3-note" data-note="loop>design" hidden>↺ {rethink}</p>
+          <p class="c3-note" data-note="ship" hidden>✳ Ships to the work below.</p>
+          {
+            stages.map((s, i) => (
+              <article class="c3-card" data-card={s.id} data-off={i !== 0 ? '' : undefined}>
+                <p class="c3-card-k">
+                  <span>
+                    {pad(i + 1)} / {s.label}
+                  </span>
+                  <span>{s.owner}</span>
+                </p>
+                <h3>{s.title}</h3>
+                <p class="c3-card-body">{s.body}</p>
+                <div class="c3-call">
+                  <p class="c3-call-k">My call</p>
+                  <p>{s.humanDecision}</p>
+                </div>
+                {tools[s.id].length ? (
+                  <ul class="c3-tools" aria-label={`Tools in ${s.label}`}>
+                    {tools[s.id].map((t) => (
+                      <li>
+                        <span class="c3-tool-name">{t.name}</span>
+                        <span class="c3-tool-src">{t.source ?? kind[t.kind]}</span>
+                        <span class="c3-tool-why">{t.purpose}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p class="c3-card-out">
+                    <span>Leaves with</span>
+                    {s.output}
+                  </p>
+                )}
+              </article>
+            ))
+          }
+          <p class="c3-sources" style="grid-area: 2 / 1">
+            Skills from{' '}
+            {workflow.sources.map((src, i) => (
+              <><a href={src.href} target="_blank" rel="noopener">{src.label}</a>{i < workflow.sources.length - 2 ? ', ' : i === workflow.sources.length - 2 ? ' and ' : '.'}</>
+            ))}
+          </p>
+        </div>
+      </div>
     </div>
   </section>
+
+  <section id="work" class="work" aria-labelledby="c3-work-title">
+    <div class="shell section-heading work-head">
+      <div>
+        <p class="eyebrow">Selected work</p>
+        <h2 id="c3-work-title">Three rooms, <span class="ghost">running.</span></h2>
+      </div>
+      <p>Sift, FocusQuote and Catcher, recorded as they run. Each demo plays when you reach it.</p>
+    </div>
+
+    {
+      selected.map((f, i) => (
+        <article
+          class:list={['demo-room', 'shell', { flip: i % 2 === 1 }]}
+          data-demo-room
+          data-name={f.project.name}
+          data-duration={f.demo.duration}
+          data-chapters={JSON.stringify(f.demo.chapters.map(({ t, label }) => ({ t, label })))}
+          aria-labelledby={`c3-${f.project.id}`}
+        >
+          <div class="c3-stage" data-stage>
+            <canvas class="c3-rock" data-rock aria-hidden="true" />
+            <div class="c3-window" data-window>
+              <div class="c3-screen" data-screen>
+                <video
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={f.demo.poster}
+                  aria-label={`${f.project.name} demo, silent: ${f.demo.chapters.map((c) => c.label.toLowerCase()).join(', ')}.`}
+                >
+                  <source src={f.demo.webm} type="video/webm" />
+                  <source src={f.demo.mp4} type="video/mp4" />
+                </video>
+                <canvas class="c3-veil" data-veil aria-hidden="true" />
+                <p class="c3-caption" data-caption>
+                  <b>01</b> {f.demo.chapters[0].label}
+                </p>
+                <button class="c3-big-play" type="button" data-big-play aria-label={`Play the ${f.project.name} demo`} hidden>
+                  <svg class="ico" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                    {icon(icons.play).map((c) => (
+                      <rect x={c.x} y={c.y} width="1" height="1" />
+                    ))}
+                  </svg>
+                  Play the demo
+                </button>
+              </div>
+              <div class="c3-bar">
+                <button class="c3-ctl" type="button" data-play aria-label={`Play the ${f.project.name} demo`}>
+                  <svg class="ico ico-play" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                    {icon(icons.play).map((c) => (
+                      <rect x={c.x} y={c.y} width="1" height="1" />
+                    ))}
+                  </svg>
+                  <svg class="ico ico-pause" viewBox="0 0 5 7" aria-hidden="true" shape-rendering="crispEdges">
+                    {icon(icons.pause).map((c) => (
+                      <rect x={c.x} y={c.y} width="1" height="1" />
+                    ))}
+                  </svg>
+                </button>
+                <div class="c3-track" data-track aria-hidden="true">
+                  <span class="c3-fill" data-fill />
+                  {f.demo.chapters.map(() => (
+                    <span class="c3-tick" data-tick />
+                  ))}
+                </div>
+                <span class="c3-len">{Math.round(f.demo.duration)}s loop</span>
+                <button
+                  class="c3-ctl"
+                  type="button"
+                  data-expand
+                  aria-label={`Watch the ${f.project.name} demo full screen`}
+                >
+                  <svg class="ico" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                    {icon(icons.expand).map((c) => (
+                      <rect x={c.x} y={c.y} width="1" height="1" />
+                    ))}
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="c3-side">
+            <p class="eyebrow">
+              Room {pad(i + 1)} / {pad(selected.length)} · {f.status}
+            </p>
+            <h3 id={`c3-${f.project.id}`}>
+              <a href={f.href}>{f.project.name}</a>
+            </h3>
+            <p class="c3-sub">{f.subtitle}</p>
+            <p class="c3-desc">{f.project.description}</p>
+            <ol class="c3-beats" aria-label={`${f.project.name} demo chapters`}>
+              {f.demo.chapters.map((c, k) => (
+                <li>
+                  <button type="button" data-beat data-current={k === 0 ? '' : undefined}>
+                    <span class="n">{pad(k + 1)}</span>
+                    <span class="l">{c.label}</span>
+                    <span class="t">{clock(c.t)}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+            <div class="c3-foot">
+              <p class="meta">{f.project.stack.split(' · ').join(' / ')}</p>
+              <a class="c3-enter" href={f.href}>
+                {f.project.name} in detail <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </div>
+        </article>
+      ))
+    }
+  </section>
 </div>
+
+<style>
+  .c3 {
+    display: contents;
+  }
+
+  /* Workflow */
+  .wf {
+    padding-block: 36px 72px;
+  }
+  .wf-head {
+    margin-bottom: 22px;
+  }
+  .wf-head .eyebrow,
+  .work-head .eyebrow {
+    margin-bottom: 14px;
+  }
+  .wf-head > p {
+    max-width: 360px;
+  }
+  .wf-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 372px;
+    gap: 40px;
+    align-items: start;
+  }
+  .c3-map-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .c3-hint {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .c3-tour {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .ico {
+    width: auto;
+    height: 10px;
+    fill: currentColor;
+  }
+  .ico-play {
+    width: 10px;
+  }
+  .ico-pause {
+    width: 7px;
+  }
+  .c3-tour[aria-pressed='true'] .ico-play,
+  .c3-tour[aria-pressed='false'] .ico-pause {
+    display: none;
+  }
+
+  .c3-map {
+    position: relative;
+    min-height: 420px;
+  }
+  .c3-map canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .c3-room {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 7px;
+    padding: 9px 10px;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+  }
+  .c3-room:active {
+    transform: none;
+  }
+  .c3-room-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .c3-room-no {
+    padding: 2px 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1.2;
+    border: 1px solid var(--line);
+  }
+  .c3-sign {
+    width: calc(var(--w) * 3px);
+    height: 21px;
+    fill: var(--ink);
+  }
+  .c3-room-owner {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .c3-room[aria-pressed='true'] {
+    box-shadow: inset 0 0 0 4px var(--light);
+  }
+  .c3-room[aria-pressed='true'] .c3-room-no {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: var(--paper);
+  }
+  .c3-room[aria-pressed='true'] .c3-sign {
+    fill: var(--blue);
+  }
+  .c3-room:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: -3px;
+  }
+  .c3-map-label {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-inline: 6px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.35;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .c3-map-label.c3-right {
+    align-items: flex-end;
+    text-align: right;
+  }
+  .c3-map-label.c3-exit {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--blue);
+  }
+
+  .c3-legend {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 24px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .c3-party,
+  .c3-keys {
+    display: flex;
+    gap: 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .c3-party li {
+    display: flex;
+    gap: 10px;
+    align-items: start;
+    max-width: 215px;
+  }
+  .c3-party p {
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .c3-party b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .c3-model {
+    font-family: var(--mono);
+    font-size: 10px;
+  }
+  .c3-sprite {
+    flex-shrink: 0;
+    width: 27px;
+    height: 30px;
+  }
+  .c3-keys {
+    flex-direction: column;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    white-space: nowrap;
+  }
+  .c3-keys li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .c3-k {
+    width: 10px;
+    height: 10px;
+    background: var(--amber);
+  }
+  .c3-k-loop {
+    width: 30px;
+    background: repeating-linear-gradient(90deg, var(--light) 0 10px, transparent 10px 20px);
+  }
+  .c3-k-path {
+    width: 30px;
+    background: repeating-linear-gradient(90deg, var(--amber) 0 10px, transparent 10px 10px);
+  }
+  .c3-k-idea {
+    width: 14px;
+    height: 14px;
+  }
+
+  .c3-panel {
+    position: relative;
+    display: grid;
+    margin: 2px;
+    padding: 22px 22px 18px;
+    background: var(--paper);
+    box-shadow:
+      0 -2px 0 0 var(--ink),
+      0 2px 0 0 var(--ink),
+      -2px 0 0 0 var(--ink),
+      2px 0 0 0 var(--ink),
+      6px 6px 0 0 var(--light);
+  }
+  .c3-card {
+    grid-area: 1 / 1;
+  }
+  .c3-card[data-off] {
+    visibility: hidden;
+  }
+  .c3-note {
+    position: absolute;
+    z-index: 1;
+    top: -13px;
+    left: 18px;
+    max-width: calc(100% - 36px);
+    padding: 6px 10px;
+    background: var(--blue);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .c3-card-k {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .c3-card h3 {
+    margin: 10px 0 8px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+  .c3-card-body {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .c3-call {
+    margin: 12px 0;
+    padding: 10px 12px;
+    border-left: 4px solid var(--blue);
+    background: var(--paper-2);
+  }
+  .c3-call-k {
+    margin-bottom: 3px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--blue);
+  }
+  .c3-call p:last-child {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .c3-tools {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .c3-tools li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 10px;
+    padding: 5px 0;
+    border-top: 1px solid var(--line);
+  }
+  .c3-tool-name {
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .c3-tool-src {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+  .c3-tool-why {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  .c3-card-out {
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .c3-card-out span {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .c3-sources {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .c3-sources a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Work */
+  .work {
+    padding-block: 40px 60px;
+    overflow-x: clip;
+  }
+  .work-head {
+    margin-bottom: 30px;
+  }
+  .demo-room {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 96px;
+    align-items: center;
+    padding-block: 84px;
+  }
+  .demo-room.flip {
+    grid-template-columns: 330px minmax(0, 1fr);
+  }
+  .demo-room.flip .c3-stage {
+    order: 2;
+  }
+  .c3-stage {
+    position: relative;
+  }
+  .c3-rock {
+    position: absolute;
+    inset: -60px;
+    width: calc(100% + 120px);
+    height: calc(100% + 120px);
+    pointer-events: none;
+  }
+  .c3-window {
+    position: relative;
+    margin-inline: auto;
+    background: var(--paper);
+  }
+  .c3-screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #e7e6e0;
+  }
+  .c3-screen video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .c3-veil {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .c3-caption {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding: 8px 12px;
+    background: var(--paper);
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .c3-caption :global(b) {
+    margin-right: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--blue);
+  }
+  .c3-big-play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 2px;
+    background: var(--blue);
+    color: var(--paper);
+    font: inherit;
+    font-size: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .c3-big-play .ico {
+    width: 12px;
+    height: 12px;
+  }
+  .c3-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 40px;
+    padding-inline: 4px;
+  }
+  .c3-ctl {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .c3-ctl .ico {
+    height: 12px;
+    width: 12px;
+  }
+  .c3-ctl:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: -3px;
+  }
+  .c3-ctl .ico-pause {
+    width: 9px;
+  }
+  [data-demo-room]:not(.is-playing) .c3-ctl .ico-pause,
+  [data-demo-room].is-playing .c3-ctl .ico-play {
+    display: none;
+  }
+  .c3-track {
+    position: relative;
+    flex: 1;
+    height: 10px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 10px);
+  }
+  .c3-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    background: repeating-linear-gradient(90deg, var(--blue) 0 8px, transparent 8px 10px);
+  }
+  .c3-tick {
+    position: absolute;
+    top: -6px;
+    width: 8px;
+    height: 4px;
+    background: var(--rule-2);
+  }
+  .c3-tick[data-done] {
+    background: var(--blue);
+  }
+  .c3-len {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .c3-side .eyebrow {
+    color: var(--muted);
+  }
+  .c3-side h3 {
+    margin: 14px 0 6px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(52px, 5vw, 76px);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+  .c3-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 21px;
+    line-height: 1.25;
+    color: var(--ghost, #949c99);
+  }
+  .c3-desc {
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .c3-beats {
+    margin: 22px 0 18px;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  .c3-beats button {
+    display: grid;
+    grid-template-columns: 30px 1fr auto;
+    align-items: center;
+    width: 100%;
+    min-height: 38px;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .c3-beats button:active {
+    transform: none;
+  }
+  .c3-beats .n,
+  .c3-beats .t {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--muted-2);
+  }
+  .c3-beats button[data-current] {
+    color: var(--blue);
+  }
+  .c3-beats button[data-current] .n {
+    color: var(--blue);
+  }
+  .c3-beats button[data-current] .n::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 5px;
+    background: var(--blue);
+  }
+  .c3-beats button:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+  }
+  .c3-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .c3-foot .meta {
+    color: var(--muted);
+  }
+  .c3-enter {
+    font-size: 14px;
+    white-space: nowrap;
+    border-bottom: 1px solid currentColor;
+    color: var(--blue);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .c3-room:hover .c3-sign {
+      fill: var(--blue);
+    }
+    .c3-room:hover .c3-room-no {
+      border-color: var(--blue);
+    }
+    .c3-tour:hover {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .c3-beats button:hover .l {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .c3-ctl:hover {
+      color: var(--blue);
+    }
+    .c3-side h3 a:hover,
+    .c3-enter:hover {
+      color: var(--blue);
+    }
+  }
+
+  @media (max-width: 1180px) {
+    .wf-grid {
+      grid-template-columns: 1fr;
+    }
+    .c3-legend {
+      flex-wrap: wrap;
+    }
+  }
+  @media (max-width: 1000px) {
+    .demo-room,
+    .demo-room.flip {
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+    .demo-room.flip .c3-stage {
+      order: 0;
+    }
+  }
+  .c3-coarse {
+    display: none;
+  }
+  @media (pointer: coarse) {
+    .c3-fine {
+      display: none;
+    }
+    .c3-coarse {
+      display: inline;
+    }
+  }
+  @media (max-width: 700px) {
+    .wf-grid {
+      gap: 0;
+    }
+    .wf-world {
+      display: contents;
+    }
+    .c3-map-bar {
+      order: 1;
+    }
+    .c3-map {
+      order: 2;
+    }
+    .c3-panel {
+      order: 3;
+      display: block;
+      margin-top: 28px;
+    }
+    .c3-card[data-off] {
+      display: none;
+    }
+    .c3-legend {
+      order: 4;
+      margin-top: 28px;
+    }
+    .c3-rock {
+      inset: -20px;
+      width: calc(100% + 40px);
+      height: calc(100% + 40px);
+    }
+    .c3-sign {
+      width: calc(var(--w) * 2px);
+      height: 14px;
+    }
+    .c3-room {
+      padding: 7px 8px;
+      gap: 4px;
+    }
+    .c3-party {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .c3-party li {
+      max-width: none;
+    }
+    .c3-map-bar {
+      flex-direction: column;
+      align-items: start;
+    }
+    .demo-room {
+      padding-block: 40px;
+    }
+    .c3-side h3 {
+      font-size: 52px;
+    }
+    .c3-len {
+      display: none;
+    }
+    .c3-caption {
+      font-size: 12px;
+      padding: 6px 9px;
+    }
+    .c3-foot {
+      flex-direction: column;
+      align-items: start;
+    }
+  }
+</style>
+
+<style is:global>
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='c3']) {
+      scroll-snap-type: y proximity;
+    }
+    html:has([data-proto='c3']) .cover,
+    html:has([data-proto='c3']) #workflow,
+    html:has([data-proto='c3']) [data-demo-room],
+    html:has([data-proto='c3']) .experience,
+    html:has([data-proto='c3']) #index,
+    html:has([data-proto='c3']) #readme,
+    html:has([data-proto='c3']) .writing,
+    html:has([data-proto='c3']) #playground {
+      scroll-snap-align: start;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-proto="c3"]');
+  import { initMap } from './map';
+  import { initRooms } from './rooms';
+
+  if (root) {
+    initMap(root);
+    initRooms(root);
+  }
+</script>

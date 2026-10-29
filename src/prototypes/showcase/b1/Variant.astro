@@ -1,22 +1,887 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
-import PixelSigil from '../../../components/PixelSigil.astro';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import { CLAUDE, CODEX, STAR, rects } from './sprites';
+
+const clock = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+const stages = workflow.stages;
+const [failBuild, failDesign] = workflow.feedback.body.split(/(?<=\.)\s+/);
+const lineText = {
+  stages: stages.map((s) => ({ label: s.label, title: s.title })),
+  fail: { build: `04 · ${failBuild}`, design: `04 · ${failDesign}` },
+  arcs: { build: 'failed checks', design: 'wrong approach' },
+};
+const cast = [
+  { sprite: rects(STAR), name: 'Me', meta: 'Frame and Decide', role: 'I own the direction and the final call.' },
+  ...workflow.agents.map((a) => ({
+    sprite: rects(a.id === 'claude' ? CLAUDE : CODEX),
+    name: a.name,
+    meta: a.model,
+    role: a.role,
+  })),
+];
+const kindLabel = { agent: 'agents', orchestration: 'orchestration', check: 'check', skill: 'skill' };
 ---
 
-<div data-proto="b1">
-  <section class="section shell" id="work" aria-labelledby="work-title">
-    <div class="work-intro">
-      <PixelSigil star />
-      <p>Placeholder for variant b1.</p>
-    </div>
-    <div class="section-heading">
-      <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant b1 has not been built yet.</p>
-    </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+<div data-proto="b1" class="b1">
+  <section id="work" class="work" aria-labelledby="b1-work-title" style={`--steps:${selected.length}`}>
+    {
+      selected.map((p, i) => (
+        <span class="step" id={`work-${p.project.id}`} style={`--k:${i}`} aria-hidden="true" />
+      ))
+    }
+    <div class="pin">
+      <div class="shell stage">
+        <div class="head">
+          <h2 id="b1-work-title" class="eyebrow">Selected work</h2>
+          <span class="meta count" aria-hidden="true"><span data-count>01</span> / 0{selected.length}</span>
+        </div>
+
+        <ol class="names" aria-label="Products">
+          {
+            selected.map((p, i) => (
+              <li>
+                <a href={`#work-${p.project.id}`} data-index={i} aria-current={i === 0 ? 'true' : undefined}>
+                  {p.project.name}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="details">
+          {
+            selected.map((p, i) => (
+              <div class="detail" data-detail={i} hidden={i !== 0}>
+                <p class="subtitle">{p.subtitle}</p>
+                <p class="desc">{p.project.description}</p>
+                <p class="meta stack">
+                  <span>{p.project.stack.split(' · ').join(' / ')}</span>
+                  <span>{p.status}</span>
+                </p>
+                <a class="button read" href={p.href}>
+                  Read the {p.project.name} story <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            ))
+          }
+        </div>
+
+        <figure class="screen">
+          <div class="frame" data-frame>
+            {
+              selected.map((p, i) => (
+                <video
+                  class:list={[i === 0 && 'on']}
+                  data-video={i}
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={p.demo.poster}
+                  aria-label={`${p.project.name} demo: ${p.demo.chapters.map((c) => c.label).join('. ')}.`}
+                >
+                  <source src={p.demo.webm} type="video/webm" />
+                  <source src={p.demo.mp4} type="video/mp4" />
+                </video>
+              ))
+            }
+            <canvas class="wipe" aria-hidden="true"></canvas>
+            <button class="play-big" type="button" data-play hidden>
+              <i aria-hidden="true"></i><span>Play the demo</span>
+            </button>
+            <button class="toggle" type="button" data-toggle data-state="paused" aria-label="Play the demo">
+              <i aria-hidden="true"></i>
+            </button>
+          </div>
+          <figcaption>
+            {
+              selected.map((p, i) => (
+                <ol
+                  class="rail"
+                  data-rail={i}
+                  data-duration={p.demo.duration}
+                  hidden={i !== 0}
+                  style={`--n:${p.demo.chapters.length}`}
+                  aria-label={`${p.project.name} demo chapters`}
+                >
+                  {p.demo.chapters.map((c, j) => (
+                    <li>
+                      <button
+                        type="button"
+                        data-t={c.t}
+                        data-label={c.label}
+                        aria-label={`Jump to ${clock(c.t)}, ${c.label}`}
+                        aria-current={j === 0 ? 'step' : undefined}
+                      >
+                        <span class="bar">
+                          <span class="fill" />
+                        </span>
+                        <span class="label">
+                          <span class="t">{clock(c.t)}</span> {c.label}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              ))
+            }
+            <p class="now meta" data-now aria-hidden="true">{selected[0].demo.chapters[0].label}</p>
+          </figcaption>
+          <p class="next meta" aria-hidden="true">
+            {selected.map((p, i) => (
+              <span data-next={i} hidden={i !== 0}>
+                Scroll for {selected[i + 1]?.project.name ?? 'my AI workflow'} <span class="arrow">↓</span>
+              </span>
+            ))}
+          </p>
+        </figure>
+      </div>
     </div>
   </section>
+
+  <section id="workflow" class="section shell workflow" aria-labelledby="b1-wf-title" data-text={JSON.stringify(lineText)}>
+    <div class="section-heading">
+      <h2 id="b1-wf-title">My AI <span class="ghost">workflow.</span></h2>
+      <p>Claude Code and Codex explore, build and challenge the work. I own the direction and the final call.</p>
+    </div>
+
+    <ul class="cast">
+      {
+        cast.map((c) => (
+          <li>
+            <svg viewBox={`0 0 ${c.sprite.w} ${c.sprite.h}`} shape-rendering="crispEdges" aria-hidden="true">
+              {c.sprite.cells.map((r) => <rect x={r.x} y={r.y} width="1" height="1" fill={r.fill} />)}
+            </svg>
+            <div>
+              <p class="who">{c.name} <span class="meta">{c.meta}</span></p>
+              <p class="role">{c.role}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="line-wrap">
+      <canvas
+        class="line"
+        role="img"
+        aria-label="An assembly line of five stations: Frame, Design, Build, Review and Decide. I frame the ticket and make the final call. Claude Code and Codex carry it through Design, Build and Review. Failed checks send it back to Build; a wrong approach sends it back to Design."
+      ></canvas>
+      <ol class="stations">
+        {
+          stages.map((s, i) => (
+            <li>
+              <button type="button" data-station={i} aria-pressed="false" aria-controls="b1-panels">
+                <span class="n meta">0{i + 1}</span>
+                <span class="label">{s.label}</span>
+                <span class="hint meta">{s.hint}</span>
+              </button>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="status meta"><span class="dot" aria-hidden="true"></span><span data-status>01 · {stages[0].title}</span></p>
+    </div>
+
+    <div class="panels" id="b1-panels">
+      {
+        stages.map((s, i) => {
+          const tools = workflow.tools[s.id];
+          return (
+            <div class:list={['panel', i === 0 && 'on']} data-panel={i}>
+              <div class="panel-head">
+                <p class="meta">
+                  0{i + 1} / 05 · {s.owner}
+                </p>
+                <h3>{s.title}</h3>
+                <p class="decision">
+                  <span class="meta">My decision</span>
+                  {s.humanDecision}
+                </p>
+              </div>
+              {tools.length ? (
+                <ul class="tools">
+                  {tools.map((t) => (
+                    <li>
+                      <span class="tool-name">{t.name}</span>
+                      <span class="tool-src meta">{t.source ?? kindLabel[t.kind]}</span>
+                      <span class="tool-purpose">{t.purpose}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="no-tools">{s.action}</p>
+              )}
+            </div>
+          );
+        })
+      }
+    </div>
+
+    <p class="sources meta">
+      Skills from <a href={workflow.sources[0].href} target="_blank" rel="noopener">{workflow.sources[0].label}</a>, <a
+        href={workflow.sources[1].href}
+        target="_blank"
+        rel="noopener">{workflow.sources[1].label}</a
+      > and <a href={workflow.sources[2].href} target="_blank" rel="noopener">{workflow.sources[2].label.replace('My', 'my')}</a>.
+      Orchestrated with Orca, checked with Playwright.
+    </p>
+  </section>
 </div>
+
+<script>
+  import { initStage } from './stage';
+  import { initLine } from './line';
+
+  const root = document.querySelector<HTMLElement>('[data-proto="b1"]');
+  if (root) {
+    initStage(root);
+    initLine(root);
+  }
+</script>
+
+<style>
+  /* Work: a pinned stage, one snap step per product. */
+  .work {
+    position: relative;
+    height: calc(var(--steps) * 100svh);
+  }
+  .step {
+    position: absolute;
+    left: 0;
+    top: calc(var(--k) * 100svh);
+    width: 1px;
+    height: 100svh;
+    pointer-events: none;
+  }
+  .pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    align-items: center;
+    padding-top: 64px;
+    box-sizing: border-box;
+  }
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(300px, 1fr) minmax(0, 2.2fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: 'head screen' 'names screen' 'details screen';
+    column-gap: 56px;
+  }
+  .head {
+    grid-area: head;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .head h2 {
+    font-size: 11px;
+  }
+  .count {
+    color: var(--muted);
+  }
+  .names {
+    grid-area: names;
+    margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .names a {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding-block: 2px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(44px, 4.5vw, 70px);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    color: #a7aca8;
+    transition: color 0.35s var(--ease);
+  }
+  .names a::before {
+    content: '';
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    background: var(--blue);
+    transform: scale(0);
+    transition: transform 0.35s var(--ease);
+  }
+  .names a[aria-current] {
+    color: var(--ink);
+  }
+  .names a[aria-current]::before {
+    transform: scale(1);
+  }
+  .details {
+    grid-area: details;
+    align-self: end;
+  }
+  .subtitle {
+    font-size: 20px;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+  }
+  .desc {
+    max-width: 380px;
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin-top: 16px;
+    color: var(--muted);
+  }
+  .stack span + span::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 8px;
+    background: var(--blue);
+    vertical-align: 1px;
+  }
+  .read {
+    margin-top: 22px;
+  }
+  .detail:not([hidden]) {
+    animation: b1-rise 0.45s var(--ease);
+  }
+  @keyframes b1-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  .screen {
+    grid-area: screen;
+    margin: 0;
+    align-self: center;
+    width: 100%;
+    max-width: calc((100svh - 230px) * 1.6);
+    justify-self: end;
+  }
+  .frame {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #e7e6e0;
+    border: 1px solid #bbbdb2;
+    border-radius: 4px;
+  }
+  .frame video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    visibility: hidden;
+  }
+  .frame video.on {
+    visibility: visible;
+  }
+  .wipe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .toggle,
+  .play-big {
+    position: absolute;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+  }
+  .toggle {
+    right: 10px;
+    bottom: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 2px;
+    opacity: 0.88;
+  }
+  .toggle i,
+  .play-big i {
+    display: block;
+    margin: auto;
+    width: 10px;
+    height: 12px;
+  }
+  .toggle[data-state='playing'] i {
+    background:
+      linear-gradient(var(--ink), var(--ink)) left / 4px 100% no-repeat,
+      linear-gradient(var(--ink), var(--ink)) right / 4px 100% no-repeat;
+  }
+  .toggle[data-state='paused'] i,
+  .play-big i {
+    width: 12px;
+    background: var(--ink);
+    clip-path: polygon(0 0, 0 100%, 34% 100%, 34% 84%, 67% 84%, 67% 67%, 100% 67%, 100% 34%, 67% 34%, 67% 17%, 34% 17%, 34% 0);
+  }
+  .play-big {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    font-size: 15px;
+  }
+  .play-big i {
+    margin: 0;
+  }
+  .play-big:active {
+    transform: translate(-50%, calc(-50% + 2px));
+  }
+
+  .rail {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rail button {
+    display: block;
+    width: 100%;
+    padding: 14px 0 6px;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--muted-2);
+    text-align: left;
+    cursor: pointer;
+  }
+  .bar {
+    position: relative;
+    display: block;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 8px);
+  }
+  .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    background: repeating-linear-gradient(90deg, var(--blue) 0 6px, transparent 6px 8px);
+  }
+  .label {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.45;
+    transition: color 0.2s;
+  }
+  .label .t {
+    display: block;
+    color: var(--muted-2);
+  }
+  .rail button[aria-current] {
+    color: var(--ink);
+  }
+  .rail button[aria-current] .t {
+    color: var(--blue);
+  }
+  .now {
+    display: none;
+  }
+  .next {
+    margin-top: 14px;
+    color: var(--muted-2);
+    text-align: right;
+  }
+  .next .arrow {
+    display: inline-block;
+    margin-left: 4px;
+    color: var(--blue);
+    animation: b1-nudge 1.6s var(--ease) infinite;
+  }
+  @keyframes b1-nudge {
+    50% {
+      transform: translateY(3px);
+    }
+  }
+
+  /* Workflow: a pixel assembly line. */
+  .workflow {
+    padding-block: 96px 80px;
+  }
+  .workflow .section-heading {
+    margin-bottom: 28px;
+  }
+  .workflow .section-heading p {
+    max-width: 330px;
+  }
+  .cast {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 0 0 20px;
+    padding: 18px 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .cast li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .cast svg {
+    flex-shrink: 0;
+    width: 33px;
+    height: 33px;
+  }
+  .who {
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .who .meta {
+    margin-left: 6px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .role {
+    max-width: 330px;
+    margin-top: 2px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .line-wrap {
+    position: relative;
+  }
+  .line {
+    width: 100%;
+    height: 196px;
+  }
+  .stations {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stations button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    padding: 12px 6px 10px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    font: inherit;
+    color: var(--ink);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .stations .label {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .stations .n,
+  .stations .hint {
+    color: var(--muted);
+  }
+  .stations button.live .n {
+    color: var(--blue);
+  }
+  .stations button.shown {
+    border-bottom-color: var(--ink);
+  }
+  .stations button[aria-pressed='true'] {
+    border-bottom-color: var(--blue);
+  }
+  .status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 2.2em;
+    margin-top: 10px;
+    color: var(--ink);
+  }
+  .status .dot {
+    width: 7px;
+    height: 7px;
+    background: var(--amber);
+  }
+  .panels {
+    display: grid;
+    margin-top: 18px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+  .panel {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-content: start;
+    gap: 40px;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity 0.25s,
+      visibility 0s 0.25s;
+  }
+  .panel.on {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.25s;
+  }
+  .panel-head .meta {
+    color: var(--muted);
+  }
+  .panel h3 {
+    margin: 6px 0 12px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+  .decision {
+    max-width: 340px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .decision .meta {
+    display: block;
+    color: var(--blue);
+  }
+  .tools {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    align-content: start;
+  }
+  .tools li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 10px;
+    align-items: baseline;
+  }
+  .tool-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .tool-src {
+    color: var(--muted-2);
+  }
+  .tool-purpose {
+    grid-column: 1 / -1;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .no-tools {
+    max-width: 520px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .sources {
+    margin-top: 28px;
+    color: var(--muted);
+  }
+  .sources a {
+    border-bottom: 1px solid;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .names a:hover {
+      color: var(--ink);
+    }
+    .rail button:hover {
+      color: var(--ink);
+    }
+    .rail button:hover .bar {
+      background: repeating-linear-gradient(90deg, #a3a38f 0 6px, transparent 6px 8px);
+    }
+    .stations button:hover {
+      border-bottom-color: var(--ink);
+    }
+    .toggle:hover {
+      opacity: 1;
+    }
+    .play-big:hover {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .play-big:hover i {
+      background: var(--paper);
+    }
+    .sources a:hover {
+      color: var(--blue);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail:not([hidden]),
+    .next .arrow {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .stage {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      grid-template-areas: 'head' 'names' 'screen' 'details';
+    }
+    .names {
+      display: flex;
+      gap: 18px;
+      margin: 14px 0 14px;
+    }
+    .names a {
+      gap: 8px;
+      font-size: 30px;
+    }
+    .names a::before {
+      width: 7px;
+      height: 7px;
+    }
+    .screen {
+      max-width: none;
+    }
+    .details {
+      margin-top: 18px;
+    }
+    .rail .label {
+      display: none;
+    }
+    .rail button {
+      padding: 12px 0 4px;
+    }
+    .now {
+      display: block;
+      margin-top: 6px;
+      color: var(--ink);
+    }
+    .cast {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .panel {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .pin {
+      padding-top: 70px;
+    }
+    .names {
+      gap: 14px;
+    }
+    .names a {
+      font-size: 26px;
+    }
+    .subtitle {
+      font-size: 17px;
+    }
+    .desc {
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .stack {
+      margin-top: 10px;
+    }
+    .read {
+      margin-top: 14px;
+      min-height: 40px;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    .line {
+      height: 116px;
+    }
+    .stations button {
+      padding: 8px 0;
+    }
+    .stations .label {
+      font-size: 12px;
+    }
+    .stations .hint {
+      display: none;
+    }
+    .status {
+      justify-content: flex-start;
+      align-items: flex-start;
+      min-height: 3.2em;
+      text-align: left;
+    }
+    .status .dot {
+      flex-shrink: 0;
+      margin-top: 0.55em;
+    }
+    .tools {
+      grid-template-columns: 1fr;
+    }
+    .panel h3 {
+      font-size: 28px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Sections carry their own top padding, so anchors and snaps land flush. */
+  html:has([data-proto='b1']) {
+    scroll-padding-top: 0;
+  }
+  /* Snapping: proximity on the page, one point per section start and per product step. */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='b1']) {
+      scroll-snap-type: y proximity;
+    }
+    html:has([data-proto='b1']) .cover,
+    html:has([data-proto='b1']) [data-proto='b1'] .step,
+    html:has([data-proto='b1']) [data-proto='b1'] #workflow,
+    html:has([data-proto='b1']) main > .experience,
+    html:has([data-proto='b1']) main > #index,
+    html:has([data-proto='b1']) main > #readme,
+    html:has([data-proto='b1']) main > .writing,
+    html:has([data-proto='b1']) main > #playground {
+      scroll-snap-align: start;
+    }
+    html:has([data-proto='b1']) main > .experience {
+      scroll-margin-top: 20px;
+    }
+    html:has([data-proto='b1']) main > #playground {
+      scroll-margin-top: 70px;
+    }
+  }
+</style>

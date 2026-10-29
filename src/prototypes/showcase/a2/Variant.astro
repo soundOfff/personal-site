@@ -1,22 +1,894 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
 import PixelSigil from '../../../components/PixelSigil.astro';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import { wide, tall, route, type Layout, type Cell } from './layout';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const clock = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+
+const products = selected.map((p, i) => {
+  const { chapters, duration } = p.demo;
+  return {
+    ...p,
+    index: pad(i + 1),
+    stack: p.project.stack.split(' · ').join(' / '),
+    chapters: chapters.map((c, j) => ({ ...c, end: chapters[j + 1]?.t ?? duration })),
+    label: `${p.project.name} demo: ${chapters.map((c) => c.label.toLowerCase()).join(', ')}.`,
+  };
+});
+
+// Original sprites for the two agents. Not logos: a terminal with a prompt, and a round helper.
+const sprites = {
+  claude: ['########', '#......#', '#.#....#', '#..#...#', '#.#.##.#', '#......#', '########', '.#....#.'],
+  codex: ['..####..', '.#....#.', '#.#..#.#', '#......#', '#.####.#', '.#....#.', '..#..#..', '.##..##.'],
+};
+const spriteCells = (rows: string[]) =>
+  rows.flatMap((row, y) => [...row].flatMap((bit, x) => (bit === '#' ? [{ x, y }] : [])));
+
+const stages = workflow.stages;
+const toolsFor = (id: (typeof stages)[number]['id']) => workflow.tools[id];
+const owner = (id: string) => (id === 'frame' || id === 'decide' ? 'me' : 'agents');
+const edgeTone = (id: string) => (id === 'fix' || id === 'rethink' ? 'loop' : 'line');
+
+const boards: Layout[] = [wide, tall];
+const pos = (b: { x: number; y: number; w?: number; h?: number }) =>
+  `--x:${b.x};--y:${b.y};--w:${b.w ?? 1};--h:${b.h ?? 1}`;
+const arrowRects = (at: Cell, dir: 'down' | 'left') => {
+  const [x, y] = at;
+  return dir === 'down'
+    ? [
+        { x: x - 1, y: y - 1, w: 3, h: 0.5 },
+        { x: x - 0.5, y: y - 0.5, w: 2, h: 0.5 },
+        { x, y, w: 1, h: 0.5 },
+      ]
+    : [
+        { x: x + 1.5, y: y - 1, w: 0.5, h: 3 },
+        { x: x + 1, y: y - 0.5, w: 0.5, h: 2 },
+        { x: x + 0.5, y, w: 0.5, h: 1 },
+      ];
+};
 ---
 
-<div data-proto="a2">
-  <section class="section shell" id="work" aria-labelledby="work-title">
+<div data-proto="a2" class="a2">
+  <section class="section shell work" id="work" aria-labelledby="work-title">
     <div class="work-intro">
       <PixelSigil star />
-      <p>Placeholder for variant a2.</p>
+      <p>Thoughtful interfaces.<br />Useful systems. All the way through.</p>
     </div>
     <div class="section-heading">
       <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant a2 has not been built yet.</p>
+      <p>Independent tools for learning,<br />reading, and making.</p>
     </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+
+    <div class="products">
+      {
+        products.map((p) => (
+          <article class="product" data-demo aria-labelledby={`a2-${p.project.id}`}>
+            <header class="head">
+              <p class="meta">
+                {p.index} / {p.status}
+              </p>
+              <h3 id={`a2-${p.project.id}`}>
+                <a href={p.href}>{p.project.name}</a>
+              </h3>
+            </header>
+
+            <figure class="stage">
+              <div class="frame">
+                <video
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={p.demo.poster}
+                  aria-label={p.label}
+                  width="1600"
+                  height="1000"
+                >
+                  <source src={p.demo.webm} type="video/webm" />
+                  <source src={p.demo.mp4} type="video/mp4" />
+                </video>
+                <button class="bigplay" type="button" data-bigplay tabindex="-1" aria-hidden="true">
+                  <svg viewBox="0 0 8 7" aria-hidden="true" shape-rendering="crispEdges">
+                    <rect x="0" y="0" width="2" height="7" /><rect x="2" y="1" width="2" height="5" />
+                    <rect x="4" y="2" width="2" height="3" /><rect x="6" y="3" width="2" height="1" />
+                  </svg>
+                  Play demo
+                </button>
+                <div class="rail" role="group" aria-label={`${p.project.name} demo chapters`}>
+                  {p.chapters.map((c, j) => (
+                    <button
+                      class="seg"
+                      type="button"
+                      data-t={c.t}
+                      data-end={c.end}
+                      data-label={c.label}
+                      style={`--grow:${(c.end - c.t).toFixed(2)}`}
+                      aria-label={`Chapter ${j + 1}, ${c.label}, at ${clock(c.t)}`}
+                    >
+                      <span class="fill" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <figcaption class="caption">
+                <span class="cap-num" data-cap-num>
+                  01/{pad(p.chapters.length)}
+                </span>
+                <span class="cap-label" data-cap-label>
+                  {p.chapters[0].label}
+                </span>
+                <span class="cap-time">{clock(p.demo.duration)} loop</span>
+                <button class="toggle" type="button" data-toggle aria-label={`Play the ${p.project.name} demo`}>
+                  <svg class="icon-play" viewBox="0 0 8 7" aria-hidden="true" shape-rendering="crispEdges">
+                    <rect x="0" y="0" width="2" height="7" /><rect x="2" y="1" width="2" height="5" />
+                    <rect x="4" y="2" width="2" height="3" /><rect x="6" y="3" width="2" height="1" />
+                  </svg>
+                  <svg class="icon-pause" viewBox="0 0 8 7" aria-hidden="true" shape-rendering="crispEdges">
+                    <rect x="1" y="0" width="2" height="7" /><rect x="5" y="0" width="2" height="7" />
+                  </svg>
+                </button>
+              </figcaption>
+            </figure>
+
+            <div class="body">
+              <p class="desc">{p.project.description}</p>
+              <p class="meta stack">{p.stack}</p>
+              <p class="links">
+                <a class="small-link" href={p.href}>
+                  Read the case study <span aria-hidden="true">→</span>
+                </a>
+                {p.demo.walkthrough && (
+                  <a class="small-link quiet" href={p.demo.walkthrough} target="_blank" rel="noopener">
+                    Narrated walkthrough <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+                {!p.demo.walkthrough && p.project.source && (
+                  <a class="small-link quiet" href={p.project.source} target="_blank" rel="noopener">
+                    Source <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+              </p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section shell flow" id="workflow" aria-labelledby="workflow-title">
+    <div class="section-heading">
+      <h2 id="workflow-title">My AI <span class="ghost">workflow.</span></h2>
+      <p>
+        Claude Code and Codex explore, build and challenge the work. I frame it and make the
+        final call.
+      </p>
+    </div>
+
+    <div class="owners" aria-hidden="true">
+      <span class="owner"><PixelSigil star class="me-mark" /> Tomas frames and decides</span>
+      <span class="owner"
+        ><svg class="sprite" viewBox="0 0 8 8" shape-rendering="crispEdges"
+          >{spriteCells(sprites.claude).map(({ x, y }) => <rect x={x} y={y} width="1" height="1" />)}</svg
+        ><svg class="sprite alt" viewBox="0 0 8 8" shape-rendering="crispEdges"
+          >{spriteCells(sprites.codex).map(({ x, y }) => <rect x={x} y={y} width="1" height="1" />)}</svg
+        > Claude Code and Codex design, build and review, with me</span
+      >
+    </div>
+
+    {
+      boards.map((b) => (
+        <figure
+          class:list={['board', b.name]}
+          style={`--cols:${b.cols};--rows:${b.rows}`}
+          data-board={b.name}
+          data-edges={JSON.stringify(b.edges)}
+          data-route={JSON.stringify(route)}
+        >
+          <svg
+            class="pixels"
+            viewBox={`0 0 ${b.cols} ${b.rows}`}
+            aria-hidden="true"
+            shape-rendering="crispEdges"
+          >
+            <defs>
+              <pattern id={`a2-line-${b.name}`} width="0.2" height="0.2" patternUnits="userSpaceOnUse">
+                <rect width="0.2" height="0.2" fill="#8a9bff" />
+                <rect width="0.1" height="0.1" fill="#0024cc" />
+                <rect x="0.1" y="0.1" width="0.1" height="0.1" fill="#0024cc" />
+              </pattern>
+              <pattern id={`a2-loop-${b.name}`} width="0.2" height="0.2" patternUnits="userSpaceOnUse">
+                <rect width="0.2" height="0.2" fill="#f7f3e9" />
+                <rect width="0.1" height="0.1" fill="#8a9bff" />
+                <rect x="0.1" y="0.1" width="0.1" height="0.1" fill="#8a9bff" />
+              </pattern>
+            </defs>
+            {Object.entries(b.edges).map(([id, cells]) => (
+              <g fill={`url(#a2-${edgeTone(id)}-${b.name})`}>
+                {cells.map(([x, y]) => (
+                  <rect x={x} y={y} width="1" height="1" />
+                ))}
+              </g>
+            ))}
+            <g class="arrows">
+              {b.arrows.flatMap((a) =>
+                arrowRects(a.at, a.dir).map((r) => <rect x={r.x} y={r.y} width={r.w} height={r.h} />),
+              )}
+            </g>
+            {stages.map((s) => {
+              const r = b.rooms[s.id];
+              return (
+                <g class:list={['room', owner(s.id)]} data-room={s.id}>
+                  <rect x={r.x + 0.5} y={r.y} width={r.w - 1} height={r.h} />
+                  <rect x={r.x} y={r.y + 0.5} width={r.w} height={r.h - 1} />
+                </g>
+              );
+            })}
+            <rect class="walker" x="-2" y="-2" width="0.5" height="0.5" />
+          </svg>
+
+          <div class="overlay">
+            {b.lanes && (
+              <>
+                <div class="lane" style={pos(b.lanes.me)}>
+                  <p class="lane-who">
+                    <PixelSigil star class="me-mark" /> Tomas
+                  </p>
+                  <p class="lane-what">Frames the problem and makes the final call.</p>
+                </div>
+                <div class="lane" style={pos(b.lanes.agents)}>
+                  <p class="lane-who">
+                    <svg class="sprite" viewBox="0 0 8 8" aria-hidden="true" shape-rendering="crispEdges">
+                      {spriteCells(sprites.claude).map(({ x, y }) => (
+                        <rect x={x} y={y} width="1" height="1" />
+                      ))}
+                    </svg>
+                    Claude Code <span class="model">{workflow.agents[0].model}</span>
+                  </p>
+                  <p class="lane-who">
+                    <svg class="sprite alt" viewBox="0 0 8 8" aria-hidden="true" shape-rendering="crispEdges">
+                      {spriteCells(sprites.codex).map(({ x, y }) => (
+                        <rect x={x} y={y} width="1" height="1" />
+                      ))}
+                    </svg>
+                    Codex CLI <span class="model">{workflow.agents[1].model}</span>
+                  </p>
+                  <p class="lane-what">Design, build and review in their own worktrees, with me.</p>
+                </div>
+              </>
+            )}
+            <ol class="stages">
+              {stages.map((s, i) => {
+                const tools = toolsFor(s.id);
+                return (
+                  <li>
+                    <p class:list={['room-label', owner(s.id)]} style={pos(b.rooms[s.id])}>
+                      <span class="num">{pad(i + 1)}</span>
+                      <span class="name">{s.label}</span>
+                    </p>
+                    <div class="note" style={pos(b.notes[s.id])}>
+                      <p class="hint">{s.hint}</p>
+                      {tools.length > 0 ? (
+                        <ul class="tools" aria-label={`Tools for ${s.label}`}>
+                          {tools.map((t) => (
+                            <li data-kind={t.kind} data-source={t.source}>
+                              <i class="sw" aria-hidden="true" />
+                              {t.name}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p class="decision">{s.humanDecision}</p>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+            {b.labels.fix && (
+              <p class="loop-label" style={pos(b.labels.fix)}>
+                Checks fail, back to Build
+              </p>
+            )}
+            {b.labels.rethink && (
+              <p class="loop-label" style={pos(b.labels.rethink)}>
+                Wrong approach, back to Design
+              </p>
+            )}
+          </div>
+        </figure>
+      ))
+    }
+
+    <div class="legend">
+      <p class="loops-key">
+        <span class="key-loop" aria-hidden="true"></span>
+        {workflow.feedback.body}
+      </p>
+      <ul class="sources" aria-label="Where the skills come from">
+        <li data-source="pstack"><i class="sw" aria-hidden="true"></i><a href={workflow.sources[0].href}>pstack</a></li>
+        <li data-source="Matt Pocock"><i class="sw" aria-hidden="true"></i><a href={workflow.sources[1].href}>Matt Pocock’s skills</a></li>
+        <li data-source="flow kit"><i class="sw" aria-hidden="true"></i><a href={workflow.sources[2].href}>My flow kit</a></li>
+        <li data-kind="agent"><i class="sw" aria-hidden="true"></i>Agents, Orca and checks</li>
+      </ul>
     </div>
   </section>
 </div>
+
+<script>
+  import { initDemos } from './demos';
+  import { initFlow } from './flow';
+
+  const root = document.querySelector<HTMLElement>('[data-proto="a2"]');
+  if (root) {
+    initDemos(root);
+    initFlow(root);
+  }
+</script>
+
+<style is:global>
+  /* Native proximity snapping on section starts, cover included only at its top. */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='a2']) {
+      scroll-snap-type: y proximity;
+    }
+    html:has([data-proto='a2']) .cover,
+    html:has([data-proto='a2']) [data-proto='a2'] #work,
+    html:has([data-proto='a2']) [data-proto='a2'] .product,
+    html:has([data-proto='a2']) [data-proto='a2'] #workflow,
+    html:has([data-proto='a2']) .experience,
+    html:has([data-proto='a2']) #index,
+    html:has([data-proto='a2']) #readme,
+    html:has([data-proto='a2']) .writing,
+    html:has([data-proto='a2']) #playground,
+    html:has([data-proto='a2']) #contact {
+      scroll-snap-align: start;
+    }
+  }
+  html:has([data-proto='a2']) .cover,
+  html:has([data-proto='a2']) [data-proto='a2'] #work,
+  html:has([data-proto='a2']) [data-proto='a2'] #workflow,
+  html:has([data-proto='a2']) .experience,
+  html:has([data-proto='a2']) #index,
+  html:has([data-proto='a2']) #readme,
+  html:has([data-proto='a2']) .writing,
+  html:has([data-proto='a2']) #playground,
+  html:has([data-proto='a2']) #contact {
+    scroll-margin-top: -100px;
+  }
+  @media (max-width: 600px) {
+    html:has([data-proto='a2']) .cover,
+    html:has([data-proto='a2']) [data-proto='a2'] #work,
+    html:has([data-proto='a2']) [data-proto='a2'] #workflow,
+    html:has([data-proto='a2']) .experience,
+    html:has([data-proto='a2']) #index,
+    html:has([data-proto='a2']) #readme,
+    html:has([data-proto='a2']) .writing,
+    html:has([data-proto='a2']) #playground,
+    html:has([data-proto='a2']) #contact {
+      scroll-margin-top: -80px;
+    }
+  }
+</style>
+
+<style>
+  /* Projects */
+
+  .work .section-heading {
+    margin-bottom: 60px;
+  }
+  .products {
+    display: grid;
+    gap: 120px;
+  }
+  .product {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.25fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'head stage'
+      'body stage';
+    column-gap: 48px;
+  }
+  .head {
+    grid-area: head;
+    padding-top: 20px;
+  }
+  .head .meta {
+    color: var(--muted);
+  }
+  .head h3 {
+    margin-top: 14px;
+    font-size: clamp(30px, 3vw, 40px);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+  .head h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .body {
+    grid-area: body;
+    padding-top: 18px;
+  }
+  .desc {
+    max-width: 380px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .stack {
+    margin-top: 16px;
+    color: var(--muted);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    margin-top: 28px;
+  }
+  .small-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .small-link.quiet {
+    color: var(--muted);
+    border-bottom-color: var(--line);
+  }
+
+  .stage {
+    grid-area: stage;
+    margin: 0;
+    min-width: 0;
+  }
+  /* A 1-cell frame with the corner cells knocked out. Its bottom edge is the chapter rail. */
+  .frame {
+    --cell: 20px;
+    position: relative;
+    padding: var(--cell) var(--cell) 0;
+    background: var(--light);
+    clip-path: polygon(
+      var(--cell) 0,
+      calc(100% - var(--cell)) 0,
+      calc(100% - var(--cell)) var(--cell),
+      100% var(--cell),
+      100% calc(100% - var(--cell)),
+      calc(100% - var(--cell)) calc(100% - var(--cell)),
+      calc(100% - var(--cell)) 100%,
+      var(--cell) 100%,
+      var(--cell) calc(100% - var(--cell)),
+      0 calc(100% - var(--cell)),
+      0 var(--cell),
+      var(--cell) var(--cell)
+    );
+  }
+  video {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: #e7e6e0;
+  }
+  .rail {
+    display: flex;
+    gap: 4px;
+    height: var(--cell);
+    margin-inline: calc(var(--cell) * -1);
+    padding-inline: var(--cell);
+    background: var(--paper);
+  }
+  .seg {
+    all: unset;
+    position: relative;
+    flex: var(--grow) 1 0;
+    background: var(--light);
+    cursor: pointer;
+  }
+  .seg::before {
+    content: '';
+    position: absolute;
+    inset: -8px 0 -14px;
+  }
+  .seg .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--p, 0px);
+    background: var(--blue);
+  }
+  .seg:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+  }
+  .toggle {
+    all: unset;
+    position: relative;
+    align-self: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    margin-right: -6px;
+    color: var(--blue);
+    cursor: pointer;
+  }
+  .toggle svg {
+    width: 16px;
+    height: 14px;
+    fill: currentColor;
+  }
+  .toggle:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+  }
+  .product:not([data-playing='true']) .icon-pause,
+  .product[data-playing='true'] .icon-play {
+    display: none;
+  }
+  .bigplay {
+    all: unset;
+    position: absolute;
+    left: 50%;
+    top: calc(50% - 10px);
+    transform: translate(-50%, -50%);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px 12px 12px;
+    background: var(--blue);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .bigplay svg {
+    width: 16px;
+    height: 14px;
+    fill: currentColor;
+  }
+  .product[data-hold='true']:not([data-playing='true']) .bigplay {
+    display: flex;
+  }
+  .bigplay:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .caption {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-top: 8px;
+    padding-inline: 20px;
+    min-height: 28px;
+  }
+  .cap-num,
+  .cap-time {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .cap-label {
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .cap-time {
+    margin-left: auto;
+  }
+  .caption[data-preview] .cap-label {
+    color: var(--blue);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .toggle:hover {
+      background: var(--light);
+    }
+    .seg:hover {
+      background-image: repeating-conic-gradient(var(--blue) 0 25%, var(--light) 0 50%);
+      background-size: 4px 4px;
+    }
+    .head h3 a:hover,
+    .small-link:hover {
+      color: var(--blue);
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .product {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'head' 'stage' 'body';
+    }
+    .head {
+      padding-top: 0;
+      margin-bottom: 18px;
+    }
+    /* Keep the frame and its caption inside one screen on tablets. */
+    .stage {
+      max-width: calc((100svh - 250px) * 1.6 + 40px);
+    }
+    .products {
+      gap: 90px;
+    }
+  }
+  @media (max-width: 600px) {
+    .products {
+      gap: 64px;
+    }
+    .frame {
+      --cell: 10px;
+    }
+    .rail {
+      height: 14px;
+      gap: 3px;
+    }
+    .caption {
+      padding-inline: 0;
+      gap: 10px;
+    }
+    .cap-label {
+      font-size: 14px;
+    }
+    .cap-time {
+      display: none;
+    }
+    .toggle {
+      margin-left: auto;
+      width: 36px;
+      height: 36px;
+    }
+    .head h3 {
+      font-size: 30px;
+    }
+  }
+
+  /* Workflow */
+
+  .flow .section-heading {
+    margin-bottom: 36px;
+  }
+  .flow .section-heading p {
+    max-width: 340px;
+  }
+  .owners {
+    display: none;
+  }
+  .board {
+    position: relative;
+    margin: 0;
+    width: min(100%, calc(var(--cols) * 20px));
+    aspect-ratio: var(--cols) / var(--rows);
+  }
+  .board.tall {
+    display: none;
+  }
+  .pixels {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .room.me {
+    fill: var(--blue);
+  }
+  .room.agents {
+    fill: var(--light);
+  }
+  .room.lit.me {
+    fill: #193de0;
+  }
+  .room.lit.agents {
+    fill: #a3b0ff;
+  }
+  .arrows {
+    fill: var(--light);
+  }
+  .walker {
+    fill: var(--amber);
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+  }
+  .overlay [style*='--x'] {
+    position: absolute;
+    left: calc(var(--x) / var(--cols) * 100%);
+    top: calc(var(--y) / var(--rows) * 100%);
+    width: calc(var(--w) / var(--cols) * 100%);
+  }
+  .stages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .room-label {
+    height: calc(var(--h) / var(--rows) * 100%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-inline: 16px;
+  }
+  .room-label.me {
+    color: var(--paper);
+  }
+  .room-label.agents {
+    color: var(--ink);
+  }
+  .room-label .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    opacity: 0.75;
+  }
+  .room-label .name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 28px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .note {
+    font-size: 13px;
+  }
+  .hint {
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .decision {
+    max-width: 180px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.2;
+    color: var(--ink-2);
+  }
+  .tools,
+  .sources {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .tools li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 19px;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .sw {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    background: var(--blue);
+  }
+  [data-source='Matt Pocock'] .sw {
+    background: var(--light);
+  }
+  [data-source='flow kit'] .sw {
+    background: repeating-conic-gradient(var(--blue) 0 25%, var(--paper) 0 50%) 0 0 / 4px 4px;
+  }
+  [data-kind='agent'] .sw,
+  [data-kind='orchestration'] .sw,
+  [data-kind='check'] .sw {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--ink);
+  }
+  .lane-who {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    line-height: 20px;
+    margin-bottom: 8px;
+  }
+  .lane-who .model {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .lane-what {
+    max-width: 190px;
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .owner :global(.pixel-sigil),
+  .lane :global(.pixel-sigil) {
+    width: 20px;
+    height: 20px;
+  }
+  .sprite {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    fill: var(--blue);
+  }
+  .sprite.alt {
+    fill: var(--ink);
+  }
+  .loop-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px 40px;
+    margin-top: 36px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  .loops-key {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .key-loop {
+    width: 20px;
+    height: 10px;
+    background: repeating-conic-gradient(var(--light) 0 25%, var(--paper) 0 50%) 0 0 / 4px 4px;
+  }
+  .sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+  }
+  .sources li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .sources a {
+    color: var(--ink);
+  }
+
+  @media (max-width: 1179px) {
+    .board.wide {
+      display: none;
+    }
+    .board.tall {
+      display: block;
+    }
+    .owners {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .owner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--ink-2);
+    }
+    .room-label {
+      padding-inline: 14px;
+    }
+    .room-label .name {
+      font-size: 24px;
+    }
+    .note {
+      font-size: 13px;
+    }
+    .hint {
+      margin-bottom: 2px;
+    }
+    .decision {
+      max-width: 260px;
+    }
+    .legend {
+      flex-direction: column;
+    }
+  }
+</style>
