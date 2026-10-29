@@ -1,0 +1,19 @@
+---
+import { rects, SPRITES, type SpriteId } from './sprites';
+
+interface Props {
+  id: SpriteId;
+  class?: string;
+}
+const { id, class: className } = Astro.props;
+const rows = SPRITES[id];
+---
+
+<svg
+  class:list={['sprite', `sprite-${id}`, className]}
+  viewBox={`0 0 ${rows[0].length} ${rows.length}`}
+  aria-hidden="true"
+  shape-rendering="crispEdges"
+>
+  {rects(id).map(({ x, y, fill }) => <rect x={x} y={y} width="1" height="1" fill={fill} />)}
+</svg>

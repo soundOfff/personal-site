@@ -1,22 +1,1077 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
-import PixelSigil from '../../../components/PixelSigil.astro';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import Sprite from './Sprite.astro';
+import PixelSigil from '../../../components/PixelSigil.astro';
+
+const time = (t: number) => `0:${String(Math.floor(t)).padStart(2, '0')}`;
+const stages = workflow.stages.map((stage, i) => ({
+  ...stage,
+  n: String(i + 1).padStart(2, '0'),
+  tools: workflow.tools[stage.id],
+  cast: stage.owner === 'Me' ? (['tomas'] as const) : (['claude', 'codex'] as const),
+}));
+const names = { tomas: 'Me', claude: 'Claude Code', codex: 'Codex CLI' } as const;
+const [claude, codex] = workflow.agents;
+const tour = {
+  stages: stages.map((s) => ({ id: s.id, label: s.label, n: s.n, body: s.body })),
+  feedback: workflow.feedback.body,
+};
+const TRACK = 40;
+const rooms = selected.map((item, i) => ({
+  ...item,
+  n: String(i + 1).padStart(2, '0'),
+  ticks: item.demo.chapters.map((c) => Math.round((c.t / item.demo.duration) * TRACK)),
+  label: `${item.project.name} demo, a silent screen recording: ${item.demo.chapters
+    .map((c) => c.label.toLowerCase())
+    .join(', ')}.`,
+}));
+const icons = {
+  play: ['X......', 'XXX....', 'XXXXX..', 'XXXXXXX', 'XXXXX..', 'XXX....', 'X......'],
+  pause: ['XX.XX', 'XX.XX', 'XX.XX', 'XX.XX', 'XX.XX', 'XX.XX', 'XX.XX'],
+  expand: ['XXX.XXX', 'X.....X', 'X.....X', '.......', 'X.....X', 'X.....X', 'XXX.XXX'],
+};
+const cells = (rows: string[]) =>
+  rows.flatMap((row, y) => [...row].flatMap((b, x) => (b === 'X' ? [{ x, y }] : [])));
 ---
 
-<div data-proto="c">
-  <section class="section shell" id="work" aria-labelledby="work-title">
-    <div class="work-intro">
-      <PixelSigil star />
-      <p>Placeholder for variant c.</p>
+<div data-proto="c" class="proto-c">
+  <section id="workflow" class="wf" data-snap aria-labelledby="c-wf-title">
+    <div class="shell wf-head">
+      <div>
+        <p class="eyebrow">How I work with agents</p>
+        <h2 id="c-wf-title">My AI <span class="ghost">workflow.</span></h2>
+      </div>
+      <div class="wf-intro">
+        <p>{workflow.introduction}</p>
+        <ul class="party" aria-label="The party">
+          <li><Sprite id="tomas" /><span><b>Me</b>Direction and the final call.</span></li>
+          <li>
+            <Sprite id="claude" /><span><b>{claude.name} · {claude.model}</b>{claude.role}</span>
+          </li>
+          <li>
+            <Sprite id="codex" /><span><b>{codex.name} · {codex.model}</b>{codex.role}</span>
+          </li>
+        </ul>
+      </div>
     </div>
-    <div class="section-heading">
-      <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant c has not been built yet.</p>
+
+    <div class="wf-map" data-map data-tour={JSON.stringify(tour)}>
+      <canvas class="wf-canvas" aria-hidden="true"></canvas>
+      <ol class="wf-rooms">
+        {
+          stages.map((s) => (
+            <li class="wf-room" data-stage={s.id}>
+              <p class="room-top">
+                <span class="room-n">{s.n}</span>
+                <span>{s.owner}</span>
+              </p>
+              <h3>{s.label}</h3>
+              <p class="room-hint">{s.hint}</p>
+              <div class="room-cast">
+                {s.cast.map((id) => (
+                  <span class="cast">
+                    <Sprite id={id} />
+                    <span>{names[id]}</span>
+                  </span>
+                ))}
+              </div>
+              {s.tools.length ? (
+                <>
+                  <ul class="room-tools" tabindex="0" aria-label={`${s.label} tools`}>
+                    {s.tools.map((t) => (
+                      <li>
+                        <span>{t.name}</span>
+                        <span class="src">{t.source ?? t.kind}</span>
+                        <span class="why">{t.purpose}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div class="room-why" aria-hidden="true">
+                    {s.tools.map((t) => (
+                      <p>
+                        <span class="why-name">
+                          <span>{t.name}</span>
+                          <span class="src">{t.source ?? t.kind}</span>
+                        </span>
+                        {t.purpose}
+                      </p>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <ul class="room-tools room-outcomes" aria-label="Possible outcomes">
+                  <li>
+                    <span>Ship it</span>
+                  </li>
+                  <li>
+                    <span>Revise the slice</span>
+                  </li>
+                  <li>
+                    <span>Reconsider the approach</span>
+                  </li>
+                </ul>
+              )}
+              <p class="room-call">
+                <Sprite id="tomas" class="mini" />
+                <span>
+                  <span class="sr-only">My call: </span>
+                  {s.humanDecision}
+                </span>
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="wf-lanes">
+        <span class="lane-label" data-loop="build">Failed checks return to Build</span>
+        <span class="lane-label" data-loop="design">A wrong approach returns to Design</span>
+      </div>
     </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+
+    <div class="shell wf-foot">
+      <p class="wf-status">
+        <span class="status-key" aria-hidden="true"></span>
+        <span data-status>{workflow.feedback.label}. {workflow.feedback.body}</span>
+      </p>
+      <button class="wf-toggle" type="button" data-toggle aria-pressed="false">Pause</button>
+      <p class="wf-sources">
+        Skills from {
+          workflow.sources.map((s, i) => (
+            <>
+              {i > 0 && (i === workflow.sources.length - 1 ? ' and ' : ', ')}
+              <a href={s.href} target="_blank" rel="noopener">
+                {s.label}
+              </a>
+            </>
+          ))
+        }.
+      </p>
     </div>
   </section>
+
+  <section id="work" class="work" data-snap aria-labelledby="c-work-title">
+    <div class="shell work-head">
+      <h2 id="c-work-title" class="eyebrow">Selected work</h2>
+      <p>Three products, recorded in use. Pick a chapter to jump to that moment.</p>
+      <nav aria-label="Products">
+        {
+          rooms.map((r) => (
+            <a href={`#c-${r.project.id}`}>
+              <PixelSigil slug={r.project.id} />
+              <span>{r.project.name}</span>
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+    {
+      rooms.map((r, i) => (
+        <article
+          class:list={['room', { flip: i % 2 === 1 }]}
+          id={`c-${r.project.id}`}
+          data-room
+          data-snap={i > 0 ? '' : undefined}
+          aria-labelledby={`c-room-${r.project.id}`}
+          data-chapters={JSON.stringify(r.demo.chapters.map((c) => c.t))}
+          data-duration={r.demo.duration}
+        >
+          <div class="shell room-grid">
+            <div class="room-copy">
+              <p class="room-index">
+                {r.n} / 0{rooms.length} <span>{r.project.category}</span>
+              </p>
+              <h3 id={`c-room-${r.project.id}`}>
+                <a href={r.href}>{r.project.name}</a>
+              </h3>
+              <p class="room-sub">{r.subtitle}</p>
+              <p class="room-desc">{r.project.description}</p>
+              <ol class="beats" aria-label={`${r.project.name} chapters`}>
+                {r.demo.chapters.map((c, j) => (
+                  <li>
+                    <button type="button" data-beat={j} aria-current={j === 0 ? 'step' : undefined}>
+                      <span class="beat-n">{String(j + 1).padStart(2, '0')}</span>
+                      <span class="beat-l">{c.label}</span>
+                      <span class="beat-t">{time(c.t)}</span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+              <p class="room-meta">
+                {r.status} · {r.project.stack.split(' · ').join(' / ')}
+              </p>
+              <a class="room-link" href={r.href}>
+                More about {r.project.name} <span aria-hidden="true">→</span>
+              </a>
+            </div>
+            <div class="room-stage">
+              <canvas class="room-halo" aria-hidden="true" />
+              <div class="room-clear">
+                <div class="room-screen">
+                  <video
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    poster={r.demo.poster}
+                    aria-label={r.label}
+                  >
+                    <source src={r.demo.webm} type="video/webm" />
+                    <source src={r.demo.mp4} type="video/mp4" />
+                  </video>
+                  <canvas class="room-wipe" aria-hidden="true" />
+                  <p class="room-caption" aria-hidden="true">
+                    <span class="cap-n">01</span>
+                    <span class="cap-l">{r.demo.chapters[0].label}</span>
+                  </p>
+                  <button class="room-big" type="button" data-big tabindex="-1" aria-hidden="true" hidden>
+                    <svg class="ico" viewBox="0 0 7 7" shape-rendering="crispEdges">
+                      {cells(icons.play).map((c) => (
+                        <rect x={c.x} y={c.y} width="1" height="1" />
+                      ))}
+                    </svg>
+                  </button>
+                </div>
+                <div class="room-bar">
+                  <button class="bar-btn" type="button" data-play aria-label={`Play the ${r.project.name} demo`}>
+                    <svg class="ico ico-play" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                      {cells(icons.play).map((c) => (
+                        <rect x={c.x} y={c.y} width="1" height="1" />
+                      ))}
+                    </svg>
+                    <svg class="ico ico-pause" viewBox="0 0 5 7" aria-hidden="true" shape-rendering="crispEdges">
+                      {cells(icons.pause).map((c) => (
+                        <rect x={c.x} y={c.y} width="1" height="1" />
+                      ))}
+                    </svg>
+                  </button>
+                  <div class="room-track" aria-hidden="true">
+                    {Array.from({ length: TRACK }, (_, k) => (
+                      <span class:list={{ tick: r.ticks.includes(k) }} />
+                    ))}
+                  </div>
+                  <span class="bar-len">{Math.round(r.demo.duration)}s loop</span>
+                  <button
+                    class="bar-btn"
+                    type="button"
+                    data-expand
+                    aria-label={`Watch the ${r.project.name} demo full screen`}
+                  >
+                    <svg class="ico" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                      {cells(icons.expand).map((c) => (
+                        <rect x={c.x} y={c.y} width="1" height="1" />
+                      ))}
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      ))
+    }
+  </section>
 </div>
+
+<style is:inline>
+  /* No CSS snap container: proximity snapping traps slow wheel input here. These snap-align rules
+     are the targets for the shared directional settle (../settle.ts), which only glides forward. */
+  html:has([data-proto='c']) {
+    scroll-snap-type: none !important;
+  }
+  html:has([data-proto='c']) .cover {
+    scroll-snap-align: none;
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='c']) [data-proto='c'] [data-snap],
+    html:has([data-proto='c']) .experience,
+    html:has([data-proto='c']) #index,
+    html:has([data-proto='c']) #readme,
+    html:has([data-proto='c']) .writing,
+    html:has([data-proto='c']) #playground,
+    html:has([data-proto='c']) #contact {
+      scroll-snap-align: start;
+    }
+  }
+  /* With the 100 px scroll padding, each section's first line lands about 24 px under the header. */
+  html:has([data-proto='c']) [data-proto='c'] #workflow,
+  html:has([data-proto='c']) [data-proto='c'] #work {
+    scroll-margin-top: -60px;
+  }
+  html:has([data-proto='c']) [data-proto='c'] .room {
+    scroll-margin-top: -40px;
+  }
+  html:has([data-proto='c']) .experience {
+    scroll-margin-top: -80px;
+  }
+  @media (max-width: 600px) {
+    html:has([data-proto='c']) [data-proto='c'] #workflow {
+      scroll-margin-top: -50px;
+    }
+  }
+</style>
+
+<style is:inline>
+  html:has([data-proto='c']) .proto-c {
+    --cell: 20px;
+  }
+
+  /* Workflow */
+
+  html:has([data-proto='c']) .wf {
+    position: relative;
+    padding-block: 84px 40px;
+    overflow-x: clip;
+  }
+  html:has([data-proto='c']) .wf-head {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 560px);
+    gap: 40px;
+    align-items: end;
+  }
+  html:has([data-proto='c']) .wf-head h2 {
+    margin-top: 14px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(48px, 5.3vw, 84px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+  html:has([data-proto='c']) .wf-intro > p {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 520px;
+  }
+  html:has([data-proto='c']) .party {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  html:has([data-proto='c']) .party li {
+    display: flex;
+    gap: 10px;
+    align-items: start;
+  }
+  html:has([data-proto='c']) .party .sprite {
+    width: 25px;
+    flex-shrink: 0;
+  }
+  html:has([data-proto='c']) .party span {
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  html:has([data-proto='c']) .party b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  html:has([data-proto='c']) .wf-map {
+    position: relative;
+    padding-block: 60px 0;
+  }
+  html:has([data-proto='c']) .wf-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  html:has([data-proto='c']) .wf-rooms {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 80px;
+    width: calc(100% - 96px);
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+  html:has([data-proto='c']) .wf-room {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  html:has([data-proto='c']) .room-top {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  html:has([data-proto='c']) .room-n {
+    padding: 1px 4px;
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+  html:has([data-proto='c']) .wf-room.is-here .room-n {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  html:has([data-proto='c']) .wf-room h3 {
+    margin-top: 10px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 38px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  html:has([data-proto='c']) .room-hint {
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  html:has([data-proto='c']) .room-cast {
+    display: flex;
+    gap: 18px;
+    margin-top: 16px;
+    min-height: 62px;
+  }
+  html:has([data-proto='c']) .cast {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+  html:has([data-proto='c']) .cast .sprite {
+    width: 40px;
+  }
+  html:has([data-proto='c']) .wf-room.is-here .cast .sprite {
+    animation: c-bob 0.5s steps(1) infinite;
+  }
+  html:has([data-proto='c']) .wf-room.is-here .cast:nth-child(2) .sprite {
+    animation-delay: -0.25s;
+  }
+  @keyframes c-bob {
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+  html:has([data-proto='c']) .room-tools {
+    display: grid;
+    gap: 3px;
+    margin: 14px 0 0;
+    padding: 10px 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  html:has([data-proto='c']) .room-tools:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 4px;
+  }
+  html:has([data-proto='c']) .room-tools li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 8px;
+  }
+  html:has([data-proto='c']) .room-tools .src,
+  html:has([data-proto='c']) .room-why .src {
+    color: #8b928f;
+    white-space: nowrap;
+  }
+  html:has([data-proto='c']) .room-tools .why {
+    grid-column: 1 / -1;
+    margin: 1px 0 6px;
+    font: 12px/1.35 var(--sans);
+    color: var(--muted);
+  }
+  html:has([data-proto='c']) .room-outcomes li {
+    display: flex;
+  }
+  html:has([data-proto='c']) .room-outcomes li::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin: 5px 8px 0 0;
+    background: var(--ink);
+    flex-shrink: 0;
+  }
+  html:has([data-proto='c']) .room-call {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 14px;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  html:has([data-proto='c']) .room-call .mini {
+    width: 15px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* On the wide map the purposes wait in a text box that opens over the room on hover or focus. */
+  html:has([data-proto='c']) .room-why {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    left: -14px;
+    right: -14px;
+    bottom: -10px;
+    padding: 8px 10px 6px;
+    background: var(--paper);
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  html:has([data-proto='c']) .room-why p {
+    padding: 4px 0;
+    border-top: 1px solid var(--line);
+    font-size: 11.5px;
+    line-height: 1.28;
+    color: var(--muted);
+  }
+  html:has([data-proto='c']) .room-why p:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+  html:has([data-proto='c']) .why-name {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font: 11px/1.4 var(--mono);
+    color: var(--ink);
+  }
+  @media (min-width: 1280px) {
+    html:has([data-proto='c']) .room-tools .why {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    html:has([data-proto='c']) .room-why {
+      display: block;
+      visibility: hidden;
+    }
+    html:has([data-proto='c']) .wf-room:focus-within .room-why {
+      visibility: visible;
+      box-shadow: 0 0 0 2px var(--blue);
+    }
+  }
+  /* Hover intent: the pointer has to rest on the tools, so a parked cursor or a passing scroll opens nothing. */
+  @media (min-width: 1280px) and (hover: hover) and (pointer: fine) {
+    html:has([data-proto='c']) .room-tools[tabindex] {
+      cursor: help;
+    }
+    html:has([data-proto='c']) .wf-room:has(.room-tools:hover, .room-why:hover) .room-why {
+      visibility: visible;
+      transition: visibility 0s 0.15s;
+    }
+  }
+
+  html:has([data-proto='c']) .wf-lanes {
+    height: 150px;
+  }
+  html:has([data-proto='c']) .lane-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 20px;
+    white-space: nowrap;
+    color: var(--ink);
+    visibility: hidden;
+  }
+  html:has([data-proto='c']) .lane-label.placed {
+    visibility: visible;
+  }
+
+  html:has([data-proto='c']) .wf-foot {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 6px;
+    font-size: 13px;
+  }
+  html:has([data-proto='c']) .wf-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 20px;
+    flex: 1;
+  }
+  html:has([data-proto='c']) .status-key {
+    width: 10px;
+    height: 10px;
+    background: var(--amber);
+    flex-shrink: 0;
+  }
+  html:has([data-proto='c']) .wf-toggle {
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--ink);
+    font: 11px var(--mono);
+    cursor: pointer;
+  }
+  html:has([data-proto='c']) .wf-sources {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  html:has([data-proto='c']) .wf-sources a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--line);
+  }
+
+  /* Work */
+
+  html:has([data-proto='c']) .work {
+    padding-top: 84px;
+  }
+  html:has([data-proto='c']) .work-head {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  html:has([data-proto='c']) .work-head h2 {
+    flex-shrink: 0;
+  }
+  html:has([data-proto='c']) .work-head p {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  html:has([data-proto='c']) .work-head nav {
+    display: flex;
+    gap: 22px;
+    margin-left: auto;
+  }
+  html:has([data-proto='c']) .work-head nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: 11px var(--mono);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  html:has([data-proto='c']) .work-head .pixel-sigil {
+    width: 16px;
+    height: 16px;
+  }
+  html:has([data-proto='c']) .room {
+    position: relative;
+    padding-block: 60px 40px;
+    overflow-x: clip;
+  }
+  html:has([data-proto='c']) .room:first-of-type {
+    padding-top: 24px;
+  }
+  html:has([data-proto='c']) .room-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 340px) 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  html:has([data-proto='c']) .room.flip .room-grid {
+    grid-template-columns: 1fr minmax(280px, 340px);
+  }
+  html:has([data-proto='c']) .room.flip .room-copy {
+    order: 2;
+  }
+  html:has([data-proto='c']) .room-index {
+    display: flex;
+    gap: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  html:has([data-proto='c']) .room-copy h3 {
+    margin-top: 10px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(52px, 5vw, 76px);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+  html:has([data-proto='c']) .room-copy h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  html:has([data-proto='c']) .room-sub {
+    margin-top: 12px;
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  html:has([data-proto='c']) .room-desc {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  html:has([data-proto='c']) .beats {
+    display: grid;
+    margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  html:has([data-proto='c']) .beats button {
+    display: grid;
+    grid-template-columns: 26px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    padding: 7px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    color: var(--muted);
+    font: 13px var(--sans);
+    text-align: left;
+    cursor: pointer;
+  }
+  html:has([data-proto='c']) .beat-n {
+    display: grid;
+    place-items: center;
+    height: 18px;
+    font: 10px var(--mono);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  html:has([data-proto='c']) .beat-t {
+    font: 10px var(--mono);
+    color: #8b928f;
+  }
+  html:has([data-proto='c']) .beats button[aria-current] {
+    color: var(--ink);
+  }
+  html:has([data-proto='c']) .beats button[aria-current] .beat-n {
+    background: var(--blue);
+    color: var(--paper);
+    box-shadow: none;
+  }
+  html:has([data-proto='c']) .room-meta {
+    margin-top: 18px;
+    font: 11px var(--mono);
+    color: var(--muted-2);
+  }
+  html:has([data-proto='c']) .room-link {
+    display: inline-flex;
+    gap: 10px;
+    margin-top: 12px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--ink);
+    font-size: 14px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* The clearing is the screen plus its control bar; the halo canvas is placed around it in world.ts. */
+  html:has([data-proto='c']) .room-stage {
+    position: relative;
+    padding: 60px 60px 40px;
+  }
+  html:has([data-proto='c']) .room-halo {
+    position: absolute;
+    pointer-events: none;
+  }
+  html:has([data-proto='c']) .room-clear {
+    position: relative;
+  }
+  html:has([data-proto='c']) .room.flip .room-clear {
+    margin-left: auto;
+  }
+  @media (min-height: 640px) {
+    html:has([data-proto='c']) .room-clear {
+      width: min(100%, calc((100svh - 320px) * 1.6));
+    }
+  }
+  html:has([data-proto='c']) .room-screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: var(--ink);
+  }
+  html:has([data-proto='c']) .room-screen video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  html:has([data-proto='c']) .room-wipe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  html:has([data-proto='c']) .room-caption {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 12px 6px 6px;
+    background: var(--paper);
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  html:has([data-proto='c']) .cap-n {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 18px;
+    background: var(--blue);
+    color: var(--paper);
+    font: 10px var(--mono);
+  }
+  html:has([data-proto='c']) .room-big {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: 80px;
+    height: 80px;
+    border: 0;
+    background: var(--blue);
+    color: var(--paper);
+    box-shadow:
+      0 0 0 6px var(--paper),
+      0 0 0 8px var(--blue);
+    cursor: pointer;
+  }
+  html:has([data-proto='c']) .room-big[hidden] {
+    display: none;
+  }
+  html:has([data-proto='c']) .room-big .ico {
+    width: 21px;
+    height: 21px;
+    margin-left: 4px;
+    fill: currentColor;
+  }
+
+  html:has([data-proto='c']) .room-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding-inline: 4px;
+    background: var(--paper);
+  }
+  html:has([data-proto='c']) .bar-btn {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  html:has([data-proto='c']) .bar-btn:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: -2px;
+  }
+  html:has([data-proto='c']) .bar-btn .ico {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+  }
+  html:has([data-proto='c']) .bar-btn .ico-pause {
+    width: 9px;
+  }
+  html:has([data-proto='c']) .room:not(.is-playing) .ico-pause,
+  html:has([data-proto='c']) .room.is-playing .ico-play {
+    display: none;
+  }
+  html:has([data-proto='c']) .room-track {
+    display: flex;
+    flex: 1;
+    gap: 2px;
+    align-items: end;
+    height: 12px;
+  }
+  html:has([data-proto='c']) .room-track span {
+    flex: 1;
+    height: 6px;
+    background: var(--line);
+  }
+  html:has([data-proto='c']) .room-track span.tick {
+    height: 12px;
+  }
+  html:has([data-proto='c']) .room-track span.on {
+    background: var(--blue);
+  }
+  html:has([data-proto='c']) .bar-len {
+    font: 10px var(--mono);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    html:has([data-proto='c']) .beats button:hover {
+      color: var(--ink);
+    }
+    html:has([data-proto='c']) .beats button:hover .beat-n {
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+    html:has([data-proto='c']) .room-copy h3 a:hover {
+      color: var(--blue);
+    }
+    html:has([data-proto='c']) .room-link:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+    }
+    html:has([data-proto='c']) .wf-toggle:hover {
+      border-color: var(--ink);
+    }
+    html:has([data-proto='c']) .bar-btn:hover {
+      color: var(--blue);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html:has([data-proto='c']) .wf-toggle {
+      display: none;
+    }
+  }
+
+  /* Narrow: the map turns vertical, rooms stack with the path on the left and loops on the right. */
+  @media (max-width: 1279px) {
+    html:has([data-proto='c']) .wf-head {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    html:has([data-proto='c']) .wf-map {
+      padding-block: 80px 60px;
+    }
+    html:has([data-proto='c']) .wf-rooms {
+      grid-template-columns: 1fr;
+      gap: 100px;
+      width: auto;
+      max-width: 560px;
+      margin: 0 120px 0 60px;
+    }
+    html:has([data-proto='c']) .wf-lanes {
+      height: 0;
+    }
+    html:has([data-proto='c']) .wf-foot {
+      flex-wrap: wrap;
+    }
+    html:has([data-proto='c']) .room-grid {
+      grid-template-columns: 1fr;
+    }
+    html:has([data-proto='c']) .room.flip .room-copy {
+      order: 0;
+    }
+    html:has([data-proto='c']) .room.flip .room-grid {
+      grid-template-columns: 1fr;
+    }
+    html:has([data-proto='c']) .room.flip .room-clear {
+      margin-left: 0;
+    }
+  }
+
+  @media (max-width: 600px) {
+    html:has([data-proto='c']) .wf {
+      padding-top: 72px;
+    }
+    html:has([data-proto='c']) .party {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    html:has([data-proto='c']) .wf-rooms {
+      margin: 0 110px 0 40px;
+    }
+    html:has([data-proto='c']) .work-head {
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
+    html:has([data-proto='c']) .work-head nav {
+      margin-left: 0;
+    }
+    html:has([data-proto='c']) .wf-foot {
+      width: calc(100% - 32px);
+    }
+    html:has([data-proto='c']) .work-head {
+      width: calc(100% - 32px);
+    }
+    html:has([data-proto='c']) .room {
+      padding-block: 56px 40px;
+    }
+    html:has([data-proto='c']) .room-grid {
+      width: 100%;
+      gap: 18px;
+    }
+    html:has([data-proto='c']) .room-copy {
+      display: contents;
+    }
+    html:has([data-proto='c']) .room-copy > * {
+      margin-inline: 16px;
+    }
+    html:has([data-proto='c']) .room-index,
+    html:has([data-proto='c']) .room-copy h3,
+    html:has([data-proto='c']) .room-sub {
+      order: -1;
+    }
+    html:has([data-proto='c']) .room-copy h3 {
+      margin-top: 0;
+    }
+    html:has([data-proto='c']) .room-sub {
+      margin-top: -8px;
+      font-size: 16px;
+    }
+    html:has([data-proto='c']) .room-desc {
+      display: none;
+    }
+    html:has([data-proto='c']) .room-stage {
+      order: 0;
+      margin-block: 14px;
+      padding: 40px 0 20px;
+    }
+    html:has([data-proto='c']) .room-bar {
+      padding-inline: 10px;
+    }
+    html:has([data-proto='c']) .beats {
+      margin-top: 0;
+    }
+    html:has([data-proto='c']) .beats,
+    html:has([data-proto='c']) .room-meta,
+    html:has([data-proto='c']) .room-link {
+      order: 1;
+    }
+    html:has([data-proto='c']) .room-meta {
+      margin-top: 0;
+    }
+    html:has([data-proto='c']) .room-link {
+      justify-self: start;
+      margin-top: 0;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-proto="c"]');
+  import { initWorld } from './world';
+  import { initSettle } from '../settle';
+  if (root) {
+    initSettle(root);
+    initWorld(root);
+  }
+</script>
