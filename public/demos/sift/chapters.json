@@ -1,0 +1,30 @@
+{
+  "duration": 23.07,
+  "chapters": [
+    {
+      "t": 0,
+      "label": "Start a lecture",
+      "still": "stills/01-start.webp"
+    },
+    {
+      "t": 5.33,
+      "label": "Notes as you watch",
+      "still": "stills/02-notes.webp"
+    },
+    {
+      "t": 9.03,
+      "label": "Sources from the web",
+      "still": "stills/03-sources.webp"
+    },
+    {
+      "t": 12.3,
+      "label": "Diagrams and steps",
+      "still": "stills/04-blocks.webp"
+    },
+    {
+      "t": 18.1,
+      "label": "Saved to your Library",
+      "still": "stills/05-library.webp"
+    }
+  ]
+}

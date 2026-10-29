@@ -1,0 +1,30 @@
+{
+  "duration": 27.2,
+  "chapters": [
+    {
+      "t": 0,
+      "label": "Save a quote while reading",
+      "still": "stills/01-capture.webp"
+    },
+    {
+      "t": 5.01,
+      "label": "AI tags every quote",
+      "still": "stills/02-dashboard.webp"
+    },
+    {
+      "t": 11.72,
+      "label": "Start a focus session",
+      "still": "stills/03-session.webp"
+    },
+    {
+      "t": 18.66,
+      "label": "Read the AI session report",
+      "still": "stills/04-report.webp"
+    },
+    {
+      "t": 21.56,
+      "label": "AI-graded recall quiz",
+      "still": "stills/05-recall.webp"
+    }
+  ]
+}

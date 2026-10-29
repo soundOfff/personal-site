@@ -1,0 +1,30 @@
+{
+  "duration": 24.13,
+  "chapters": [
+    {
+      "t": 0,
+      "label": "Point at any component",
+      "still": "stills/01-point.webp"
+    },
+    {
+      "t": 6.8,
+      "label": "Arrow keys widen the pick",
+      "still": "stills/02-walk.webp"
+    },
+    {
+      "t": 10.2,
+      "label": "Enter catches the card",
+      "still": "stills/03-caught.webp"
+    },
+    {
+      "t": 13.9,
+      "label": "Live preview in the Library",
+      "still": "stills/04-preview.webp"
+    },
+    {
+      "t": 19.6,
+      "label": "Library keeps every catch",
+      "still": "stills/05-library.webp"
+    }
+  ]
+}
