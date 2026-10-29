@@ -1,22 +1,1138 @@
 ---
-// Placeholder. The candidate that owns this folder replaces this file.
-import WorkCard from '../../../components/WorkCard.astro';
 import PixelSigil from '../../../components/PixelSigil.astro';
 import { selected } from '../content/showcase';
+import { workflow } from '../content/workflow';
+import { CLAUDE, CODEX, ICONS, TICKET, runs } from './sprites';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const stages = workflow.stages;
+const sourceLabel: Record<string, string> = {
+  agent: 'agents',
+  orchestration: 'orchestration',
+  check: 'browser check',
+};
+const sprite = (frames: string[][]) => frames.map((rows) => runs(rows));
+const claude = sprite(CLAUDE);
+const codex = sprite(CODEX);
+const ticket = sprite(TICKET);
+const [claudeAgent, codexAgent] = workflow.agents;
+const [sayChecks, sayApproach] = workflow.feedback.body.split(/(?<=\.)\s+/);
+
+// The scripts get their copy from here, never by reading text back out of the DOM.
+const stageCopy = {
+  names: selected.map((item) => item.project.name),
+  chapters: selected.map((item) => item.demo.chapters.map(({ t, label }) => ({ t, label }))),
+  next: [...selected.slice(1).map((item) => `Next: ${item.project.name}`), 'Next: my AI workflow'],
+};
+const station = (k: number) => `${pad(k + 1)} ${stages[k].label}`;
+const lineCopy = {
+  say: stages.map((s, k) => `${station(k)}. ${s.body}`),
+  fail: { checks: `${station(3)}. A check fails.`, approach: `${station(3)}. The approach is wrong.` },
+  loop: { build: `${station(3)}. ${sayChecks}`, design: `${station(3)}. ${sayApproach}` },
+  bubble: { checks: 'Checks failed', approach: 'Wrong approach', pass: 'Evidence holds' },
+};
 ---
 
 <div data-proto="b">
-  <section class="section shell" id="work" aria-labelledby="work-title">
-    <div class="work-intro">
-      <PixelSigil star />
-      <p>Placeholder for variant b.</p>
+  <section
+    id="work"
+    class="b-work"
+    aria-labelledby="b-work-title"
+    style={`--n:${selected.length}`}
+    data-copy={JSON.stringify(stageCopy)}
+  >
+    <div class="b-stops" aria-hidden="true">
+      {selected.map((_, k) => <span class="b-stop" style={`--k:${k}`} />)}
     </div>
-    <div class="section-heading">
-      <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-      <p>Variant b has not been built yet.</p>
+    <div class="b-stage">
+      <div class="shell b-grid">
+        <div class="b-side">
+          <div class="b-top">
+            <h2 id="b-work-title" class="eyebrow">Selected work</h2>
+            <p class="b-count" aria-live="polite">
+              <span data-count>01</span> / {pad(selected.length)}
+            </p>
+          </div>
+          <ol class="b-names" aria-label="Products">
+            {
+              selected.map((item, k) => (
+                <li>
+                  <button
+                    type="button"
+                    class="b-name"
+                    data-go={k}
+                    aria-current={k === 0 ? 'true' : undefined}
+                  >
+                    <span class="b-num">{pad(k + 1)}</span>
+                    <span class="b-name-text">{item.project.name}</span>
+                  </button>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="b-panels">
+            {
+              selected.map((item, k) => (
+                <div class={k === 0 ? 'b-panel is-on' : 'b-panel'} data-panel={k} inert={k !== 0}>
+                  <p class="b-desc">{item.project.description}</p>
+                  <p class="meta b-meta">{item.project.stack.split(' · ').join(' / ')}</p>
+                  <ol class="b-beats" aria-label={`${item.project.name} demo chapters`}>
+                    {item.demo.chapters.map((c, j) => (
+                      <li>
+                        <button type="button" class="b-beat" data-seek={c.t} data-j={j}>
+                          <span class="b-num">{pad(j + 1)}</span>
+                          {c.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ol>
+                  <p class="b-links">
+                    <a class="b-more" href={item.href}>
+                      {item.project.name} in detail <span aria-hidden="true">→</span>
+                    </a>
+                    {item.demo.walkthrough && (
+                      <a class="b-walk" href={item.demo.walkthrough} target="_blank" rel="noopener">
+                        Narrated walkthrough <span aria-hidden="true">↗</span>
+                      </a>
+                    )}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div class="b-screen">
+          <div class="b-frame" data-frame>
+            {
+              selected.map((item, k) => (
+                <video
+                  class="b-video"
+                  data-video={k}
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={item.demo.poster}
+                  aria-label={`${item.project.name} demo: ${item.demo.chapters.map((c) => c.label.toLowerCase()).join(', ')}.`}
+                  data-active={k === 0 ? '' : undefined}
+                >
+                  <source src={item.demo.webm} type="video/webm" />
+                  <source src={item.demo.mp4} type="video/mp4" />
+                </video>
+              ))
+            }
+            <canvas class="b-wipe" aria-hidden="true"></canvas>
+            <button type="button" class="b-play" data-play aria-label="Pause the demo">
+              <svg viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges" class="b-icon-pause">
+                <rect x="1" y="1" width="2" height="5" /><rect x="4" y="1" width="2" height="5" />
+              </svg>
+              <svg viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges" class="b-icon-play">
+                <rect x="1" y="0" width="1" height="7" /><rect x="2" y="1" width="1" height="5" /><rect x="3" y="1" width="1" height="5" /><rect x="4" y="2" width="1" height="3" /><rect x="5" y="3" width="1" height="1" />
+              </svg>
+              <span data-play-label>Pause</span>
+            </button>
+          </div>
+          <p class="b-now" aria-hidden="true">
+            <span class="b-num" data-now-n>01</span> <span data-now>{selected[0].demo.chapters[0].label}</span>
+          </p>
+          {
+            selected.map((item, k) => (
+              <div class="b-rail" data-rail={k} hidden={k !== 0}>
+                {item.demo.chapters.map((c, j) => {
+                  const end = item.demo.chapters[j + 1]?.t ?? item.demo.duration;
+                  return (
+                    <button
+                      type="button"
+                      class="b-seg"
+                      style={`flex-grow:${(end - c.t).toFixed(2)}`}
+                      data-seek={c.t}
+                      data-j={j}
+                      tabindex="-1"
+                      aria-label={`Jump to ${c.label}`}
+                    >
+                      <span class="b-fill" />
+                    </button>
+                  );
+                })}
+              </div>
+            ))
+          }
+          <p class="b-next-row">
+            <a class="b-next" href="#workflow" data-next>
+              <span data-next-label>{stageCopy.next[0]}</span> <span aria-hidden="true">↓</span>
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
-    <div class="bento">
-      {selected.map((p) => <WorkCard project={p.project} selected />)}
+  </section>
+
+  <section
+    id="workflow"
+    class="section b-flow"
+    aria-labelledby="b-flow-title"
+    data-copy={JSON.stringify(lineCopy)}
+  >
+    <div class="shell">
+      <div class="section-heading b-flow-head">
+        <div>
+          <p class="eyebrow">{workflow.title}</p>
+          <h2 id="b-flow-title">Agents iterate. <span class="ghost">I&nbsp;decide.</span></h2>
+        </div>
+        <p>{workflow.introduction}</p>
+      </div>
+
+      <div class="b-scene" data-scene>
+        <ol class="b-stations">
+          {
+            stages.map((s, k) => (
+              <li>
+                <button
+                  type="button"
+                  class="b-station"
+                  data-station={k}
+                  data-owner={s.owner === 'Me' ? 'me' : 'agents'}
+                  aria-pressed="false"
+                  aria-controls={`b-detail-${s.id}`}
+                >
+                  <span class="b-st-label">
+                    <span class="b-num">{pad(k + 1)}</span> {s.label}
+                  </span>
+                  <span class="b-st-hint">{s.hint}</span>
+                  <span class="b-tile">
+                    <svg viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                      {runs(ICONS[s.id]).map((r) => (
+                        <rect x={r.x} y={r.y} width={r.w} height="1" />
+                      ))}
+                    </svg>
+                  </span>
+                </button>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="b-run" data-run aria-hidden="true">
+          <div class="b-belt" data-belt></div>
+          <div class="b-loop" data-loop="build"><span><span class="b-long">Failed </span>checks</span></div>
+          <div class="b-loop" data-loop="design"><span><span class="b-long">Wrong </span>approach</span></div>
+          <div class="b-bubble" data-bubble></div>
+          <div class="b-actor" data-actor="claude">
+            <span class="b-tag">Claude</span>
+            <svg viewBox="0 0 10 12" shape-rendering="crispEdges">
+              {claude.map((f, i) => <g data-f={i}>{f.map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}</g>)}
+            </svg>
+          </div>
+          <div class="b-actor" data-actor="codex">
+            <span class="b-tag">Codex</span>
+            <svg viewBox="0 0 10 12" shape-rendering="crispEdges">
+              {codex.map((f, i) => <g data-f={i}>{f.map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}</g>)}
+            </svg>
+          </div>
+          <div class="b-ticket" data-ticket>
+            <svg viewBox="0 0 9 6" shape-rendering="crispEdges">
+              {ticket.map((f, i) => <g data-f={i}>{f.map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}</g>)}
+            </svg>
+          </div>
+        </div>
+        <div class="b-caption">
+          <p class="b-narration" data-narration>{lineCopy.say[0]}</p>
+          <p class="b-controls">
+            <span class="b-hint">Hover or tap a station for its tools.</span>
+            <button type="button" class="b-pause" data-line-pause aria-pressed="false">Pause the line</button>
+          </p>
+        </div>
+      </div>
+
+      <div class="b-flow-foot">
+        <div class="b-details">
+          {
+            stages.map((s, k) => {
+              const list = workflow.tools[s.id];
+              return (
+                <div class={k === 0 ? 'b-detail is-on' : 'b-detail'} id={`b-detail-${s.id}`} data-detail={k} inert={k !== 0}>
+                  <p class="meta b-detail-meta">
+                    {pad(k + 1)} {s.label} / {s.owner === 'Me' ? 'Me' : 'Agents + me'}
+                  </p>
+                  <h3>{s.title}</h3>
+                  <p class="b-detail-body">{s.body}</p>
+                  {list.length ? (
+                    <ul class="b-tools">
+                      {list.map((t) => (
+                        <li>
+                          <span class="b-tool-name">{t.name}</span>
+                          <span class="b-tool-src">{t.source ?? sourceLabel[t.kind]}</span>
+                          <span class="b-tool-why">{t.purpose}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p class="b-solo">No agents at this station. The call is mine.</p>
+                  )}
+                  <p class="b-ask">
+                    <span class="meta">My call</span>
+                    {s.humanDecision}
+                  </p>
+                </div>
+              );
+            })
+          }
+        </div>
+        <div class="b-cast">
+          <p class="eyebrow">On the line</p>
+          <ul>
+            <li>
+              <span class="b-cast-mark b-cast-me"><PixelSigil star /></span>
+              <span><strong>Me</strong> Frame and Decide. I own the direction and the final call.</span>
+            </li>
+            <li>
+              <span class="b-cast-mark">
+                <svg viewBox="0 0 10 12" shape-rendering="crispEdges" aria-hidden="true">
+                  {claude[0].map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}
+                </svg>
+              </span>
+              <span><strong>{claudeAgent.name}</strong> on {claudeAgent.model}. {claudeAgent.role}</span>
+            </li>
+            <li>
+              <span class="b-cast-mark">
+                <svg viewBox="0 0 10 12" shape-rendering="crispEdges" aria-hidden="true">
+                  {codex[0].map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.c} />)}
+                </svg>
+              </span>
+              <span><strong>{codexAgent.name}</strong> on {codexAgent.model}. {codexAgent.role}</span>
+            </li>
+          </ul>
+          <p class="b-sources">
+            {workflow.sources.map((s) => <a href={s.href} target="_blank" rel="noopener">{s.label} <span aria-hidden="true">↗</span></a>)}
+          </p>
+        </div>
+      </div>
     </div>
   </section>
 </div>
+
+<script>
+  import { initStage } from './stage';
+  import { initLine } from './line';
+  import { initSettle } from '../settle';
+
+  const root = document.querySelector<HTMLElement>('[data-proto="b"]');
+  if (root) {
+    initSettle(root);
+    initStage(root);
+    initLine(root);
+  }
+</script>
+
+{/*
+  is:inline keeps these rules in this variant's own HTML. The route lazy-loads every variant, and Astro
+  injects each bundled <style> into every variant's page, so a bundled block would load on ?variant=a1 too.
+*/}
+<style is:inline>
+  html:has([data-proto='b']) {
+    scroll-padding-top: 0;
+
+    /* ---------- Pinned demo stage ---------- */
+
+    & .b-work {
+      --step: 75svh;
+      position: relative;
+      height: calc(100svh + (var(--n) - 1) * var(--step));
+    }
+    & .b-stops {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    & .b-stop {
+      position: absolute;
+      left: 0;
+      top: calc(var(--k) * var(--step));
+      width: 1px;
+      height: var(--step);
+    }
+    & .b-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      display: flex;
+      align-items: center;
+      overflow: clip;
+    }
+    & .b-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 350px) minmax(0, 1fr);
+      gap: 56px;
+      align-items: center;
+      padding-top: 56px;
+    }
+    & .b-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    & .b-count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted-2);
+      font-variant-numeric: tabular-nums;
+    }
+    & .b-count [data-count] {
+      color: var(--ink);
+    }
+    & .b-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-style: normal;
+      letter-spacing: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    & .b-names {
+      list-style: none;
+      margin: 26px 0 30px;
+      padding: 0;
+    }
+    & .b-name {
+      display: flex;
+      align-items: start;
+      gap: 14px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #949c99;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(44px, 4.4vw, 66px);
+      line-height: 1.04;
+      letter-spacing: -0.045em;
+      cursor: pointer;
+      transition: color 0.25s;
+    }
+    & .b-name .b-num {
+      margin-top: 0.7em;
+      width: 18px;
+    }
+    & .b-name[aria-current='true'] {
+      color: var(--ink);
+    }
+    & .b-name[aria-current='true'] .b-num {
+      color: var(--blue);
+    }
+    & .b-panels {
+      display: grid;
+    }
+    & .b-panel {
+      grid-area: 1 / 1;
+      visibility: hidden;
+      opacity: 0;
+      transition:
+        opacity 0.25s,
+        visibility 0s 0.25s;
+    }
+    & .b-panel.is-on {
+      visibility: visible;
+      opacity: 1;
+      transition: opacity 0.35s 0.05s;
+    }
+    & .b-desc {
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--ink-2);
+    }
+    & .b-meta {
+      margin-top: 10px;
+      color: var(--muted-2);
+    }
+    & .b-beats {
+      list-style: none;
+      margin: 22px 0 0;
+      padding: 0;
+      border-top: 1px solid var(--line);
+    }
+    & .b-beat {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 7px 0;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: none;
+      color: var(--muted-2);
+      font: inherit;
+      font-size: 13px;
+      text-align: left;
+      cursor: pointer;
+    }
+    & .b-beat::before {
+      content: '';
+      flex: none;
+      width: 7px;
+      height: 7px;
+      background: var(--line);
+    }
+    & .b-beat[data-done]::before {
+      background: var(--light);
+    }
+    & .b-beat[data-current] {
+      color: var(--ink);
+    }
+    & .b-beat[data-current]::before {
+      background: var(--blue);
+    }
+    & .b-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+      align-items: baseline;
+      margin-top: 22px;
+    }
+    & .b-more {
+      padding-bottom: 3px;
+      border-bottom: 1px solid;
+      font-size: 14px;
+    }
+    & .b-walk {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    & .b-screen {
+      min-width: 0;
+    }
+    & .b-frame {
+      position: relative;
+      width: min(100%, calc((100svh - 210px) * 1.6));
+      aspect-ratio: 16 / 10;
+      margin-left: auto;
+      overflow: hidden;
+      background: #e7e6e0;
+      border: 1px solid #bbbdb2;
+      border-radius: 2px;
+    }
+    & .b-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      visibility: hidden;
+    }
+    & .b-video[data-active] {
+      visibility: visible;
+    }
+    & .b-wipe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    & .b-play {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 9px;
+      border: 0;
+      border-radius: 2px;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    & .b-play:focus-visible,
+    & .b-seg:focus-visible {
+      outline-offset: 2px;
+    }
+    & .b-play svg {
+      width: 9px;
+      height: 9px;
+      fill: currentColor;
+    }
+    & .b-frame[data-state='playing'] .b-icon-play,
+    & .b-frame:not([data-state='playing']) .b-icon-pause {
+      display: none;
+    }
+    & .b-now {
+      display: none;
+    }
+    & .b-rail {
+      display: flex;
+      gap: 3px;
+      width: min(100%, calc((100svh - 210px) * 1.6));
+      margin: 12px 0 0 auto;
+    }
+    & .b-seg {
+      position: relative;
+      flex-basis: 0;
+      min-width: 0;
+      height: 20px;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+    & .b-seg::before,
+    & .b-fill {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 7px;
+      height: 6px;
+      background: var(--line);
+    }
+    & .b-fill {
+      background: var(--blue);
+      transform: scaleX(var(--f, 0));
+      transform-origin: left;
+    }
+    & .b-seg[data-current]::before {
+      background: repeating-conic-gradient(var(--light) 0 25%, var(--paper) 0 50%) 0 0 / 4px 4px;
+    }
+
+    & .b-next-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+    & .b-next {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ---------- Workflow: the assembly line ---------- */
+
+    & .b-flow {
+      padding-block: 100px 90px;
+    }
+    & .b-flow-head {
+      margin-bottom: 34px;
+    }
+    & .b-flow-head .eyebrow {
+      margin-bottom: 18px;
+    }
+    & .b-flow-head p:not(.eyebrow) {
+      max-width: 400px;
+    }
+    & .b-scene {
+      --px: 5px;
+      position: relative;
+    }
+    & .b-stations {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    & .b-station {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      padding: 4px 4px 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+    & .b-st-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    & .b-st-label .b-num {
+      color: var(--muted-2);
+    }
+    & .b-st-hint {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    & .b-tile {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 60px;
+      height: 60px;
+      margin-top: 12px;
+      border: 2px solid var(--ink);
+      background: var(--paper);
+      transition: translate 0.18s steps(3);
+    }
+    & .b-tile::after {
+      content: '';
+      position: absolute;
+      top: calc(100% + 2px);
+      left: calc(50% - 1px);
+      width: 2px;
+      height: calc(var(--px) * 18 + 30px);
+      background: repeating-linear-gradient(var(--line) 0 4px, transparent 4px 8px);
+      pointer-events: none;
+    }
+    & .b-tile svg {
+      width: 35px;
+      height: 35px;
+      fill: var(--ink);
+    }
+    & .b-station[data-owner='me'] .b-tile {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    & .b-station[data-owner='me'] .b-tile svg {
+      fill: var(--paper);
+    }
+    & .b-station.is-live .b-tile {
+      box-shadow:
+        0 0 0 4px var(--paper),
+        0 0 0 6px var(--light);
+    }
+    & .b-station.is-shown .b-st-label {
+      color: var(--blue);
+    }
+    & .b-station[aria-pressed='true'] .b-tile {
+      box-shadow:
+        0 0 0 4px var(--paper),
+        0 0 0 6px var(--blue);
+    }
+    & .b-tile.is-stamping {
+      translate: 0 8px;
+    }
+
+    & .b-run {
+      position: relative;
+      height: calc(var(--px) * 30 + 54px);
+    }
+    & .b-belt {
+      position: absolute;
+      left: 10%;
+      right: 6%;
+      top: calc(var(--px) * 18 + 30px);
+      height: 8px;
+      background:
+        linear-gradient(var(--ink), var(--ink)) top / 100% 2px no-repeat,
+        repeating-conic-gradient(var(--light) 0 25%, var(--paper) 0 50%) 0 0 / 4px 4px;
+    }
+    & .b-loop {
+      position: absolute;
+      border: 2px dashed var(--light);
+      border-top: 0;
+    }
+    & .b-loop::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 0;
+      width: 10px;
+      height: 6px;
+      background: var(--blue);
+      clip-path: polygon(4px 0, 6px 0, 6px 2px, 8px 2px, 8px 4px, 10px 4px, 10px 6px, 0 6px, 0 4px, 2px 4px, 2px 2px, 4px 2px);
+    }
+    & .b-loop > span {
+      position: absolute;
+      left: 50%;
+      bottom: -8px;
+      translate: -50% 0;
+      padding: 0 6px;
+      background: var(--paper);
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 14px;
+      white-space: nowrap;
+    }
+    & .b-actor,
+    & .b-ticket,
+    & .b-bubble {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    & .b-actor {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    & .b-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      line-height: 1;
+      color: var(--muted);
+    }
+    & .b-actor svg {
+      width: calc(var(--px) * 10);
+      height: calc(var(--px) * 12);
+    }
+    & .b-ticket {
+      z-index: 2;
+      transform-origin: 50% 100%;
+    }
+    & .b-ticket svg {
+      width: calc(var(--px) * 9);
+      height: calc(var(--px) * 6);
+    }
+    & .b-bubble {
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    & .b-bubble svg {
+      width: 8px;
+      height: 8px;
+      fill: currentColor;
+    }
+    & .b-bubble::after {
+      content: '';
+      position: absolute;
+      left: calc(50% - 3px);
+      bottom: -4px;
+      width: 6px;
+      height: 4px;
+      background: var(--ink);
+    }
+    & .b-caption {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 24px;
+      margin-top: 6px;
+    }
+    & .b-narration {
+      min-height: 3em;
+      max-width: 720px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--ink-2);
+    }
+    & .b-controls {
+      display: flex;
+      flex: none;
+      gap: 22px;
+      align-items: baseline;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+    & .b-scene.is-frozen .b-narration {
+      display: none;
+    }
+    & .b-pause {
+      flex: none;
+      padding: 0 0 3px;
+      border: 0;
+      border-bottom: 1px solid;
+      background: none;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    & .b-scene.is-frozen .b-pause {
+      display: none;
+    }
+
+    & .b-flow-foot {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 56px;
+      margin-top: 22px;
+      padding-top: 26px;
+      border-top: 1px solid var(--line);
+    }
+    & .b-details {
+      display: grid;
+    }
+    & .b-detail {
+      grid-area: 1 / 1;
+      visibility: hidden;
+    }
+    & .b-detail.is-on {
+      visibility: visible;
+    }
+    & .b-detail-meta {
+      color: var(--muted-2);
+    }
+    & .b-detail h3 {
+      margin-top: 8px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+    & .b-detail-body {
+      max-width: 560px;
+      margin-top: 8px;
+      font-size: 15px;
+      color: var(--muted);
+    }
+    & .b-tools {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 28px;
+      margin: 18px 0 0;
+      padding: 0;
+    }
+    & .b-tools li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 10px;
+      align-items: baseline;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+    & .b-tool-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    & .b-tool-src {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted-2);
+    }
+    & .b-tool-why {
+      grid-column: 1 / -1;
+      margin-top: 2px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+    & .b-solo {
+      margin-top: 18px;
+      font-size: 14px;
+    }
+    & .b-ask {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      margin-top: 18px;
+      font-size: 14px;
+    }
+    & .b-ask .meta {
+      flex: none;
+      color: var(--blue);
+    }
+    & .b-cast ul {
+      list-style: none;
+      display: grid;
+      gap: 16px;
+      margin: 18px 0 0;
+      padding: 0;
+    }
+    & .b-cast li {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 14px;
+      align-items: start;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+    & .b-cast strong {
+      display: block;
+      color: var(--ink);
+      font-weight: 500;
+    }
+    & .b-cast-mark svg {
+      width: 30px;
+      height: 36px;
+    }
+    & .b-cast-me .pixel-sigil {
+      width: 28px;
+      height: 28px;
+      margin-top: 2px;
+    }
+    & .b-sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      margin-top: 22px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    & .b-sources a {
+      border-bottom: 1px solid var(--line);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      & .b-name:hover {
+        color: var(--ink-2);
+      }
+      & .b-beat:hover {
+        color: var(--ink);
+      }
+      & .b-seg:hover::before {
+        background: var(--light);
+      }
+      & .b-station:hover .b-tile {
+        translate: 0 -4px;
+      }
+      & .b-more:hover,
+      & .b-sources a:hover {
+        color: var(--blue);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      & .b-frame:not([data-state='playing']) .b-play {
+        right: 50%;
+        bottom: 50%;
+        translate: 50% 50%;
+        gap: 10px;
+        padding: 14px 20px;
+        background: var(--blue);
+        color: var(--paper);
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      & .b-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+        padding-top: 70px;
+      }
+      & .b-side {
+        display: contents;
+      }
+      & .b-names {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 20px;
+        margin: 12px 0 14px;
+      }
+      & .b-name {
+        font-size: 30px;
+      }
+      & .b-name .b-num {
+        display: none;
+      }
+      & .b-screen {
+        order: 3;
+      }
+      & .b-panels {
+        order: 4;
+        margin-top: 14px;
+      }
+      & .b-frame,
+      & .b-rail {
+        width: 100%;
+      }
+      & .b-now {
+        display: block;
+        margin-top: 10px;
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      & .b-now .b-num {
+        color: var(--blue);
+      }
+      & .b-rail {
+        margin-top: 2px;
+      }
+      & .b-beats {
+        display: none;
+      }
+      & .b-desc {
+        font-size: 14px;
+      }
+      & .b-links {
+        margin-top: 12px;
+      }
+
+      & .b-scene {
+        --px: 3px;
+      }
+      & .b-long {
+        display: none;
+      }
+      & .b-st-hint {
+        display: none;
+      }
+      & .b-tile {
+        width: 44px;
+        height: 44px;
+        margin-top: 6px;
+      }
+      & .b-tile svg {
+        width: 28px;
+        height: 28px;
+      }
+      & .b-tag {
+        font-size: 8px;
+      }
+      & .b-caption {
+        flex-direction: column;
+        gap: 8px;
+      }
+      & .b-flow-foot {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 36px;
+      }
+      & .b-tools {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      & .b-flow {
+        padding-block: 65px;
+      }
+      & .b-st-label {
+        font-size: 10px;
+      }
+      & .b-st-label .b-num {
+        display: block;
+        text-align: center;
+      }
+      & .b-detail h3 {
+        font-size: 28px;
+      }
+      & #index,
+      & #readme,
+      & .writing {
+        scroll-margin-top: 14px;
+      }
+    }
+  }
+
+  /*
+    Settle targets, read by ../settle.ts: section starts plus one step per product in the pinned stage.
+    No scroll-snap-type, because CSS proximity snapping pulls slow wheel notches back onto the steps.
+  */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+    html:has([data-proto='b']) {
+      & .b-stop,
+      & #workflow,
+      & .experience,
+      & #index,
+      & #readme,
+      & .writing,
+      & #playground {
+        scroll-snap-align: start;
+      }
+      & .experience {
+        scroll-margin-top: 20px;
+      }
+    }
+  }
+</style>

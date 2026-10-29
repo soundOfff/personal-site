@@ -102,10 +102,10 @@ def run_case(browser, vid, name, viewport, reduced, out, report, quick):
 
     snap = page.evaluate(SNAP_PROBE)
     case["snap"] = {"container": snap["container"], "targets": snap["targets"][:30]}
-    settle = page.evaluate("document.documentElement.dataset.settle || null")
-    case["snap"]["settle"] = settle
+    settle_state = page.evaluate("document.documentElement.dataset.settle || null")
+    case["snap"]["settle"] = settle_state
     snapping_expected = not reduced and viewport["height"] >= 640
-    if snapping_expected and settle != "on" and (snap["container"] == "none" or not snap["targets"]):
+    if snapping_expected and settle_state != "on" and (snap["container"] == "none" or not snap["targets"]):
         case["fail"].append("no scroll-snap container or no snap targets (snapping should be on)")
     if reduced and snap["container"] != "none" and "none" not in snap["container"]:
         case["notes"].append(f"snap still on under reduced motion: {snap['container']}")
