@@ -1,0 +1,104 @@
+{
+  "catcher": {
+    "mp4": "/demos/catcher/loop.mp4",
+    "webm": "/demos/catcher/loop.webm",
+    "poster": "/demos/catcher/poster.webp",
+    "duration": 24.13,
+    "chapters": [
+      {
+        "t": 0,
+        "label": "Point at any component",
+        "still": "/demos/catcher/stills/01-point.webp"
+      },
+      {
+        "t": 6.8,
+        "label": "Arrow keys widen the pick",
+        "still": "/demos/catcher/stills/02-walk.webp"
+      },
+      {
+        "t": 10.2,
+        "label": "Enter catches the card",
+        "still": "/demos/catcher/stills/03-caught.webp"
+      },
+      {
+        "t": 13.9,
+        "label": "Live preview in the Library",
+        "still": "/demos/catcher/stills/04-preview.webp"
+      },
+      {
+        "t": 19.6,
+        "label": "Library keeps every catch",
+        "still": "/demos/catcher/stills/05-library.webp"
+      }
+    ],
+    "walkthrough": null
+  },
+  "focus-quote": {
+    "mp4": "/demos/focus-quote/loop.mp4",
+    "webm": "/demos/focus-quote/loop.webm",
+    "poster": "/demos/focus-quote/poster.webp",
+    "duration": 27.2,
+    "chapters": [
+      {
+        "t": 0,
+        "label": "Save a quote while reading",
+        "still": "/demos/focus-quote/stills/01-capture.webp"
+      },
+      {
+        "t": 5.01,
+        "label": "AI tags every quote",
+        "still": "/demos/focus-quote/stills/02-dashboard.webp"
+      },
+      {
+        "t": 11.72,
+        "label": "Start a focus session",
+        "still": "/demos/focus-quote/stills/03-session.webp"
+      },
+      {
+        "t": 18.66,
+        "label": "Read the AI session report",
+        "still": "/demos/focus-quote/stills/04-report.webp"
+      },
+      {
+        "t": 21.56,
+        "label": "AI-graded recall quiz",
+        "still": "/demos/focus-quote/stills/05-recall.webp"
+      }
+    ],
+    "walkthrough": null
+  },
+  "sift": {
+    "mp4": "/demos/sift/loop.mp4",
+    "webm": "/demos/sift/loop.webm",
+    "poster": "/demos/sift/poster.webp",
+    "duration": 23.07,
+    "chapters": [
+      {
+        "t": 0,
+        "label": "Start a lecture",
+        "still": "/demos/sift/stills/01-start.webp"
+      },
+      {
+        "t": 5.33,
+        "label": "Notes as you watch",
+        "still": "/demos/sift/stills/02-notes.webp"
+      },
+      {
+        "t": 9.03,
+        "label": "Sources from the web",
+        "still": "/demos/sift/stills/03-sources.webp"
+      },
+      {
+        "t": 12.3,
+        "label": "Diagrams and steps",
+        "still": "/demos/sift/stills/04-blocks.webp"
+      },
+      {
+        "t": 18.1,
+        "label": "Saved to your Library",
+        "still": "/demos/sift/stills/05-library.webp"
+      }
+    ],
+    "walkthrough": "/demos/sift/walkthrough.mp4"
+  }
+}
