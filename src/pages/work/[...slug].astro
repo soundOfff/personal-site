@@ -1,89 +1,165 @@
 ---
 import { getCollection, render } from 'astro:content';
-import { Badge } from 'editorial-ui';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import '../../styles/reading.css';
+import PromptPracticeDemo from '../../islands/PromptPracticeDemo';
+import { projects, workSlug } from '../../data/projects';
+import stories from '../../data/project-stories.json';
 
+// Every project gets a page. Projects with a written case study render it below the story.
 export const getStaticPaths = (async () => {
   const studies = await getCollection('work', ({ data }) => !data.draft);
-  return studies.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+  return projects.map((project) => ({
+    params: { slug: workSlug(project) },
+    props: { project, study: studies.find((entry) => entry.id === workSlug(project)) },
+  }));
 }) satisfies GetStaticPaths;
 
-const { entry } = Astro.props;
-const { Content, headings } = await render(entry);
-const sections = headings.filter((heading) => heading.depth === 2);
-const studies = await getCollection('work', ({ data }) => !data.draft);
-const position = studies.findIndex((study) => study.id === entry.id);
-const previous = studies[position - 1];
-const next = studies[position + 1];
+const { project, study } = Astro.props;
+const story = stories[project.id as keyof typeof stories];
+const Content = study ? (await render(study)).Content : null;
+const next = projects[(projects.indexOf(project) + 1) % projects.length];
+const website = project.website === '#playground' ? '/#playground' : project.website;
 ---
 
 <BaseLayout
-  title={`${entry.data.title} · Tomas Brasca`}
-  description={entry.data.description}
+  title={`${project.name} · Tomas Brasca`}
+  description={project.description}
   type="article"
   articleKind="Article"
-  headline={entry.data.title}
+  headline={project.name}
 >
-  <main id="main" class="reading-shell shell">
-    <div class="article-column">
-      <header class="page-head">
-        <p class="eyebrow">// <b>case study</b> · {entry.data.n}</p>
-        <h1>{entry.data.title}</h1>
-        <p class="dek">{entry.data.description}</p>
-        <div class="meta">
-          <span>{entry.data.year}</span>
-          <span>·</span>
-          <span>{entry.data.stack}</span>
-          <Badge variant={entry.data.code ? 'success' : 'info'}>
-            {entry.data.code ? 'real code' : 'narrative'}
-          </Badge>
+  <main id="main" tabindex="-1">
+    <header class="detail-hero" data-on-blue>
+      <canvas class="detail-cave" data-cave={project.id} data-bloom aria-hidden="true"></canvas>
+      <div class="shell">
+        <a class="back" href="/#index">← All projects</a>
+        <p class="eyebrow">{project.category}{study && ` / ${study.data.year}`}</p>
+        <h1>{project.name}</h1>
+        <p class="subtitle">{story.subtitle}</p>
+        <p class="detail-lede">{project.description}</p>
+        <div class="detail-info">
+          <div><span class="meta">Contribution</span><p>{story.role}</p></div>
+          <div>
+            <span class="meta">Built with</span><p>{project.stack.split(' · ').join(' / ')}</p>
+          </div>
+          <div><span class="meta">Status</span><p>{story.status}</p></div>
+          <div class="detail-actions">
+            {
+              project.id === 'a2ui' && (
+                <a class="button primary" href="/#playground">
+                  Open the playground ↗
+                </a>
+              )
+            }
+            {
+              project.id === 'letterboxd' && (
+                <a
+                  class="button"
+                  href="/previews/letterboxd/sample-story.pdf"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Open the full booklet ↗
+                </a>
+              )
+            }
+            {
+              website && project.id !== 'a2ui' && (
+                <a class="button" href={website} target="_blank" rel="noopener">
+                  Visit project ↗
+                </a>
+              )
+            }
+            {
+              project.source && (
+                <a class="button" href={project.source} target="_blank" rel="noopener">
+                  View source ↗
+                </a>
+              )
+            }
+          </div>
         </div>
-      </header>
+      </div>
+    </header>
 
+    <section class="shell detail-media" aria-label={`${project.name} in action`}>
       {
-        sections.length > 2 && (
-          <details class="article-contents">
-            <>
-              <summary>
-                In this case study <span>{sections.length} sections</span>
-              </summary>
-              <nav aria-label="Case study contents">
-                <ol>
-                  {sections.map((heading) => (
-                    <li>
-                      <a href={`#${heading.slug}`}>{heading.text}</a>
-                    </li>
-                  ))}
-                </ol>
-              </nav>
-            </>
-          </details>
+        project.id === '60-seconds' ? (
+          <PromptPracticeDemo client:visible />
+        ) : story.demo ? (
+          <figure class="demo-video">
+            <video
+              controls
+              muted
+              playsinline
+              preload="metadata"
+              poster={project.image ?? undefined}
+            >
+              <source src={story.demo} type="video/mp4" />
+              <a href={story.demo}>Download the product demonstration</a>
+            </video>
+            <figcaption>
+              Actual extension recording / Select a component, capture it, open the library.
+            </figcaption>
+          </figure>
+        ) : story.media.length ? (
+          <div class="gallery">
+            {story.media.map((media, i) => (
+              <figure>
+                <img
+                  src={media.src}
+                  alt={media.caption}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+                <figcaption>{media.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        ) : (
+          <div class="detail-cover">
+            <canvas class="generated-cover" data-cave={`${project.id}-cover`} aria-hidden="true" />
+            <span class="generated-title">{project.name}</span>
+          </div>
         )
       }
-      <article class="prose">
-        <Content />
-      </article>
+      {story.note && <p class="media-note">{story.note}</p>}
+    </section>
+
+    <section class="shell story" aria-labelledby="story-title">
+      <div>
+        <p class="eyebrow">Behind the interface</p>
+        <h2 id="story-title">What I worked on.</h2>
+      </div>
+      <div>
+        <p class="lede">{story.story}</p>
+        <ul>{story.contribution.map((item) => <li>{item}</li>)}</ul>
+      </div>
+    </section>
+    <section class="shell story" aria-labelledby="flow-title">
+      <div>
+        <p class="eyebrow">The product flow</p>
+        <h2 id="flow-title">From input to something useful.</h2>
+      </div>
+      <ol>{story.flow.map((step) => <li>{step}</li>)}</ol>
+    </section>
+
+    {
+      Content && (
+        <>
+          <div class="shell case-study-label">
+            <p class="eyebrow">The engineering case study</p>
+          </div>
+          <article class="reading" data-progress>
+            <Content />
+          </article>
+        </>
+      )
+    }
+
+    <div class="shell section">
+      <a class="journal-cta" href={`/work/${workSlug(next)}`}>Next: {next.name} →</a>
     </div>
-
-    <nav class="reading-neighbors article-column" aria-label="More case studies">
-      {
-        previous && (
-          <a href={`/work/${previous.id}`}>
-            <span>← Previous case study</span>
-            {previous.data.title}
-          </a>
-        )
-      }{
-        next && (
-          <a href={`/work/${next.id}`}>
-            <span>Next case study →</span>
-            {next.data.title}
-          </a>
-        )
-      }
-    </nav>
-    <a class="article-back" href="/#index">← All projects</a>
   </main>
 </BaseLayout>

@@ -1,8 +1,10 @@
 ---
 import { render } from 'astro:content';
-import { publicPosts } from '../../lib/discovery/documents';
 import type { GetStaticPaths } from 'astro';
-import BlogLayout from '../../layouts/BlogLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { publicPosts } from '../../lib/discovery/documents';
+import { pageUrl } from '../../lib/site-origin';
 
 export const getStaticPaths = (async () => {
   const posts = await publicPosts();
@@ -10,47 +12,57 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { post } = Astro.props;
-const posts = await publicPosts();
-const position = posts.findIndex((entry) => entry.id === post.id);
-const newer = posts[position - 1];
-const older = posts[position + 1];
 const { Content, headings } = await render(post);
 const sections = headings.filter((heading) => heading.depth === 2);
+// Three related posts, ranked by shared tags.
+const related = (await publicPosts())
+  .filter((other) => other.id !== post.id)
+  .map((other) => ({
+    other,
+    score: other.data.tags.filter((tag) => post.data.tags.includes(tag)).length,
+  }))
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 3)
+  .map(({ other }) => other);
 const date = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',
-  month: 'long',
+  month: 'short',
   year: 'numeric',
   timeZone: 'UTC',
 });
+const published = date.format(post.data.date);
 ---
 
-<BlogLayout
+<BaseLayout
   title={`${post.data.title} · Tomas Brasca`}
   description={post.data.description}
   type="article"
+  articleKind="BlogPosting"
   headline={post.data.title}
   markdownPath={`/blog/${post.id}.md`}
   publishedTime={post.data.date.toISOString()}
 >
-  <article class="article-column" aria-labelledby="article-title">
-    <a class="article-back" href="/blog">← All articles</a>
-    <header class="article-head">
-      <p class="writing-eyebrow">{post.data.pillar}</p>
-      <h1 id="article-title">{post.data.title}</h1>
-      <p class="article-dek">{post.data.description}</p>
-      <div class="article-meta">
-        <span>Tomas Brasca</span>
-        <time datetime={post.data.date.toISOString()}>{date.format(post.data.date)}</time>
-        <span>{post.data.readingTime} read</span>
-      </div>
-    </header>
-    {
-      sections.length > 2 && (
-        <details class="article-contents">
-          <summary>
-            In this article <span>{sections.length} sections</span>
-          </summary>
-          <nav aria-label="Article contents">
+  <main id="main" tabindex="-1">
+    <div class="shell">
+      <header class="article-top">
+        <a class="back" href="/blog">← Back to the journal</a>
+        <p class="eyebrow">{post.data.pillar}</p>
+        <h1>{post.data.title}</h1>
+        <p class="dek">{post.data.description}</p>
+        <div class="article-meta">
+          <span>Tomas Brasca</span>
+          <time datetime={post.data.date.toISOString()}>{published}</time>
+          <span>{post.data.readingTime} read</span>
+        </div>
+      </header>
+    </div>
+    <article class="reading" data-progress>
+      {
+        sections.length > 2 && (
+          <details class="toc">
+            <summary>
+              In this article <span class="muted">/ {sections.length} sections</span>
+            </summary>
             <ol>
               {sections.map((heading) => (
                 <li>
@@ -58,55 +70,44 @@ const date = new Intl.DateTimeFormat('en-GB', {
                 </li>
               ))}
             </ol>
-          </nav>
-        </details>
-      )
-    }
-    <div class="prose"><Content /></div>
-    <footer class="article-foot">
-      {
-        post.data.tags.length > 0 && (
-          <nav class="article-tags" aria-label="Article topics">
-            <span>Topics</span>
-            {post.data.tags.map((tag: string) => (
-              <a href={`/blog?tag=${encodeURIComponent(tag)}`}>{tag.replaceAll('-', ' ')}</a>
-            ))}
-          </nav>
+          </details>
         )
       }
-      <nav class="reading-end" aria-label="After reading">
-        <a href="/blog">← All articles</a>
-        <a href="mailto:tomibrasca97@gmail.com">Discuss this article </a>
-      </nav>
-      <nav class="reading-neighbors" aria-label="More articles">
-        {
-          newer && (
-            <a href={`/blog/${newer.id}`}>
-              <span>← Newer article</span>
-              {newer.data.title}
-            </a>
-          )
-        }{
-          older && (
-            <a href={`/blog/${older.id}`}>
-              <span>Older article →</span>
-              {older.data.title}
-            </a>
-          )
-        }
-      </nav>
-    </footer>
-  </article>
-  <script is:inline>
-    document.querySelectorAll('.prose pre, .prose table').forEach((element) => {
-      element.setAttribute('tabindex', '0');
-      if (element.tagName === 'PRE') {
-        element.setAttribute('role', 'region');
-      }
-      element.setAttribute(
-        'aria-label',
-        element.tagName === 'PRE' ? 'Code example' : 'Article table',
-      );
-    });
-  </script>
-</BlogLayout>
+      <Content />
+    </article>
+    <section class="post-close" aria-label="After reading">
+      <div class="shell">
+        <div class="post-close-top">
+          <div>
+            <span class="meta">{published} / {post.data.readingTime} read</span>
+            <h3>A thought worth keeping?</h3>
+            <p>{post.data.tags.map((tag) => tag.replaceAll('-', ' ')).join(' / ')}</p>
+            <button
+              class="button"
+              type="button"
+              data-copy={pageUrl(`/blog/${post.id}`)}
+              data-copy-label="Copy article link"
+            >
+              Copy article link <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+          <div>
+            <p class="eyebrow">Written by Tomas Brasca</p>
+            <h3>Curious by default.</h3>
+            <p>
+              Full-stack engineer in Rosario. I build web and mobile products, the APIs behind them,
+              and AI systems that make them useful.
+            </p>
+            <a class="small-link" href="mailto:tomibrasca97@gmail.com"
+              >Continue the conversation ↗</a
+            >
+          </div>
+        </div>
+        <h2 class="related-title">Follow another thread.</h2>
+        <div class="post-grid">
+          {related.map((other) => <PostCard post={other} />)}
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

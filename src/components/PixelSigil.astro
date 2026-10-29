@@ -1,0 +1,35 @@
+---
+import { GLYPH, hash, random } from '../lib/flood/pixels';
+
+interface Props {
+  /** Seeds a mirrored 8×8 mark. Ignored when `star` is set. */
+  slug?: string;
+  /** Draw the ✳ wordmark glyph instead. */
+  star?: boolean;
+  class?: string;
+}
+
+const { slug = '', star = false, class: className } = Astro.props;
+const cells: { x: number; y: number }[] = [];
+if (star) {
+  GLYPH.forEach((row, y) => [...row].forEach((bit, x) => bit === '1' && cells.push({ x, y })));
+} else {
+  const rand = random(hash(slug));
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 4; x++) {
+      if (rand() > 0.46) cells.push({ x, y }, { x: 7 - x, y });
+    }
+  }
+}
+const side = star ? 7 : 8;
+---
+
+<svg
+  class:list={['pixel-sigil', className]}
+  viewBox={`0 0 ${side} ${side}`}
+  aria-hidden="true"
+  fill="currentColor"
+  shape-rendering="crispEdges"
+>
+  {cells.map(({ x, y }) => <rect x={x} y={y} width="1" height="1" />)}
+</svg>

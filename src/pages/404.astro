@@ -3,15 +3,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="404 · Tomas Brasca" description="Page not found." noindex={true}>
-  <main id="main" class="not-found shell">
-    <span class="label-chip">404 / Page not found</span><h1>
-      A little<br /><em>off course.</em>
-    </h1><p>
-      This page could not be found. Explore the work or find something to read in the journal.
-    </p><div>
-      <a class="underlined-link" href="/">Back to the work </a><a
-        class="underlined-link"
-        href="/blog">Visit the journal </a>
-    </div>
+  <main id="main" tabindex="-1">
+    <section class="not-found">
+      <canvas data-cave="lost-without-a-path" aria-hidden="true"></canvas>
+      <div class="shell">
+        <p class="eyebrow">404 / No path found</p>
+        <h1>A little<br />off course.</h1>
+        <p>
+          This path doesn’t lead to a page. There’s still plenty to explore: a useful project, a new
+          idea, or a way back to the beginning.
+        </p>
+        <a class="button primary" href="/">Find your way home ↗</a>
+        <a class="button" href="/blog">Visit the journal</a>
+      </div>
+    </section>
   </main>
 </BaseLayout>

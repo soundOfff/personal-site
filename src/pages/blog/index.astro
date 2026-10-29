@@ -1,17 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PixelSigil from '../../components/PixelSigil.astro';
+import PostCard from '../../components/PostCard.astro';
 import { publicPosts } from '../../lib/discovery/documents';
+import { PILLARS } from '../../lib/pillars';
 
 const posts = await publicPosts();
-const categories = [...new Set(posts.map((post) => post.data.pillar))];
-const date = new Intl.DateTimeFormat('en-GB', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'UTC',
-});
-
-const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+const topics = PILLARS.filter((pillar) => posts.some((post) => post.data.pillar === pillar));
 ---
 
 <BaseLayout
@@ -20,171 +15,108 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
   pageKind="CollectionPage"
   markdownPath="/blog/index.md"
 >
-  <main id="main">
-    <section class="journal-hero shell" aria-labelledby="journal-title">
-      <div class="hero-overline">
-        <span class="label-chip">Journal / Field notes</span><span>Writing by Tomas Brasca</span>
-      </div><div class="journal-hero-grid">
-        <h1 id="journal-title">Thinking<br /><em>out loud.</em></h1><div>
-          <span class="hero-mark" aria-hidden="true">✳</span><p>
-            Notes on building products, making systems behave, and learning what matters after the
-            demo.
-          </p><span class="journal-count"
-            >{posts.length} articles / {categories.length} themes</span>
+  <main id="main" tabindex="-1">
+    <div class="shell">
+      <header class="page-head">
+        <p class="eyebrow">The journal</p>
+        <h1>Thinking<br /><span class="ghost">out loud.</span></h1>
+        <div class="head-bottom">
+          <p>
+            Notes on software, algorithms, and the work<br />between an idea and something useful.
+          </p>
+          <span class="meta">{posts.length} articles / always learning</span>
         </div>
+      </header>
+      <div class="journal-controls">
+        <div class="chips" role="group" aria-label="Journal topics">
+          {
+            ['All', ...topics].map((topic, i) => (
+              <button
+                class="chip"
+                type="button"
+                data-topic={topic}
+                aria-pressed={i === 0 ? 'true' : 'false'}
+              >
+                {topic}
+              </button>
+            ))
+          }
+        </div>
+        <label class="search-wrap">
+          <span class="sr-only">Search article titles</span>
+          <span aria-hidden="true">⌕</span>
+          <input type="search" id="post-search" placeholder="Find a thought…" autocomplete="off" />
+          <button type="button" id="clear-search" aria-label="Clear search" hidden>×</button>
+        </label>
       </div>
-    </section>
-    <section class="journal-index shell" aria-labelledby="articles-title">
-      <div class="journal-index-title">
-        <span class="eyebrow">01 / The archive</span><h2 id="articles-title">
-          All articles<span class="blue-period">.</span>
-        </h2>
-      </div><div
-        class="journal-controls"
-        aria-label="Filter articles by topic"
-        data-topic-controls
-        hidden
-      >
-        <button type="button" class="filter-button" data-topic-choice="" aria-pressed="true"
-          >All <span>{posts.length}</span></button
-        >{
-          categories.map((category) => (
-            <button
-              type="button"
-              class="filter-button"
-              data-topic-choice={category}
-              aria-pressed="false"
-            >
-              {category} <span>{posts.filter((post) => post.data.pillar === category).length}</span>
-            </button>
-          ))
-        }<button type="button" class="reset-button" data-topic-reset hidden>Clear filter ↺</button>
-      </div><p class="result-count" data-topic-result role="status" aria-live="polite">
-        Showing all {posts.length} articles
-      </p><label class="tag-filter" data-tag-control hidden
-        >Topic <select data-tag-choice aria-controls="article-list"
-          ><option value="">All topics</option>{
-            tags.map((tag) => <option value={tag}>{tag.replaceAll('-', ' ')}</option>)
-          }</select
-        ></label
-      ><ol class="article-list" id="article-list">
-        {
-          posts.map((post, index) => (
-            <li
-              data-topic-category={post.data.pillar}
-              data-article-tags={JSON.stringify(post.data.tags)}
-            >
-              <article class="article-row">
-                <>
-                  <div class="article-meta">
-                    <>
-                      <span>
-                        {String(index + 1).padStart(2, '0')} / {post.data.pillar}
-                      </span>
-                      <time datetime={post.data.date.toISOString()}>
-                        {date.format(post.data.date)}
-                      </time>
-                    </>
-                  </div>
-                  <div class="article-content">
-                    <>
-                      <h3>
-                        <a href={`/blog/${post.id}`}>
-                          {post.data.title}
-
-                        </a>
-                      </h3>
-                      <p>{post.data.description}</p>
-                      <span class="read-time">{post.data.readingTime} read</span>
-                    </>
-                  </div>
-                </>
-              </article>
-            </li>
-          ))
-        }
-      </ol><p class="writing-empty" data-topic-empty hidden>
-        No articles match this topic. <a href="/blog">View all articles</a>.
-      </p>
-    </section>
-    <aside class="journal-outro shell">
-      <span class="hero-mark" aria-hidden="true">✳</span><p>
-        Interested in the projects behind these notes?
-      </p><a class="underlined-link" href="/#work"
-        >Explore selected work </a>
-    </aside>
+      <section class="journal-results" aria-label="Articles">
+        <div class="results-meta">
+          <span class="meta" id="post-count" role="status">{posts.length} articles</span>
+          <span class="meta muted">Newest first</span>
+        </div>
+        <div class="post-grid" id="post-grid">
+          {posts.map((post, i) => <PostCard post={post} featured={i < 2} />)}
+          <div class="empty" id="post-empty" hidden>
+            <PixelSigil star />
+            <h2>Nothing matches “<span id="empty-query"></span>”.</h2>
+            <p>Try another word, or explore all the articles.</p>
+            <button class="button" type="button" id="reset-search">Clear filters</button>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
 </BaseLayout>
 
 <script>
-  const topicChoices = Array.from(
-    document.querySelectorAll<HTMLButtonElement>('[data-topic-choice]'),
-  );
-  const articles = Array.from(document.querySelectorAll<HTMLElement>('[data-topic-category]'));
-  const result = document.querySelector<HTMLElement>('[data-topic-result]');
-  const reset = document.querySelector<HTMLButtonElement>('[data-topic-reset]');
-  const topicControls = document.querySelector<HTMLElement>('[data-topic-controls]');
-  const tagChoice = document.querySelector<HTMLSelectElement>('[data-tag-choice]');
-  const tagControl = document.querySelector<HTMLElement>('[data-tag-control]');
-  const empty = document.querySelector<HTMLElement>('[data-topic-empty]');
-  let selectedTag = new URLSearchParams(location.search).get('tag') ?? '';
-  if (tagChoice) {
-    if (
-      selectedTag &&
-      !Array.from(tagChoice.options).some((option) => option.value === selectedTag)
-    )
-      tagChoice.add(new Option(selectedTag.replaceAll('-', ' '), selectedTag));
-    tagChoice.value = selectedTag;
-  }
-  if (tagControl) tagControl.hidden = false;
-  let selectedCategory = '';
-  function showCategory() {
-    topicChoices.forEach((button) =>
-      button.setAttribute(
-        'aria-pressed',
-        String((button.dataset.topicChoice ?? '') === selectedCategory),
-      ),
+  const input = document.querySelector<HTMLInputElement>('#post-search')!;
+  const clear = document.querySelector<HTMLButtonElement>('#clear-search')!;
+  const count = document.querySelector<HTMLElement>('#post-count')!;
+  const empty = document.querySelector<HTMLElement>('#post-empty')!;
+  const emptyQuery = document.querySelector<HTMLElement>('#empty-query')!;
+  const cards = [...document.querySelectorAll<HTMLElement>('#post-grid .post-card')];
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-topic]')];
+  let topic = 'All';
+
+  function filter() {
+    const query = input.value.trim().toLowerCase();
+    const matches = cards.filter(
+      (card) =>
+        (topic === 'All' || card.dataset.pillar === topic) && card.dataset.title!.includes(query),
     );
-    const count = articles.reduce((visible, article) => {
-      const tags: string[] = JSON.parse(article.dataset.articleTags ?? '[]');
-      article.hidden =
-        (Boolean(selectedCategory) && article.dataset.topicCategory !== selectedCategory) ||
-        (Boolean(selectedTag) && !tags.includes(selectedTag));
-      return visible + Number(!article.hidden);
-    }, 0);
-    if (result)
-      result.textContent = selectedCategory
-        ? `Showing ${count} ${selectedCategory} article${count === 1 ? '' : 's'}`
-        : `Showing all ${count} articles`;
-    if (selectedTag && result)
-      result.textContent = `Showing ${count} article${count === 1 ? '' : 's'} about ${selectedTag.replaceAll('-', ' ')}`;
-    if (empty) empty.hidden = count !== 0;
-    if (reset) reset.hidden = !selectedCategory && !selectedTag;
+    // The two newest posts are featured only in the unfiltered view.
+    let featured = topic === 'All' && !query ? 2 : 0;
+    cards.forEach((card) => {
+      const match = matches.includes(card);
+      card.hidden = !match;
+      card.classList.toggle('featured', match && featured-- > 0);
+    });
+    count.textContent = `${matches.length} article${matches.length === 1 ? '' : 's'}`;
+    clear.hidden = !input.value;
+    empty.hidden = matches.length > 0;
+    emptyQuery.textContent = input.value || topic;
   }
-  if (topicControls) topicControls.hidden = false;
-  tagChoice?.addEventListener('change', () => {
-    selectedTag = tagChoice.value;
-    const url = new URL(location.href);
-    if (selectedTag) url.searchParams.set('tag', selectedTag);
-    else url.searchParams.delete('tag');
-    history.replaceState(null, '', url);
-    showCategory();
-  });
-  showCategory();
-  topicChoices.forEach((button) =>
-    button.addEventListener('click', () => {
-      selectedCategory = button.dataset.topicChoice ?? '';
-      showCategory();
+
+  function reset(all: boolean) {
+    input.value = '';
+    if (all) {
+      topic = 'All';
+      chips.forEach((chip) =>
+        chip.setAttribute('aria-pressed', String(chip.dataset.topic === 'All')),
+      );
+    }
+    filter();
+    input.focus();
+  }
+
+  input.addEventListener('input', filter);
+  clear.addEventListener('click', () => reset(false));
+  document.querySelector('#reset-search')!.addEventListener('click', () => reset(true));
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      topic = chip.dataset.topic!;
+      chips.forEach((other) => other.setAttribute('aria-pressed', String(other === chip)));
+      filter();
     }),
   );
-  reset?.addEventListener('click', () => {
-    selectedCategory = '';
-    selectedTag = '';
-    if (tagChoice) tagChoice.value = '';
-    const url = new URL(location.href);
-    url.searchParams.delete('tag');
-    history.replaceState(null, '', url);
-    showCategory();
-    topicChoices[0]?.focus();
-  });
 </script>

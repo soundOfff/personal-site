@@ -1,0 +1,64 @@
+---
+import { workSlug, type Project } from '../data/projects';
+import stories from '../data/project-stories.json';
+
+interface Props {
+  project: Project;
+  /** Selected-work cards also show the first stack tags. */
+  selected?: boolean;
+}
+
+const { project, selected = false } = Astro.props;
+const story = stories[project.id as keyof typeof stories];
+// The cursor scrubs through every screenshot the project has.
+const sources = [
+  ...new Set([project.image, ...(story?.media ?? []).map((media) => media.src)].filter(Boolean)),
+] as string[];
+const scrubs = sources.length > 1;
+---
+
+<a
+  class="work-card"
+  href={`/work/${workSlug(project)}`}
+  data-project={project.id}
+  data-category={project.category}
+>
+  <div class="project-media" data-scrub={scrubs ? JSON.stringify(sources) : undefined}>
+    {
+      project.image ? (
+        <>
+          <img class="media-backdrop" src={project.image} alt="" loading="lazy" decoding="async" />
+          <img
+            class="project-shot"
+            src={project.image}
+            alt={`${project.name} interface`}
+            loading="lazy"
+            decoding="async"
+          />
+        </>
+      ) : (
+        <>
+          <canvas class="generated-cover" data-cave={project.id} aria-hidden="true" />
+          <span class="generated-title">{project.name}</span>
+        </>
+      )
+    }
+    <span class="tag">{project.category}</span>
+    {
+      scrubs && (
+        <>
+          <span class="media-count">1 / {sources.length}</span>
+          <span class="scrub-bar" />
+        </>
+      )
+    }
+  </div>
+  <div class="card-copy">
+    <div class="card-title-row">
+      <h3>{project.name}</h3>
+      <span class="arrow" aria-hidden="true">↗</span>
+    </div>
+    <p>{project.description}</p>
+    {selected && <p class="meta">{project.stack.split(' · ').slice(0, 3).join(' / ')}</p>}
+  </div>
+</a>

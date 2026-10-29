@@ -1,0 +1,39 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import PixelSigil from './PixelSigil.astro';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  featured?: boolean;
+}
+
+const { post, featured = false } = Astro.props;
+const date = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+---
+
+<a
+  class:list={['post-card', { featured }]}
+  href={`/blog/${post.id}`}
+  data-post={post.id}
+  data-pillar={post.data.pillar}
+  data-title={post.data.title.toLowerCase()}
+>
+  <div class="post-card-top">
+    <PixelSigil slug={post.id} />
+    <span class="meta">
+      <time datetime={post.data.date.toISOString()}>{date.format(post.data.date)}</time><br />
+      {post.data.readingTime} read
+    </span>
+  </div>
+  <h3>{post.data.title}</h3>
+  <p>{post.data.description}</p>
+  <div class="post-card-bottom">
+    <span class="meta">{post.data.pillar}</span>
+    <span class="arrow" aria-hidden="true">↗</span>
+  </div>
+</a>

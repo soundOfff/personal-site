@@ -45,7 +45,7 @@ export default defineConfig({
         const path = new URL(page).pathname.replace(/\/$/, '') || '/';
         return (
           !/\.[^/]+$/.test(path) &&
-          (path === '/' || path === '/blog' || /^\/(blog|work|showcase)\/.+/.test(path))
+          (path === '/' || path === '/blog' || /^\/(blog|work)\/.+/.test(path))
         );
       },
     }),

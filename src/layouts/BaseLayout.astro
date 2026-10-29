@@ -9,10 +9,11 @@ import '@fontsource-variable/jetbrains-mono';
 import 'editorial-ui/tokens.css';
 import 'editorial-ui/styles.css';
 
-// The production site owns its palette, typography, and outer layout.
-import '../styles/pigment.css';
-import PigmentHeader from '../components/PigmentHeader.astro';
-import PigmentFooter from '../components/PigmentFooter.astro';
+// The flood-fill identity owns the palette, typography and outer layout. Must come last.
+import '../styles/flood.css';
+import FloodHeader from '../components/FloodHeader.astro';
+import FloodFooter from '../components/FloodFooter.astro';
+import { ARRIVAL_KEY } from '../lib/flood/transition-key';
 
 import { profile, contact } from '../data/site';
 import { pageUrl, siteUrl } from '../lib/site-origin';
@@ -204,12 +205,35 @@ const robots = noindex
 
     <!-- Structured data -->
     <script type="application/ld+json" is:inline set:html={jsonLd} />
+
+    <!-- Arriving mid route-transition: stay covered until the wave uncovers the page. -->
+    <script is:inline define:vars={{ key: ARRIVAL_KEY }}>
+      try {
+        const motion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const nav = performance.getEntriesByType('navigation')[0];
+        if (!motion && (sessionStorage.getItem(key) || nav?.type === 'back_forward')) {
+          document.documentElement.classList.add('flood-covered');
+        }
+      } catch {
+        /* ignore */
+      }
+    </script>
   </head>
-  <body class="pigment">
+  <body>
     <Fragment set:html={iconSprite} />
-    <a class="skip-link" href="#main">Skip to content</a>
-    <PigmentHeader />
+    <a class="skip" href="#main">Skip to content</a>
+    <div id="reading-progress" aria-hidden="true"></div>
+    <FloodHeader />
     <slot />
-    <PigmentFooter />
+    <FloodFooter />
+    <canvas id="transition" aria-hidden="true"></canvas>
+    <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+    <script>
+      import { initSite } from '../lib/flood/site';
+      import { initTransitions } from '../lib/flood/transition';
+
+      initTransitions();
+      initSite();
+    </script>
   </body>
 </html>

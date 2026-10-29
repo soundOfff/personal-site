@@ -1,0 +1,42 @@
+---
+const email = 'tomibrasca97@gmail.com';
+const links = [
+  { label: 'GitHub ↗', href: 'https://github.com/soundOfff', external: true },
+  { label: 'LinkedIn ↗', href: 'https://www.linkedin.com/in/tomasbrasca', external: true },
+  { label: 'Journal', href: '/blog' },
+  { label: 'RSS', href: '/rss.xml' },
+];
+---
+
+<footer id="contact" class="footer">
+  <div class="shell">
+    <div class="footer-main">
+      <div>
+        <p class="eyebrow">Have something in mind?</p>
+        <h2>Let’s make<br />it useful.</h2>
+        <div class="footer-links">
+          <button class="button" type="button" data-copy={email} data-copy-label="Copy email">
+            Copy email <span aria-hidden="true">↗</span>
+          </button>
+          {
+            links.map((link) => (
+              <a
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener' : undefined}
+              >
+                {link.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+      <canvas class="footer-art" aria-hidden="true"></canvas>
+    </div>
+    <div class="footer-bottom">
+      <span>© {new Date().getFullYear()} Tomas Brasca</span>
+      <span>Rosario, Argentina / UTC−3</span>
+      <button type="button" data-top>Back to top ↑</button>
+    </div>
+  </div>
+</footer>

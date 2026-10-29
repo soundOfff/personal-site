@@ -168,3 +168,6 @@ export const projects: Project[] = [
     image: null,
   },
 ];
+
+/** Case studies keep their original /work URL; every other project uses its id. */
+export const workSlug = (project: Project) => project.caseStudy?.split('/').pop() ?? project.id;
