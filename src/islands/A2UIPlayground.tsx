@@ -366,7 +366,6 @@ export default function A2UIPlayground() {
                       onClick={() => void ask(prompt)}
                     >
                       <span>{prompt}</span>
-
                     </button>
                   ))}
                 </div>

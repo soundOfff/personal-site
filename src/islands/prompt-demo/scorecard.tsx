@@ -86,7 +86,11 @@ function JudgeCard({ result, caseStudy }: { result: JudgeResult; caseStudy: Case
         {RUBRIC_CRITERIA.map((c) => {
           const raw = score.scores[c.key] ?? 0;
           return (
-            <div key={c.key} className="pb-criterion" title={`${c.label} — weight ${caseStudy.rubric[c.key]}`}>
+            <div
+              key={c.key}
+              className="pb-criterion"
+              title={`${c.label} — weight ${caseStudy.rubric[c.key]}`}
+            >
               <span className="pb-criterion-label">{c.label}</span>
               <span className="pb-criterion-bar">
                 <span className="pb-criterion-fill" style={{ width: `${(raw / 10) * 100}%` }} />

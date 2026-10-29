@@ -32,7 +32,9 @@ interface ParagraphProps {
 
 export function Paragraph({ content, align, muted }: ParagraphProps) {
   return (
-    <p className={cx('pb-paragraph', align === 'center' && 'pb-center', muted && 'pb-muted')}>{content}</p>
+    <p className={cx('pb-paragraph', align === 'center' && 'pb-center', muted && 'pb-muted')}>
+      {content}
+    </p>
   );
 }
 
@@ -49,7 +51,12 @@ export function Field({ label, type, placeholder, helpText, required }: FieldPro
     <label className="pb-field">
       <span className="pb-label">
         {label}
-        {required && <span className="pb-req" aria-hidden> *</span>}
+        {required && (
+          <span className="pb-req" aria-hidden>
+            {' '}
+            *
+          </span>
+        )}
       </span>
       {type === 'textarea' ? (
         <textarea className="pb-input pb-textarea" placeholder={placeholder} rows={3} readOnly />
@@ -180,7 +187,11 @@ interface ListProps {
   }>;
 }
 
-function listMarker(checked: boolean | undefined, ordered: boolean | undefined, index: number): string {
+function listMarker(
+  checked: boolean | undefined,
+  ordered: boolean | undefined,
+  index: number,
+): string {
   if (checked != null) return checked ? '✓' : '○';
   if (ordered) return `${index + 1}.`;
   return '•';
@@ -209,19 +220,35 @@ export function List({ title, ordered, items }: ListProps) {
 
 export function RenderedBlock({ block }: { block: GeneratedBlock }) {
   switch (block.component) {
-    case 'heading': return <Heading {...block.props} />;
-    case 'paragraph': return <Paragraph {...block.props} />;
-    case 'field': return <Field {...block.props} />;
-    case 'checkboxRow': return <CheckboxRow {...block.props} />;
-    case 'buttonRow': return <ButtonRow {...block.props} />;
-    case 'alert': return <Alert {...block.props} />;
-    case 'badgeRow': return <BadgeRow {...block.props} />;
-    case 'divider': return <Divider {...block.props} />;
-    case 'priceTag': return <PriceTag {...block.props} />;
-    case 'list': return <List {...block.props} />;
+    case 'heading':
+      return <Heading {...block.props} />;
+    case 'paragraph':
+      return <Paragraph {...block.props} />;
+    case 'field':
+      return <Field {...block.props} />;
+    case 'checkboxRow':
+      return <CheckboxRow {...block.props} />;
+    case 'buttonRow':
+      return <ButtonRow {...block.props} />;
+    case 'alert':
+      return <Alert {...block.props} />;
+    case 'badgeRow':
+      return <BadgeRow {...block.props} />;
+    case 'divider':
+      return <Divider {...block.props} />;
+    case 'priceTag':
+      return <PriceTag {...block.props} />;
+    case 'list':
+      return <List {...block.props} />;
   }
 }
 
 export function RenderedUI({ blocks }: { blocks: GeneratedBlock[] }) {
-  return <div className="pb-canvas-stack">{blocks.map((block, index) => <RenderedBlock key={index} block={block} />)}</div>;
+  return (
+    <div className="pb-canvas-stack">
+      {blocks.map((block, index) => (
+        <RenderedBlock key={index} block={block} />
+      ))}
+    </div>
+  );
 }

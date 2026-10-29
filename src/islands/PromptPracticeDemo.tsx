@@ -120,7 +120,14 @@ export default function PromptPracticeDemo() {
       )}
 
       {!selectedCaseId && (
-        <div style={{ textAlign: 'center', color: 'var(--muted)', padding: '40px 0', fontSize: '14px' }}>
+        <div
+          style={{
+            textAlign: 'center',
+            color: 'var(--muted)',
+            padding: '40px 0',
+            fontSize: '14px',
+          }}
+        >
           Select a case study above to begin the demo.
         </div>
       )}

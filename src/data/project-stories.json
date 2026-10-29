@@ -9,11 +9,7 @@
       "Worked across inventory and checkout APIs, Postgres and React storefront components.",
       "Separated fast browsing from the stricter checks needed when an order is placed."
     ],
-    "flow": [
-      "Browse the catalog",
-      "Validate stock and checkout",
-      "Record the order"
-    ],
+    "flow": ["Browse the catalog", "Validate stock and checkout", "Record the order"],
     "media": [],
     "note": "Brand-inspired cover. My contribution was product and backend engineering; this cover is not a screenshot of work I designed. The detailed case study is a narrative account.",
     "demo": null
@@ -28,11 +24,7 @@
       "Helped route tasks across OpenAI, Groq and OpenRouter.",
       "Used task-specific evaluations to decide which model could handle a request."
     ],
-    "flow": [
-      "Understand the task",
-      "Choose a capable model",
-      "Evaluate the result"
-    ],
+    "flow": ["Understand the task", "Choose a capable model", "Evaluate the result"],
     "media": [
       {
         "src": "/previews/dex.webp",
@@ -52,11 +44,7 @@
       "Connected concept notes to timestamps and a local IndexedDB notebook.",
       "Added learning blocks, cited web context, library search and notebook export."
     ],
-    "flow": [
-      "Start capture on a lecture",
-      "Read timestamped concepts",
-      "Review the notebook"
-    ],
+    "flow": ["Start capture on a lecture", "Read timestamped concepts", "Review the notebook"],
     "media": [
       {
         "src": "/previews/sift/01-notes-beside-the-lecture.png",
@@ -107,11 +95,7 @@
       "Collected component structure, styles and assets into a local library.",
       "Added a preview and detail view so a captured component can be inspected and reused as a reference."
     ],
-    "flow": [
-      "Select a component",
-      "Capture it with context",
-      "Inspect it in the library"
-    ],
+    "flow": ["Select a component", "Capture it with context", "Inspect it in the library"],
     "media": [],
     "note": "Recorded from the actual extension. The recording shows the capture workflow on a demonstration page and a public website.",
     "demo": "/demos/catcher.mp4"
@@ -126,11 +110,7 @@
       "Designed goal-based focus sessions and their review flow.",
       "Connected optional AI session reports and active recall with a Preact, Effect, Hono and SQLite stack."
     ],
-    "flow": [
-      "Save a passage",
-      "Work with a clear goal",
-      "Review and recall"
-    ],
+    "flow": ["Save a passage", "Work with a clear goal", "Review and recall"],
     "media": [
       {
         "src": "/previews/focus-quote.png",
@@ -162,11 +142,7 @@
       "Implemented acknowledge, assign, escalate, note and resolve actions with an incident timeline.",
       "Added escalation policies, on-call rotations and temporary schedule overrides in React and Django."
     ],
-    "flow": [
-      "Receive and deduplicate events",
-      "Assign and acknowledge",
-      "Resolve with a timeline"
-    ],
+    "flow": ["Receive and deduplicate events", "Assign and acknowledge", "Resolve with a timeline"],
     "media": [],
     "note": "Illustrated product cover. The local application uses a Django API and MongoDB; the portfolio does not connect to an incident workspace.",
     "demo": null
@@ -181,11 +157,7 @@
       "Used frozen CLIP embeddings with a small trainable taste model.",
       "Tracked provenance and per-image license evidence, with a review queue for uncertain material."
     ],
-    "flow": [
-      "Collect with provenance",
-      "Score against personal labels",
-      "Curate and publish"
-    ],
+    "flow": ["Collect with provenance", "Score against personal labels", "Curate and publish"],
     "media": [],
     "note": "Concept cover. The full pipeline needs its scoring service, storage and a trained taste model; no live archive or ranking is claimed here.",
     "demo": null
@@ -219,11 +191,7 @@
       "Brought the experience together around a readable brief before a meeting.",
       "Helped bring Dana from product development to launch."
     ],
-    "flow": [
-      "Connect meeting context",
-      "Gather relevant information",
-      "Read the brief"
-    ],
+    "flow": ["Connect meeting context", "Gather relevant information", "Read the brief"],
     "media": [
       {
         "src": "/previews/dana.png",
@@ -243,11 +211,7 @@
       "Restricted generation to a whitelisted component catalog rather than arbitrary markup.",
       "Added a deterministic demo mode with sample generation and judge responses, so the flow can run without paid model calls."
     ],
-    "flow": [
-      "Read the brief",
-      "Compose the interface",
-      "Inspect the judge panel"
-    ],
+    "flow": ["Read the brief", "Compose the interface", "Inspect the judge panel"],
     "media": [],
     "note": "The local interactive demo uses canned model responses. Its score is sample data, not an evaluation of the prompt you type. Multiplayer is not implemented.",
     "demo": null
@@ -262,11 +226,7 @@
       "Translated viewing signals into reusable colour and lighting rules.",
       "Composed sanitised SVG scenes into a print-ready PDF, with intermediate artifacts saved for inspection."
     ],
-    "flow": [
-      "Read the viewing diary",
-      "Build a shared visual language",
-      "Compose the booklet"
-    ],
+    "flow": ["Read the viewing diary", "Build a shared visual language", "Compose the booklet"],
     "media": [
       {
         "src": "/previews/letterboxd/scene-1.svg",
@@ -302,11 +262,7 @@
       "Mapped structured model output to a constrained A2UI component catalog.",
       "Connected the experience to the same project and writing data used by the site."
     ],
-    "flow": [
-      "Ask about the work",
-      "Validate structured output",
-      "Render the relevant components"
-    ],
+    "flow": ["Ask about the work", "Validate structured output", "Render the relevant components"],
     "media": [],
     "note": "The live playground uses the existing backend configuration. The project showcase stays available without starting a model request.",
     "demo": null

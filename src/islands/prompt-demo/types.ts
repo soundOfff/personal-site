@@ -1,5 +1,16 @@
 import type { ComponentProps } from 'react';
-import type { Heading, Paragraph, Field, CheckboxRow, ButtonRow, Alert, BadgeRow, Divider, PriceTag, List } from './blocks';
+import type {
+  Heading,
+  Paragraph,
+  Field,
+  CheckboxRow,
+  ButtonRow,
+  Alert,
+  BadgeRow,
+  Divider,
+  PriceTag,
+  List,
+} from './blocks';
 
 /**
  * Type definitions adapted from /Users/User/Tomi/gen-ui/60-seconds/game/types.ts
@@ -31,7 +42,7 @@ type BlockProps = {
   list: ComponentProps<typeof List>;
 };
 export type GeneratedBlock = {
-  [Name in keyof BlockProps]: { component: Name; props: BlockProps[Name] }
+  [Name in keyof BlockProps]: { component: Name; props: BlockProps[Name] };
 }[keyof BlockProps];
 
 export interface JudgeScore {
