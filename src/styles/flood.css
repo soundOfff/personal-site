@@ -608,10 +608,6 @@ main:focus {
   line-height: 1.6;
   color: var(--muted);
 }
-.arrow {
-  font-size: 24px;
-  font-weight: 300;
-}
 
 /* Experience band: full-bleed cobalt with stepped, dithered edges. */
 

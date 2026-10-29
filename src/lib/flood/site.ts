@@ -294,7 +294,7 @@ async function copy(button: HTMLButtonElement) {
     button.textContent = 'Copied ✓';
     announcer()!.textContent = 'Copied to clipboard';
     setTimeout(() => {
-      if (button.isConnected) button.innerHTML = `${label} <span aria-hidden="true">↗</span>`;
+      if (button.isConnected) button.textContent = label;
     }, 2500);
   } catch {
     // No clipboard access: hand over a selected field instead.

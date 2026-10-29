@@ -1,6 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="5" fill="#f7f3e9" />
-  <g stroke="#0024cc" stroke-width="1.8" stroke-linecap="square">
-    <path d="M16 5v22M5 16h22M8.2 8.2l15.6 15.6M8.2 23.8 23.8 8.2" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 9" width="32" height="32" shape-rendering="crispEdges">
+  <!-- The ✳ wordmark glyph from src/lib/flood/pixels.ts, one cell per unit. -->
+  <rect width="9" height="9" fill="#f7f3e9" />
+  <path fill="#0024cc" d="M4 1h1v1h-1z M2 2h1v1h-1z M4 2h1v1h-1z M6 2h1v1h-1z M3 3h1v1h-1z M4 3h1v1h-1z M5 3h1v1h-1z M1 4h1v1h-1z M2 4h1v1h-1z M3 4h1v1h-1z M4 4h1v1h-1z M5 4h1v1h-1z M6 4h1v1h-1z M7 4h1v1h-1z M3 5h1v1h-1z M4 5h1v1h-1z M5 5h1v1h-1z M2 6h1v1h-1z M4 6h1v1h-1z M6 6h1v1h-1z M4 7h1v1h-1z" />
 </svg>

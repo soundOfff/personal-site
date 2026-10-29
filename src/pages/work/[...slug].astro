@@ -48,7 +48,7 @@ const website = project.website === '#playground' ? '/#playground' : project.web
             {
               project.id === 'a2ui' && (
                 <a class="button primary" href="/#playground">
-                  Open the playground ↗
+                  Open the playground
                 </a>
               )
             }
@@ -60,21 +60,21 @@ const website = project.website === '#playground' ? '/#playground' : project.web
                   target="_blank"
                   rel="noopener"
                 >
-                  Open the full booklet ↗
+                  Open the full booklet
                 </a>
               )
             }
             {
               website && project.id !== 'a2ui' && (
                 <a class="button" href={website} target="_blank" rel="noopener">
-                  Visit project ↗
+                  Visit project
                 </a>
               )
             }
             {
               project.source && (
                 <a class="button" href={project.source} target="_blank" rel="noopener">
-                  View source ↗
+                  View source
                 </a>
               )
             }
