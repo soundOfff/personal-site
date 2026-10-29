@@ -1,0 +1,79 @@
+<svg viewBox="0 0 1200 900" width="1200" height="900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sky-3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F3A5F"/><stop offset="1" stop-color="#6B3F5C"/></linearGradient><linearGradient id="accentGrad-3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8A23D"/><stop offset="1" stop-color="#C1443B"/></linearGradient><radialGradient id="horizonGlow-3" cx="0.5" cy="0.72" r="0.6"><stop offset="0" stop-color="#F4D35E" stop-opacity="1"/><stop offset="1" stop-color="#F4D35E" stop-opacity="0"/></radialGradient><radialGradient id="__vignette-3" cx="0.5" cy="0.44" r="0.75"><stop offset="0.55" stop-color="#1B1B22" stop-opacity="0"/><stop offset="1" stop-color="#1B1B22" stop-opacity="1"/></radialGradient><pattern id="__grain-3" width="90" height="90" patternUnits="userSpaceOnUse"><circle cx="50.699" cy="36.888" r="0.867" fill="#1B1B22" opacity="0.292"/><circle cx="46.068" cy="60.618" r="1.217" fill="#F4D35E" opacity="0.56"/><circle cx="58.189" cy="58.523" r="1.116" fill="#F4D35E" opacity="0.414"/><circle cx="56.944" cy="29.057" r="0.937" fill="#F4D35E" opacity="0.605"/><circle cx="55.468" cy="0.943" r="1.109" fill="#1B1B22" opacity="0.65"/><circle cx="50.466" cy="16.614" r="0.695" fill="#1B1B22" opacity="0.28"/><circle cx="65.318" cy="65.959" r="1.384" fill="#F4D35E" opacity="0.517"/><circle cx="45.508" cy="20.635" r="1.045" fill="#1B1B22" opacity="0.448"/><circle cx="53.394" cy="26.554" r="1.379" fill="#1B1B22" opacity="0.3"/><circle cx="35.827" cy="30.97" r="1.152" fill="#F4D35E" opacity="0.467"/><circle cx="38.798" cy="10.687" r="0.963" fill="#1B1B22" opacity="0.647"/><circle cx="49.341" cy="60.977" r="0.848" fill="#F4D35E" opacity="0.555"/><circle cx="58.707" cy="44.7" r="0.74" fill="#F4D35E" opacity="0.403"/><circle cx="21.134" cy="64.083" r="0.844" fill="#F4D35E" opacity="0.297"/><circle cx="74.126" cy="44.91" r="0.815" fill="#F4D35E" opacity="0.429"/><circle cx="32.833" cy="65.287" r="0.976" fill="#1B1B22" opacity="0.574"/><circle cx="81.633" cy="40.063" r="0.905" fill="#1B1B22" opacity="0.4"/><circle cx="83.025" cy="67.423" r="0.743" fill="#1B1B22" opacity="0.334"/><circle cx="15.509" cy="54.396" r="1.084" fill="#F4D35E" opacity="0.571"/><circle cx="29.021" cy="73.427" r="0.705" fill="#1B1B22" opacity="0.611"/><circle cx="59.773" cy="89.863" r="0.549" fill="#1B1B22" opacity="0.357"/><circle cx="89.819" cy="25.091" r="0.827" fill="#1B1B22" opacity="0.36"/><circle cx="29.77" cy="22.779" r="0.731" fill="#1B1B22" opacity="0.512"/><circle cx="25.571" cy="19.883" r="0.594" fill="#F4D35E" opacity="0.579"/><circle cx="78.761" cy="8.469" r="0.776" fill="#1B1B22" opacity="0.45"/><circle cx="88.978" cy="68.835" r="0.856" fill="#1B1B22" opacity="0.617"/><circle cx="56.373" cy="75.51" r="1.036" fill="#1B1B22" opacity="0.588"/><circle cx="33.202" cy="10.721" r="0.669" fill="#F4D35E" opacity="0.47"/><circle cx="51.946" cy="31.209" r="0.932" fill="#1B1B22" opacity="0.578"/><circle cx="77.262" cy="47.513" r="1.093" fill="#F4D35E" opacity="0.524"/><circle cx="60.16" cy="22.4" r="1.069" fill="#1B1B22" opacity="0.527"/><circle cx="68.624" cy="79.157" r="0.663" fill="#1B1B22" opacity="0.335"/><circle cx="35.383" cy="20.252" r="0.507" fill="#1B1B22" opacity="0.282"/><circle cx="2.192" cy="51.246" r="0.915" fill="#1B1B22" opacity="0.514"/><circle cx="40.344" cy="77.389" r="1.228" fill="#1B1B22" opacity="0.516"/><circle cx="4.938" cy="65.07" r="1.387" fill="#F4D35E" opacity="0.578"/><circle cx="60.931" cy="54.213" r="1.315" fill="#F4D35E" opacity="0.353"/><circle cx="1.314" cy="47.685" r="1.003" fill="#1B1B22" opacity="0.405"/><circle cx="43.667" cy="52.446" r="0.916" fill="#F4D35E" opacity="0.284"/><circle cx="52.058" cy="14.243" r="1.268" fill="#F4D35E" opacity="0.398"/><circle cx="72.859" cy="74.962" r="0.712" fill="#F4D35E" opacity="0.329"/><circle cx="7.149" cy="68.737" r="0.714" fill="#1B1B22" opacity="0.359"/><circle cx="45.953" cy="61.734" r="1.326" fill="#F4D35E" opacity="0.443"/><circle cx="0.788" cy="62.292" r="0.551" fill="#F4D35E" opacity="0.281"/><circle cx="88.125" cy="69.767" r="0.538" fill="#F4D35E" opacity="0.317"/><circle cx="37.703" cy="36.848" r="1.187" fill="#F4D35E" opacity="0.435"/><circle cx="79.102" cy="45.291" r="0.7" fill="#F4D35E" opacity="0.498"/><circle cx="78.596" cy="7.052" r="0.751" fill="#F4D35E" opacity="0.326"/><circle cx="38.434" cy="1.993" r="1.394" fill="#F4D35E" opacity="0.291"/><circle cx="23.569" cy="31.533" r="1.022" fill="#F4D35E" opacity="0.49"/><circle cx="35.842" cy="48.935" r="0.585" fill="#1B1B22" opacity="0.412"/><circle cx="87.883" cy="67.118" r="1.394" fill="#F4D35E" opacity="0.402"/><circle cx="48.115" cy="48.819" r="1.308" fill="#F4D35E" opacity="0.443"/><circle cx="28.342" cy="10.235" r="0.76" fill="#F4D35E" opacity="0.575"/><circle cx="15.396" cy="79.133" r="1.136" fill="#1B1B22" opacity="0.591"/><circle cx="3.942" cy="69.647" r="1.219" fill="#F4D35E" opacity="0.493"/><circle cx="14.683" cy="75.716" r="1.122" fill="#F4D35E" opacity="0.525"/><circle cx="55.719" cy="82.578" r="1.353" fill="#1B1B22" opacity="0.442"/><circle cx="47.774" cy="9.189" r="1.391" fill="#F4D35E" opacity="0.423"/><circle cx="79.208" cy="19.803" r="0.854" fill="#1B1B22" opacity="0.431"/><circle cx="19.646" cy="86.713" r="0.807" fill="#F4D35E" opacity="0.465"/><circle cx="84.045" cy="24.402" r="1.118" fill="#1B1B22" opacity="0.368"/><circle cx="76.626" cy="34.132" r="1.386" fill="#1B1B22" opacity="0.423"/><circle cx="3.61" cy="54.695" r="1.082" fill="#1B1B22" opacity="0.458"/><circle cx="84.422" cy="33.938" r="0.538" fill="#F4D35E" opacity="0.258"/><circle cx="45.104" cy="18.618" r="0.701" fill="#1B1B22" opacity="0.395"/><circle cx="82.261" cy="12.346" r="1.293" fill="#F4D35E" opacity="0.389"/><circle cx="20.138" cy="33.187" r="0.529" fill="#1B1B22" opacity="0.405"/><circle cx="79.672" cy="23.333" r="1.369" fill="#1B1B22" opacity="0.369"/><circle cx="24.081" cy="50.59" r="0.886" fill="#1B1B22" opacity="0.388"/></pattern><symbol id="figure-3" viewBox="0 0 100 200" overflow="visible"><g fill="#2B2438"><path d="M35,54 C36,46 42,42 50,42 C58,42 64,46 65,54 L70,150 L30,150 Z"/><path d="M38,150 L49,150 L54,196 L46,196 Z"/><path d="M52,150 L63,150 L58,196 L50,196 Z"/><circle cx="50" cy="30" r="14"/><ellipse cx="50" cy="19" rx="24" ry="5"/><path d="M38,19 C38,8 44,4 50,4 C56,4 62,8 62,19 Z"/></g></symbol></defs><rect width="1200" height="900" fill="#EFE6D4"/><g><!-- sky -->
+<rect x="0" y="0" width="1200" height="900" fill="url(#sky-3)"/>
+
+<!-- warm flat color block behind the ancient tree, the one and only such block -->
+<circle cx="600" cy="430" r="380" fill="#E8A23D"/>
+
+<!-- distant soft hills for depth -->
+<path d="M0,560 Q200,500 400,560 T800,560 T1200,540 L1200,650 L0,650 Z" fill="#9CA9B7" opacity="0.5"/>
+
+<!-- ground -->
+<rect x="0" y="650" width="1200" height="250" fill="#6B3F5C"/>
+<rect x="0" y="650" width="1200" height="14" fill="#2B2438"/>
+
+<!-- shadow pooled beneath the huge tree -->
+<ellipse cx="600" cy="668" rx="220" ry="26" fill="#1B1B22" opacity="0.3"/>
+
+<!-- THE 900-YEAR-OLD HORNED TREE: massive trunk -->
+<path d="M555,660 L560,300 Q600,270 640,300 L645,660 Z" fill="#1B1B22"/>
+
+<!-- gnarled root flare -->
+<path d="M540,660 Q560,610 575,600 L625,600 Q640,610 660,660 Z" fill="#1B1B22"/>
+
+<!-- antler-branches, logo-clean geometry gone feral -->
+<path d="M600,300 L430,160" stroke="#1B1B22" stroke-width="20" stroke-linecap="round" fill="none"/>
+<path d="M430,160 L340,60" stroke="#1B1B22" stroke-width="12" stroke-linecap="round" fill="none"/>
+<path d="M430,160 L390,40" stroke="#1B1B22" stroke-width="10" stroke-linecap="round" fill="none"/>
+<path d="M600,300 L770,160" stroke="#1B1B22" stroke-width="20" stroke-linecap="round" fill="none"/>
+<path d="M770,160 L860,60" stroke="#1B1B22" stroke-width="12" stroke-linecap="round" fill="none"/>
+<path d="M770,160 L810,40" stroke="#1B1B22" stroke-width="10" stroke-linecap="round" fill="none"/>
+<path d="M600,300 L600,120" stroke="#1B1B22" stroke-width="18" stroke-linecap="round" fill="none"/>
+<path d="M600,120 L540,30" stroke="#1B1B22" stroke-width="10" stroke-linecap="round" fill="none"/>
+<path d="M600,120 L660,30" stroke="#1B1B22" stroke-width="10" stroke-linecap="round" fill="none"/>
+
+<!-- antler tine tips -->
+<circle cx="340,60" r="0" fill="none"/>
+<polygon points="340,60 330,40 350,45" fill="#1B1B22"/>
+<polygon points="390,40 380,20 400,25" fill="#1B1B22"/>
+<polygon points="860,60 870,40 850,45" fill="#1B1B22"/>
+<polygon points="810,40 820,20 800,25" fill="#1B1B22"/>
+<polygon points="540,30 530,10 550,15" fill="#1B1B22"/>
+<polygon points="660,30 670,10 650,15" fill="#1B1B22"/>
+
+<!-- tiny critic figure gazing up at the base of the tree -->
+<use href="#figure-3" x="500" y="580" width="42" height="84"/>
+<ellipse cx="521" cy="666" rx="26" ry="6" fill="#1B1B22" opacity="0.3"/>
+
+<!-- piano off to the side -->
+<path d="M880,700 Q880,640 960,635 L1120,635 Q1150,635 1150,690 L1150,770 L880,770 Z" fill="#1B1B22"/>
+<rect x="880" y="770" width="270" height="14" fill="#1B1B22"/>
+<rect x="900" y="784" width="12" height="30" fill="#1B1B22"/>
+<rect x="1030" y="784" width="12" height="30" fill="#1B1B22"/>
+<rect x="1120" y="784" width="12" height="30" fill="#1B1B22"/>
+<rect x="900" y="700" width="150" height="18" fill="#EFE6D4"/>
+<rect x="900" y="700" width="150" height="18" fill="none" stroke="#1B1B22" stroke-width="2"/>
+<!-- keys -->
+<rect x="905" y="702" width="10" height="14" fill="#1B1B22"/>
+<rect x="925" y="702" width="10" height="14" fill="#1B1B22"/>
+<rect x="945" y="702" width="10" height="14" fill="#1B1B22"/>
+<rect x="965" y="702" width="10" height="14" fill="#1B1B22"/>
+<rect x="985" y="702" width="10" height="14" fill="#1B1B22"/>
+<rect x="1005" y="702" width="10" height="14" fill="#1B1B22"/>
+<rect x="1025" y="702" width="10" height="14" fill="#1B1B22"/>
+
+<!-- Léa Seydoux silhouette at the keys -->
+<use href="#figure-3" x="820" y="600" width="60" height="120" transform="translate(1700,0) scale(-1,1)"/>
+
+<!-- floating musical notes -->
+<circle cx="1000" cy="580" r="7" fill="#F4D35E"/>
+<line x1="1007" y1="580" x2="1007" y2="540" stroke="#F4D35E" stroke-width="3"/>
+<circle cx="1040" cy="560" r="6" fill="#F4D35E"/>
+<line x1="1046" y1="560" x2="1046" y2="525" stroke="#F4D35E" stroke-width="3"/>
+<circle cx="1075" cy="600" r="6" fill="#F4D35E"/>
+<line x1="1081" y1="600" x2="1081" y2="565" stroke="#F4D35E" stroke-width="3"/>
+
+<!-- 4.5 star review badge -->
+<circle cx="1110" cy="90" r="70" fill="#C1443B"/>
+<circle cx="1110" cy="90" r="70" fill="none" stroke="#1B1B22" stroke-width="4"/>
+<text x="1110" y="82" font-family="Helvetica, Arial, sans-serif" font-size="34" font-weight="700" text-anchor="middle" fill="#1B1B22">4.5</text>
+<text x="1110" y="112" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#1B1B22">STARS</text></g><rect width="1200" height="900" fill="#9CA9B7" opacity="0.032"/><rect width="1200" height="900" fill="#F4D35E" opacity="0.153"/><rect width="1200" height="900" fill="url(#horizonGlow-3)" opacity="0.45"/><rect width="1200" height="900" fill="url(#__vignette-3)" opacity="0.42"/><rect width="1200" height="900" fill="url(#__grain-3)" opacity="0.5"/></svg>

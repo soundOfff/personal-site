@@ -1,0 +1,212 @@
+[
+  {
+    "name": "skills",
+    "description": "",
+    "url": "https://github.com/soundOfff/skills",
+    "homepageUrl": ""
+  },
+  {
+    "name": "soundOfff",
+    "description": "",
+    "url": "https://github.com/soundOfff/soundOfff",
+    "homepageUrl": ""
+  },
+  {
+    "name": "personal-site",
+    "description": "",
+    "url": "https://github.com/soundOfff/personal-site",
+    "homepageUrl": ""
+  },
+  {
+    "name": "second-brain",
+    "description": "",
+    "url": "https://github.com/soundOfff/second-brain",
+    "homepageUrl": ""
+  },
+  {
+    "name": "pathproof",
+    "description": "",
+    "url": "https://github.com/soundOfff/pathproof",
+    "homepageUrl": ""
+  },
+  {
+    "name": "zonaprop-mcp",
+    "description": "",
+    "url": "https://github.com/soundOfff/zonaprop-mcp",
+    "homepageUrl": ""
+  },
+  {
+    "name": "focus-quote",
+    "description": "",
+    "url": "https://github.com/soundOfff/focus-quote",
+    "homepageUrl": ""
+  },
+  {
+    "name": "hacker-rank-hackathon",
+    "description": "",
+    "url": "https://github.com/soundOfff/hacker-rank-hackathon",
+    "homepageUrl": ""
+  },
+  {
+    "name": "editorial-ui",
+    "description": "",
+    "url": "https://github.com/soundOfff/editorial-ui",
+    "homepageUrl": ""
+  },
+  {
+    "name": "ascendancy-take-home",
+    "description": "",
+    "url": "https://github.com/soundOfff/ascendancy-take-home",
+    "homepageUrl": ""
+  },
+  {
+    "name": "code-problems",
+    "description": "Recopilation of coding challenges from leetcode, code wars, beecrowd and codeforces.",
+    "url": "https://github.com/soundOfff/code-problems",
+    "homepageUrl": ""
+  },
+  {
+    "name": "config",
+    "description": "A collection of configuration files and scripts to quickly set up and replicate my Linux development environment. Includes window manager settings, status bar customization, shell configuration, and project bootstrapping utilities.",
+    "url": "https://github.com/soundOfff/config",
+    "homepageUrl": ""
+  },
+  {
+    "name": "monogame-space-invader",
+    "description": "This project is an implementation of the classic arcade game Space Invaders (Taito, 1978) as an academic assignment. The goal is to apply object-oriented programming concepts and the .NET ecosystem in the context of game development with MonoGame.",
+    "url": "https://github.com/soundOfff/monogame-space-invader",
+    "homepageUrl": ""
+  },
+  {
+    "name": "twitter-clone",
+    "description": "",
+    "url": "https://github.com/soundOfff/twitter-clone",
+    "homepageUrl": ""
+  },
+  {
+    "name": "command-pal",
+    "description": "Just testing claude",
+    "url": "https://github.com/soundOfff/command-pal",
+    "homepageUrl": ""
+  },
+  {
+    "name": "blockchain-indexer",
+    "description": "",
+    "url": "https://github.com/soundOfff/blockchain-indexer",
+    "homepageUrl": ""
+  },
+  {
+    "name": "go-service",
+    "description": "",
+    "url": "https://github.com/soundOfff/go-service",
+    "homepageUrl": ""
+  },
+  {
+    "name": "advent-of-code",
+    "description": "https://adventofcode.com/",
+    "url": "https://github.com/soundOfff/advent-of-code",
+    "homepageUrl": "https://adventofcode.com/"
+  },
+  {
+    "name": "algo-trading-fix",
+    "description": "Practice repository for exploring the FIX protocol and messaging for algorithmic trading systems.",
+    "url": "https://github.com/soundOfff/algo-trading-fix",
+    "homepageUrl": ""
+  },
+  {
+    "name": "tc-gts-contest",
+    "description": "",
+    "url": "https://github.com/soundOfff/tc-gts-contest",
+    "homepageUrl": ""
+  },
+  {
+    "name": "proyecto-final",
+    "description": "",
+    "url": "https://github.com/soundOfff/proyecto-final",
+    "homepageUrl": ""
+  },
+  {
+    "name": "country-app-back",
+    "description": "",
+    "url": "https://github.com/soundOfff/country-app-back",
+    "homepageUrl": ""
+  },
+  {
+    "name": "country-app-front",
+    "description": "",
+    "url": "https://github.com/soundOfff/country-app-front",
+    "homepageUrl": ""
+  },
+  {
+    "name": "go-lambda-cdk",
+    "description": "Lambda functions in Go",
+    "url": "https://github.com/soundOfff/go-lambda-cdk",
+    "homepageUrl": ""
+  },
+  {
+    "name": "MA_Production_Test",
+    "description": "",
+    "url": "https://github.com/soundOfff/MA_Production_Test",
+    "homepageUrl": ""
+  },
+  {
+    "name": "laravel-practice",
+    "description": "Proyect from the course Laravel-from-scratch in Laracast.com",
+    "url": "https://github.com/soundOfff/laravel-practice",
+    "homepageUrl": ""
+  },
+  {
+    "name": "vue3-practice",
+    "description": "",
+    "url": "https://github.com/soundOfff/vue3-practice",
+    "homepageUrl": ""
+  },
+  {
+    "name": "php_practica",
+    "description": "Proyecto de practica siguiendo: https://laracasts.com/series/php-for-beginners-2023-edition",
+    "url": "https://github.com/soundOfff/php_practica",
+    "homepageUrl": ""
+  },
+  {
+    "name": "portfolio",
+    "description": "This is the repository for my personal portfolio, which showcases the projects and things that I have done.",
+    "url": "https://github.com/soundOfff/portfolio",
+    "homepageUrl": "https://portfolio-soundofff.vercel.app"
+  },
+  {
+    "name": "template-page",
+    "description": "This repository is for upload my first page created with HTML + Tailwind CSS.",
+    "url": "https://github.com/soundOfff/template-page",
+    "homepageUrl": ""
+  },
+  {
+    "name": "poc-restify",
+    "description": "Repositorio creado para guardar el codigo relacionado al POF de la materia TTADS - 2022 - UTN FRRO.",
+    "url": "https://github.com/soundOfff/poc-restify",
+    "homepageUrl": ""
+  },
+  {
+    "name": "friends-tabs",
+    "description": "Repositorio del cliente para la parte de consumir una api del trabajo de backend. TTADS - Grupo 9.",
+    "url": "https://github.com/soundOfff/friends-tabs",
+    "homepageUrl": ""
+  },
+  {
+    "name": "labs",
+    "description": "Laboratorios .NET Grupo 6 - DUR-BRA-BRA",
+    "url": "https://github.com/soundOfff/labs",
+    "homepageUrl": ""
+  },
+  {
+    "name": ".net-student-app",
+    "description": "Repositorio para el trabajo practico de la materia .NET,  Grupo 6 - DUR/BRA/BRA",
+    "url": "https://github.com/soundOfff/.net-student-app",
+    "homepageUrl": ""
+  },
+  {
+    "name": "html5-practice",
+    "description": "First steps",
+    "url": "https://github.com/soundOfff/html5-practice",
+    "homepageUrl": ""
+  }
+]

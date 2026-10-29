@@ -40,7 +40,7 @@ export async function blogDocument(): Promise<MarkdownDocument> {
     canonical: pageUrl('/blog'),
     body:
       [
-        '# Writing',
+        '# Blog',
         `Canonical HTML: ${pageUrl('/blog')}`,
         ...posts.map((post) =>
           [
@@ -78,6 +78,16 @@ export async function homeDocument(): Promise<MarkdownDocument> {
             `${markdownText(work.year)} · ${markdownText(work.stack)}`,
           ].join('\n\n'),
         ),
+        '## Projects',
+        ...snapshot.repos.map((project) =>
+          [
+            project.href
+              ? `### [${markdownText(project.name)}](${siteUrl(project.href)})`
+              : `### ${markdownText(project.name)}`,
+            markdownText(project.description),
+            markdownText(project.language),
+          ].join('\n\n'),
+        ),
         '## AI workflow',
         ...snapshot.principles.map(
           (stage) => `### ${markdownText(stage.title)}\n\n${markdownText(stage.body)}`,
@@ -88,8 +98,8 @@ export async function homeDocument(): Promise<MarkdownDocument> {
         ),
         '## Now',
         ...snapshot.now.map((item) => `- ${markdownText(item.key)}: ${markdownText(item.value)}`),
-        '## Writing',
-        `[All writing](${pageUrl('/blog')}) · [Markdown index](${siteUrl('/blog/index.md')})`,
+        '## Blog',
+        `[All articles](${pageUrl('/blog')}) · [Markdown index](${siteUrl('/blog/index.md')})`,
         ...snapshot.posts.map(
           (post) =>
             `- [${markdownText(post.title)}](${pageUrl(post.href)}): ${markdownText(post.description)}`,

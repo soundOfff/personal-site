@@ -1,0 +1,314 @@
+{
+  "mint": {
+    "subtitle": "Commerce behind the storefront.",
+    "role": "Full-stack / backend engineering",
+    "status": "Professional work",
+    "story": "The storefront is the visible part. My work sat in the services behind it: inventory, checkout and the APIs around an existing WordPress order system. The challenge was to keep the buying path reliable while working with a core the business already depended on.",
+    "contribution": [
+      "Built e-commerce services around the existing WordPress order ledger.",
+      "Worked across inventory and checkout APIs, Postgres and React storefront components.",
+      "Separated fast browsing from the stricter checks needed when an order is placed."
+    ],
+    "flow": [
+      "Browse the catalog",
+      "Validate stock and checkout",
+      "Record the order"
+    ],
+    "media": [],
+    "note": "Brand-inspired cover. My contribution was product and backend engineering; this cover is not a screenshot of work I designed. The detailed case study is a narrative account.",
+    "demo": null
+  },
+  "dex": {
+    "subtitle": "A little context goes a long way.",
+    "role": "Software Engineer II",
+    "status": "Professional work",
+    "story": "Dex is a personal CRM for remembering people and keeping in touch. I worked across the web and mobile product, and helped build AI routing that treats different tasks differently instead of sending every request to the same model.",
+    "contribution": [
+      "Developed CRM features across web and mobile.",
+      "Helped route tasks across OpenAI, Groq and OpenRouter.",
+      "Used task-specific evaluations to decide which model could handle a request."
+    ],
+    "flow": [
+      "Understand the task",
+      "Choose a capable model",
+      "Evaluate the result"
+    ],
+    "media": [
+      {
+        "src": "/previews/dex.webp",
+        "caption": "Public Dex product image — relationships, reminders and notes."
+      }
+    ],
+    "note": "Product image from getdex.com, used for product context. It does not imply that I designed every screen shown.",
+    "demo": null
+  },
+  "sift": {
+    "subtitle": "Keep the idea. Keep the moment.",
+    "role": "Independent product engineering",
+    "status": "Working extension",
+    "story": "A lecture moves on before a good note is finished. Sift puts a notebook beside the video: concise concepts, the moment they were explained, selected frames and study blocks. Notes stay in the browser, ready to search or export later.",
+    "contribution": [
+      "Built a Chrome extension that analyses short audio windows and selected video frames.",
+      "Connected concept notes to timestamps and a local IndexedDB notebook.",
+      "Added learning blocks, cited web context, library search and notebook export."
+    ],
+    "flow": [
+      "Start capture on a lecture",
+      "Read timestamped concepts",
+      "Review the notebook"
+    ],
+    "media": [
+      {
+        "src": "/previews/sift/01-notes-beside-the-lecture.png",
+        "caption": "01 / Capture — the notebook stays beside the lecture."
+      },
+      {
+        "src": "/previews/sift/02-web-context.png",
+        "caption": "02 / Understand — cited web context stays separate from lecture content."
+      },
+      {
+        "src": "/previews/sift/03-learning-blocks.png",
+        "caption": "03 / Study — comparisons, diagrams and other learning blocks."
+      },
+      {
+        "src": "/previews/sift/04-library.png",
+        "caption": "04 / Return — browse and search saved notebooks."
+      }
+    ],
+    "note": "Screenshots from the extension’s store materials, using a synthetic lecture. Live analysis requires the user’s own OpenRouter key.",
+    "demo": null
+  },
+  "second-brain": {
+    "subtitle": "A knowledge base that can show its sources.",
+    "role": "Independent system design and implementation",
+    "status": "Open source",
+    "story": "Second Brain turns collected sources into a linked wiki that an agent maintains over time. Instead of regenerating an answer from scratch on every question, the synthesis becomes an artifact you can read, navigate and audit.",
+    "contribution": [
+      "Separated immutable sources from agent-maintained concepts, entities, recaps and digests.",
+      "Built capture and feed tools, validation and deterministic cleanup around the agent.",
+      "Made unattended maintenance propose changes through pull requests before they enter the main wiki."
+    ],
+    "flow": [
+      "Capture an immutable source",
+      "Synthesize and link concepts",
+      "Review the proposed changes"
+    ],
+    "media": [],
+    "note": "Illustrated workflow cover. Personal notes and source documents are not included in the portfolio demo.",
+    "demo": null
+  },
+  "catcher": {
+    "subtitle": "From a useful interface to a reusable reference.",
+    "role": "Independent extension and capture pipeline",
+    "status": "Recorded product demo",
+    "story": "Catcher starts with a small question: what if a good interface could become a useful reference without a folder full of disconnected screenshots? Select a component in a page, capture its appearance and structure, then return to it in a personal library.",
+    "contribution": [
+      "Built the in-page element picker and capture flow.",
+      "Collected component structure, styles and assets into a local library.",
+      "Added a preview and detail view so a captured component can be inspected and reused as a reference."
+    ],
+    "flow": [
+      "Select a component",
+      "Capture it with context",
+      "Inspect it in the library"
+    ],
+    "media": [],
+    "note": "Recorded from the actual extension. The recording shows the capture workflow on a demonstration page and a public website.",
+    "demo": "/demos/catcher.mp4"
+  },
+  "focus-quote": {
+    "subtitle": "Make what you read part of how you work.",
+    "role": "Independent full-stack product",
+    "status": "Open source",
+    "story": "FocusQuote connects two habits that usually live in different apps: saving useful passages and working toward a specific goal. A browser extension captures quotes; the workspace organises them and brings them into focus sessions and review.",
+    "contribution": [
+      "Built quote capture, a searchable library and a graph of tags.",
+      "Designed goal-based focus sessions and their review flow.",
+      "Connected optional AI session reports and active recall with a Preact, Effect, Hono and SQLite stack."
+    ],
+    "flow": [
+      "Save a passage",
+      "Work with a clear goal",
+      "Review and recall"
+    ],
+    "media": [
+      {
+        "src": "/previews/focus-quote.png",
+        "caption": "01 / Workspace — quotes and focus activity in one place."
+      },
+      {
+        "src": "/previews/focus-quote/quotes-library.png",
+        "caption": "02 / Library — organise saved passages."
+      },
+      {
+        "src": "/previews/focus-quote/session-report.png",
+        "caption": "03 / Review — revisit a completed focus session."
+      },
+      {
+        "src": "/previews/focus-quote/active-recall.png",
+        "caption": "04 / Recall — turn saved ideas into a study prompt."
+      }
+    ],
+    "note": "Screenshots from the project’s own documentation.",
+    "demo": null
+  },
+  "on-call": {
+    "subtitle": "An alert is the start of a workflow.",
+    "role": "Full-stack implementation",
+    "status": "Working local application",
+    "story": "On-Call turns monitoring events into incidents with an owner, a timeline and a path to resolution. The application also handles the less visible coordination: repeated events, escalation deadlines and the person actually on call.",
+    "contribution": [
+      "Built event intake with deduplication so repeated alerts attach to an open incident.",
+      "Implemented acknowledge, assign, escalate, note and resolve actions with an incident timeline.",
+      "Added escalation policies, on-call rotations and temporary schedule overrides in React and Django."
+    ],
+    "flow": [
+      "Receive and deduplicate events",
+      "Assign and acknowledge",
+      "Resolve with a timeline"
+    ],
+    "media": [],
+    "note": "Illustrated product cover. The local application uses a Django API and MongoDB; the portfolio does not connect to an incident workspace.",
+    "demo": null
+  },
+  "curation": {
+    "subtitle": "An archive with a point of view.",
+    "role": "Independent data and ML pipeline",
+    "status": "Prototype",
+    "story": "Curation Archive explores a feed shaped by personal taste rather than a general-purpose recommendation model. Source adapters collect candidates; a small model trained on my labels scores them; a quiet interface gives the selected image the whole screen.",
+    "contribution": [
+      "Built a pipeline from source adapters through deduplication, scoring and publication.",
+      "Used frozen CLIP embeddings with a small trainable taste model.",
+      "Tracked provenance and per-image license evidence, with a review queue for uncertain material."
+    ],
+    "flow": [
+      "Collect with provenance",
+      "Score against personal labels",
+      "Curate and publish"
+    ],
+    "media": [],
+    "note": "Concept cover. The full pipeline needs its scoring service, storage and a trained taste model; no live archive or ranking is claimed here.",
+    "demo": null
+  },
+  "editorial": {
+    "subtitle": "A small design system with an editorial bias.",
+    "role": "Library author",
+    "status": "Published open source",
+    "story": "Editorial UI packages the decisions that repeat across content-heavy interfaces: type, paper-like surfaces, thin dividers and a clear primary action. It gives the portfolio and other projects shared primitives instead of repeated one-off styling.",
+    "contribution": [
+      "Created React controls and content components backed by CSS tokens.",
+      "Paired Newsreader for reading with Geist for interface text and JetBrains Mono for labels.",
+      "Published the library and documented components, themes and usage."
+    ],
+    "flow": [
+      "Choose shared tokens",
+      "Compose accessible controls",
+      "Keep the reading surface calm"
+    ],
+    "media": [],
+    "note": "The portfolio itself uses Editorial UI tokens and styles. Browse the package or source for the implementation.",
+    "demo": null
+  },
+  "dana": {
+    "subtitle": "Walk into the meeting with context.",
+    "role": "Product engineering",
+    "status": "Live product",
+    "story": "Dana gathers scattered context into a meeting brief: who is attending, relevant history, company information and the conversation ahead. It brings calendar, email, Slack and web context into a preparation flow.",
+    "contribution": [
+      "Worked on a meeting-preparation product that connects context from multiple sources.",
+      "Brought the experience together around a readable brief before a meeting.",
+      "Helped bring Dana from product development to launch."
+    ],
+    "flow": [
+      "Connect meeting context",
+      "Gather relevant information",
+      "Read the brief"
+    ],
+    "media": [
+      {
+        "src": "/previews/dana.png",
+        "caption": "Public Dana meeting brief from the product website."
+      }
+    ],
+    "note": "Public product image from danahq.com. The preview uses the website’s demonstration content, not private calendar or email data.",
+    "demo": null
+  },
+  "60-seconds": {
+    "subtitle": "How clearly can you describe an interface?",
+    "role": "Independent generative UI experiment",
+    "status": "Single-player prototype",
+    "story": "Read a brief, write a prompt, then watch a model compose an interface from a fixed component library. A panel scores the result against the brief. The implemented scope is single-player practice; competitive matchmaking remains a future direction.",
+    "contribution": [
+      "Built the brief → prompt → streamed interface → scorecard loop.",
+      "Restricted generation to a whitelisted component catalog rather than arbitrary markup.",
+      "Added a deterministic demo mode with sample generation and judge responses, so the flow can run without paid model calls."
+    ],
+    "flow": [
+      "Read the brief",
+      "Compose the interface",
+      "Inspect the judge panel"
+    ],
+    "media": [],
+    "note": "The local interactive demo uses canned model responses. Its score is sample data, not an evaluation of the prompt you type. Multiplayer is not implemented.",
+    "demo": null
+  },
+  "letterboxd": {
+    "subtitle": "A film diary, told as an illustrated story.",
+    "role": "Independent generative publishing experiment",
+    "status": "Rendered sample",
+    "story": "Letterboxd Story turns the last three months of viewing into a six-page illustrated booklet. Viewing patterns inform a shared palette and lighting system; generated SVG scenes stay consistent across the story and remain crisp in the final PDF.",
+    "contribution": [
+      "Built the diary ingestion, film enrichment and narrative pipeline.",
+      "Translated viewing signals into reusable colour and lighting rules.",
+      "Composed sanitised SVG scenes into a print-ready PDF, with intermediate artifacts saved for inspection."
+    ],
+    "flow": [
+      "Read the viewing diary",
+      "Build a shared visual language",
+      "Compose the booklet"
+    ],
+    "media": [
+      {
+        "src": "/previews/letterboxd/scene-1.svg",
+        "caption": "Scene 01 — actual generated SVG output."
+      },
+      {
+        "src": "/previews/letterboxd/scene-2.svg",
+        "caption": "Scene 02 — the same palette across a new scene."
+      },
+      {
+        "src": "/previews/letterboxd/scene-3.svg",
+        "caption": "Scene 03 — illustration from the rendered booklet."
+      },
+      {
+        "src": "/previews/letterboxd/scene-4.svg",
+        "caption": "Scene 04 — code-generated artwork."
+      },
+      {
+        "src": "/previews/letterboxd/scene-5.svg",
+        "caption": "Scene 05 — the final story beat."
+      }
+    ],
+    "note": "Existing generated sample based on the public Letterboxd diary davidehrlich. Generation needs external API keys; viewing this artifact does not.",
+    "demo": null
+  },
+  "a2ui": {
+    "subtitle": "Ask a question. Get an interface.",
+    "role": "Independent design and engineering",
+    "status": "Interactive portfolio experiment",
+    "story": "The conversational portfolio lets a visitor ask about my work and receive structured cards, comparisons or diagrams. A validated component catalog controls what can be rendered, while the rest of the site remains a conventional, browsable portfolio.",
+    "contribution": [
+      "Built the Astro portfolio and a React island for the conversational interface.",
+      "Mapped structured model output to a constrained A2UI component catalog.",
+      "Connected the experience to the same project and writing data used by the site."
+    ],
+    "flow": [
+      "Ask about the work",
+      "Validate structured output",
+      "Render the relevant components"
+    ],
+    "media": [],
+    "note": "The live playground uses the existing backend configuration. The project showcase stays available without starting a model request.",
+    "demo": null
+  }
+}
