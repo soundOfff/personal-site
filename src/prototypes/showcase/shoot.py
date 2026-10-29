@@ -172,7 +172,11 @@ def run_case(browser, vid, name, viewport, reduced, out, report, quick):
         }}""")
         settle(page, 600)
         page.wait_for_timeout(2500)
-        state = page.evaluate(VIDEO_STATE)[v["i"]]
+        states = page.evaluate(VIDEO_STATE)
+        if v["i"] >= len(states):
+            case["notes"].append(f"video {v['i']} disappeared while scrolling")
+            continue
+        state = states[v["i"]]
         played.append(state)
         if state["inView"] and state["visible"]:
             page.screenshot(path=str(out / f"{tag}-30-demo{v['i']}.png"))
@@ -236,7 +240,13 @@ def main():
         cases = [("desktop", False)] if quick else [("desktop", False), ("desktop", True), ("mobile", False), ("mobile", True)]
         for name, reduced in cases:
             try:
-                run_case(browser, vid, name, VIEWPORTS[name], reduced, out, report, quick)
+                try:
+                    run_case(browser, vid, name, VIEWPORTS[name], reduced, out, report, quick)
+                except Exception as e:
+                    if "Execution context was destroyed" not in str(e):
+                        raise
+                    print(f"  {name}{'-reduced' if reduced else ''}: page navigated mid-run, retrying once", flush=True)
+                    run_case(browser, vid, name, VIEWPORTS[name], reduced, out, report, quick)
             except Exception as e:
                 report.append({"case": f"{name}{'-reduced' if reduced else ''}", "fail": [f"crashed: {e}"]})
                 print(f"  {name}{'-reduced' if reduced else ''}: FAIL crashed: {e}", flush=True)

@@ -62,6 +62,7 @@ export default defineConfig({
       noExternal: ['editorial-ui'],
     },
     // proto/showcase: this worktree symlinks node_modules from the main checkout.
-    server: { fs: { allow: ['.', '/Users/User/Tomi/personal-site/node_modules'] } },
+    // Hot reload is off: nine agents share this server, and every save reloaded everyone's pages.
+    server: { hmr: false, fs: { allow: ['.', '/Users/User/Tomi/personal-site/node_modules'] } },
   },
 });
