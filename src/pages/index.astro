@@ -1,285 +1,368 @@
 ---
-import { getCollection, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Rail from '../components/Rail.astro';
-import Footer from '../components/Footer.astro';
-import Keybar from '../components/Keybar.astro';
-import WorkflowDiagram from '../components/WorkflowDiagram.astro';
-import WorkflowPreview from '../components/WorkflowPreview.astro';
-import { workflow } from '../data/workflow';
+import { projects } from '../data/projects';
+import { publicPosts } from '../lib/discovery/documents';
+
+const featuredIds = ['sift', 'focus-quote', 'catcher'];
+const featured = featuredIds.map((id) => projects.find((project) => project.id === id)!);
+const experience = projects.filter((project) => project.category === 'Experience');
+const categories = ['Experience', 'Product', 'Open source', 'Experiment'] as const;
+const posts = (await publicPosts()).slice(0, 2);
+const date = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+
+import archive from '../data/project-archive.json';
 import A2UIPlayground from '../islands/A2UIPlayground';
-import { profile, proofs, toolbox, log, now } from '../data/site';
-import { repos } from '../data/repos';
-import ReelHead from '../reels/ReelHead.astro';
-import Stages from '../reels/Stages.astro';
-import Opening from '../reels/Opening.astro';
-import Projector from '../reels/Projector.astro';
-import BoxOffice from '../reels/boxoffice/BoxOffice.astro';
-import '../reels/reels.css';
-
-// Work index: single source of truth is the `work` collection (also the case-study pages).
-const work = await Promise.all(
-  (await getCollection('work', ({ data }) => !data.draft))
-    .sort((a, b) => a.data.n.localeCompare(b.data.n))
-    .map(async (entry) => {
-      const { Content } = await render(entry);
-      return { entry, Content };
-    }),
-);
-
-// Writing section: homepage curates a hand-picked set, in this order.
-const FEATURED = [
-  'evals-are-contracts',
-  'binary-search-on-the-answer',
-  'data-structures-typescript-python',
-  'the-unglamorous-middle',
-];
-const byId = new Map(
-  (await getCollection('blog', ({ data }) => !data.draft)).map((p) => [p.id, p]),
-);
-const posts = FEATURED.map((id) => byId.get(id)).filter((p) => p !== undefined);
-
-const iso = (d: Date) => d.toISOString().slice(0, 10);
-const COMMITS = 'https://github.com/soundOfff/personal-site/commit/';
+import '../styles/playground.css';
 ---
 
 <BaseLayout
-  description="Tomas Brasca, a software engineer in Rosario, Argentina. Web and mobile apps, LLM routing at Dex, and e-commerce APIs for Mint Mobile."
+  description="Tomas Brasca is a full-stack software engineer in Rosario, Argentina. Explore his experience at Dex and Mint Mobile, independent products, open source and writing."
 >
-  <ReelHead slot="head" />
-  <Stages at="backdrop" />
-  <div class="shell">
-    <Rail />
+  <main id="main">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-overline">
+        <span class="label-chip">Portfolio / 2026</span><span
+          >Full-stack software engineer · Rosario, Argentina</span>
+      </div>
+      <div class="hero-grid">
+        <h1 id="hero-title">Ideas made<br /><em>useful.</em></h1><div class="hero-intro">
+          <span class="hero-mark" aria-hidden="true">✳</span><p>
+            I’m Tomas. I build thoughtful web and mobile products, the APIs behind them, and AI
+            systems that make them useful.
+          </p><a class="underlined-link" href="#work"
+            >Explore the work <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="hero-rule"><span>01 / Selected work</span><span>Scroll to explore ↓</span></div>
+    </section>
 
-    <main class="content">
-      {/* 00 · readme */}
-      <section class="block" id="readme" data-sec="0">
-        <Opening />
-        <Keybar sec="readme" label="about" />
-        <h1 class="lede" set:html={profile.lede} />
-        <p class="sub">{profile.sub}</p>
-        <div class="metrics">
+    <section id="work" class="showcase shell" aria-labelledby="showcase-title">
+      <div class="section-heading">
+        <span class="eyebrow">Selected work / 03</span><h2 id="showcase-title">
+          Products in focus<span class="blue-period">.</span>
+        </h2><p>Independent tools for learning, reading, and making.</p>
+      </div>
+      <div class="gallery" data-gallery>
+        <div class="gallery-selector" aria-label="Choose featured project">
           {
-            proofs.map((m) => (
-              <div class="m">
-                <div class="v">{m.accent ? <em>{m.value}</em> : m.value}</div>
-                <div class="k">{m.key}</div>
-              </div>
+            featured.map((project, index) => (
+              <button
+                class="gallery-choice"
+                type="button"
+                data-project-choice={project.id}
+                aria-pressed={index === 0 ? 'true' : 'false'}
+                aria-controls={`gallery-${project.id}`}
+              >
+                <>
+                  <span class="choice-number">0{index + 1}</span>
+                  <span class="choice-name">{project.name}</span>
+
+                </>
+              </button>
             ))
           }
         </div>
-        <WorkflowPreview workflow={workflow} />
-      </section>
-
-      {/* 01 · playground (the one interactive island) */}
-      <section class="block" id="playground" data-sec="1">
-        <Stages at="in:playground" />
-        <Keybar sec="playground" label="playground">ask about my work</Keybar>
-        <A2UIPlayground client:visible />
-      </section>
-      <Stages at="after:playground" />
-
-      {/* 02 · work · index */}
-      <section class="block" id="work" data-sec="2">
-        <Stages at="in:work" />
-        <Keybar sec="work" label="work" />
-        <table class="idx">
-          <tbody>
-            {
-              work.map(({ entry: w, Content }) => (
-                <tr data-href={`/work/${w.id}`}>
-                  <td class="n">{w.data.n}</td>
-                  <td class="proj">
-                    <a href={`/work/${w.id}`}>
-                      <b>{w.data.title}</b>
+        <div class="gallery-panels">
+          {
+            featured.map((project, index) => (
+              <article
+                class="gallery-panel"
+                id={`gallery-${project.id}`}
+                data-project-panel={project.id}
+              >
+                <div class="gallery-image-wrap">
+                  <>
+                    <a href={`/showcase/${project.id}`} aria-label={`Explore ${project.name}`}>
+                      <img
+                        src={project.image!}
+                        alt={`${project.name} product interface`}
+                        width="1440"
+                        height="900"
+                        loading={index === 0 ? 'eager' : 'lazy'}
+                      />
                     </a>
-                    <span>{w.data.description}</span>
-                    <template data-esper-case>
-                      <Content />
-                    </template>
-                  </td>
-                  <td class="stk">{w.data.stack}</td>
-                  <td class="yr">{w.data.year}</td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </section>
-      <Stages at="after:work" />
-
-      {/* 03 · recent projects */}
-      <section class="block" id="oss" data-sec="3">
-        <Stages at="in:oss" />
-        <Keybar sec="oss" label="recent projects" />
-        <div class="repos">
-          {
-            repos.map((r) => {
-              const Tag = r.private ? 'article' : 'a';
-              return (
-                <Tag
-                  class="repo"
-                  href={r.private ? undefined : r.href}
-                  target={r.private ? undefined : '_blank'}
-                  rel={r.private ? undefined : 'noopener noreferrer'}
-                >
-                  <span class="nm">{r.name}</span>
-                  <span class="meta">
-                    {r.private && <span class="repo-visibility">Private</span>}
-                    <span class="lang">
-                      <span class="sw" style={`background:${r.color}`} />
-                      {r.language}
+                    <span class="image-stamp">
+                      Fig. 0{index + 1} / {project.category}
                     </span>
-                  </span>
-                  <span class="desc">{r.description}</span>
-                </Tag>
-              );
-            })
-          }
-        </div>
-      </section>
-      <Stages at="after:oss" />
-
-      {/* 04 · log · recent activity */}
-      <section class="block" id="log" data-sec="4">
-        <Stages at="in:log" />
-        <Keybar sec="log" label="log" />
-        <div class="log">
-          {
-            log.map((item) => (
-              <div class:list={['logitem', item.upcoming && 'upcoming']}>
-                <div class="gutter">
-                  <span class="ln" />
-                  <span class="node" />
+                  </>
                 </div>
-                <div class="lbody">
-                  <div class="top">
-                    {item.hash && (
-                      <a
-                        class="hash"
-                        href={`${COMMITS}${item.hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`commit ${item.hash} on GitHub`}
-                      >
-                        {item.hash}
-                      </a>
-                    )}
-                    <span class="date">{item.date}</span>
-                    <span class="tag">{item.tag}</span>
-                  </div>
-                  <div class="msg">
-                    {item.msg}
-                    {item.link && (
+                <div class="gallery-caption">
+                  <>
+                    <div>
                       <>
-                        <span class="sep"> · </span>
-                        <a
-                          href={item.link.href}
-                          target={item.link.href.startsWith('http') ? '_blank' : undefined}
-                          rel={
-                            item.link.href.startsWith('http') ? 'noopener noreferrer' : undefined
-                          }
-                        >
-                          {item.link.label}
-                        </a>
+                        <span class="eyebrow">{project.stack}</span>
+                        <h3>{project.name}</h3>
+                        <p>{project.description}</p>
                       </>
-                    )}
-                  </div>
+                    </div>
+                    <a class="project-cta" href={`/showcase/${project.id}`}>
+                      Explore project
+                    </a>
+                  </>
                 </div>
-              </div>
+              </article>
             ))
           }
         </div>
-      </section>
-      <Stages at="after:log" />
+      </div>
+    </section>
 
-      {/* 05 · writing */}
-      <section class="block" id="writing" data-sec="5">
-        <Stages at="in:writing" />
-        <Keybar sec="writing" label="blog"><a href="/blog">all posts</a></Keybar>
-        <div class="wlist">
+    <section class="experience-band" aria-labelledby="experience-title">
+      <div class="shell experience-grid">
+        <div class="experience-lead">
+          <span class="eyebrow">02 / Engineering experience</span><h2 id="experience-title">
+            Built in teams.<br /><em>Shipped in the world.</em>
+          </h2><p>
+            Product engineering across customer-facing interfaces, backend systems, and AI
+            workflows.
+          </p>
+        </div><div class="experience-cards">
           {
-            posts.map((post) => (
-              <a class="wrow" href={`/blog/${post.id}`}>
-                <span class="d">{iso(post.data.date)}</span>
-                <span class="t">{post.data.title}</span>
-                <span class="rt">{post.data.readingTime}</span>
+            experience.map((project) => (
+              <article class="experience-card">
+                <>
+                  <span class="card-index">{project.id === 'mint' ? '01' : '02'} / Experience</span>
+                  <h3>
+                    <a href={`/showcase/${project.id}`}>
+                      {project.name}
+                    </a>
+                  </h3>
+                  <p>{project.description}</p>
+                  <span class="card-stack">{project.stack}</span>
+                </>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <span id="oss" aria-hidden="true"></span>
+    <section id="index" class="index-section shell" aria-labelledby="index-title">
+      <div class="index-heading">
+        <div>
+          <span class="eyebrow">03 / Complete index</span><h2 id="index-title">
+            The whole <em>body of work.</em>
+          </h2>
+        </div><p>
+          All {projects.length} projects, from product work to smaller experiments. Choose a category
+          to explore.
+        </p>
+      </div>
+      <div class="index-controls" aria-label="Filter projects" data-category-controls hidden>
+        <button type="button" class="filter-button" data-category-choice="" aria-pressed="true"
+          >All <span>{projects.length}</span></button
+        >{
+          categories.map((category) => (
+            <button
+              type="button"
+              class="filter-button"
+              data-category-choice={category}
+              aria-pressed="false"
+            >
+              {category}{' '}
+              <span>{projects.filter((project) => project.category === category).length}</span>
+            </button>
+          ))
+        }<button type="button" class="reset-button" data-category-reset hidden
+          >Clear filter ↺</button>
+      </div>
+      <p class="result-count" data-result-count role="status" aria-live="polite">
+        Showing all {projects.length} projects
+      </p>
+      <div class="project-grid">
+        {
+          projects.map((project, index) => (
+            <article class="project-tile" data-project-category={project.category}>
+              <>
+                <div class="tile-top">
+                  <>
+                    <span>
+                      {String(index + 1).padStart(2, '0')} / {project.category}
+                    </span>
+                    <span aria-hidden="true">✳</span>
+                  </>
+                </div>
+                <h3>
+                  <a href={`/showcase/${project.id}`}>
+                    {project.name}
+                  </a>
+                </h3>
+                <p>{project.description}</p>
+                <span class="tile-stack">{project.stack}</span>
+                <nav class="tile-links" aria-label={`${project.name} links`}>
+                  {project.website && (
+                    <a href={project.website}>
+                      {project.id === 'a2ui' ? 'Try the playground' : 'Visit website'}
+                    </a>
+                  )}
+                  {project.source && <a href={project.source}>Source </a>}
+                  {project.caseStudy && <a href={project.caseStudy}>Case study </a>}
+                </nav>
+              </>
+            </article>
+          ))
+        }
+      </div>
+      <details class="project-archive">
+        <summary
+          ><span>More on GitHub</span><span>{archive.length} public repositories</span></summary
+        ><div class="archive-grid">
+          {
+            archive.map((repo) => (
+              <a href={repo.url}>
+                <>
+                  <b>{repo.name}</b>
+                  <span>{repo.description || 'View repository'}</span>
+                </>
               </a>
             ))
           }
+        </div><a class="archive-profile" href="https://github.com/soundOfff"
+          >View soundOfff on GitHub</a
+        >
+      </details>
+
+      <p class="archive-note">
+        More public code at <a
+          href="https://github.com/soundOfff"
+          target="_blank"
+          rel="noopener noreferrer">soundOfff on GitHub </a>
+      </p>
+    </section>
+
+    <section id="readme" class="about-section shell" aria-labelledby="about-title">
+      <div>
+        <p class="eyebrow">A little background</p><h2 id="about-title">
+          Curious by default.<br />Practical by experience.
+        </h2>
+      </div>
+      <div class="about-copy">
+        <p>
+          I’m a full-stack engineer with 5+ years of experience. I like working across the whole
+          product, understanding the problem, building the interface, and making the backend
+          reliable.
+        </p><p>
+          My competitive programming background shapes how I approach unfamiliar problems. I was an
+          ICPC South America finalist and took first place in the GTS algorithmic trading
+          competition.
+        </p><p>
+          These days I’m especially interested in AI products, developer tools and systems that help
+          people learn.
+        </p><div class="about-links">
+          <a href="/cv.pdf">Download résumé</a><a href="https://www.linkedin.com/in/tomasbrasca"
+            >LinkedIn</a
+          ><a href="https://github.com/soundOfff">GitHub</a>
         </div>
-      </section>
-      <Stages at="after:writing" />
+      </div>
+    </section>
 
-      {/* 06 · principles · how I build */}
-      <section class="block" id="principles" data-sec="6">
-        <Stages at="in:principles" />
-        <Keybar sec="principles" label="AI workflow" />
-        <WorkflowDiagram workflow={workflow} />
-      </section>
-      <Stages at="after:principles" />
-
-      {/* 07 · stack · toolbox */}
-      <section class="block" id="stack" data-sec="7">
-        <Stages at="in:stack" />
-        <Keybar sec="stack" label="tools" />
-        <div class="toolbox">
-          {
-            toolbox.map((col) => (
-              <div class="toolcol">
-                <div class="h">{col.h}</div>
-                <ul>
-                  {col.items.map((it) => (
-                    <li>{it}</li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
-        </div>
-      </section>
-      <Stages at="after:stack" />
-
-      {/* 08 · now */}
-      <section class="block" id="now" data-sec="8">
-        <Stages at="in:now" />
-        <Keybar sec="now" label="now" />
-        <dl class="specs">
-          {
-            now.map((s) => (
-              <div class="spec">
-                <dt>{s.dt}</dt>
-                <dd>{s.dd}</dd>
-              </div>
-            ))
-          }
-        </dl>
-      </section>
-      <Stages at="after:now" />
-
-      <Stages at="credits" />
-      <Footer />
-    </main>
-  </div>
-
-  <Projector />
-  <BoxOffice />
-
-  {/* the reel engine: films load on demand; House lights loads nothing else */}
-  <script>
-    import { boot } from '../reels/engine';
-    import { bootBoxOffice } from '../reels/boxoffice/boxoffice';
-    boot();
-    bootBoxOffice();
-  </script>
-
-  {/* progressive enhancement: make work-index rows clickable */}
-  <script is:inline>
-    document.querySelectorAll('.idx tr[data-href]').forEach((row) => {
-      row.addEventListener('click', (e) => {
-        if (e.target.closest('a')) return;
-        window.location.href = row.getAttribute('data-href');
-      });
-    });
-  </script>
+    <section class="journal-teaser shell" aria-labelledby="writing-title">
+      <div>
+        <span class="eyebrow">04 / Notes from the work</span><h2 id="writing-title">
+          On the <em>page.</em>
+        </h2><a class="underlined-link" href="/blog"
+          >Visit the journal </a>
+      </div><div class="teaser-list">
+        {
+          posts.map((post) => (
+            <article>
+              <>
+                <span>
+                  {date.format(post.data.date)} / {post.data.pillar}
+                </span>
+                <h3>
+                  <a href={`/blog/${post.id}`}>
+                    {post.data.title}
+                  </a>
+                </h3>
+              </>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+    <section id="playground" class="playground-section shell">
+      <details>
+        <summary
+          ><div>
+            <p class="eyebrow">An interactive experiment</p><h2>Ask about my work.</h2>
+          </div><span class="playground-open"
+            >Open playground <span aria-hidden="true">+</span></span
+          ></summary
+        ><p class="playground-description">
+          Ask a question and get a response built from cards, comparisons and diagrams.
+        </p><A2UIPlayground client:visible />
+      </details>
+    </section>
+  </main>
 </BaseLayout>
+
+<script>
+  const gallery = document.querySelector<HTMLElement>('[data-gallery]');
+  const projectChoices = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-project-choice]'),
+  );
+  const projectPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-project-panel]'));
+  let selectedProjectId = 'sift';
+  function showProject() {
+    projectChoices.forEach((button) =>
+      button.setAttribute(
+        'aria-pressed',
+        String(button.dataset.projectChoice === selectedProjectId),
+      ),
+    );
+    projectPanels.forEach((panel) => {
+      panel.hidden = panel.dataset.projectPanel !== selectedProjectId;
+    });
+  }
+  gallery?.classList.add('gallery-ready');
+  showProject();
+  projectChoices.forEach((button) =>
+    button.addEventListener('click', () => {
+      selectedProjectId = button.dataset.projectChoice ?? 'sift';
+      showProject();
+    }),
+  );
+
+  const categoryChoices = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-category-choice]'),
+  );
+  const projectTiles = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-project-category]'),
+  );
+  const resultCount = document.querySelector<HTMLElement>('[data-result-count]');
+  const reset = document.querySelector<HTMLButtonElement>('[data-category-reset]');
+  const categoryControls = document.querySelector<HTMLElement>('[data-category-controls]');
+  let selectedCategory = '';
+  function showCategory() {
+    categoryChoices.forEach((button) =>
+      button.setAttribute(
+        'aria-pressed',
+        String((button.dataset.categoryChoice ?? '') === selectedCategory),
+      ),
+    );
+    const count = projectTiles.reduce((visible, tile) => {
+      tile.hidden = Boolean(selectedCategory) && tile.dataset.projectCategory !== selectedCategory;
+      return visible + Number(!tile.hidden);
+    }, 0);
+    if (resultCount)
+      resultCount.textContent = selectedCategory
+        ? `Showing ${count} ${selectedCategory.toLowerCase()} project${count === 1 ? '' : 's'}`
+        : `Showing all ${count} projects`;
+    if (reset) reset.hidden = !selectedCategory;
+  }
+  if (categoryControls) categoryControls.hidden = false;
+  showCategory();
+  categoryChoices.forEach((button) =>
+    button.addEventListener('click', () => {
+      selectedCategory = button.dataset.categoryChoice ?? '';
+      showCategory();
+    }),
+  );
+  reset?.addEventListener('click', () => {
+    selectedCategory = '';
+    showCategory();
+    categoryChoices[0]?.focus();
+  });
+</script>

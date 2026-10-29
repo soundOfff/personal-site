@@ -10,6 +10,10 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { post } = Astro.props;
+const posts = await publicPosts();
+const position = posts.findIndex((entry) => entry.id === post.id);
+const newer = posts[position - 1];
+const older = posts[position + 1];
 const { Content, headings } = await render(post);
 const sections = headings.filter((heading) => heading.depth === 2);
 const date = new Intl.DateTimeFormat('en-GB', {
@@ -29,7 +33,7 @@ const date = new Intl.DateTimeFormat('en-GB', {
   publishedTime={post.data.date.toISOString()}
 >
   <article class="article-column" aria-labelledby="article-title">
-    <a class="article-back" href="/blog">← All writing</a>
+    <a class="article-back" href="/blog">← All articles</a>
     <header class="article-head">
       <p class="writing-eyebrow">{post.data.pillar}</p>
       <h1 id="article-title">{post.data.title}</h1>
@@ -71,8 +75,25 @@ const date = new Intl.DateTimeFormat('en-GB', {
         )
       }
       <nav class="reading-end" aria-label="After reading">
-        <a href="/blog">← All writing</a>
-        <a href="mailto:tomibrasca97@gmail.com">Discuss this article ↗</a>
+        <a href="/blog">← All articles</a>
+        <a href="mailto:tomibrasca97@gmail.com">Discuss this article </a>
+      </nav>
+      <nav class="reading-neighbors" aria-label="More articles">
+        {
+          newer && (
+            <a href={`/blog/${newer.id}`}>
+              <span>← Newer article</span>
+              {newer.data.title}
+            </a>
+          )
+        }{
+          older && (
+            <a href={`/blog/${older.id}`}>
+              <span>Older article →</span>
+              {older.data.title}
+            </a>
+          )
+        }
       </nav>
     </footer>
   </article>

@@ -1,7 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import '../styles/blog.css';
-
+import '../styles/reading.css';
 interface Props {
   title: string;
   description: string;
@@ -10,7 +9,6 @@ interface Props {
   headline?: string;
   markdownPath: string;
 }
-
 const { title, description, type = 'website', publishedTime, headline, markdownPath } = Astro.props;
 ---
 
@@ -24,41 +22,5 @@ const { title, description, type = 'website', publishedTime, headline, markdownP
   pageKind={type === 'website' ? 'CollectionPage' : 'WebPage'}
   markdownPath={markdownPath}
 >
-  <div class="blog-shell">
-    <a class="reading-skip" href="#reading">Skip to content</a>
-    <header class="writing-nav">
-      <a class="writing-name" href="/">Tomas Brasca</a>
-      <nav aria-label="Main navigation">
-        <a href="/#work">Work</a>
-        <a href="/blog" aria-current={type === 'website' ? 'page' : undefined}>Writing</a>
-        <button
-          class="reading-theme"
-          data-theme-toggle
-          aria-label="Toggle color theme"
-          title="Toggle color theme"
-          type="button"
-        >
-          <svg
-            width="18"
-            height="18"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            aria-hidden="true"
-          >
-            <use href="#i-moon" data-theme-icon></use>
-          </svg>
-        </button>
-      </nav>
-    </header>
-    <main id="reading" tabindex="-1"><slot /></main>
-    <footer class="writing-footer">
-      <div><a href="/">Tomas Brasca</a><span>Rosario, Argentina</span></div>
-      <nav aria-label="Writing footer">
-        <a href="/rss.xml">RSS</a>
-        <a href="https://github.com/soundOfff">GitHub</a>
-        <a href="mailto:tomibrasca97@gmail.com">Email</a>
-      </nav>
-    </footer>
-  </div>
+  <main id="main" class="reading-shell shell" tabindex="-1"><slot /></main>
 </BaseLayout>

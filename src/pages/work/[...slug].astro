@@ -3,8 +3,7 @@ import { getCollection, render } from 'astro:content';
 import { Badge } from 'editorial-ui';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/Icon.astro';
-import Footer from '../../components/Footer.astro';
+import '../../styles/reading.css';
 
 export const getStaticPaths = (async () => {
   const studies = await getCollection('work', ({ data }) => !data.draft);
@@ -12,7 +11,12 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+const sections = headings.filter((heading) => heading.depth === 2);
+const studies = await getCollection('work', ({ data }) => !data.draft);
+const position = studies.findIndex((study) => study.id === entry.id);
+const previous = studies[position - 1];
+const next = studies[position + 1];
 ---
 
 <BaseLayout
@@ -22,73 +26,64 @@ const { Content } = await render(entry);
   articleKind="Article"
   headline={entry.data.title}
 >
-  <div class="sheet">
-    <div class="topbar">
-      <a class="back" href="/#work"><Icon name="i-arrow-l" size={13} />work index</a>
-      <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
-        <svg
-          width="15"
-          height="15"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-          aria-hidden="true"
-        >
-          <use href="#i-moon" data-theme-icon></use>
-        </svg>
-      </button>
+  <main id="main" class="reading-shell shell">
+    <div class="article-column">
+      <header class="page-head">
+        <p class="eyebrow">// <b>case study</b> · {entry.data.n}</p>
+        <h1>{entry.data.title}</h1>
+        <p class="dek">{entry.data.description}</p>
+        <div class="meta">
+          <span>{entry.data.year}</span>
+          <span>·</span>
+          <span>{entry.data.stack}</span>
+          <Badge variant={entry.data.code ? 'success' : 'info'}>
+            {entry.data.code ? 'real code' : 'narrative'}
+          </Badge>
+        </div>
+      </header>
+
+      {
+        sections.length > 2 && (
+          <details class="article-contents">
+            <>
+              <summary>
+                In this case study <span>{sections.length} sections</span>
+              </summary>
+              <nav aria-label="Case study contents">
+                <ol>
+                  {sections.map((heading) => (
+                    <li>
+                      <a href={`#${heading.slug}`}>{heading.text}</a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            </>
+          </details>
+        )
+      }
+      <article class="prose">
+        <Content />
+      </article>
     </div>
 
-    <header class="page-head">
-      <p class="eyebrow">// <b>case study</b> · {entry.data.n}</p>
-      <h1>{entry.data.title}</h1>
-      <p class="dek">{entry.data.description}</p>
-      <div class="meta">
-        <span>{entry.data.year}</span>
-        <span>·</span>
-        <span>{entry.data.stack}</span>
-        <Badge variant={entry.data.code ? 'success' : 'info'}>
-          {entry.data.code ? 'real code' : 'narrative'}
-        </Badge>
-      </div>
-    </header>
-
-    <article class="prose">
-      <Content />
-    </article>
-
-    <button
-      class="back-to-top"
-      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
-      aria-label="Back to top"
-      type="button"
-    >
-      <Icon name="i-arrow-u" size={14} />
-    </button>
-
-    <script is:inline>
-      (function () {
-        const btn = document.querySelector('.back-to-top');
-        if (btn) {
-          // Check on load in case the user reloads halfway down
-          if (window.scrollY > window.innerHeight) {
-            btn.classList.add('is-visible');
-          }
-          window.addEventListener(
-            'scroll',
-            () => {
-              if (window.scrollY > window.innerHeight) {
-                btn.classList.add('is-visible');
-              } else {
-                btn.classList.remove('is-visible');
-              }
-            },
-            { passive: true },
-          );
-        }
-      })();
-    </script>
-
-    <Footer />
-  </div>
+    <nav class="reading-neighbors article-column" aria-label="More case studies">
+      {
+        previous && (
+          <a href={`/work/${previous.id}`}>
+            <span>← Previous case study</span>
+            {previous.data.title}
+          </a>
+        )
+      }{
+        next && (
+          <a href={`/work/${next.id}`}>
+            <span>Next case study →</span>
+            {next.data.title}
+          </a>
+        )
+      }
+    </nav>
+    <a class="article-back" href="/#index">← All projects</a>
+  </main>
 </BaseLayout>

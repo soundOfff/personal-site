@@ -366,7 +366,7 @@ export default function A2UIPlayground() {
                       onClick={() => void ask(prompt)}
                     >
                       <span>{prompt}</span>
-                      <span aria-hidden="true">↗</span>
+
                     </button>
                   ))}
                 </div>
@@ -456,7 +456,7 @@ export default function A2UIPlayground() {
                               className="a2-window-button"
                               onClick={() => void ask(request.question)}
                             >
-                              Retry question <span aria-hidden="true">↗</span>
+                              Retry question
                             </button>
                           )}
                           {!spent && (

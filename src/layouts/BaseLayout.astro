@@ -9,10 +9,12 @@ import '@fontsource-variable/jetbrains-mono';
 import 'editorial-ui/tokens.css';
 import 'editorial-ui/styles.css';
 
-// Workbench layer (font-family overrides, base, ported layout). Must come last.
-import '../styles/global.css';
+// The production site owns its palette, typography, and outer layout.
+import '../styles/pigment.css';
+import PigmentHeader from '../components/PigmentHeader.astro';
+import PigmentFooter from '../components/PigmentFooter.astro';
 
-import { site, profile, contact } from '../data/site';
+import { profile, contact } from '../data/site';
 import { pageUrl, siteUrl } from '../lib/site-origin';
 
 // Icon sprite, inlined once per page. Chrome doesn't resolve cross-document
@@ -149,7 +151,7 @@ const robots = noindex
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -165,9 +167,8 @@ const robots = noindex
     <meta name="author" content={profile.name} />
     <meta name="generator" content={Astro.generator} />
     <meta name="robots" content={robots} />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#FBFAF6" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1B1814" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f7f3e9" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={type} />
@@ -198,52 +199,17 @@ const robots = noindex
       href={rssUrl}
     />
 
-    <!-- Page-specific head (the homepage's reel bootstrap + generated CSS). -->
+    <!-- Page-specific metadata and resources. -->
     <slot name="head" />
 
     <!-- Structured data -->
     <script type="application/ld+json" is:inline set:html={jsonLd} />
-
-    <!-- No-FOUC theme bootstrap: set data-theme before first paint. -->
-    <script is:inline define:vars={{ key: site.themeKey }}>
-      try {
-        const t = localStorage.getItem(key);
-        if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
-      } catch {
-        /* ignore */
-      }
-    </script>
   </head>
-  <body>
+  <body class="pigment">
     <Fragment set:html={iconSprite} />
+    <a class="skip-link" href="#main">Skip to content</a>
+    <PigmentHeader />
     <slot />
-
-    <!-- Theme toggle: flip data-theme, persist, swap the moon/sun glyph. -->
-    <script is:inline define:vars={{ key: site.themeKey }}>
-      (function () {
-        const root = document.documentElement;
-        const current = () =>
-          root.dataset.theme ||
-          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        const apply = (theme) => {
-          root.dataset.theme = theme;
-          document.querySelectorAll('[data-theme-icon]').forEach((u) => {
-            u.setAttribute('href', theme === 'dark' ? '#i-sun' : '#i-moon');
-          });
-        };
-        apply(current());
-        document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const next = current() === 'dark' ? 'light' : 'dark';
-            try {
-              localStorage.setItem(key, next);
-            } catch {
-              /* ignore */
-            }
-            apply(next);
-          });
-        });
-      })();
-    </script>
+    <PigmentFooter />
   </body>
 </html>

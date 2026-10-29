@@ -1,0 +1,16 @@
+---
+const journal = Astro.url.pathname.startsWith('/blog');
+---
+
+<header class="site-header shell">
+  <a class="wordmark" href="/" aria-label="Tomas Brasca, home"
+    >Tomas <span>Brasca</span><i aria-hidden="true">✳</i></a
+  >
+  <nav aria-label="Main navigation">
+    <a href="/#work">Work</a><a href="/#index">Index</a><a
+      href="/blog"
+      aria-current={journal ? 'page' : undefined}>Journal</a
+    ><a href="#contact">Contact</a>
+  </nav>
+  <a class="resume-link" href="/cv.pdf">Résumé </a>
+</header>

@@ -1,37 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Icon from '../components/Icon.astro';
-import Footer from '../components/Footer.astro';
 ---
 
 <BaseLayout title="404 · Tomas Brasca" description="Page not found." noindex={true}>
-  <div class="sheet">
-    <div class="topbar">
-      <a class="back" href="/"><Icon name="i-arrow-l" size={13} />back to index</a>
-      <button class="btn-icon btn-quiet" data-theme-toggle aria-label="Toggle theme" type="button">
-        <svg
-          width="15"
-          height="15"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-          aria-hidden="true"
-        >
-          <use href="#i-moon" data-theme-icon></use>
-        </svg>
-      </button>
+  <main id="main" class="not-found shell">
+    <span class="label-chip">404 / Page not found</span><h1>
+      A little<br /><em>off course.</em>
+    </h1><p>
+      This page could not be found. Explore the work or find something to read in the journal.
+    </p><div>
+      <a class="underlined-link" href="/">Back to the work </a><a
+        class="underlined-link"
+        href="/blog">Visit the journal </a>
     </div>
-
-    <header class="page-head">
-      <p class="eyebrow">// <b>404</b></p>
-      <h1>Route not found</h1>
-      <p class="dek">
-        No page matches this path; the router fell through every rule. Try the
-        <a href="/">index</a>, the <a href="/blog">writing</a>, or a
-        <a href="/work/dex">case study</a>.
-      </p>
-    </header>
-
-    <Footer />
-  </div>
+  </main>
 </BaseLayout>
