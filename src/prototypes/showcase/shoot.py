@@ -102,8 +102,10 @@ def run_case(browser, vid, name, viewport, reduced, out, report, quick):
 
     snap = page.evaluate(SNAP_PROBE)
     case["snap"] = {"container": snap["container"], "targets": snap["targets"][:30]}
+    settle = page.evaluate("document.documentElement.dataset.settle || null")
+    case["snap"]["settle"] = settle
     snapping_expected = not reduced and viewport["height"] >= 640
-    if snapping_expected and (snap["container"] == "none" or not snap["targets"]):
+    if snapping_expected and settle != "on" and (snap["container"] == "none" or not snap["targets"]):
         case["fail"].append("no scroll-snap container or no snap targets (snapping should be on)")
     if reduced and snap["container"] != "none" and "none" not in snap["container"]:
         case["notes"].append(f"snap still on under reduced motion: {snap['container']}")
@@ -138,6 +140,26 @@ def run_case(browser, vid, name, viewport, reduced, out, report, quick):
         case["pagedown_stops"] = keys
         if len(set(keys)) < 4:
             case["fail"].append(f"Page Down got stuck: {keys}")
+
+    # Slow mouse-wheel notches (100 px, 150 ms apart) must move the page from every section start.
+    # Proximity snapping with dense snap points pulls each notch back and traps the visitor.
+    if not reduced and name == "desktop":
+        traps = []
+        for sid in ("work", "workflow"):
+            start = page.evaluate(f"(() => {{ const s = document.querySelector('[data-proto] #{sid}'); return s ? Math.round(s.getBoundingClientRect().top + scrollY) : null; }})()")
+            if start is None:
+                continue
+            page.evaluate(f"scrollTo({{top: {start}, behavior: 'instant'}})")
+            settle(page, 600)
+            y0 = page.evaluate("scrollY")
+            for _ in range(10):
+                page.mouse.wheel(0, 100)
+                page.wait_for_timeout(150)
+            y1 = settle(page, 600)
+            traps.append({"from": sid, "start": y0, "end": y1})
+            if y1 - y0 < 500:
+                case["fail"].append(f"slow wheel trapped at #{sid}: 10 notches moved {y1 - y0}px")
+        case["slow_wheel"] = traps
 
     # Sections, one viewport shot each.
     n = page.evaluate("""() => [...document.querySelectorAll('main section')]
