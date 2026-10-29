@@ -1,0 +1,94 @@
+---
+import type { Demo } from '../data/demos';
+
+interface Props {
+  demo: Demo;
+  name: string;
+}
+
+const { demo, name } = Astro.props;
+const chapters = demo.chapters.map(({ t, label }) => ({ t, label }));
+---
+
+<figure class="demo-video" data-demo={JSON.stringify(chapters)}>
+  <video
+    controls
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    poster={demo.poster}
+    aria-label={`${name} demo: ${chapters.map((chapter) => chapter.label).join(', ')}`}
+  >
+    <source src={demo.webm} type="video/webm" />
+    <source src={demo.mp4} type="video/mp4" />
+    <a href={demo.mp4}>Download the {name} demo</a>
+  </video>
+  <figcaption>
+    <p class="demo-chapter">
+      <span class="demo-count" data-demo-count>1 / {chapters.length}</span>
+      <span data-demo-label>{chapters[0].label}</span>
+    </p>
+    <div class="demo-actions">
+      <button class="button demo-toggle" type="button" data-demo-toggle hidden>Play demo</button>
+      {
+        demo.walkthrough && (
+          <a class="small-link" href={demo.walkthrough}>
+            Watch the narrated walkthrough
+          </a>
+        )
+      }
+    </div>
+  </figcaption>
+</figure>
+
+<script>
+  import { reducedMotion } from '../lib/flood/scroll';
+
+  type Chapter = { t: number; label: string };
+
+  document.querySelectorAll<HTMLElement>('[data-demo]').forEach((figure) => {
+    const chapters: Chapter[] = JSON.parse(figure.dataset.demo!);
+    const video = figure.querySelector('video')!;
+    const label = figure.querySelector<HTMLElement>('[data-demo-label]')!;
+    const count = figure.querySelector<HTMLElement>('[data-demo-count]')!;
+    const toggle = figure.querySelector<HTMLButtonElement>('[data-demo-toggle]')!;
+    let visitorPaused = reducedMotion.matches;
+    let inView = false;
+    let chapter = 0;
+
+    function sync() {
+      toggle.textContent = visitorPaused ? 'Play demo' : 'Pause demo';
+      if (visitorPaused || !inView) {
+        video.pause();
+        return;
+      }
+      video.play().catch((error: DOMException) => {
+        if (error.name !== 'NotAllowedError') return;
+        visitorPaused = true;
+        sync();
+      });
+    }
+
+    video.controls = false;
+    toggle.hidden = false;
+    toggle.addEventListener('click', () => {
+      visitorPaused = !visitorPaused;
+      sync();
+    });
+    video.addEventListener('timeupdate', () => {
+      const next = chapters.findLastIndex((c) => c.t <= video.currentTime);
+      if (next < 0 || next === chapter) return;
+      chapter = next;
+      label.textContent = chapters[next].label;
+      count.textContent = `${next + 1} / ${chapters.length}`;
+    });
+    new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.intersectionRatio >= 0.25;
+        sync();
+      },
+      { threshold: 0.25 },
+    ).observe(video);
+  });
+</script>

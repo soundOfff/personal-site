@@ -2,7 +2,9 @@
 import { getCollection, render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import DemoLoop from '../../components/DemoLoop.astro';
 import PromptPracticeDemo from '../../islands/PromptPracticeDemo';
+import { demoFor } from '../../data/demos';
 import { projects, workSlug } from '../../data/projects';
 import stories from '../../data/project-stories.json';
 
@@ -17,6 +19,7 @@ export const getStaticPaths = (async () => {
 
 const { project, study } = Astro.props;
 const story = stories[project.id as keyof typeof stories];
+const demo = demoFor(project.id);
 const Content = study ? (await render(study)).Content : null;
 const next = projects[(projects.indexOf(project) + 1) % projects.length];
 const website = project.website === '#playground' ? '/#playground' : project.website;
@@ -87,36 +90,25 @@ const website = project.website === '#playground' ? '/#playground' : project.web
       {
         project.id === '60-seconds' ? (
           <PromptPracticeDemo client:visible />
-        ) : story.demo ? (
-          <figure class="demo-video">
-            <video
-              controls
-              muted
-              playsinline
-              preload="metadata"
-              poster={project.image ?? undefined}
-            >
-              <source src={story.demo} type="video/mp4" />
-              <a href={story.demo}>Download the product demonstration</a>
-            </video>
-            <figcaption>
-              Actual extension recording / Select a component, capture it, open the library.
-            </figcaption>
-          </figure>
-        ) : story.media.length ? (
-          <div class="gallery">
-            {story.media.map((media, i) => (
-              <figure>
-                <img
-                  src={media.src}
-                  alt={media.caption}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  decoding="async"
-                />
-                <figcaption>{media.caption}</figcaption>
-              </figure>
-            ))}
-          </div>
+        ) : demo || story.media.length ? (
+          <>
+            {demo && <DemoLoop demo={demo} name={project.name} />}
+            {story.media.length > 0 && (
+              <div class="gallery">
+                {story.media.map((media, i) => (
+                  <figure>
+                    <img
+                      src={media.src}
+                      alt={media.caption}
+                      loading={i === 0 && !demo ? 'eager' : 'lazy'}
+                      decoding="async"
+                    />
+                    <figcaption>{media.caption}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div class="detail-cover">
             <canvas class="generated-cover" data-cave={`${project.id}-cover`} aria-hidden="true" />
