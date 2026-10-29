@@ -17,7 +17,9 @@ export default defineConfig({
 
   // /work has no index page — case studies live at /work/<id> and the index is
   // the #work section on the homepage. Catch the guessable bare URL.
-  redirects: { '/work': '/#work' },
+  redirects: {
+    '/work': '/#work',
+  },
 
   // The adapter reads wrangler.toml automatically, so `Astro.locals.runtime.env`
   // (KV, secrets) is simulated locally during `astro dev`.
@@ -43,7 +45,7 @@ export default defineConfig({
         const path = new URL(page).pathname.replace(/\/$/, '') || '/';
         return (
           !/\.[^/]+$/.test(path) &&
-          (path === '/' || path === '/blog' || /^\/(blog|work)\/.+/.test(path))
+          (path === '/' || path === '/blog' || /^\/(blog|work|showcase)\/.+/.test(path))
         );
       },
     }),
