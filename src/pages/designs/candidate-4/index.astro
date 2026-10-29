@@ -1,0 +1,101 @@
+---
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import '@fontsource-variable/geist';
+import './candidate.css';
+import { projects } from '../../../data/projects';
+import { publicPosts } from '../../../lib/discovery/documents';
+
+const featuredIds = ['sift', 'focus-quote', 'catcher'];
+const featured = featuredIds.map((id) => projects.find((project) => project.id === id)!);
+const experience = projects.filter((project) => project.category === 'Experience');
+const categories = ['Experience', 'Product', 'Open source', 'Experiment'] as const;
+const posts = (await publicPosts()).slice(0, 2);
+const date = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f3e9" />
+    <meta name="description" content="Tomas Brasca is a full-stack software engineer building web and mobile products, APIs, and AI systems." />
+    <title>Tomas Brasca — Pigment Studio</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="pigment">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header shell">
+      <a class="wordmark" href="/designs/candidate-4" aria-label="Tomas Brasca, home">Tomas <span>Brasca</span><i aria-hidden="true">✳</i></a>
+      <nav aria-label="Main navigation"><a href="#work">Work</a><a href="#index">Index</a><a href="/designs/candidate-4/blog">Journal</a><a href="#contact">Contact</a></nav>
+      <a class="view-designs" href="/designs">View designs </a>
+    </header>
+    <main id="main">
+      <section class="hero shell" aria-labelledby="hero-title">
+        <div class="hero-overline"><span class="label-chip">Portfolio / 2026</span><span>Full-stack software engineer · Rosario, Argentina</span></div>
+        <div class="hero-grid"><h1 id="hero-title">Ideas made<br /><em>useful.</em></h1><div class="hero-intro"><span class="hero-mark" aria-hidden="true">✳</span><p>I’m Tomas. I build thoughtful web and mobile products, the APIs behind them, and AI systems that make them useful.</p><a class="underlined-link" href="#work">Explore the work <span aria-hidden="true">↓</span></a></div></div>
+        <div class="hero-rule"><span>01 / Selected work</span><span>Scroll to explore ↓</span></div>
+      </section>
+
+      <section id="work" class="showcase shell" aria-labelledby="showcase-title">
+        <div class="section-heading"><span class="eyebrow">Selected work / 03</span><h2 id="showcase-title">Products in focus<span class="blue-period">.</span></h2><p>Independent tools for learning, reading, and making.</p></div>
+        <div class="gallery" data-gallery>
+          <div class="gallery-selector" aria-label="Choose featured project">
+            {featured.map((project, index) => <button class="gallery-choice" type="button" data-project-choice={project.id} aria-pressed={index === 0 ? 'true' : 'false'} aria-controls={`gallery-${project.id}`}><span class="choice-number">0{index + 1}</span><span class="choice-name">{project.name}</span></button>)}
+          </div>
+          <div class="gallery-panels">
+            {featured.map((project, index) => <article class="gallery-panel" id={`gallery-${project.id}`} data-project-panel={project.id}>
+              <div class="gallery-image-wrap"><a href={`/showcase/${project.id}`} aria-label={`Explore ${project.name}`}><img src={project.image!} alt={`${project.name} product interface`} width="1440" height="900" loading={index === 0 ? 'eager' : 'lazy'} /></a><span class="image-stamp">Fig. 0{index + 1} / {project.category}</span></div>
+              <div class="gallery-caption"><div><span class="eyebrow">{project.stack}</span><h3>{project.name}</h3><p>{project.description}</p></div><a class="project-cta" href={`/showcase/${project.id}`}>Explore project </a></div>
+            </article>)}
+          </div>
+        </div>
+      </section>
+
+      <section class="experience-band" aria-labelledby="experience-title"><div class="shell experience-grid"><div class="experience-lead"><span class="eyebrow">02 / Engineering experience</span><h2 id="experience-title">Built in teams.<br /><em>Shipped in the world.</em></h2><p>Product engineering across customer-facing interfaces, backend systems, and AI workflows.</p></div><div class="experience-cards">{experience.map((project) => <article class="experience-card"><span class="card-index">{project.id === 'mint' ? '01' : '02'} / Experience</span><h3><a href={`/showcase/${project.id}`}>{project.name} </a></h3><p>{project.description}</p><span class="card-stack">{project.stack}</span></article>)}</div></div></section>
+
+      <section id="index" class="index-section shell" aria-labelledby="index-title"><div class="index-heading"><div><span class="eyebrow">03 / Complete index</span><h2 id="index-title">The whole <em>body of work.</em></h2></div><p>All 13 projects, from product work to smaller experiments. Choose a category to explore.</p></div>
+        <div class="index-controls" aria-label="Filter projects" data-category-controls hidden><button type="button" class="filter-button" data-category-choice="" aria-pressed="true">All <span>{projects.length}</span></button>{categories.map((category) => <button type="button" class="filter-button" data-category-choice={category} aria-pressed="false">{category} <span>{projects.filter((project) => project.category === category).length}</span></button>)}<button type="button" class="reset-button" data-category-reset hidden>Clear filter ↺</button></div>
+        <p class="result-count" data-result-count role="status" aria-live="polite">Showing all {projects.length} projects</p>
+        <div class="project-grid">{projects.map((project, index) => <article class="project-tile" data-project-category={project.category}><div class="tile-top"><span>{String(index + 1).padStart(2, '0')} / {project.category}</span><span aria-hidden="true">✳</span></div><h3><a href={`/showcase/${project.id}`}>{project.name} </a></h3><p>{project.description}</p><span class="tile-stack">{project.stack}</span></article>)}</div>
+        <p class="archive-note">More public code at <a href="https://github.com/soundOfff" target="_blank" rel="noopener noreferrer">soundOfff on GitHub </a></p>
+      </section>
+
+      <section class="journal-teaser shell" aria-labelledby="writing-title"><div><span class="eyebrow">04 / Notes from the work</span><h2 id="writing-title">On the <em>page.</em></h2><a class="underlined-link" href="/designs/candidate-4/blog">Visit the journal </a></div><div class="teaser-list">{posts.map((post) => <article><span>{date.format(post.data.date)} / {post.data.pillar}</span><h3><a href={`/blog/${post.id}`}>{post.data.title} </a></h3></article>)}</div></section>
+    </main>
+    <footer id="contact" class="site-footer"><div class="shell"><span class="eyebrow">Have something in mind?</span><div class="footer-hero"><p>Let’s make it <em>useful.</em></p></div><div class="footer-bottom"><span>© {new Date().getFullYear()} Tomas Brasca</span><div><a href="mailto:tomibrasca97@gmail.com">Email</a><a href="https://github.com/soundOfff" target="_blank" rel="noopener noreferrer">GitHub</a><a href="/designs/candidate-4/blog">Journal</a><a href="/designs">Designs</a></div><span>Rosario · UTC−3</span></div></div></footer>
+  </body>
+</html>
+
+<script>
+  const gallery = document.querySelector<HTMLElement>('[data-gallery]');
+  const projectChoices = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-project-choice]'));
+  const projectPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-project-panel]'));
+  let selectedProjectId = 'sift';
+  function showProject() {
+    projectChoices.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.projectChoice === selectedProjectId)));
+    projectPanels.forEach((panel) => { panel.hidden = panel.dataset.projectPanel !== selectedProjectId; });
+  }
+  gallery?.classList.add('gallery-ready');
+  showProject();
+  projectChoices.forEach((button) => button.addEventListener('click', () => { selectedProjectId = button.dataset.projectChoice ?? 'sift'; showProject(); }));
+
+  const categoryChoices = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-category-choice]'));
+  const projectTiles = Array.from(document.querySelectorAll<HTMLElement>('[data-project-category]'));
+  const resultCount = document.querySelector<HTMLElement>('[data-result-count]');
+  const reset = document.querySelector<HTMLButtonElement>('[data-category-reset]');
+  const categoryControls = document.querySelector<HTMLElement>('[data-category-controls]');
+  let selectedCategory = '';
+  function showCategory() {
+    categoryChoices.forEach((button) => button.setAttribute('aria-pressed', String((button.dataset.categoryChoice ?? '') === selectedCategory)));
+    const count = projectTiles.reduce((visible, tile) => { tile.hidden = Boolean(selectedCategory) && tile.dataset.projectCategory !== selectedCategory; return visible + Number(!tile.hidden); }, 0);
+    if (resultCount) resultCount.textContent = selectedCategory ? `Showing ${count} ${selectedCategory.toLowerCase()} project${count === 1 ? '' : 's'}` : `Showing all ${count} projects`;
+    if (reset) reset.hidden = !selectedCategory;
+  }
+  if (categoryControls) categoryControls.hidden = false;
+  showCategory();
+  categoryChoices.forEach((button) => button.addEventListener('click', () => { selectedCategory = button.dataset.categoryChoice ?? ''; showCategory(); }));
+  reset?.addEventListener('click', () => { selectedCategory = ''; showCategory(); categoryChoices[0]?.focus(); });
+</script>

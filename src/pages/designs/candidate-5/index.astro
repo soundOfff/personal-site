@@ -1,0 +1,146 @@
+---
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/jetbrains-mono';
+import './candidate.css';
+import { projects } from '../../../data/projects';
+import { publicPosts } from '../../../lib/discovery/documents';
+import projectStories from '../../../data/project-stories.json';
+import ProjectPreview from '../../../components/ProjectPreview.astro';
+
+const posts = (await publicPosts()).slice(0, 3);
+const sift = projects.find((p) => p.id === 'sift')!;
+const focusQuote = projects.find((p) => p.id === 'focus-quote')!;
+const independent = projects.filter((p) => p.category !== 'Experience' && !['sift', 'focus-quote'].includes(p.id));
+const date = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+const curatedProducts = projects.filter((p) => ['sift', 'focus-quote', 'catcher', 'dana', '60-seconds', 'a2ui'].includes(p.id));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5fcfa" />
+    <meta name="description" content="Tomas Brasca is a full-stack software engineer building web and mobile products, APIs, and AI systems." />
+    <title>Tomas Brasca · Tidal Studio</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="candidate-five">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header shell">
+      <a class="wordmark" href="/designs/candidate-5" aria-label="Tomas Brasca, home">Tomas<span>Brasca</span><b aria-hidden="true">✦</b></a>
+      <nav aria-label="Main navigation">
+        <a href="#selected">Work</a>
+        <a href="#index">Index</a>
+        <a href="/designs/candidate-5/blog">Writing</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="header-switch" href="/designs">View designs </a>
+    </header>
+
+    <main id="main">
+      <section class="hero shell" aria-labelledby="hero-title">
+        <div class="hero-main">
+          <p class="availability"><span class="availability-dot" aria-hidden="true"></span> Full-stack software engineer · Rosario, Argentina</p>
+          <h1 id="hero-title">Making things<br /><em>worth using.</em></h1>
+        </div>
+        <div class="hero-side">
+          <p>I'm Tomas. I build web and mobile products, the APIs behind them, and the AI systems that make them useful.</p>
+          <a class="text-link" href="#selected">Explore selected work <span aria-hidden="true">↓</span></a>
+        </div>
+      </section>
+
+      <section id="selected" class="selected shell" aria-labelledby="selected-title">
+        <div class="section-heading"><h2 id="selected-title">Selected work</h2><p>Independent products</p></div>
+        <article class="lead-project">
+          <div class="lead-project-top">
+            <div><span class="project-kicker">Chrome extension / Learning</span><h3>{sift.name}<span class="project-star" aria-hidden="true">✦</span></h3></div>
+            <p>{sift.description}</p>
+            <button class="quick-view-trigger" data-project-quick-view="sift" aria-label="Quick view of Sift project">Preview</button>
+          </div>
+          <a class="lead-image" href={`/showcase/${sift.id}`} aria-label="Explore Sift project details"><img src={sift.image!} width="1280" height="800" alt="Sift sidebar beside a YouTube lesson, showing timestamped notes and a captured frame about HTTPS session keys" /></a>
+          <div class="lead-project-bottom"><span>Keep the important ideas beside the video.</span><span>TypeScript · Chrome extension · AI</span></div>
+        </article>
+
+        <article class="second-project">
+          <div class="second-copy">
+            <span class="project-kicker">Open source / Reading & focus</span>
+            <h3>{focusQuote.name}</h3>
+            <p>{focusQuote.description}</p>
+            <div class="project-actions">
+              <button class="text-link" data-project-quick-view="focus-quote">Quick view </button>
+              <a class="quiet-link" href={focusQuote.source!} target="_blank" rel="noopener noreferrer">Source </a>
+            </div>
+          </div>
+          <a class="second-image" href={`/showcase/${focusQuote.id}`} aria-label="Explore FocusQuote project details"><img src={focusQuote.image!} width="1915" height="821" loading="lazy" alt="FocusQuote overview with saved quotes, active topics, and a focus session" /></a>
+        </article>
+      </section>
+
+      <section class="experience-band" aria-labelledby="experience-title">
+        <div class="shell experience-inner">
+          <div class="experience-intro"><p class="band-caption">Employer contributions</p><h2 id="experience-title">Built in teams.<br /><em>Used in the world.</em></h2><p>Product engineering across customer-facing interfaces and backend systems.</p></div>
+          <div class="experience-list">
+            {projects.filter((p) => p.category === 'Experience').reverse().map((p) => <article class="experience-item"><div class="experience-item-top"><h3><a href={`/showcase/${p.id}`}>{p.name}</a></h3><span>{p.id === 'dex' ? 'Software Engineer II' : 'Commerce platform'}</span></div><p>{p.description}</p><div class="experience-item-links"><a href={`/showcase/${p.id}`}>Read contribution </a>{p.website && <a href={p.website} target="_blank" rel="noopener noreferrer">Visit site </a>}</div></article>)}
+          </div>
+          <figure class="experience-preview"><a href="/showcase/dex" aria-label="Explore the Dex contribution"><img src="/previews/dex.webp" width="1546" height="1120" loading="lazy" alt="Dex product home interface with contacts, reminders, calendar events, and a copilot prompt" /></a><figcaption>Dex product interface · Explore my contribution </figcaption></figure>
+        </div>
+      </section>
+
+      <section id="index" class="index-section shell" aria-labelledby="index-title">
+        <div class="index-intro"><p class="small-label">The complete index</p><h2 id="index-title">More things<br />I've made.</h2><p>Products, open-source work, and experiments. Each one began with a concrete problem or a new tool worth exploring.</p></div>
+        <div class="project-index">
+          {independent.map((p) => <article class="index-row"><div class="index-name"><span class="category-dot" aria-hidden="true"></span><h3><a href={`/showcase/${p.id}`}>{p.name}</a></h3><span class="index-category">{p.category}</span></div><p>{p.description}</p><div class="index-links">{curatedProducts.find((cp) => cp.id === p.id) ? <button data-project-quick-view={p.id} aria-label={`Quick view of ${p.name}`}>Preview</button> : <a href={`/showcase/${p.id}`} aria-label={`Explore ${p.name}`}>Details</a>}{p.website && <a href={p.id === 'a2ui' ? '/#playground' : p.website} target={p.id === 'a2ui' ? undefined : '_blank'} rel={p.id === 'a2ui' ? undefined : 'noopener noreferrer'} aria-label={`${p.id === 'a2ui' ? 'Try' : 'Visit'} ${p.name}`}>{p.id === 'a2ui' ? 'Try' : 'Site'}</a>}{p.source && <a href={p.source} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} source code`}>Code</a>}</div></article>)}
+        </div>
+        <p class="archive-note">For the full public repository archive, <a href="https://github.com/soundOfff" target="_blank" rel="noopener noreferrer">visit soundOfff on GitHub </a></p>
+      </section>
+
+      <section class="about-section shell" aria-labelledby="about-title">
+        <div><p class="small-label">The person behind the pixels</p><h2 id="about-title">Curious about the<br /><em>whole system.</em></h2></div>
+        <div class="about-body"><p>I have 5+ years of full-stack experience. I've built CRM features for web and mobile at Dex, worked on multi-provider AI routing, and developed commerce services around inventory, checkout, and a WordPress order ledger for Mint Mobile.</p><p>Outside product work, I was an ICPC South America finalist and placed first in the GTS algorithmic trading competition. Those experiences still shape how I reason about constraints and tradeoffs.</p><div class="about-facts"><span>Based in Rosario, Argentina</span><span>Remote · UTC−3</span></div><a class="text-link" href="/cv.pdf">Read my résumé </a></div>
+      </section>
+
+      <section class="writing-section shell" aria-labelledby="writing-title"><div class="section-heading"><h2 id="writing-title">Notes from the work</h2><a class="text-link" href="/designs/candidate-5/blog">All writing </a></div><div class="teaser-list">{posts.map((post) => <article class="teaser"><span>{date.format(post.data.date)}</span><div><h3><a href={`/blog/${post.id}`}>{post.data.title}</a></h3><p>{post.data.description}</p></div></article>)}</div></section>
+    </main>
+
+    <footer id="contact" class="site-footer"><div class="shell"><div class="footer-top"><p>Have a product problem<br />worth thinking through?</p><a href="mailto:tomibrasca97@gmail.com">Let's talk </a></div><div class="footer-bottom"><span>© {new Date().getFullYear()} Tomas Brasca</span><div><a href="mailto:tomibrasca97@gmail.com">Email</a><a href="https://github.com/soundOfff" target="_blank" rel="noopener noreferrer">GitHub</a><a href="/designs/candidate-5/blog">Writing</a><a href="/designs">Designs</a></div><span>Rosario · UTC−3</span></div></div></footer>
+
+    {curatedProducts.map((project) => {
+      const story = Object.entries(projectStories).find(([id]) => id === project.id)?.[1];
+      return story && <dialog id={`preview-${project.id}`} class="project-dialog" aria-labelledby={`preview-title-${project.id}`}>
+        <button type="button" class="project-dialog-close" data-dialog-close aria-label="Close project details">×</button>
+        <div>
+          {project.image ? <img src={project.image} alt={`${project.name} project preview`} class="project-dialog-image" loading="lazy" /> : <ProjectPreview project={project} />}
+          <div class="project-dialog-body">
+            <h2 id={`preview-title-${project.id}`}>{project.name}</h2>
+            <p class="project-dialog-subtitle">{story.subtitle}</p>
+            <div class="project-dialog-meta"><span>{story.role}</span><span>{story.status}</span></div>
+            <p class="project-dialog-story">{story.story}</p>
+            <div class="project-dialog-actions">
+              <a href={`/showcase/${project.id}`}>Full project details →</a>
+              {project.source && <a href={project.source} target="_blank" rel="noreferrer">View source </a>}
+              {project.website && project.id !== 'a2ui' && <a href={project.website} target="_blank" rel="noreferrer">Visit site </a>}
+            </div>
+          </div>
+        </div>
+      </dialog>;
+    })}
+  </body>
+</html>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-project-quick-view]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const dialog = document.getElementById(`preview-${button.dataset.projectQuickView}`);
+      if (dialog instanceof HTMLDialogElement) dialog.showModal();
+    });
+  });
+  document.querySelectorAll<HTMLDialogElement>('.project-dialog').forEach((dialog) => {
+    dialog.querySelector<HTMLButtonElement>('[data-dialog-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+</script>

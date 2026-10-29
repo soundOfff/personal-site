@@ -1,0 +1,110 @@
+---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import './candidate.css';
+import { projects } from '../../../data/projects';
+import { publicPosts } from '../../../lib/discovery/documents';
+
+const posts = (await publicPosts()).slice(0, 3);
+const byId = (id: string) => projects.find((project) => project.id === id)!;
+const sift = byId('sift');
+const focusQuote = byId('focus-quote');
+const dex = byId('dex');
+const mint = byId('mint');
+const independentProjects = projects.filter((project) => project.category !== 'Experience');
+const date = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#3449df" />
+    <meta name="description" content="Tomas Brasca is a full-stack software engineer in Rosario, Argentina. Selected products, engineering work and writing." />
+    <title>Tomas Brasca — Software engineer & maker</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="candidate-three">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <main>
+    <div class="hero-shell">
+      <header class="site-header wrap">
+        <a class="brand" href="/designs/candidate-3/" aria-label="Tomas Brasca, candidate 3 home">Tomas<span>Brasca</span><span class="brand-mark" aria-hidden="true">✳</span></a>
+        <nav aria-label="Main navigation">
+          <a href="#work">Work</a>
+          <a href="/designs/candidate-3/blog">Writing</a>
+          <a href="#about">About</a>
+          <a class="nav-contact" href="mailto:tomibrasca97@gmail.com">Get in touch </a>
+        </nav>
+      </header>
+
+        <section class="hero wrap" id="main" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="intro-line"><span class="live-dot" aria-hidden="true"></span> Full-stack engineer in Rosario, Argentina <span class="intro-rule" aria-hidden="true"></span> Remote, UTC−3</p>
+            <h1 id="hero-title">I build the <em>whole</em> thing.</h1>
+            <div class="hero-foot">
+              <p>From the interface someone touches to the systems that make it work. I’m Tomas, a software engineer with 5+ years building web, mobile and AI products.</p>
+              <a href="#work" class="circle-link" aria-label="Explore selected work"><span aria-hidden="true">↓</span></a>
+            </div>
+          </div>
+          <div class="hero-index" aria-hidden="true"><span>TB / 26</span><span>Selected work<br />& notes</span></div>
+        </section>
+
+        <section class="lead-project wrap" id="work" aria-labelledby="sift-title">
+          <div class="lead-topline"><span>Featured independent product</span><span>01 / Sift</span></div>
+          <a class="sift-stage" href={`/showcase/${sift.id}`} aria-label="Explore Sift project details">
+            <div class="sift-window">
+              <div class="window-bar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>Learning, captured in context</span><span class="window-end">SIFT</span></div>
+              <img src={sift.image!} alt="Sift's study panel beside a YouTube lesson, showing timestamped notes and a captured diagram" width="1280" height="800" fetchpriority="high" />
+            </div>
+            <span class="stage-stamp" aria-hidden="true">SIFT<br /></span>
+          </a>
+          <div class="lead-caption">
+            <div><p class="section-kicker">Chrome extension / AI / Learning</p><h2 id="sift-title">Sift</h2></div>
+            <p>{sift.description} <a href={`/showcase/${sift.id}`}>Explore the project </a></p>
+          </div>
+        </section>
+    </div>
+
+    <section class="work-section wrap" aria-labelledby="more-work-title">
+      <div class="section-heading"><div><p class="section-kicker">The work</p><h2 id="more-work-title">Things made<br /><em>to be used.</em></h2></div><p>Independent products and contributions to teams. Each starts with a problem worth understanding, then gets built all the way through.</p></div>
+      <div class="feature-grid">
+        <article class="feature feature-focus">
+          <a class="feature-visual focus-visual" href={`/showcase/${focusQuote.id}`} aria-label="Explore FocusQuote project details"><img src={focusQuote.image!} alt="FocusQuote interface showing saved passages and focus sessions" loading="lazy" width="1440" height="900" /></a>
+          <div class="feature-caption"><div><p class="section-kicker">Independent / Open source</p><h3>FocusQuote</h3></div><p>{focusQuote.description}</p><div class="feature-actions"><a href={`/showcase/${focusQuote.id}`}>Project details </a><a href={focusQuote.source!} target="_blank" rel="noopener noreferrer">Source </a></div></div>
+        </article>
+        <article class="feature feature-dex">
+          <a class="feature-visual dex-visual" href={`/showcase/${dex.id}`} aria-label="Explore Dex contribution details"><img src="/previews/dex.webp" alt="Dex CRM dashboard with contacts, reminders and a Copilot entry point" loading="lazy" width="1548" height="1120" /></a>
+          <div class="feature-caption"><div><p class="section-kicker">Employer contribution / CRM</p><h3>Dex</h3></div><p>{dex.description}</p><div class="feature-actions"><a href={`/showcase/${dex.id}`}>Contribution details </a><a href={dex.website!} target="_blank" rel="noopener noreferrer">Visit Dex </a></div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="experience-band" id="about" aria-labelledby="experience-title">
+      <div class="wrap experience-grid">
+        <div><p class="section-kicker">How I work</p><h2 id="experience-title">Between product instinct and engineering depth.</h2></div>
+        <div class="experience-copy"><p>I like the decisions in the middle: how an interface fits its workflow, where a service draws its boundaries, and how to know if an AI feature is actually useful.</p><dl><div><dt>Dex</dt><dd>Software Engineer II. CRM across web and mobile; multi-provider AI routing and task-specific evals.</dd></div><div><dt>Mint Mobile</dt><dd>Commerce and backend work around inventory, checkout APIs and a WordPress order ledger backed by Postgres.</dd></div><div><dt>Before that</dt><dd>ICPC South America finalist and 1st place in GTS algorithmic trading.</dd></div></dl><a href="/cv.pdf" class="text-link">Download résumé </a></div>
+      </div>
+    </section>
+
+    <section class="archive-section wrap" aria-labelledby="archive-title">
+      <div class="archive-intro"><div><p class="section-kicker">A complete index</p><h2 id="archive-title">Everything<br /><em>on the bench.</em></h2></div><p>Selected work is only part of the picture. Here’s the full project catalog, with employer contributions kept separate from independent projects.</p></div>
+      <h3 class="index-label">At work</h3>
+      <div class="project-list">
+        {[dex, mint].map((project) => <article class="project-row"><a class="project-main" href={`/showcase/${project.id}`}><span class="project-name">{project.name}</span><span class="project-description">{project.description}</span></a><div class="project-links"><span>Employer contribution</span>{project.website && <a href={project.website} target="_blank" rel="noopener noreferrer">Website </a>}</div></article>)}
+      </div>
+      <h3 class="index-label independent-label">Independent work</h3>
+      <div class="project-list">
+        {independentProjects.map((project) => <article class="project-row"><a class="project-main" href={`/showcase/${project.id}`}><span class="project-name">{project.name}</span><span class="project-description">{project.description}</span></a><div class="project-links"><span>{project.category}</span>{project.website && <a href={project.id === 'a2ui' ? '/#playground' : project.website} target={project.website.startsWith('http') ? '_blank' : undefined} rel={project.website.startsWith('http') ? 'noopener noreferrer' : undefined}>{project.id === 'a2ui' ? 'Try it' : 'Website'} </a>}{project.source && <a href={project.source} target="_blank" rel="noopener noreferrer">Source </a>}</div></article>)}
+      </div>
+    </section>
+
+    <section class="writing-section" aria-labelledby="writing-title"><div class="wrap"><div class="writing-heading"><div><p class="section-kicker">Notes from the work</p><h2 id="writing-title">Thinking<br /><em>out loud.</em></h2></div><a href="/designs/candidate-3/blog" class="writing-all">Read the journal </a></div><div class="writing-teasers">{posts.map((post) => <article><p class="teaser-meta"><time datetime={post.data.date.toISOString()}>{date.format(post.data.date)}</time><span>{post.data.pillar}</span></p><h3><a href={`/blog/${post.id}`}>{post.data.title}</a></h3><p>{post.data.description}</p></article>)}</div></div></section>
+    </main>
+
+    <footer class="footer"><div class="wrap"><p>Have a problem worth making sense of?</p><a class="footer-email" href="mailto:tomibrasca97@gmail.com">Let’s talk</a><div class="footer-bottom"><span>Tomas Brasca / Rosario, Argentina</span><div><a href="https://github.com/soundOfff" target="_blank" rel="noopener noreferrer">GitHub</a><a href="/cv.pdf">Résumé</a><a href="/designs">All designs</a><a href="#main">Back to top ↑</a></div></div></div></footer>
+  </body>
+</html>

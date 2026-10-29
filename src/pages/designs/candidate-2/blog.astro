@@ -1,0 +1,470 @@
+---
+// Self-hosted fonts
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import '@fontsource-variable/geist';
+
+import { publicPosts } from '../../../lib/discovery/documents';
+import { site, profile } from '../../../data/site';
+import iconSprite from '../../../assets/icons.svg?raw';
+
+const posts = await publicPosts();
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+const date = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+const pageTitle = `Blog · ${profile.name}`;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content="Notes on AI systems, algorithms, and the decisions behind the things I build." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="color-scheme" content="light dark" />
+</head>
+<body>
+  <Fragment set:html={iconSprite} />
+
+  <nav class="site-nav">
+    <div class="nav-left">
+      <a href="/designs/candidate-2" class="nav-back">← Portfolio</a>
+      <a href="/designs" class="nav-compare">All designs</a>
+    </div>
+    <button data-theme-toggle aria-label="Toggle theme">
+      <svg width="18" height="18"><use data-theme-icon href="#i-moon"></use></svg>
+    </button>
+  </nav>
+
+  <header class="blog-header">
+    <div class="header-content">
+      <h1>Blog</h1>
+      <p class="lead">
+        Notes on building AI products, understanding systems, and learning from the work.
+      </p>
+    </div>
+  </header>
+
+  <main class="blog-main">
+    <aside class="blog-sidebar">
+      <div class="filter-section">
+        <label for="topic-filter">
+          <span class="filter-label">Filter by topic</span>
+          <select id="topic-filter" aria-controls="article-list">
+            <option value="">All topics ({posts.length})</option>
+            {tags.map((tag) => (
+              <option value={tag}>{tag.replaceAll('-', ' ')}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <p id="article-count" class="article-count" role="status" aria-atomic="true">
+        {posts.length} {posts.length === 1 ? 'article' : 'articles'}
+      </p>
+    </aside>
+
+    <div class="articles">
+      <ol class="article-list" id="article-list">
+        {posts.map((post) => (
+          <li data-tags={JSON.stringify(post.data.tags)}>
+            <article class="article-card">
+              <time datetime={post.data.date.toISOString()}>
+                {date.format(post.data.date)}
+              </time>
+              <h2>
+                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+              </h2>
+              <p class="article-description">{post.data.description}</p>
+              <div class="article-meta">
+                <span class="pillar">{post.data.pillar}</span>
+                <span class="reading-time">{post.data.readingTime}</span>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ol>
+
+      <p class="empty-state" id="empty-state" hidden>
+        No articles in this topic. <a href="/designs/candidate-2/blog">View all articles</a>
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>
+        <p><strong>Tomas Brasca</strong></p>
+        <p>Full-stack software engineer</p>
+      </div>
+      <div class="footer-links">
+        <a href="/designs/candidate-2">Portfolio</a>
+        <a href="mailto:tomibrasca97@gmail.com">Email</a>
+        <a href="/cv.pdf">Resume</a>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --font-sans: 'Geist Variable', system-ui, sans-serif;
+      --font-serif: 'Newsreader Variable', Georgia, serif;
+      --color-bg: #fafafa;
+      --color-text: #1a1a1a;
+      --color-text-muted: #666;
+      --color-border: #e0e0e0;
+      --color-accent: #2563eb;
+      --color-accent-hover: #1d4ed8;
+      --spacing-unit: 8px;
+    }
+
+    :root[data-theme="dark"] {
+      --color-bg: #0f0f0f;
+      --color-text: #e8e8e8;
+      --color-text-muted: #999;
+      --color-border: #2a2a2a;
+      --color-accent: #60a5fa;
+      --color-accent-hover: #93c5fd;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4);
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    .nav-back,
+    .nav-compare {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover,
+    .nav-compare:hover {
+      color: var(--color-text);
+    }
+
+    button[data-theme-toggle] {
+      background: none;
+      border: none;
+      color: var(--color-text);
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    .blog-header {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: calc(var(--spacing-unit) * 12) calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 8);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .header-content {
+      max-width: 700px;
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(48px, 8vw, 72px);
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: calc(var(--spacing-unit) * 3);
+      letter-spacing: -0.02em;
+    }
+
+    .lead {
+      font-size: clamp(18px, 2.5vw, 22px);
+      line-height: 1.5;
+      color: var(--color-text-muted);
+      max-width: 42ch;
+    }
+
+    .blog-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: calc(var(--spacing-unit) * 6) calc(var(--spacing-unit) * 4);
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: calc(var(--spacing-unit) * 8);
+      align-items: start;
+    }
+
+    .blog-sidebar {
+      position: sticky;
+      top: calc(var(--spacing-unit) * 10);
+    }
+
+    .filter-section {
+      margin-bottom: calc(var(--spacing-unit) * 3);
+    }
+
+    .filter-label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+      margin-bottom: calc(var(--spacing-unit));
+    }
+
+    select {
+      width: 100%;
+      padding: calc(var(--spacing-unit) * 1.5);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      background: var(--color-bg);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    select:hover,
+    select:focus {
+      border-color: var(--color-text-muted);
+      outline: none;
+    }
+
+    .article-count {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .article-list {
+      list-style: none;
+      display: grid;
+      gap: calc(var(--spacing-unit) * 6);
+    }
+
+    .article-card {
+      padding-bottom: calc(var(--spacing-unit) * 6);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .article-card time {
+      display: block;
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .article-card h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 4vw, 36px);
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      letter-spacing: -0.01em;
+    }
+
+    .article-card h2 a {
+      color: var(--color-text);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .article-card h2 a:hover {
+      color: var(--color-accent);
+    }
+
+    .article-description {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--color-text-muted);
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      max-width: 60ch;
+    }
+
+    .article-meta {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .pillar {
+      font-weight: 500;
+    }
+
+    .reading-time::before {
+      content: '·';
+      margin-right: calc(var(--spacing-unit) * 2);
+    }
+
+    .empty-state {
+      padding: calc(var(--spacing-unit) * 8) 0;
+      text-align: center;
+      color: var(--color-text-muted);
+    }
+
+    .empty-state a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--color-border);
+      padding: calc(var(--spacing-unit) * 6) calc(var(--spacing-unit) * 4);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    .footer-content p {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin-bottom: calc(var(--spacing-unit) / 2);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    .footer-links a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--color-text);
+    }
+
+    @media (max-width: 768px) {
+      .blog-main {
+        grid-template-columns: 1fr;
+        gap: calc(var(--spacing-unit) * 4);
+      }
+
+      .blog-sidebar {
+        position: static;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: calc(var(--spacing-unit) * 4);
+      }
+
+      .footer-content {
+        flex-direction: column;
+      }
+    }
+  </style>
+
+  <script is:inline define:vars={{ key: `${site.themeKey}:editorial-preview` }}>
+    (function () {
+      const root = document.documentElement;
+      const current = () =>
+        root.dataset.theme ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const apply = (theme) => {
+        root.dataset.theme = theme;
+        document.querySelectorAll('[data-theme-icon]').forEach((u) => {
+          u.setAttribute('href', theme === 'dark' ? '#i-sun' : '#i-moon');
+        });
+      };
+      let saved;
+      try { saved = localStorage.getItem(key); } catch {}
+      apply(saved === 'dark' ? 'dark' : 'light');
+      document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const next = current() === 'dark' ? 'light' : 'dark';
+          try {
+            localStorage.setItem(key, next);
+          } catch {}
+          apply(next);
+        });
+      });
+    })();
+  </script>
+
+  <script is:inline>
+    (() => {
+      const select = document.getElementById('topic-filter');
+      const entries = [...document.querySelectorAll('[data-tags]')].map((element) => ({
+        element,
+        tags: JSON.parse(element.dataset.tags),
+      }));
+      const count = document.getElementById('article-count');
+      const empty = document.getElementById('empty-state');
+
+      const apply = () => {
+        let visible = 0;
+        entries.forEach(({ element, tags }) => {
+          element.hidden = Boolean(select.value) && !tags.includes(select.value);
+          if (!element.hidden) visible++;
+        });
+        count.textContent = `${visible} ${visible === 1 ? 'article' : 'articles'}`;
+        empty.hidden = visible !== 0;
+      };
+
+      const initial = new URLSearchParams(location.search).get('tag');
+      if (initial && ![...select.options].some((option) => option.value === initial)) {
+        select.add(new Option(initial.replaceAll('-', ' '), initial));
+      }
+      select.value = initial || '';
+
+      select.addEventListener('change', () => {
+        apply();
+        const url = new URL(location.href);
+        if (select.value) url.searchParams.set('tag', select.value);
+        else url.searchParams.delete('tag');
+        history.replaceState(null, '', url);
+      });
+
+      apply();
+    })();
+  </script>
+</body>
+</html>

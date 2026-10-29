@@ -1,0 +1,53 @@
+---
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import '@fontsource-variable/geist';
+import './candidate.css';
+import { publicPosts } from '../../../lib/discovery/documents';
+
+const posts = await publicPosts();
+const categories = [...new Set(posts.map((post) => post.data.pillar))];
+const date = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f3e9" />
+    <meta name="description" content="A journal by Tomas Brasca about product engineering, AI systems, algorithms, and the work behind the work." />
+    <title>Journal — Tomas Brasca / Pigment Studio</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="pigment journal-page">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header shell"><a class="wordmark" href="/designs/candidate-4" aria-label="Tomas Brasca, home">Tomas <span>Brasca</span><i aria-hidden="true">✳</i></a><nav aria-label="Main navigation"><a href="/designs/candidate-4#work">Work</a><a href="/designs/candidate-4#index">Index</a><a href="/designs/candidate-4/blog" aria-current="page">Journal</a><a href="#contact">Contact</a></nav><a class="view-designs" href="/designs">View designs </a></header>
+    <main id="main">
+      <section class="journal-hero shell" aria-labelledby="journal-title"><div class="hero-overline"><span class="label-chip">Journal / Field notes</span><span>Writing by Tomas Brasca</span></div><div class="journal-hero-grid"><h1 id="journal-title">Thinking<br /><em>out loud.</em></h1><div><span class="hero-mark" aria-hidden="true">✳</span><p>Notes on building products, making systems behave, and learning what matters after the demo.</p><span class="journal-count">{posts.length} articles / {categories.length} themes</span></div></div></section>
+      <section class="journal-index shell" aria-labelledby="articles-title"><div class="journal-index-title"><span class="eyebrow">01 / The archive</span><h2 id="articles-title">All articles<span class="blue-period">.</span></h2></div><div class="journal-controls" aria-label="Filter articles by topic" data-topic-controls hidden><button type="button" class="filter-button" data-topic-choice="" aria-pressed="true">All <span>{posts.length}</span></button>{categories.map((category) => <button type="button" class="filter-button" data-topic-choice={category} aria-pressed="false">{category} <span>{posts.filter((post) => post.data.pillar === category).length}</span></button>)}<button type="button" class="reset-button" data-topic-reset hidden>Clear filter ↺</button></div><p class="result-count" data-topic-result role="status" aria-live="polite">Showing all {posts.length} articles</p><ol class="article-list">{posts.map((post, index) => <li data-topic-category={post.data.pillar}><article class="article-row"><div class="article-meta"><span>{String(index + 1).padStart(2, '0')} / {post.data.pillar}</span><time datetime={post.data.date.toISOString()}>{date.format(post.data.date)}</time></div><div class="article-content"><h3><a href={`/blog/${post.id}`}>{post.data.title}</a></h3><p>{post.data.description}</p><span class="read-time">{post.data.readingTime} read</span></div></article></li>)}</ol></section>
+      <aside class="journal-outro shell"><span class="hero-mark" aria-hidden="true">✳</span><p>Interested in the projects behind these notes?</p><a class="underlined-link" href="/designs/candidate-4#work">Explore selected work </a></aside>
+    </main>
+    <footer id="contact" class="site-footer"><div class="shell"><span class="eyebrow">Have something in mind?</span><div class="footer-hero"><p>Let’s make it <em>useful.</em></p></div><div class="footer-bottom"><span>© {new Date().getFullYear()} Tomas Brasca</span><div><a href="mailto:tomibrasca97@gmail.com">Email</a><a href="https://github.com/soundOfff" target="_blank" rel="noopener noreferrer">GitHub</a><a href="/designs/candidate-4">Work</a><a href="/designs">Designs</a></div><span>Rosario · UTC−3</span></div></div></footer>
+  </body>
+</html>
+
+<script>
+  const topicChoices = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-topic-choice]'));
+  const articles = Array.from(document.querySelectorAll<HTMLElement>('[data-topic-category]'));
+  const result = document.querySelector<HTMLElement>('[data-topic-result]');
+  const reset = document.querySelector<HTMLButtonElement>('[data-topic-reset]');
+  const topicControls = document.querySelector<HTMLElement>('[data-topic-controls]');
+  let selectedCategory = '';
+  function showCategory() {
+    topicChoices.forEach((button) => button.setAttribute('aria-pressed', String((button.dataset.topicChoice ?? '') === selectedCategory)));
+    const count = articles.reduce((visible, article) => { article.hidden = Boolean(selectedCategory) && article.dataset.topicCategory !== selectedCategory; return visible + Number(!article.hidden); }, 0);
+    if (result) result.textContent = selectedCategory ? `Showing ${count} ${selectedCategory} article${count === 1 ? '' : 's'}` : `Showing all ${count} articles`;
+    if (reset) reset.hidden = !selectedCategory;
+  }
+  if (topicControls) topicControls.hidden = false;
+  showCategory();
+  topicChoices.forEach((button) => button.addEventListener('click', () => { selectedCategory = button.dataset.topicChoice ?? ''; showCategory(); }));
+  reset?.addEventListener('click', () => { selectedCategory = ''; showCategory(); topicChoices[0]?.focus(); });
+</script>
