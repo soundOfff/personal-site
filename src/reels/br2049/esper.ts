@@ -101,7 +101,7 @@ export function mountEsper(ctx: ReelContext): () => void {
     const link = document.createElement('a');
     link.className = 'br-esper-source';
     link.href = entry.link.href;
-    link.textContent = 'Read the full case study ↗';
+    link.textContent = 'Read the full case study';
     copy.appendChild(header);
     copy.appendChild(controls);
     copy.appendChild(evidence);
@@ -176,7 +176,7 @@ export function mountEsper(ctx: ReelContext): () => void {
     const inspect = document.createElement('button');
     inspect.type = 'button';
     inspect.className = 'br-esper-inspect';
-    inspect.textContent = 'Inspect ↗';
+    inspect.textContent = 'Inspect';
     inspect.setAttribute('aria-label', `Inspect ${title}`);
     inspect.setAttribute('aria-expanded', 'false');
     inspect.setAttribute('aria-controls', `br-esper-${index}`);

@@ -380,10 +380,6 @@ html[data-boxoffice] {
   color: var(--bo-muted);
   font-size: 11px;
 }
-.bo-house-arrow {
-  margin-left: 16px;
-  color: var(--bo-muted);
-}
 .bo-house:hover b,
 .bo-house[data-current] b {
   color: var(--bo-green);

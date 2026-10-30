@@ -542,8 +542,8 @@ export default function A2UIPlayground() {
                     onClick={readLatest}
                   >
                     {unreadReply
-                      ? 'New reply ready ↑'
-                      : `Latest ${request.kind === 'idle' ? 'reply' : 'question'} ↑`}
+                      ? 'New reply ready'
+                      : `Latest ${request.kind === 'idle' ? 'reply' : 'question'}`}
                   </button>
                   <button type="button" className="a2-reset" onClick={reset}>
                     Start over

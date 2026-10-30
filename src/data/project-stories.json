@@ -197,7 +197,7 @@
     "status": "Single-player prototype",
     "story": "Read a brief, write a prompt, then watch a model compose an interface from a fixed component library. A panel scores the result against the brief. The implemented scope is single-player practice; competitive matchmaking remains a future direction.",
     "contribution": [
-      "Built the brief → prompt → streamed interface → scorecard loop.",
+      "Built the loop from brief to prompt to streamed interface to scorecard.",
       "Restricted generation to a whitelisted component catalog rather than arbitrary markup.",
       "Added a deterministic demo mode with sample generation and judge responses, so the flow can run without paid model calls."
     ],

@@ -36,7 +36,7 @@ const website = project.website === '#playground' ? '/#playground' : project.web
     <header class="detail-hero" data-on-blue>
       <canvas class="detail-cave" data-cave={project.id} data-bloom aria-hidden="true"></canvas>
       <div class="shell">
-        <a class="back" href="/#index">← All projects</a>
+        <a class="back" href="/#index">All projects</a>
         <p class="eyebrow">{project.category}{study && ` / ${study.data.year}`}</p>
         <h1>{project.name}</h1>
         <p class="subtitle">{story.subtitle}</p>
@@ -151,7 +151,7 @@ const website = project.website === '#playground' ? '/#playground' : project.web
     }
 
     <div class="shell section">
-      <a class="journal-cta" href={`/work/${workSlug(next)}`}>Next: {next.name} →</a>
+      <a class="journal-cta" href={`/work/${workSlug(next)}`}>Next: {next.name}</a>
     </div>
   </main>
 </BaseLayout>
