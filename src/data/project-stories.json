@@ -11,8 +11,7 @@
     ],
     "flow": ["Browse the catalog", "Validate stock and checkout", "Record the order"],
     "media": [],
-    "note": "Brand-inspired cover. My contribution was product and backend engineering; this cover is not a screenshot of work I designed. The detailed case study is a narrative account.",
-    "demo": null
+    "note": "Brand-inspired cover. My contribution was product and backend engineering; this cover is not a screenshot of work I designed. The detailed case study is a narrative account."
   },
   "dex": {
     "subtitle": "A little context goes a long way.",
@@ -31,8 +30,7 @@
         "caption": "Public Dex product image — relationships, reminders and notes."
       }
     ],
-    "note": "Product image from getdex.com, used for product context. It does not imply that I designed every screen shown.",
-    "demo": null
+    "note": "Product image from getdex.com, used for product context. It does not imply that I designed every screen shown."
   },
   "sift": {
     "subtitle": "Keep the idea. Keep the moment.",
@@ -63,8 +61,7 @@
         "caption": "04 / Return — browse and search saved notebooks."
       }
     ],
-    "note": "Screenshots from the extension’s store materials, using a synthetic lecture. Live analysis requires the user’s own OpenRouter key.",
-    "demo": null
+    "note": "Screenshots from the extension’s store materials, using a synthetic lecture. Live analysis requires the user’s own OpenRouter key."
   },
   "second-brain": {
     "subtitle": "A knowledge base that can show its sources.",
@@ -82,8 +79,7 @@
       "Review the proposed changes"
     ],
     "media": [],
-    "note": "Illustrated workflow cover. Personal notes and source documents are not included in the portfolio demo.",
-    "demo": null
+    "note": "Illustrated workflow cover. Personal notes and source documents are not included in the portfolio demo."
   },
   "catcher": {
     "subtitle": "From a useful interface to a reusable reference.",
@@ -97,8 +93,7 @@
     ],
     "flow": ["Select a component", "Capture it with context", "Inspect it in the library"],
     "media": [],
-    "note": "Recorded from the actual extension. The recording shows the capture workflow on a demonstration page and a public website.",
-    "demo": "/demos/catcher.mp4"
+    "note": "Recorded from the actual extension. The recording shows the capture workflow on a demonstration page and a public website."
   },
   "focus-quote": {
     "subtitle": "Make what you read part of how you work.",
@@ -129,8 +124,7 @@
         "caption": "04 / Recall — turn saved ideas into a study prompt."
       }
     ],
-    "note": "Screenshots from the project’s own documentation.",
-    "demo": null
+    "note": "Screenshots from the project’s own documentation."
   },
   "on-call": {
     "subtitle": "An alert is the start of a workflow.",
@@ -144,8 +138,7 @@
     ],
     "flow": ["Receive and deduplicate events", "Assign and acknowledge", "Resolve with a timeline"],
     "media": [],
-    "note": "Illustrated product cover. The local application uses a Django API and MongoDB; the portfolio does not connect to an incident workspace.",
-    "demo": null
+    "note": "Illustrated product cover. The local application uses a Django API and MongoDB; the portfolio does not connect to an incident workspace."
   },
   "curation": {
     "subtitle": "An archive with a point of view.",
@@ -159,8 +152,7 @@
     ],
     "flow": ["Collect with provenance", "Score against personal labels", "Curate and publish"],
     "media": [],
-    "note": "Concept cover. The full pipeline needs its scoring service, storage and a trained taste model; no live archive or ranking is claimed here.",
-    "demo": null
+    "note": "Concept cover. The full pipeline needs its scoring service, storage and a trained taste model; no live archive or ranking is claimed here."
   },
   "editorial": {
     "subtitle": "A small design system with an editorial bias.",
@@ -178,8 +170,7 @@
       "Keep the reading surface calm"
     ],
     "media": [],
-    "note": "The portfolio itself uses Editorial UI tokens and styles. Browse the package or source for the implementation.",
-    "demo": null
+    "note": "The portfolio itself uses Editorial UI tokens and styles. Browse the package or source for the implementation."
   },
   "dana": {
     "subtitle": "Walk into the meeting with context.",
@@ -198,8 +189,7 @@
         "caption": "Public Dana meeting brief from the product website."
       }
     ],
-    "note": "Public product image from danahq.com. The preview uses the website’s demonstration content, not private calendar or email data.",
-    "demo": null
+    "note": "Public product image from danahq.com. The preview uses the website’s demonstration content, not private calendar or email data."
   },
   "60-seconds": {
     "subtitle": "How clearly can you describe an interface?",
@@ -213,8 +203,7 @@
     ],
     "flow": ["Read the brief", "Compose the interface", "Inspect the judge panel"],
     "media": [],
-    "note": "The local interactive demo uses canned model responses. Its score is sample data, not an evaluation of the prompt you type. Multiplayer is not implemented.",
-    "demo": null
+    "note": "The local interactive demo uses canned model responses. Its score is sample data, not an evaluation of the prompt you type. Multiplayer is not implemented."
   },
   "letterboxd": {
     "subtitle": "A film diary, told as an illustrated story.",
@@ -249,8 +238,7 @@
         "caption": "Scene 05 — the final story beat."
       }
     ],
-    "note": "Existing generated sample based on the public Letterboxd diary davidehrlich. Generation needs external API keys; viewing this artifact does not.",
-    "demo": null
+    "note": "Existing generated sample based on the public Letterboxd diary davidehrlich. Generation needs external API keys; viewing this artifact does not."
   },
   "a2ui": {
     "subtitle": "Ask a question. Get an interface.",
@@ -264,7 +252,6 @@
     ],
     "flow": ["Ask about the work", "Validate structured output", "Render the relevant components"],
     "media": [],
-    "note": "The live playground uses the existing backend configuration. The project showcase stays available without starting a model request.",
-    "demo": null
+    "note": "The live playground uses the existing backend configuration. The project showcase stays available without starting a model request."
   }
 }
