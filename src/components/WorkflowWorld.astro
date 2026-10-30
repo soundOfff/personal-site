@@ -1,0 +1,520 @@
+---
+import Bitmap from './Bitmap.astro';
+import { toolOrigin, workflow, type WorkflowStageId } from '../data/workflow';
+import { SPRITES, type SpriteId } from '../lib/flood/sprites';
+
+const nameOf = (id: SpriteId) =>
+  id === 'me' ? 'Me' : workflow.agents.find((agent) => agent.id === id)!.name;
+const party: { id: SpriteId; title: string; role: string }[] = [
+  { id: 'me', title: 'Me', role: 'Direction and the final call.' },
+  ...workflow.agents.map((agent) => ({
+    id: agent.id,
+    title: `${agent.name} · ${agent.model}`,
+    role: agent.role,
+  })),
+];
+const labelOf = (id: WorkflowStageId) => workflow.stages.find((stage) => stage.id === id)!.label;
+const { feedback } = workflow;
+const rooms = workflow.stages.map((stage, i) => {
+  const n = String(i + 1).padStart(2, '0');
+  const cast: SpriteId[] = stage.owner === 'Me' ? ['me'] : workflow.agents.map((agent) => agent.id);
+  return { stage, n, line: `${n} ${stage.label}. ${stage.body}`, cast };
+});
+const rest = `${feedback.label}. ${feedback.loops.map((loop) => loop.body).join(' ')}`;
+---
+
+<section id="workflow" class="workflow" aria-labelledby="workflow-title" data-settle>
+  <div class="shell head">
+    <div>
+      <p class="eyebrow">How I work with agents</p>
+      <h2 id="workflow-title">My AI <span class="ghost">workflow.</span></h2>
+    </div>
+    <div class="intro">
+      <p>{workflow.introduction}</p>
+      <ul class="party" aria-label="Who does the work">
+        {
+          party.map((member) => (
+            <li>
+              <Bitmap rows={SPRITES[member.id]} class="sprite" />
+              <span>
+                <b>{member.title}</b>
+                {member.role}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  <div class="map" data-map>
+    <canvas aria-hidden="true"></canvas>
+    <ol class="rooms">
+      {
+        rooms.map(({ stage, n, line, cast }) => (
+          <li class="room" data-stage={stage.id} data-line={line}>
+            <p class="room-top">
+              <span class="room-n">{n}</span>
+              <span>{stage.owner}</span>
+            </p>
+            <h3>{stage.label}</h3>
+            <p class="hint">{stage.hint}</p>
+            <div class="cast">
+              {cast.map((id) => (
+                <span class="member">
+                  <Bitmap rows={SPRITES[id]} class="sprite" />
+                  <span>{nameOf(id)}</span>
+                </span>
+              ))}
+            </div>
+            {'outcomes' in stage ? (
+              <ul class="tools outcomes" aria-label="Possible outcomes">
+                {stage.outcomes.map((outcome) => (
+                  <li>{outcome}</li>
+                ))}
+              </ul>
+            ) : (
+              <>
+                {/* Focus opens the purposes box on wide screens, as hover does (WCAG 1.4.13). */}
+                {/* eslint-disable-next-line astro/jsx-a11y/no-noninteractive-tabindex */}
+                <ul class="tools" tabindex="0" aria-label={`${stage.label} tools`}>
+                  {stage.tools.map((tool) => (
+                    <li>
+                      <span>{tool.name}</span>
+                      <span class="origin">{toolOrigin(tool)}</span>
+                      <span class="purpose">{tool.purpose}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div class="why" aria-hidden="true">
+                  {stage.tools.map((tool) => (
+                    <p>
+                      <span class="why-name">
+                        <span>{tool.name}</span>
+                        <span class="origin">{toolOrigin(tool)}</span>
+                      </span>
+                      {tool.purpose}
+                    </p>
+                  ))}
+                </div>
+              </>
+            )}
+            <p class="call">
+              <Bitmap rows={SPRITES.me} class="mini" />
+              <span>
+                <span class="sr-only">My call: </span>
+                {stage.humanDecision}
+              </span>
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="lanes" data-from={feedback.from}>
+      {
+        feedback.loops.map((loop) => (
+          <span
+            class="lane"
+            data-to={loop.to}
+            data-line={`${labelOf(feedback.from)} to ${labelOf(loop.to)}. ${loop.body}`}
+          >
+            {loop.lane}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="shell foot">
+    <p class="status">
+      <span class="status-key" aria-hidden="true"></span>
+      <span data-status>{rest}</span>
+    </p>
+    <button class="toggle" type="button" data-toggle>Pause</button>
+    <p class="sources">
+      Skills from{' '}
+      {
+        workflow.sources.map((source, i) => [
+          i === 0 ? '' : i === workflow.sources.length - 1 ? ' and ' : ', ',
+          <a href={source.href} target="_blank" rel="noopener" set:text={source.label} />,
+        ])
+      }.
+    </p>
+  </div>
+</section>
+
+<script>
+  import { initWorkflowMap } from '../lib/flood/workflow-map';
+
+  initWorkflowMap();
+</script>
+
+<style>
+  .workflow {
+    position: relative;
+    padding-block: 84px 40px;
+    overflow-x: clip;
+    /* With the 100px scroll padding, the eyebrow lands about 24px under the header. */
+    scroll-margin-top: -60px;
+  }
+  .head {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 560px);
+    gap: 40px;
+    align-items: end;
+  }
+  h2 {
+    margin-top: 14px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(48px, 5.3vw, 84px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+  .intro > p {
+    max-width: 520px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .party {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .party li {
+    display: flex;
+    gap: 10px;
+    align-items: start;
+  }
+  .party :global(.sprite) {
+    width: 25px;
+    flex-shrink: 0;
+  }
+  .party span {
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  .party b {
+    display: block;
+    margin-bottom: 2px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  .map {
+    position: relative;
+    padding-top: 60px;
+  }
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .rooms {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 80px;
+    width: calc(100% - 96px);
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+  .room {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .room-top {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  .room-n {
+    padding: 1px 4px;
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+  .room.is-here .room-n {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  h3 {
+    margin-top: 10px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 38px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .hint {
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  .cast {
+    display: flex;
+    gap: 18px;
+    min-height: 62px;
+    margin-top: 16px;
+  }
+  .member {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .member :global(.sprite) {
+    width: 40px;
+  }
+  .map.is-walking .room.is-here .member :global(.sprite) {
+    animation: bob 0.5s steps(1) infinite;
+  }
+  .map.is-walking .room.is-here .member:nth-child(2) :global(.sprite) {
+    animation-delay: -0.25s;
+  }
+  @keyframes bob {
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  .tools {
+    display: grid;
+    gap: 3px;
+    margin: 14px 0 0;
+    padding: 10px 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .tools:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 4px;
+  }
+  .tools li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 8px;
+  }
+  .origin {
+    color: #8b928f;
+    white-space: nowrap;
+  }
+  .purpose {
+    grid-column: 1 / -1;
+    margin: 1px 0 6px;
+    font: 12px/1.35 var(--sans);
+    color: var(--muted);
+  }
+  .outcomes li {
+    display: flex;
+  }
+  .outcomes li::before {
+    content: '';
+    flex-shrink: 0;
+    width: 7px;
+    height: 7px;
+    margin: 5px 8px 0 0;
+    background: var(--ink);
+  }
+  .call {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 14px;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .call :global(.mini) {
+    flex-shrink: 0;
+    width: 15px;
+    margin-top: 2px;
+  }
+
+  /* On the wide map the purposes wait in a text box over the lower half of the room. */
+  .why {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    left: -14px;
+    right: -14px;
+    bottom: -10px;
+    padding: 8px 10px 6px;
+    background: var(--paper);
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  .why p {
+    padding: 4px 0;
+    border-top: 1px solid var(--line);
+    font-size: 11.5px;
+    line-height: 1.28;
+    color: var(--muted);
+  }
+  .why p:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .why-name {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font: 11px/1.4 var(--mono);
+    color: var(--ink);
+  }
+  @media (min-width: 1280px) {
+    .purpose {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .why {
+      display: block;
+      visibility: hidden;
+    }
+    .room:focus-within .why {
+      visibility: visible;
+      box-shadow: 0 0 0 2px var(--blue);
+    }
+  }
+  /* Hover intent: the pointer has to rest on the tools, so a parked cursor or a passing scroll opens nothing. */
+  @media (min-width: 1280px) and (hover: hover) and (pointer: fine) {
+    .tools[tabindex] {
+      cursor: help;
+    }
+    .room:has(.tools:hover, .why:hover) .why {
+      visibility: visible;
+      transition: visibility 0s 0.15s;
+    }
+  }
+
+  .lanes {
+    height: 150px;
+  }
+  .lane {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 20px;
+    white-space: nowrap;
+    color: var(--ink);
+    visibility: hidden;
+  }
+
+  .foot {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 6px;
+    font-size: 13px;
+  }
+  .status {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 10px;
+    min-height: 20px;
+  }
+  .status-key {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    background: var(--amber);
+  }
+  .toggle {
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--ink);
+    font: 11px var(--mono);
+    cursor: pointer;
+  }
+  .sources {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .sources a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .toggle:hover {
+      border-color: var(--ink);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toggle {
+      display: none;
+    }
+  }
+
+  /* Narrow: the map turns vertical, with the rail on the left and the lanes on the right. */
+  @media (max-width: 1279px) {
+    .head {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .map {
+      padding-block: 80px 60px;
+    }
+    .rooms {
+      grid-template-columns: 1fr;
+      gap: 100px;
+      width: auto;
+      max-width: 560px;
+      margin: 0 120px 0 60px;
+    }
+    .lanes {
+      height: 0;
+    }
+    .foot {
+      flex-wrap: wrap;
+    }
+  }
+  @media (max-width: 600px) {
+    .workflow {
+      padding-top: 72px;
+      scroll-margin-top: -50px;
+    }
+    .party {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .rooms {
+      margin: 0 110px 0 40px;
+    }
+    .foot {
+      width: calc(100% - 32px);
+    }
+  }
+</style>

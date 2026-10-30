@@ -1,0 +1,31 @@
+---
+import { PALETTE } from '../lib/flood/pixels';
+
+interface Props {
+  /** One string per row. k ink, b blue, l light, p paper, x the current color, anything else empty. */
+  rows: readonly string[];
+  class?: string;
+}
+
+const FILLS: Record<string, string> = {
+  k: PALETTE.ink,
+  b: PALETTE.blue,
+  l: PALETTE.light,
+  p: PALETTE.paper,
+  x: 'currentColor',
+};
+
+const { rows, class: className } = Astro.props;
+const cells = rows.flatMap((row, y) =>
+  [...row].flatMap((key, x) => (FILLS[key] ? [{ x, y, fill: FILLS[key] }] : [])),
+);
+---
+
+<svg
+  class={className}
+  viewBox={`0 0 ${rows[0].length} ${rows.length}`}
+  aria-hidden="true"
+  shape-rendering="crispEdges"
+>
+  {cells.map(({ x, y, fill }) => <rect x={x} y={y} width="1" height="1" fill={fill} />)}
+</svg>

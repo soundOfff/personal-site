@@ -6,7 +6,14 @@
  * drain, ripples and the amber path) derives from BFS distance over it.
  */
 
-export const PALETTE = { blue: '#0024cc', light: '#8a9bff', paper: '#f7f3e9', amber: '#e0b81f' };
+export const PALETTE = {
+  blue: '#0024cc',
+  light: '#8a9bff',
+  paper: '#f7f3e9',
+  amber: '#e0b81f',
+  ink: '#182126',
+  line: '#c8c6b8',
+};
 
 /** The ✳ wordmark glyph, 7×7. */
 export const GLYPH = ['0001000', '0101010', '0011100', '1111111', '0011100', '0101010', '0001000'];
@@ -36,8 +43,11 @@ export interface Grid {
   order: Int32Array;
   seed: number;
   maxDist: number;
-  patterns?: CanvasPattern[];
+  tones?: Tone[];
 }
+
+/** A cell fill: blue, a blue/light dither, light or a light/paper dither. */
+export type Tone = string | CanvasPattern;
 
 export function hash(text: string): number {
   let n = 2166136261;
@@ -107,6 +117,45 @@ export function nearest(g: Grid, x: number, y: number): number {
   return best;
 }
 
+/** Smooth value noise in 0..1, one value per cell, so shapes come in blobs instead of salt. */
+export function noise(cols: number, rows: number, seed: number, scale = 4): Float64Array {
+  const rand = random(seed);
+  const nc = Math.ceil(cols / scale) + 2;
+  const nr = Math.ceil(rows / scale) + 2;
+  const points = Array.from({ length: nc * nr }, rand);
+  const smooth = (t: number) => t * t * (3 - 2 * t);
+  const values = new Float64Array(cols * rows);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const ix = Math.floor(x / scale);
+      const iy = Math.floor(y / scale);
+      const fx = smooth(x / scale - ix);
+      const fy = smooth(y / scale - iy);
+      const top = points[iy * nc + ix] * (1 - fx) + points[iy * nc + ix + 1] * fx;
+      const bottom = points[(iy + 1) * nc + ix] * (1 - fx) + points[(iy + 1) * nc + ix + 1] * fx;
+      values[y * cols + x] = top * (1 - fy) + bottom * fy;
+    }
+  }
+  return values;
+}
+
+/** A stable 0..1 value per cell, for edges that should look hand-placed. */
+export function jitter(seed: number, x: number, y: number): number {
+  return (hash(`${seed}:${x}:${y}`) % 1000) / 1000;
+}
+
+/**
+ * The halo rule shared by the workflow map and the demo rooms. `e` is a cell's distance in cells
+ * from the edge of a clearing, already stretched on the sides that must stay quiet, and `j` its
+ * jitter. Solid at the wall, dithered further out, thinner with distance until the paper comes
+ * back. Returns a tone index, or -1 for paper.
+ */
+export function haloTone(e: number, j: number): number {
+  if (j > 1.15 - 0.3 * e) return -1;
+  const t = Math.floor(e - 0.5 + j * 1.2);
+  return t > 3 ? -1 : Math.max(0, t);
+}
+
 /**
  * Value noise plus two cellular-automaton smoothing passes reads as a cave,
  * not static. About a third of the cells end up as walls. Isolated rooms are
@@ -132,24 +181,7 @@ export function grid(width: number, height: number, seed = 1, cell = 20, clear: 
     maxDist: 0,
   };
 
-  const rand = random(seed);
-  const scale = 4;
-  const nc = Math.ceil(cols / scale) + 2;
-  const nr = Math.ceil(rows / scale) + 2;
-  const noise = Array.from({ length: nc * nr }, rand);
-  const smooth = (t: number) => t * t * (3 - 2 * t);
-  const values: number[] = [];
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      const ix = Math.floor(x / scale);
-      const iy = Math.floor(y / scale);
-      const fx = smooth(x / scale - ix);
-      const fy = smooth(y / scale - iy);
-      const top = noise[iy * nc + ix] * (1 - fx) + noise[iy * nc + ix + 1] * fx;
-      const bottom = noise[(iy + 1) * nc + ix] * (1 - fx) + noise[(iy + 1) * nc + ix + 1] * fx;
-      values.push(top * (1 - fy) + bottom * fy);
-    }
-  }
+  const values = noise(cols, rows, seed);
   const threshold = [...values].sort((a, b) => a - b)[Math.floor(n * 0.36)];
   values.forEach((v, i) => (g.open[i] = v > threshold ? 1 : 0));
 
@@ -224,6 +256,12 @@ export function size(canvas: HTMLCanvasElement, width: number, height: number) {
   return ctx;
 }
 
+/** The four cell tones, in order from the wall outwards. */
+export function tones(ctx: CanvasRenderingContext2D): Tone[] {
+  const [blueLight, lightPaper] = patterns(ctx);
+  return [PALETTE.blue, blueLight, PALETTE.light, lightPaper];
+}
+
 /** 2px checkerboards between neighbor tones, so three colors read as five. */
 export function patterns(ctx: CanvasRenderingContext2D): CanvasPattern[] {
   return [
@@ -267,8 +305,7 @@ export function draw(ctx: CanvasRenderingContext2D, g: Grid, options: DrawOption
     ctx.fillStyle = PALETTE.paper;
     ctx.fillRect(0, 0, g.width, g.height);
   } else ctx.clearRect(0, 0, g.width, g.height);
-  g.patterns ??= patterns(ctx);
-  const tones = [PALETTE.blue, g.patterns[0], PALETTE.light, g.patterns[1]];
+  const fills = (g.tones ??= tones(ctx));
   const cut = progress * (g.maxDist + 1);
   const tick = Math.floor(time / 170);
   const visible = (i: number) =>
@@ -279,7 +316,7 @@ export function draw(ctx: CanvasRenderingContext2D, g: Grid, options: DrawOption
     let tone = g.tone[i];
     if (time && hash(String(i + Math.floor(tick / 4))) % 419 === 0) tone = (tone + 1) % 4;
     if (ripple >= 0 && Math.abs(g.dist[i] - ripple * g.maxDist) < 3) tone = (tone + 1) % 4;
-    ctx.fillStyle = tones[tone];
+    ctx.fillStyle = fills[tone];
     ctx.fillRect((i % g.cols) * g.cell, Math.floor(i / g.cols) * g.cell, g.cell, g.cell);
   }
   if (path.length) {
