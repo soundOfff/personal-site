@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PixelSigil from '../components/PixelSigil.astro';
 import WorkCard from '../components/WorkCard.astro';
 import WorkflowWorld from '../components/WorkflowWorld.astro';
+import ProductRooms from '../components/ProductRooms.astro';
 import PostCard from '../components/PostCard.astro';
 import { projects, workSlug } from '../data/projects';
 import stories from '../data/project-stories.json';
@@ -17,9 +18,6 @@ const bio = [
   'These days I’m especially interested in AI products, developer tools and systems that help people learn.',
 ];
 
-const selected = ['sift', 'focus-quote', 'catcher'].map(
-  (id) => projects.find((project) => project.id === id)!,
-);
 const caseStudies = new Map((await getCollection('work')).map((entry) => [entry.id, entry.data]));
 const experience = projects
   .filter((project) => project.category === 'Experience')
@@ -80,19 +78,7 @@ const words = [['Ideas', 'made'], ['useful.']];
 
     <WorkflowWorld />
 
-    <section class="section shell" id="work" aria-labelledby="work-title" data-settle>
-      <div class="work-intro">
-        <PixelSigil star />
-        <p>Thoughtful interfaces.<br />Useful systems. All the way through.</p>
-      </div>
-      <div class="section-heading">
-        <h2 id="work-title">Products <span class="ghost">in focus.</span></h2>
-        <p>Independent tools for learning,<br />reading, and making.</p>
-      </div>
-      <div class="bento">
-        {selected.map((project) => <WorkCard project={project} selected />)}
-      </div>
-    </section>
+    <ProductRooms />
 
     <section class="experience" data-on-blue aria-labelledby="experience-title" data-settle>
       <div class="shell">
