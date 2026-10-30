@@ -181,7 +181,7 @@ export interface AgentContext {
   posts: (PostItem | PostStub)[];
   repos: PortfolioSnapshot['repos'];
   log: PortfolioSnapshot['log'];
-  principles: PortfolioSnapshot['principles'];
+  workflow: PortfolioSnapshot['workflow'];
   toolbox: PortfolioSnapshot['toolbox'];
   now: PortfolioSnapshot['now'];
   /** What scored highest, so the prompt can say so out loud. */
@@ -242,7 +242,7 @@ export function selectContext(snapshot: PortfolioSnapshot, query: string): Agent
     posts: rankedPosts.map(({ post }, i) => (i < EXPANDED_POSTS ? post : postStub(post))),
     repos: snapshot.repos,
     log: snapshot.log,
-    principles: snapshot.principles,
+    workflow: snapshot.workflow,
     toolbox: snapshot.toolbox,
     now: snapshot.now,
     relevant: [...rankedWork, ...rankedPosts]
