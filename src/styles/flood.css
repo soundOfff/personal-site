@@ -41,6 +41,13 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 100px;
 }
+/* Where the home page settles after a scroll (src/lib/flood/settle.ts). There is no
+   scroll-snap-type, because proximity snapping traps slow wheels between nearby targets. */
+@media (prefers-reduced-motion: no-preference) and (min-height: 640px) {
+  [data-settle] {
+    scroll-snap-align: start;
+  }
+}
 body {
   margin: 0;
   background: var(--paper);
@@ -615,6 +622,8 @@ main:focus {
   position: relative;
   margin-block: 35px;
   padding-block: 100px;
+  /* Lands with the dithered top edge at the top of the screen. */
+  scroll-margin-top: -80px;
   background: var(--blue);
   color: var(--paper);
 }
