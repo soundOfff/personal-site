@@ -19,7 +19,7 @@
 import { getCollection } from 'astro:content';
 import { log, now, profile, proofs, toolbox } from '../../data/site';
 import { repos } from '../../data/repos';
-import { workflow } from '../../data/workflow';
+import { workflow, type WorkflowTool } from '../../data/workflow';
 
 export interface WorkItem {
   id: string;
@@ -71,7 +71,11 @@ export interface PortfolioSnapshot {
   posts: PostItem[];
   repos: RepoItem[];
   log: LogItem[];
-  principles: { title: string; body: string }[];
+  workflow: {
+    introduction: string;
+    agents: { name: string; model: string; role: string }[];
+    stages: { title: string; body: string; tools: readonly WorkflowTool[] }[];
+  };
   toolbox: { group: string; items: string[] }[];
   now: { key: string; value: string }[];
 }
@@ -166,25 +170,28 @@ export async function buildSnapshot(): Promise<PortfolioSnapshot> {
       ...(item.link ? { href: item.link.href } : {}),
       upcoming: item.upcoming === true,
     })),
-    principles: workflow.stages.map((stage) => ({
-      title: stage.title,
-      body: [
-        stage.body,
-        `Owner: ${stage.owner}.`,
-        `Input: ${stage.input}`,
-        `Action: ${stage.action}`,
-        `Output: ${stage.output}`,
-        `My decision: ${stage.humanDecision}`,
-        ...stage.skillGroups.map(
-          ({ source, skills }) =>
-            `${source} skills: ${skills.map(({ name, purpose }) => `${name}: ${purpose}`).join(' ')}`,
-        ),
-        ...(stage.condition ? [`${stage.condition.label}: ${stage.condition.body}`] : []),
-        ...(stage.id === workflow.feedback.from
-          ? [`${workflow.feedback.label}. ${workflow.feedback.body}`]
-          : []),
-      ].join(' '),
-    })),
+    workflow: {
+      introduction: workflow.introduction,
+      agents: workflow.agents.map(({ name, model, role }) => ({ name, model, role })),
+      stages: workflow.stages.map((stage) => ({
+        title: stage.title,
+        body: [
+          stage.body,
+          `Owner: ${stage.owner}.`,
+          `Input: ${stage.input}`,
+          `Action: ${stage.action}`,
+          `Output: ${stage.output}`,
+          `My decision: ${stage.humanDecision}`,
+          ...(stage.condition ? [`${stage.condition.label}: ${stage.condition.body}`] : []),
+          ...(stage.id === workflow.feedback.from
+            ? [
+                `${workflow.feedback.label}. ${workflow.feedback.loops.map((loop) => loop.body).join(' ')}`,
+              ]
+            : []),
+        ].join(' '),
+        tools: stage.tools,
+      })),
+    },
     toolbox: toolbox.map(({ h, items }) => ({ group: h, items: [...items] })),
     now: now.map(({ dt, dd }) => ({ key: dt, value: dd })),
   };

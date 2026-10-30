@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { contact, profile } from '../../data/site';
 import { getSnapshot } from '../portfolio/snapshot';
+import { toolOrigin } from '../../data/workflow';
 import { pageUrl, siteUrl } from '../site-origin';
 import { articleBody, markdownText } from './markdown';
 
@@ -89,8 +90,26 @@ export async function homeDocument(): Promise<MarkdownDocument> {
           ].join('\n\n'),
         ),
         '## AI workflow',
-        ...snapshot.principles.map(
-          (stage) => `### ${markdownText(stage.title)}\n\n${markdownText(stage.body)}`,
+        markdownText(snapshot.workflow.introduction),
+        snapshot.workflow.agents
+          .map(
+            (agent) =>
+              `- ${markdownText(agent.name)} (${markdownText(agent.model)}): ${markdownText(agent.role)}`,
+          )
+          .join('\n'),
+        ...snapshot.workflow.stages.map((stage) =>
+          [
+            `### ${markdownText(stage.title)}`,
+            markdownText(stage.body),
+            stage.tools
+              .map(
+                (tool) =>
+                  `- ${markdownText(tool.name)} (${markdownText(toolOrigin(tool))}): ${markdownText(tool.purpose)}`,
+              )
+              .join('\n'),
+          ]
+            .filter(Boolean)
+            .join('\n\n'),
         ),
         '## Tools',
         ...snapshot.toolbox.map(
