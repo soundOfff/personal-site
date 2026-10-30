@@ -1,0 +1,530 @@
+---
+import Bitmap from './Bitmap.astro';
+import PixelSigil from './PixelSigil.astro';
+import { demoFor } from '../data/demos';
+import { projects, workSlug } from '../data/projects';
+import stories from '../data/project-stories.json';
+
+/** Cells in the progress track under each demo. */
+const TRACK = 40;
+const ICONS = {
+  play: ['x......', 'xxx....', 'xxxxx..', 'xxxxxxx', 'xxxxx..', 'xxx....', 'x......'],
+  pause: ['xx.xx', 'xx.xx', 'xx.xx', 'xx.xx', 'xx.xx', 'xx.xx', 'xx.xx'],
+  expand: ['xxx.xxx', 'x.....x', 'x.....x', '.......', 'x.....x', 'x.....x', 'xxx.xxx'],
+};
+const clock = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+
+const rooms = (['sift', 'focus-quote', 'catcher'] as const).map((id, i) => {
+  const project = projects.find((p) => p.id === id)!;
+  const demo = demoFor(id);
+  if (!demo) throw new Error(`The featured product ${id} has no recorded demo.`);
+  const ticks = new Set(demo.chapters.map((c) => Math.round((c.t / demo.duration) * TRACK)));
+  return {
+    id,
+    project,
+    demo,
+    story: stories[id],
+    href: `/work/${workSlug(project)}`,
+    n: String(i + 1).padStart(2, '0'),
+    track: Array.from({ length: TRACK }, (_, k) => ticks.has(k)),
+    label: `${project.name} demo, a silent screen recording: ${demo.chapters.map((c) => c.label).join(', ')}.`,
+  };
+});
+---
+
+<section id="work" class="work" aria-labelledby="work-title" data-settle>
+  <div class="shell work-head">
+    <h2 id="work-title" class="eyebrow">Selected work</h2>
+    <p>Three products, recorded in use. Pick a chapter to jump to that moment.</p>
+    <nav aria-label="Products">
+      {
+        rooms.map(({ id, project }) => (
+          <a href={`#${id}`}>
+            <PixelSigil slug={id} />
+            <span>{project.name}</span>
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+  {
+    rooms.map(({ id, project, demo, story, href, n, track, label }, i) => (
+      <article
+        class:list={['room', { flip: i % 2 === 1 }]}
+        id={id}
+        aria-labelledby={`${id}-title`}
+        data-room
+        data-settle={i > 0 ? '' : undefined}
+        data-name={project.name}
+        data-duration={demo.duration}
+        data-chapters={JSON.stringify(demo.chapters.map(({ t, label }) => ({ t, label })))}
+      >
+        <div class="shell grid">
+          <div class="copy">
+            <p class="index">
+              {n} / {String(rooms.length).padStart(2, '0')} <span>{project.category}</span>
+            </p>
+            <h3 id={`${id}-title`}>
+              <a href={href}>{project.name}</a>
+            </h3>
+            <p class="sub">{story.subtitle}</p>
+            <p class="desc">{project.description}</p>
+            <ol class="chapters" aria-label={`${project.name} chapters`}>
+              {demo.chapters.map((chapter, j) => (
+                <li>
+                  <button type="button" data-beat aria-current={j === 0 ? 'step' : undefined}>
+                    <span class="beat-n">{String(j + 1).padStart(2, '0')}</span>
+                    <span class="beat-label">{chapter.label}</span>
+                    <span class="beat-t">{clock(chapter.t)}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+            <p class="facts">
+              {story.status} · {project.stack.split(' · ').join(' / ')}
+            </p>
+            <a class="more" href={href}>
+              More about {project.name} <span aria-hidden="true">→</span>
+            </a>
+          </div>
+          <div class="stage" data-stage>
+            <canvas class="halo" data-halo aria-hidden="true" />
+            <div class="clearing" data-clearing>
+              <div class="screen" data-screen>
+                <video
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={demo.poster}
+                  aria-label={label}
+                >
+                  <source src={demo.webm} type="video/webm" />
+                  <source src={demo.mp4} type="video/mp4" />
+                </video>
+                <canvas class="wipe" data-wipe aria-hidden="true" />
+                <p class="caption" aria-hidden="true">
+                  <span class="caption-n" data-caption-n>
+                    01
+                  </span>
+                  <span data-caption-label>{demo.chapters[0].label}</span>
+                </p>
+                {/* Under reduced motion, a large play target for the pointer. The keyboard uses the bar. */}
+                <button class="big" type="button" data-big tabindex="-1" aria-hidden="true" hidden>
+                  <Bitmap rows={ICONS.play} class="icon" />
+                </button>
+              </div>
+              <div class="bar">
+                <button
+                  class="bar-button"
+                  type="button"
+                  data-play
+                  aria-label={`Play the ${project.name} demo`}
+                >
+                  <Bitmap rows={ICONS.play} class="icon icon-play" />
+                  <Bitmap rows={ICONS.pause} class="icon icon-pause" />
+                </button>
+                <div class="track" aria-hidden="true">
+                  {track.map((tick) => (
+                    <span data-cell class:list={{ tick }} />
+                  ))}
+                </div>
+                <span class="length">{Math.round(demo.duration)}s loop</span>
+                <button
+                  class="bar-button"
+                  type="button"
+                  data-expand
+                  aria-label={`Watch the ${project.name} demo full screen`}
+                >
+                  <Bitmap rows={ICONS.expand} class="icon" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    ))
+  }
+</section>
+
+<script>
+  import { initDemoRooms } from '../lib/flood/demo-rooms';
+
+  initDemoRooms();
+</script>
+
+<style>
+  .work {
+    padding-top: 84px;
+    scroll-margin-top: -60px;
+  }
+  .work-head {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .work-head h2 {
+    flex-shrink: 0;
+  }
+  .work-head p {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .work-head nav {
+    display: flex;
+    gap: 22px;
+    margin-left: auto;
+  }
+  .work-head nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: 11px var(--mono);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .work-head :global(.pixel-sigil) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .room {
+    position: relative;
+    padding-block: 60px 40px;
+    overflow-x: clip;
+    scroll-margin-top: -40px;
+  }
+  .room:first-of-type {
+    padding-top: 24px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 340px) 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .flip .grid {
+    grid-template-columns: 1fr minmax(280px, 340px);
+  }
+  .flip .copy {
+    order: 2;
+  }
+  .index {
+    display: flex;
+    gap: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-2);
+  }
+  h3 {
+    margin-top: 10px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(52px, 5vw, 76px);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+  h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .sub {
+    margin-top: 12px;
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .desc {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .chapters {
+    display: grid;
+    margin: 22px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .chapters button {
+    display: grid;
+    grid-template-columns: 26px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    padding: 7px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    color: var(--muted);
+    font: 13px var(--sans);
+    text-align: left;
+    cursor: pointer;
+  }
+  .beat-n {
+    display: grid;
+    place-items: center;
+    height: 18px;
+    font: 10px var(--mono);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .beat-t {
+    font: 10px var(--mono);
+    color: #8b928f;
+  }
+  .chapters button[aria-current] {
+    color: var(--ink);
+  }
+  .chapters button[aria-current] .beat-n {
+    background: var(--blue);
+    color: var(--paper);
+    box-shadow: none;
+  }
+  .facts {
+    margin-top: 18px;
+    font: 11px var(--mono);
+    color: var(--muted-2);
+  }
+  .more {
+    display: inline-flex;
+    gap: 10px;
+    margin-top: 12px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--ink);
+    font-size: 14px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* The clearing is the screen plus its control bar. demo-rooms.ts places the halo around it. */
+  .stage {
+    position: relative;
+    padding: 60px 60px 40px;
+  }
+  .halo {
+    position: absolute;
+    pointer-events: none;
+  }
+  .clearing {
+    position: relative;
+  }
+  .flip .clearing {
+    margin-left: auto;
+  }
+  @media (min-height: 640px) {
+    .clearing {
+      width: min(100%, calc((100svh - 320px) * 1.6));
+    }
+  }
+  .screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: var(--ink);
+  }
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .wipe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .caption {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 12px 6px 6px;
+    background: var(--paper);
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  .caption-n {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 18px;
+    background: var(--blue);
+    color: var(--paper);
+    font: 10px var(--mono);
+  }
+  .big {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: 80px;
+    height: 80px;
+    border: 0;
+    background: var(--blue);
+    color: var(--paper);
+    box-shadow:
+      0 0 0 6px var(--paper),
+      0 0 0 8px var(--blue);
+    cursor: pointer;
+  }
+  .big :global(.icon) {
+    width: 21px;
+    height: 21px;
+    margin-left: 4px;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding-inline: 4px;
+    background: var(--paper);
+  }
+  .bar-button {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .bar-button:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: -2px;
+  }
+  .bar-button :global(.icon) {
+    width: 12px;
+    height: 12px;
+  }
+  .bar-button :global(.icon-pause) {
+    width: 9px;
+  }
+  .room:not(.is-playing) :global(.icon-pause),
+  .room.is-playing :global(.icon-play) {
+    display: none;
+  }
+  .track {
+    display: flex;
+    flex: 1;
+    gap: 2px;
+    align-items: end;
+    height: 12px;
+  }
+  .track span {
+    flex: 1;
+    height: 6px;
+    background: var(--line);
+  }
+  .track span.tick {
+    height: 12px;
+  }
+  .track span.on {
+    background: var(--blue);
+  }
+  .length {
+    font: 10px var(--mono);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .chapters button:hover {
+      color: var(--ink);
+    }
+    .chapters button:hover .beat-n {
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+    h3 a:hover,
+    .bar-button:hover {
+      color: var(--blue);
+    }
+    .more:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+    }
+  }
+
+  @media (max-width: 1279px) {
+    .grid,
+    .flip .grid {
+      grid-template-columns: 1fr;
+    }
+    .flip .copy {
+      order: 0;
+    }
+    .flip .clearing {
+      margin-left: 0;
+    }
+  }
+  /* Phone: the title sits above the demo and the chapters below it. */
+  @media (max-width: 600px) {
+    .work-head {
+      flex-wrap: wrap;
+      row-gap: 8px;
+      width: calc(100% - 32px);
+    }
+    .work-head nav {
+      margin-left: 0;
+    }
+    .room {
+      padding-block: 56px 40px;
+    }
+    .grid {
+      width: 100%;
+      gap: 18px;
+    }
+    .copy {
+      display: contents;
+    }
+    .copy > * {
+      margin-inline: 16px;
+    }
+    .index,
+    h3,
+    .sub {
+      order: -1;
+    }
+    h3 {
+      margin-top: 0;
+    }
+    .sub {
+      margin-top: -8px;
+      font-size: 16px;
+    }
+    .desc {
+      display: none;
+    }
+    .stage {
+      order: 0;
+      margin-block: 14px;
+      padding: 40px 0 20px;
+    }
+    .bar {
+      padding-inline: 10px;
+    }
+    .chapters,
+    .facts,
+    .more {
+      order: 1;
+    }
+    .chapters,
+    .facts {
+      margin-top: 0;
+    }
+    .more {
+      justify-self: start;
+      margin-top: 0;
+    }
+  }
+</style>
