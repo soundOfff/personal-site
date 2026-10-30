@@ -788,7 +788,7 @@ main:focus {
 .footer {
   position: relative;
   overflow: hidden;
-  padding: 75px 0 25px;
+  padding: 72px 0 16px;
   background: var(--ink);
   color: var(--paper);
 }
@@ -800,37 +800,156 @@ main:focus {
 }
 .footer h2 {
   max-width: 650px;
-  margin: 20px 0 40px;
+  margin: 20px 0 30px;
   font-family: var(--serif);
   font-style: italic;
   font-size: clamp(70px, 8vw, 120px);
   line-height: 0.95;
   letter-spacing: -0.05em;
 }
-.footer-links {
+/* What Tomas is open to, then where and when (muted). */
+.footer-status {
+  max-width: 36em;
+  font-size: 17px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.footer-status p + p {
+  color: #a5a9a7;
+}
+/* Laid out before the clock script runs, so showing it moves nothing. */
+.footer-clock {
+  visibility: hidden;
+}
+.footer[data-clock-on] .footer-clock {
+  visibility: visible;
+}
+.footer-clock time {
+  font-variant-numeric: tabular-nums;
+  color: var(--paper);
+}
+.footer-address {
+  margin: 38px 0 16px;
+  font-size: clamp(28px, 2.7vw, 40px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+  -webkit-user-select: all;
+  user-select: all;
+}
+.footer-address::selection {
+  background: var(--light);
+  color: var(--ink);
+}
+.footer-actions {
   display: flex;
-  align-items: center;
-  gap: 24px;
   flex-wrap: wrap;
-  font-size: 14px;
+  align-items: center;
+  gap: 12px;
 }
 .footer .button {
+  min-height: 48px;
   border-color: #a5a9a7;
   color: var(--paper);
 }
+/* The primary is paper on ink: Copy with a mouse, where mailto often opens an unset mail app,
+   and the mail link on touch, where it opens the mail app in one tap. */
+.footer .footer-copy {
+  min-width: 10.5em;
+  border-color: var(--paper);
+  background: var(--paper);
+  color: var(--ink);
+}
+@media (hover: none), (pointer: coarse) {
+  .footer .footer-copy {
+    border-color: #a5a9a7;
+    background: transparent;
+    color: var(--paper);
+  }
+  .footer .footer-mail {
+    border-color: var(--paper);
+    background: var(--paper);
+    color: var(--ink);
+  }
+}
+/* site.ts's clipboard-blocked field: its own row under both buttons. */
+.footer .copy-fallback {
+  order: 3;
+  flex-basis: 100%;
+  min-width: 0;
+  max-width: 382px;
+  min-height: 48px;
+  border-color: #a5a9a7;
+}
+.footer-links,
+.footer-site {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 32px;
+  margin-top: 26px;
+  font-size: 15px;
+}
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  transition: color 0.2s;
+}
+.footer-kind {
+  padding: 1px 4px;
+  border: 1px solid #f7f3e955;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.4;
+  color: #a5a9a7;
+}
 .footer-art {
   width: 100%;
-  height: 360px;
+  height: 330px;
+  touch-action: manipulation;
+}
+.footer-art-static {
+  display: none;
+  justify-self: center;
+  width: 175px;
+  height: 175px;
+  fill: var(--paper);
 }
 .footer-bottom {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  margin-top: 70px;
-  padding-top: 24px;
+  gap: 0 24px;
+  margin-top: 56px;
+  padding-top: 10px;
   border-top: 1px solid #ffffff36;
   font-family: var(--mono);
   font-size: 10px;
+}
+.footer-site {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.footer-site a,
+.footer-site button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  transition: color 0.2s;
+}
+.footer-site li:last-child button {
+  padding-right: 0;
 }
 
 /* Journal */
@@ -1569,8 +1688,26 @@ html.flood-covered::after {
     text-decoration: underline;
     text-underline-offset: 8px;
   }
-  .footer a:hover {
+  .footer a:hover,
+  .footer-site button:hover {
     color: var(--light);
+  }
+  .footer .footer-copy:hover {
+    border-color: var(--light);
+    background: var(--light);
+    color: var(--ink);
+  }
+}
+/* Touch gets the same colour cue while the finger is down. */
+@media (hover: none) {
+  .footer-links a:active,
+  .footer-site a:active,
+  .footer-site button:active {
+    color: var(--light);
+  }
+  .footer .footer-mail:active {
+    border-color: var(--light);
+    background: var(--light);
   }
 }
 
@@ -1620,7 +1757,7 @@ html.flood-covered::after {
     padding-top: 130px;
   }
   .footer-art {
-    height: 280px;
+    height: 260px;
   }
   .story {
     grid-template-columns: 1fr;
@@ -1807,27 +1944,76 @@ html.flood-covered::after {
     align-items: start;
   }
   .footer {
-    padding-top: 50px;
+    padding: 48px 0 28px;
   }
   .footer-main {
-    grid-template-columns: 1fr;
-    gap: 15px;
+    display: block;
+  }
+  /* The ✳ shrinks to a mark in the top corner instead of a screen of its own. */
+  .footer-art,
+  .footer-art-static {
+    position: absolute;
+    top: 44px;
+    right: 18px;
+    width: 56px;
+    height: 56px;
   }
   .footer h2 {
-    margin-bottom: 30px;
+    margin: 18px 0 24px;
     font-size: 73px;
   }
-  .footer-links {
-    gap: 18px;
-    font-size: 13px;
+  .footer-status {
+    font-size: 16px;
   }
-  .footer-art {
-    height: 220px;
+  .footer-status p + p {
+    margin-top: 6px;
+  }
+  .footer-address {
+    margin-top: 30px;
+    font-size: 26px;
+  }
+  .footer-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .footer-actions .button {
+    min-height: 52px;
+    min-width: 0;
+    padding-inline: 12px;
+  }
+  .footer .copy-fallback {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+  }
+  /* Three equal 48 px cells under a hairline. */
+  .footer-links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-top: 22px;
+    border-top: 1px solid #ffffff24;
+  }
+  .footer-links a {
+    width: 100%;
+    min-height: 48px;
   }
   .footer-bottom {
-    flex-wrap: wrap;
-    margin-top: 25px;
-    font-size: 9px;
+    margin-top: 18px;
+    padding-top: 6px;
+  }
+  /* Controls first, the copyright closes the page. */
+  .footer-site {
+    order: -1;
+    width: calc(100% + 10px);
+    margin-left: -10px;
+  }
+  .footer-site li:last-child {
+    margin-left: auto;
+  }
+  .footer-copyright {
+    padding-top: 10px;
   }
   .page-head {
     padding-block: 145px 35px;

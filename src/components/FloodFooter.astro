@@ -1,42 +1,94 @@
 ---
+import { GLYPH } from '../lib/flood/pixels';
+
 const email = 'tomibrasca97@gmail.com';
-const links = [
-  { label: 'GitHub', href: 'https://github.com/soundOfff', external: true },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/tomasbrasca', external: true },
-  { label: 'Journal', href: '/blog' },
-  { label: 'RSS', href: '/rss.xml' },
+const profiles = [
+  { label: 'GitHub', href: 'https://github.com/soundOfff' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/tomasbrasca' },
 ];
+// The ✳ without JavaScript: the same 7x7 glyph the canvas draws, as static rects.
+const star = GLYPH.flatMap((row, y) =>
+  [...row].flatMap((bit, x) => (bit === '1' ? [{ x, y }] : [])),
+);
 ---
 
-<footer id="contact" class="footer" data-settle>
+<footer id="contact" class="footer" data-settle aria-labelledby="footer-title">
   <div class="shell">
     <div class="footer-main">
       <div>
         <p class="eyebrow">Have something in mind?</p>
-        <h2>Let’s make<br />it useful.</h2>
-        <div class="footer-links">
-          <button class="button" type="button" data-copy={email} data-copy-label="Copy email">
-            Copy email
-          </button>
+        <h2 id="footer-title">Let’s make<br />it useful.</h2>
+        <div class="footer-status">
+          <p>Open to senior full-stack and AI roles, plus contract work.</p>
+          <p>
+            Works remote from Rosario, Argentina, on&nbsp;UTC−3 all year.<span
+              class="footer-clock"
+              data-clock>{' '}It’s <time>00:00</time> there now.</span
+            >
+          </p>
+        </div>
+        <p class="footer-address">{email}</p>
+        <div class="footer-actions">
+          <button
+            class="button footer-copy"
+            type="button"
+            data-copy={email}
+            data-copy-label="Copy email">Copy email</button
+          >
+          <a class="button footer-mail" href={`mailto:${email}`}>Open mail app</a>
+        </div>
+        <ul class="footer-links" aria-label="Profiles and résumé">
           {
-            links.map((link) => (
-              <a
-                href={link.href}
-                target={link.external ? '_blank' : undefined}
-                rel={link.external ? 'noopener' : undefined}
-              >
-                {link.label}
-              </a>
+            profiles.map((link) => (
+              <li>
+                <a href={link.href} target="_blank" rel="noopener">
+                  {link.label}
+                  <span class="sr-only">(opens in a new tab)</span>
+                </a>
+              </li>
             ))
           }
-        </div>
+          <li>
+            <a href="/cv.pdf" download="Resume_Brasca_Tomas.pdf">
+              Résumé <span class="footer-kind">PDF</span>
+            </a>
+          </li>
+        </ul>
       </div>
       <canvas class="footer-art" aria-hidden="true"></canvas>
+      <svg
+        class="footer-art-static"
+        viewBox="0 0 7 7"
+        aria-hidden="true"
+        shape-rendering="crispEdges"
+      >
+        {star.map(({ x, y }) => <rect x={x} y={y} width="0.92" height="0.92" />)}
+      </svg>
     </div>
     <div class="footer-bottom">
-      <span>© {new Date().getFullYear()} Tomas Brasca</span>
-      <span>Rosario, Argentina / UTC−3</span>
-      <button type="button" data-top>Back to top ↑</button>
+      <span class="footer-copyright">© {new Date().getFullYear()} Tomas Brasca</span>
+      <ul class="footer-site" aria-label="On this site">
+        <li><a href="/blog">Journal</a></li>
+        <li><a href="/rss.xml">RSS</a></li>
+        <li><button type="button" data-top>Back to top</button></li>
+      </ul>
     </div>
   </div>
+  <noscript>
+    <style is:inline>
+      /* Without JavaScript nothing can copy or ripple; the address and the mail link remain. */
+      .footer [data-copy],
+      .footer .footer-art {
+        display: none;
+      }
+      .footer .footer-art-static {
+        display: block;
+      }
+      .footer .footer-mail {
+        border-color: var(--paper);
+        background: var(--paper);
+        color: var(--ink);
+      }
+    </style>
+  </noscript>
 </footer>
