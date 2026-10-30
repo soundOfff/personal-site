@@ -4,11 +4,9 @@ import stories from '../data/project-stories.json';
 
 interface Props {
   project: Project;
-  /** Selected-work cards also show the first stack tags. */
-  selected?: boolean;
 }
 
-const { project, selected = false } = Astro.props;
+const { project } = Astro.props;
 const story = stories[project.id as keyof typeof stories];
 // The cursor scrubs through every screenshot the project has.
 const sources = [
@@ -58,6 +56,5 @@ const scrubs = sources.length > 1;
       <h3>{project.name}</h3>
     </div>
     <p>{project.description}</p>
-    {selected && <p class="meta">{project.stack.split(' · ').slice(0, 3).join(' / ')}</p>}
   </div>
 </a>
